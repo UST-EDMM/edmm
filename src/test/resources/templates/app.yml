@@ -1,0 +1,72 @@
+---
+version: edm_1_0
+description: |
+  The quick brown fox jumps over the lazy dog.
+metadata:
+  maintainer: Michael Wurster <miwurster@gmail.com>
+properties:
+  port:
+    description: The port of something
+    metadata:
+      foo: bar
+    type: integer
+    required: true
+    default: 8080
+component_types:
+  base:
+    extends: null
+    description: The base type
+    metadata: {}
+    properties:
+      id:
+        type: string
+        description: A unique identifier of the realized instance
+    operations:
+      create: ~
+      configure: ~
+      start: ~
+      stop: ~
+      delete: ~
+  compute:
+    extends: base
+    properties:
+      ip_address:
+        type: string
+        description: The public IP address assigned for the instance
+      os_family:
+        type: string
+        description: Specifies the type of operating system
+        default_value: linux
+    operations:
+      configure: configure.sh
+relation_types:
+  depends_on:
+    extends: null
+    properties: {}
+    operations:
+      pre_configure_source: ~
+      pre_configure_target: ~
+      post_configure_source: ~
+      post_configure_target: ~
+      target_changed: ~
+      target_removed: ~
+  hosted_on:
+    extends: depends_on
+  connects_to:
+    extends: depends_on
+  subscribes_to:
+    extends: connects_to
+components:
+  ubuntu:
+    type: compute
+    properties:
+      ip_address: 127.0.0.1
+    operations:
+      configure: configure.sh
+    artifacts:
+      - iso: ubuntu.iso
+      - file: users
+    relations:
+      - hosted_on: ubuntu
+      - depends_on:
+          target: ubuntu
