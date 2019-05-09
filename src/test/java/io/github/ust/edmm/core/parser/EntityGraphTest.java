@@ -5,6 +5,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
+import static io.github.ust.edmm.core.parser.EntityGraph.ROOT;
+
 public class EntityGraphTest {
 
     private static EntityGraph graph;
@@ -16,7 +18,7 @@ public class EntityGraphTest {
     }
 
     @Test
-    public void testContentOfObject() {
-        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version")).get()).getValue());
+    public void testBasicParsing() {
+        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(ROOT.extend("version")).orElseThrow(IllegalStateException::new)).getValue());
     }
 }

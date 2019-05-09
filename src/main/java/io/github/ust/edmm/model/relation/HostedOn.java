@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class HostedOn extends RootRelationship {
+public class HostedOn extends RootRelation {
 
     public HostedOn(MappingEntity entity) {
         super(entity);

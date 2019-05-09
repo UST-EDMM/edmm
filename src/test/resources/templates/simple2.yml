@@ -1,26 +1,42 @@
 ---
 version: edm_1_0
-description: |
-  The quick brown fox jumps over the lazy dog.
+
+description: Very simple example
+
 metadata:
-  maintainer: Michael Wurster <miwurster@gmail.com>
+  maintainer: Michael Wurster
+
 properties:
-  port:
-    description: The port of something
+  foo:
+    type: string
+  bar:
+    type: integer
+
+components:
+  ubuntu:
+    type: compute
+    description: Ubuntu node
     metadata:
       foo: bar
-    type: integer
-    required: true
-    default: 8080
+    properties:
+      foo: hello
+      bar: 8080
+    artifacts:
+      - file: tmp.txt
+    relations:
+      - depends_on: db
+  db:
+    type: compute
+    artifacts:
+      - file: data.sql
+    operations:
+      configure: configure.sh
+
 component_types:
   base:
     extends: null
     description: The base type
     metadata: {}
-    properties:
-      id:
-        type: string
-        description: A unique identifier of the realized instance
     operations:
       create: ~
       configure: ~
@@ -30,15 +46,13 @@ component_types:
   compute:
     extends: base
     properties:
-      ip_address:
-        type: string
-        description: The public IP address assigned for the instance
       os_family:
         type: string
         description: Specifies the type of operating system
         default_value: linux
     operations:
       configure: configure.sh
+
 relation_types:
   depends_on:
     extends: null
@@ -54,19 +68,3 @@ relation_types:
     extends: depends_on
   connects_to:
     extends: depends_on
-  subscribes_to:
-    extends: connects_to
-components:
-  ubuntu:
-    type: compute
-    properties:
-      ip_address: 127.0.0.1
-    operations:
-      configure: configure.sh
-    artifacts:
-      - iso: ubuntu.iso
-      - file: users
-    relations:
-      - hosted_on: ubuntu
-      - depends_on:
-          target: ubuntu

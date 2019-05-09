@@ -13,11 +13,11 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public class Metadata implements Map<String, String> {
+public class Metadata implements Map<String, Object> {
 
-    private final Map<String, String> values = new LinkedHashMap<>();
+    private final Map<String, Object> values = new LinkedHashMap<>();
 
-    public static Metadata of(Map<String, String> values) {
+    public static Metadata of(Map<String, Object> values) {
         Metadata metadata = new Metadata();
         metadata.putAll(values);
         return metadata;
@@ -44,22 +44,22 @@ public class Metadata implements Map<String, String> {
     }
 
     @Override
-    public String get(Object key) {
+    public Object get(Object key) {
         return values.get(key);
     }
 
     @Override
-    public String put(String key, String value) {
+    public Object put(String key, Object value) {
         return values.put(key, value);
     }
 
     @Override
-    public String remove(Object key) {
+    public Object remove(Object key) {
         return values.remove(key);
     }
 
     @Override
-    public void putAll(Map<? extends String, ? extends String> m) {
+    public void putAll(Map<? extends String, ?> m) {
         values.putAll(m);
     }
 
@@ -74,32 +74,32 @@ public class Metadata implements Map<String, String> {
     }
 
     @Override
-    public Collection<String> values() {
+    public Collection<Object> values() {
         return values.values();
     }
 
     @Override
-    public Set<Entry<String, String>> entrySet() {
+    public Set<Entry<String, Object>> entrySet() {
         return values.entrySet();
     }
 
     @Override
-    public String getOrDefault(Object key, String defaultValue) {
+    public Object getOrDefault(Object key, Object defaultValue) {
         return values.getOrDefault(key, defaultValue);
     }
 
     @Override
-    public void forEach(BiConsumer<? super String, ? super String> action) {
+    public void forEach(BiConsumer<? super String, ? super Object> action) {
         values.forEach(action);
     }
 
     @Override
-    public void replaceAll(BiFunction<? super String, ? super String, ? extends String> function) {
+    public void replaceAll(BiFunction<? super String, ? super Object, ?> function) {
         values.replaceAll(function);
     }
 
     @Override
-    public String putIfAbsent(String key, String value) {
+    public Object putIfAbsent(String key, Object value) {
         return values.putIfAbsent(key, value);
     }
 
@@ -109,32 +109,32 @@ public class Metadata implements Map<String, String> {
     }
 
     @Override
-    public boolean replace(String key, String oldValue, String newValue) {
+    public boolean replace(String key, Object oldValue, Object newValue) {
         return values.replace(key, oldValue, newValue);
     }
 
     @Override
-    public String replace(String key, String value) {
+    public Object replace(String key, Object value) {
         return values.replace(key, value);
     }
 
     @Override
-    public String computeIfAbsent(String key, Function<? super String, ? extends String> mappingFunction) {
+    public Object computeIfAbsent(String key, Function<? super String, ?> mappingFunction) {
         return values.computeIfAbsent(key, mappingFunction);
     }
 
     @Override
-    public String computeIfPresent(String key, BiFunction<? super String, ? super String, ? extends String> remappingFunction) {
+    public Object computeIfPresent(String key, BiFunction<? super String, ? super Object, ?> remappingFunction) {
         return values.computeIfPresent(key, remappingFunction);
     }
 
     @Override
-    public String compute(String key, BiFunction<? super String, ? super String, ? extends String> remappingFunction) {
+    public Object compute(String key, BiFunction<? super String, ? super Object, ?> remappingFunction) {
         return values.compute(key, remappingFunction);
     }
 
     @Override
-    public String merge(String key, String value, BiFunction<? super String, ? super String, ? extends String> remappingFunction) {
+    public Object merge(String key, Object value, BiFunction<? super Object, ? super Object, ?> remappingFunction) {
         return values.merge(key, value, remappingFunction);
     }
 }

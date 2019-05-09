@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.github.ust.edmm.core.parser.support.GraphNormalizer;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,16 +34,10 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
 
     public EntityGraph(InputStream is) {
         super((source, target) -> new Edge(target.getName(), source, target));
-        MappingEntity root = new MappingEntity(ROOT, this);
-        addVertex(root);
+        addVertex(new MappingEntity(ROOT, this));
         Node snakeNode = new Yaml().compose(new InputStreamReader(is));
-        populateGraph(snakeNode, root.getId());
-        resolveExtends(COMPONENT_TYPES);
-        resolveExtends(RELATION_TYPES);
-        resolveComponentTypes();
-        resolveRelationTypes();
-        resolveRelations();
-        normalizeOperations();
+        populateGraph(snakeNode, ROOT);
+        GraphNormalizer.normalize(this);
     }
 
     public Optional<Entity> getEntity(EntityId id) {
@@ -101,8 +96,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
         addEdge(source, target, new Edge(name, source, target));
     }
 
-    // ----------------------------------------------------------------------------------------
-
     private void populateGraph(Node node, EntityId id) {
         if (node instanceof MappingNode) {
             MappingNode mappingNode = (MappingNode) node;
@@ -140,123 +133,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
             ScalarEntity scalarEntity = new ScalarEntity(value, id, this);
             addEntity(scalarEntity);
         }
-    }
-
-    private void normalizeOperations() {
-        for (Entity node : getChildren(COMPONENTS)) {
-            doNormalizeOperations(node);
-        }
-        for (Entity node : getChildren(COMPONENT_TYPES)) {
-            doNormalizeOperations(node);
-        }
-        for (Entity node : getChildren(RELATION_TYPES)) {
-            doNormalizeOperations(node);
-        }
-    }
-
-    private void doNormalizeOperations(Entity node) {
-        Optional<Entity> operations = node.getChild("operations");
-        if (operations.isPresent()) {
-            for (Entity op : operations.get().getChildren()) {
-                if (op instanceof ScalarEntity) {
-                    ScalarEntity scalarEntity = (ScalarEntity) op;
-                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), this);
-                    SequenceEntity artifacts = new SequenceEntity(op.getId().extend("artifacts"), this);
-                    ScalarEntity artifact = new ScalarEntity(scalarEntity.getValue(), artifacts.getId().extend("0"), this);
-                    replaceEntity(scalarEntity, normalizedEntity);
-                    addEntity(artifacts);
-                    addEntity(artifact);
-                }
-            }
-        }
-    }
-
-    private void resolveComponentTypes() {
-        for (Entity node : getChildren(COMPONENTS)) {
-            Optional<Entity> entity = node.getChild("type");
-            if (entity.isPresent()) {
-                ScalarEntity typeAssignment = (ScalarEntity) entity.get();
-                findMappingEntity(typeAssignment.getValue(), COMPONENT_TYPES)
-                        .ifPresent(value -> addEdge(node, value, "component_type"));
-            }
-        }
-    }
-
-    private void resolveRelationTypes() {
-        for (Entity node : getChildren(COMPONENTS)) {
-            Optional<Entity> relations = node.getChild("relations");
-            if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
-                    findMappingEntity(relation.getName(), RELATION_TYPES)
-                            .ifPresent(value -> addEdge(relation, value, "relation_type"));
-                }
-            }
-        }
-    }
-
-    private void resolveRelations() {
-        normalizeRelations();
-        for (Entity node : getChildren(COMPONENTS)) {
-            Optional<Entity> relations = node.getChild("relations");
-            if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
-                    Optional<Entity> entity = relation.getChild("target");
-                    if (entity.isPresent()) {
-                        ScalarEntity targetAssignment = (ScalarEntity) entity.get();
-                        findMappingEntity(targetAssignment.getValue(), COMPONENTS)
-                                .ifPresent(value -> addEdge(relation, value, "target_component"));
-                    }
-                }
-            }
-        }
-    }
-
-    private void normalizeRelations() {
-        for (Entity node : getChildren(COMPONENTS)) {
-            Optional<Entity> relations = node.getChild("relations");
-            if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
-                    if (relation instanceof ScalarEntity) {
-                        ScalarEntity scalarEntity = (ScalarEntity) relation;
-                        MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), this);
-                        ScalarEntity target = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend("target"), this);
-                        replaceEntity(scalarEntity, normalizedEntity);
-                        addEntity(target);
-                    }
-                }
-            }
-        }
-    }
-
-    private void resolveExtends(EntityId types) {
-        for (Entity node : getChildren(types)) {
-            Optional<Entity> entity = node.getChild("extends");
-            if (entity.isPresent()) {
-                ScalarEntity extendsAssignment = (ScalarEntity) entity.get();
-                if (extendsAssignment.getValue() != null) {
-                    findMappingEntity(extendsAssignment.getValue(), types)
-                            .ifPresent(value -> addEdge(node, value, "extends_type"));
-                }
-            }
-        }
-    }
-
-    /**
-     * Used to find the MappingEntity that is referenced by another one. For example, if a relation uses a certain type
-     * this method will resolve the corresponding type entity.
-     *
-     * @param entityName The name of the entity to find
-     * @param entryPoint The EntityId as entry point, e.g., "components", "relation_types".
-     * @return The found entity object
-     */
-    private Optional<Entity> findMappingEntity(String entityName, EntityId entryPoint) {
-        for (Entity node : getChildren(entryPoint)) {
-            if (node instanceof MappingEntity
-                    && entityName.equals(node.getName())) {
-                return Optional.of(node);
-            }
-        }
-        return Optional.empty();
     }
 
     @Getter

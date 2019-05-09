@@ -2,8 +2,11 @@ package io.github.ust.edmm.model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Map;
 
 import io.github.ust.edmm.core.parser.EntityGraph;
+import io.github.ust.edmm.model.component.RootComponent;
+import io.github.ust.edmm.model.support.TypeWrapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -17,9 +20,13 @@ public final class EffectiveModel {
     private final String name;
     private final EntityGraph graph;
 
+    private Map<String, RootComponent> components;
+
     public EffectiveModel(String name, EntityGraph graph) {
         this.name = name;
         this.graph = graph;
+
+        components = TypeWrapper.wrapComponents(graph);
     }
 
     @SneakyThrows

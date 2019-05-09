@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import io.github.ust.edmm.model.support.Attribute;
 import lombok.Getter;
 
 @Getter
@@ -40,6 +41,19 @@ public abstract class Entity implements Comparable<Entity> {
             children.add(e.getTarget());
         }
         return children;
+    }
+
+    public Optional<Entity> getChild(Attribute<?> key) {
+        Entity source = this;
+        if (key.getPredecessor().isPresent()) {
+            Optional<Entity> predecessor = getChild(key.getPredecessor().get());
+            if (predecessor.isPresent()) {
+                source = predecessor.get();
+            } else {
+                return Optional.empty();
+            }
+        }
+        return source.getChild(key.getName());
     }
 
     public Optional<Entity> getChild(String name) {

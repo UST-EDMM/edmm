@@ -3,11 +3,11 @@ package io.github.ust.edmm.model.visitor;
 import io.github.ust.edmm.model.relation.ConnectsTo;
 import io.github.ust.edmm.model.relation.DependsOn;
 import io.github.ust.edmm.model.relation.HostedOn;
-import io.github.ust.edmm.model.relation.RootRelationship;
+import io.github.ust.edmm.model.relation.RootRelation;
 
 public interface RelationVisitor {
 
-    default void visit(RootRelationship relation) {
+    default void visit(RootRelation relation) {
         // noop;
     }
 

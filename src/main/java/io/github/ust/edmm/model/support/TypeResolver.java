@@ -1,0 +1,46 @@
+package io.github.ust.edmm.model.support;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.github.ust.edmm.model.component.Compute;
+import io.github.ust.edmm.model.component.RootComponent;
+import io.github.ust.edmm.model.component.SoftwareComponent;
+import io.github.ust.edmm.model.relation.ConnectsTo;
+import io.github.ust.edmm.model.relation.DependsOn;
+import io.github.ust.edmm.model.relation.HostedOn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public abstract class TypeResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(TypeResolver.class);
+
+    private static final Map<String, Class<? extends ModelEntity>> TYPE_MAPPING = new HashMap<>();
+
+    static {
+        // Components
+        put("compute", Compute.class);
+        put("software_component", SoftwareComponent.class);
+        // Relations
+        put("depends_on", DependsOn.class);
+        put("hosted_on", HostedOn.class);
+        put("connects_to", ConnectsTo.class);
+    }
+
+    public static Class<? extends ModelEntity> resolve(String type) {
+        Class<? extends ModelEntity> clazz = TYPE_MAPPING.get(type);
+        if (clazz != null) {
+            return clazz;
+        } else {
+
+
+            logger.warn("Type '{}' is unknown and not supported", type);
+            return RootComponent.class;
+        }
+    }
+
+    private static void put(String name, Class<? extends ModelEntity> clazz) {
+        TYPE_MAPPING.put(name, clazz);
+    }
+}
