@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import io.github.ust.edmm.model.support.Attribute;
 import io.github.ust.edmm.model.Metadata;
+import io.github.ust.edmm.model.support.Attribute;
 import io.github.ust.edmm.model.support.ModelEntity;
 import io.github.ust.edmm.model.support.TypeWrapper;
 
@@ -60,22 +60,10 @@ public class MappingEntity extends Entity {
         Class<T> targetType = key.getType();
         if (entity.isPresent()) {
             for (Entity child : entity.get().getChildren()) {
-//                if (RootRelation.class.isAssignableFrom(targetType)) {
-//                    MappingEntity mappingEntity = (MappingEntity) child;
-//
-//                    // values.add(TypeWrapper.wrapModelEntity(mappingEntity, targetType));
-//                    System.out.println();
-//                }
                 if (ModelEntity.class.isAssignableFrom(targetType)) {
                     MappingEntity mappingEntity = (MappingEntity) child;
                     values.add(TypeWrapper.wrapModelEntity(mappingEntity, targetType));
-                }
-//                else if (Artifact.class.isAssignableFrom(targetType)) {
-//                    ScalarEntity scalarEntity = (ScalarEntity) child;
-//                    Artifact artifact = new Artifact(scalarEntity.getName(), scalarEntity.getValue());
-//                    values.add((T) artifact);
-//                }
-                else {
+                } else {
                     throw new IllegalStateException(String.format("Cannot get value of type '%s' from entity '%s'", targetType, entity));
                 }
             }

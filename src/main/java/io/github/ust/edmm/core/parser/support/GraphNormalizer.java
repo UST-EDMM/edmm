@@ -119,7 +119,7 @@ public abstract class GraphNormalizer {
                     ScalarEntity scalarEntity = (ScalarEntity) op;
                     MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
                     SequenceEntity artifacts = new SequenceEntity(op.getId().extend("artifacts"), graph);
-                    ScalarEntity artifact = new ScalarEntity(scalarEntity.getValue(), artifacts.getId().extend("0"), graph);
+                    ScalarEntity artifact = new ScalarEntity(scalarEntity.getValue(), artifacts.getId().extend("cmd"), graph);
                     graph.replaceEntity(scalarEntity, normalizedEntity);
                     graph.addEntity(artifacts);
                     graph.addEntity(artifact);

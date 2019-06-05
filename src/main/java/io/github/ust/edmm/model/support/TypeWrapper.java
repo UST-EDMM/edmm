@@ -10,6 +10,7 @@ import io.github.ust.edmm.core.parser.MappingEntity;
 import io.github.ust.edmm.core.parser.ScalarEntity;
 import io.github.ust.edmm.model.Metadata;
 import io.github.ust.edmm.model.component.RootComponent;
+import io.github.ust.edmm.model.relation.RootRelation;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 public abstract class TypeWrapper {
@@ -64,7 +65,17 @@ public abstract class TypeWrapper {
         try {
             return (T) ConstructorUtils.invokeConstructor(type, entity);
         } catch (Exception e) {
-            throw new IllegalStateException(String.format("Failed to wrapModelEntity up entity '%s' in type '%s'", entity, type), e);
+            throw new IllegalStateException(String.format("Failed to wrap entity '%s' in type '%s'", entity, type), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RootRelation wrapRelation(MappingEntity relationEntity, MappingEntity componentEntity) {
+        Class clazz = TypeResolver.resolve(relationEntity.getName());
+        try {
+            return (RootRelation) ConstructorUtils.invokeConstructor(clazz, relationEntity, componentEntity);
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format("Failed to wrap relation '%s'", relationEntity), e);
         }
     }
 }

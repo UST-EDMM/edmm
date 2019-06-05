@@ -1,4 +1,3 @@
----
 version: edm_1_0
 
 description: Very simple example
@@ -15,22 +14,11 @@ properties:
 components:
   ubuntu:
     type: compute
-    description: Ubuntu node
-    metadata:
-      foo: bar
-    properties:
-      foo: hello
-      bar: 8080
-    artifacts:
-      - file: tmp.txt
+  tomcat:
+    type: software_component
     relations:
-      - depends_on: db
-  db:
-    type: compute
-    artifacts:
-      - file: data.sql
-    operations:
-      configure: configure.sh
+      - hosted_on: ubuntu
+      - depends_on: ubuntu
 
 component_types:
   base:
@@ -52,6 +40,8 @@ component_types:
         default_value: linux
     operations:
       configure: configure.sh
+  software_component:
+    extends: base
 
 relation_types:
   depends_on:

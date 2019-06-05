@@ -3,8 +3,8 @@ package io.github.ust.edmm.model.component;
 import java.util.Optional;
 
 import io.github.ust.edmm.core.parser.MappingEntity;
-import io.github.ust.edmm.model.support.Attribute;
 import io.github.ust.edmm.model.Property;
+import io.github.ust.edmm.model.support.Attribute;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

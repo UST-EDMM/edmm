@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 import io.github.ust.edmm.core.plugin.Plugin;
 import io.github.ust.edmm.core.plugin.PluginService;
 import io.github.ust.edmm.core.transformation.support.ExecutionTask;
-import io.github.ust.edmm.model.EffectiveModel;
+import io.github.ust.edmm.model.DeploymentModel;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class TransformationService {
         this.pluginService = pluginService;
     }
 
-    public Transformation createTransformation(@NonNull EffectiveModel model, @NonNull Platform platform) {
+    public Transformation createTransformation(@NonNull DeploymentModel model, @NonNull Platform platform) {
         return new Transformation(model, platform);
     }
 

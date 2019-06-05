@@ -19,6 +19,7 @@
         <jgrapht.version>1.1.0</jgrapht.version>
         <picocli.version>4.0.0-alpha-1</picocli.version>
         <progressbar.version>0.7.3</progressbar.version>
+        <guava.version>27.1-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -52,6 +53,11 @@
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
             <version>${progressbar.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

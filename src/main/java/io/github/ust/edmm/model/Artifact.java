@@ -1,21 +1,28 @@
 package io.github.ust.edmm.model;
 
+import io.github.ust.edmm.core.parser.MappingEntity;
+import io.github.ust.edmm.core.parser.ScalarEntity;
+import io.github.ust.edmm.model.support.BaseElement;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
 @ToString
-@EqualsAndHashCode
-public class Artifact {
+@EqualsAndHashCode(callSuper = true)
+public class Artifact extends BaseElement {
 
-    private final String name;
+    private final ScalarEntity entity;
 
-    private final String uri;
+    public Artifact(ScalarEntity artifactEntity, MappingEntity entity) {
+        super(entity);
+        this.entity = artifactEntity;
+    }
 
-    public Artifact(@NonNull String name, @NonNull String uri) {
-        this.name = name;
-        this.uri = uri;
+    @Override
+    public String getName() {
+        return entity.getName();
+    }
+
+    public String getValue() {
+        return entity.getValue();
     }
 }

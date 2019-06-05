@@ -1,6 +1,6 @@
 package io.github.ust.edmm.core.transformation;
 
-import io.github.ust.edmm.model.EffectiveModel;
+import io.github.ust.edmm.model.DeploymentModel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -9,12 +9,12 @@ import lombok.Setter;
 @Setter
 public class Transformation {
 
-    private final EffectiveModel model;
+    private final DeploymentModel model;
     private final Platform targetPlatform;
 
     private State state = State.READY;
 
-    public Transformation(@NonNull EffectiveModel model, @NonNull Platform targetPlatform) {
+    public Transformation(@NonNull DeploymentModel model, @NonNull Platform targetPlatform) {
         this.model = model;
         this.targetPlatform = targetPlatform;
     }

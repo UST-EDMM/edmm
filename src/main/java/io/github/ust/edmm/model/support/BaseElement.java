@@ -3,7 +3,6 @@ package io.github.ust.edmm.model.support;
 import java.util.Collection;
 
 import io.github.ust.edmm.core.parser.MappingEntity;
-import io.github.ust.edmm.model.support.Attribute;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

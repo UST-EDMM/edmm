@@ -8,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class DependsOn extends RootRelation {
 
-    public DependsOn(MappingEntity entity) {
-        super(entity);
+    public DependsOn(MappingEntity relationDefinition, MappingEntity entity) {
+        super(relationDefinition, entity);
     }
 }

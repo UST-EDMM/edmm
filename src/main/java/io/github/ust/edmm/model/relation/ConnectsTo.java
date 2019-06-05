@@ -8,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class ConnectsTo extends RootRelation {
 
-    public ConnectsTo(MappingEntity entity) {
-        super(entity);
+    public ConnectsTo(MappingEntity relationDefinition, MappingEntity entity) {
+        super(relationDefinition, entity);
     }
 }

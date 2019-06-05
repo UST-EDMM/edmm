@@ -1,9 +1,10 @@
 package io.github.ust.edmm.model.relation;
 
+import java.util.Objects;
+
 import io.github.ust.edmm.core.parser.MappingEntity;
 import io.github.ust.edmm.model.support.Attribute;
 import io.github.ust.edmm.model.support.ModelEntity;
-import io.github.ust.edmm.model.component.RootComponent;
 import io.github.ust.edmm.model.visitor.RelationVisitor;
 import io.github.ust.edmm.model.visitor.VisitableRelation;
 import lombok.EqualsAndHashCode;
@@ -13,11 +14,21 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public abstract class RootRelation extends ModelEntity implements VisitableRelation {
 
-    private static Attribute<RootComponent> SOURCE = new Attribute<>("source", RootComponent.class);
-    private static Attribute<RootComponent> TARGET = new Attribute<>("target", RootComponent.class);
+    public static Attribute<String> TARGET = new Attribute<>("target", String.class);
 
-    public RootRelation(MappingEntity entity) {
-        super(entity);
+    private final MappingEntity entity;
+
+    public RootRelation(MappingEntity relationDefinition, MappingEntity entity) {
+        super(relationDefinition);
+        this.entity = entity;
+    }
+
+    public String getTarget() {
+        String type = get(TARGET);
+        if (Objects.isNull(type)) {
+            throw new IllegalStateException("Relation needs to have a target");
+        }
+        return type;
     }
 
     @Override

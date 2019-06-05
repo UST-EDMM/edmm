@@ -33,8 +33,6 @@ public abstract class TypeResolver {
         if (clazz != null) {
             return clazz;
         } else {
-
-
             logger.warn("Type '{}' is unknown and not supported", type);
             return RootComponent.class;
         }
