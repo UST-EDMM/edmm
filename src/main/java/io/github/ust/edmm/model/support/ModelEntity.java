@@ -23,6 +23,8 @@ public abstract class ModelEntity extends DescribableElement {
     public static Attribute<Property> PROPERTIES = new Attribute<>("properties", Property.class);
     public static Attribute<Operation> OPERATIONS = new Attribute<>("operations", Operation.class);
 
+    private boolean transformed = false;
+
     public ModelEntity(MappingEntity entity) {
         super(entity);
     }
@@ -53,6 +55,12 @@ public abstract class ModelEntity extends DescribableElement {
         return Optional.ofNullable(getProperties().get(name));
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> getProperty(Attribute<T> attribute) {
+        Optional<Property> property = getProperty(attribute.getName());
+        return (Optional<T>) property.map(Property::getValue);
+    }
+
     public Map<String, Operation> getOperations() {
         EntityGraph graph = entity.getGraph();
         Map<String, Operation> result = new HashMap<>();
@@ -73,6 +81,14 @@ public abstract class ModelEntity extends DescribableElement {
 
     public Optional<Operation> getOperation(String name) {
         return Optional.ofNullable(getOperations().get(name));
+    }
+
+    public boolean isTransformed() {
+        return transformed;
+    }
+
+    public void setTransformed(boolean transformed) {
+        this.transformed = transformed;
     }
 
     private void populateProperties(Map<String, Property> result, Entity entity) {

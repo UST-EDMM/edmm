@@ -2,6 +2,7 @@ package io.github.ust.edmm.model.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import com.google.common.collect.Lists;
 import io.github.ust.edmm.core.parser.Entity;
 import io.github.ust.edmm.core.parser.MappingEntity;
 import io.github.ust.edmm.model.Artifact;
+import io.github.ust.edmm.model.Operation;
 import io.github.ust.edmm.model.relation.RootRelation;
 import io.github.ust.edmm.model.support.Attribute;
 import io.github.ust.edmm.model.support.ModelEntity;
@@ -48,6 +50,10 @@ public abstract class RootComponent extends ModelEntity implements VisitableComp
         return Lists.reverse(result);
     }
 
+    public StandardLifecycle getStandardLifecycle() {
+        return new StandardLifecycle(getOperations());
+    }
+
     private void populateRelations(List<RootRelation> result, Entity entity) {
         Set<Entity> children = entity.getChildren();
         for (Entity child : children) {
@@ -61,5 +67,36 @@ public abstract class RootComponent extends ModelEntity implements VisitableComp
     @Override
     public void accept(ComponentVisitor v) {
         v.visit(this);
+    }
+
+    @ToString
+    @EqualsAndHashCode
+    public static class StandardLifecycle {
+
+        private final Map<String, Operation> operations;
+
+        public StandardLifecycle(Map<String, Operation> operations) {
+            this.operations = operations;
+        }
+
+        public Optional<Operation> getCreate() {
+            return Optional.ofNullable(operations.get("create"));
+        }
+
+        public Optional<Operation> getConfigure() {
+            return Optional.ofNullable(operations.get("configure"));
+        }
+
+        public Optional<Operation> getStart() {
+            return Optional.ofNullable(operations.get("start"));
+        }
+
+        public Optional<Operation> getStop() {
+            return Optional.ofNullable(operations.get("stop"));
+        }
+
+        public Optional<Operation> getDelete() {
+            return Optional.ofNullable(operations.get("delete"));
+        }
     }
 }
