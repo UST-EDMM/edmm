@@ -15,7 +15,7 @@ public abstract class GraphHelper {
     public static Optional<MappingEntity> findTypeEntity(EntityGraph graph, MappingEntity entity) {
         MappingEntity type = null;
         for (EntityGraph.Edge edge : graph.outgoingEdgesOf(entity)) {
-            if (edge.getName().equals("instance_of")) {
+            if (edge.getName().equals(DefaultKeys.INSTANCE_OF)) {
                 type = (MappingEntity) edge.getTarget();
             }
         }
@@ -25,7 +25,7 @@ public abstract class GraphHelper {
     public static Optional<MappingEntity> findParentEntity(EntityGraph graph, MappingEntity entity) {
         MappingEntity parent = null;
         for (EntityGraph.Edge edge : graph.outgoingEdgesOf(entity)) {
-            if (edge.getName().equals("extends_type")) {
+            if (edge.getName().equals(DefaultKeys.EXTENDS)) {
                 parent = (MappingEntity) edge.getTarget();
             }
         }
