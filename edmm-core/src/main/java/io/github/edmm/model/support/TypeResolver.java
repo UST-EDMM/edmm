@@ -4,8 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.Database;
+import io.github.edmm.model.component.Dbms;
+import io.github.edmm.model.component.MysqlDatabase;
+import io.github.edmm.model.component.MysqlDbms;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.SoftwareComponent;
+import io.github.edmm.model.component.Tomcat;
+import io.github.edmm.model.component.WebApplication;
+import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.DependsOn;
 import io.github.edmm.model.relation.HostedOn;
@@ -22,6 +29,13 @@ public abstract class TypeResolver {
         // Components
         put("compute", Compute.class);
         put("software_component", SoftwareComponent.class);
+        put("web_server", WebServer.class);
+        put("web_application", WebApplication.class);
+        put("dbms", Dbms.class);
+        put("database", Database.class);
+        put("tomcat", Tomcat.class);
+        put("mysql_dbms", MysqlDbms.class);
+        put("mysql_database", MysqlDatabase.class);
         // Relations
         put("depends_on", DependsOn.class);
         put("hosted_on", HostedOn.class);

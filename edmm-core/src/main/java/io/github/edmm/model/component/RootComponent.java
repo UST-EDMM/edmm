@@ -58,7 +58,6 @@ public abstract class RootComponent extends ModelEntity implements VisitableComp
         Set<Entity> children = entity.getChildren();
         for (Entity child : children) {
             MappingEntity relationEntity = (MappingEntity) child;
-
             RootRelation relation = TypeWrapper.wrapRelation(relationEntity, this.entity);
             result.add(relation);
         }
