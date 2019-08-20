@@ -1,4 +1,4 @@
-package io.github.edmm.plugins;
+package io.github.edmm.core.plugin;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,9 +1,8 @@
-package io.github.edmm.plugins;
+package io.github.edmm.core.plugin;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import io.github.edmm.core.plugin.PluginFileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +14,11 @@ public class BashScript {
 
     private static final Logger logger = LoggerFactory.getLogger(BashScript.class);
 
-    private String name;
     private PluginFileAccess fileAccess;
     private String scriptPath;
 
-    public BashScript(PluginFileAccess fileAccess, String name) throws IOException {
+    public BashScript(PluginFileAccess fileAccess, String name) {
         this.fileAccess = fileAccess;
-        this.name = name;
         this.scriptPath = "scripts" + name + ".sh";
         this.init();
     }

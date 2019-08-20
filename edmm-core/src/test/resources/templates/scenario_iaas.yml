@@ -3,6 +3,8 @@ version: edm_1_0
 
 components:
 
+  ## Order Application
+
   order_app:
     type: web_application
     artifacts:

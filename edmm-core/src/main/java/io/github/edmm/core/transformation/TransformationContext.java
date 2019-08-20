@@ -1,6 +1,7 @@
 package io.github.edmm.core.transformation;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
 import lombok.Getter;
@@ -18,10 +19,10 @@ public final class TransformationContext {
     }
 
     /**
-     * Creates a PluginFileAccess objects that is able to create and modify files inside the plugin's root directory.
-     * Further, it is able to use a source directory as an input.
+     * Creates a {@code PluginFileAccess} object that is able to create and modify files inside the plugin's root
+     * directory. Further, it uses the current working directory as the source directory.
      */
-    public PluginFileAccess getFileAccess(File sourceDirectory) {
-        return new PluginFileAccess(sourceDirectory, rootDirectory);
+    public PluginFileAccess getFileAccess() {
+        return new PluginFileAccess(Paths.get("").toFile(), rootDirectory);
     }
 }
