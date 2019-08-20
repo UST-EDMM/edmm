@@ -1,8 +1,0 @@
-info:
-  name: Essential Deployment Model Command Line Interface
-spring:
-  main:
-    banner-mode: "off"
-logging:
-  level:
-    root: error
