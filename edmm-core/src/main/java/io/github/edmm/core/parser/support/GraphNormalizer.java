@@ -30,7 +30,7 @@ public abstract class GraphNormalizer {
                 if (extendsAssignment.getValue() != null) {
                     GraphHelper
                             .findMappingEntity(graph, extendsAssignment.getValue(), types)
-                            .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.EXTENDS));
+                            .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.EXTENDS_TYPE));
                 }
             }
         }
