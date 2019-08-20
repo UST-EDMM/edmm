@@ -21,7 +21,7 @@
         <picocli.version>4.0.0-alpha-1</picocli.version>
         <progressbar.version>0.7.3</progressbar.version>
         <guava.version>27.1-jre</guava.version>
-        <freemarker.version>freemarker</freemarker.version>
+        <freemarker.version>2.3.29</freemarker.version>
         <commons-io.version>2.5</commons-io.version>
     </properties>
 

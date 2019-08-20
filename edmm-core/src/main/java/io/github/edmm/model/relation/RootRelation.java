@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.Operation;
-import io.github.edmm.model.visitor.RelationVisitor;
-import io.github.edmm.model.visitor.VisitableRelation;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.ModelEntity;
+import io.github.edmm.model.visitor.RelationVisitor;
+import io.github.edmm.model.visitor.VisitableRelation;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

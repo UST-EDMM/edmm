@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.MappingEntity;
-import io.github.edmm.model.support.DescribableElement;
 import io.github.edmm.model.support.Attribute;
+import io.github.edmm.model.support.DescribableElement;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
