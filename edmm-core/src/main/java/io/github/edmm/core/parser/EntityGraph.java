@@ -33,11 +33,15 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     public static final EntityId RELATION_TYPES = ROOT.extend("relation_types");
 
     public EntityGraph(InputStream is) {
-        super((source, target) -> new Edge(target.getName(), source, target));
-        addVertex(new MappingEntity(ROOT, this));
+        this();
         Node snakeNode = new Yaml().compose(new InputStreamReader(is));
         populateGraph(snakeNode, ROOT);
         GraphNormalizer.normalize(this);
+    }
+
+    public EntityGraph() {
+        super((source, target) -> new Edge(target.getName(), source, target));
+        addVertex(new MappingEntity(ROOT, this));
     }
 
     public Optional<Entity> getEntity(EntityId id) {
