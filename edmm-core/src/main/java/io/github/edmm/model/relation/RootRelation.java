@@ -15,7 +15,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public abstract class RootRelation extends ModelEntity implements VisitableRelation {
+public class RootRelation extends ModelEntity implements VisitableRelation {
 
     public static Attribute<String> TARGET = new Attribute<>("target", String.class);
 

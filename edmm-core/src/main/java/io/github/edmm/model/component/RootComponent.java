@@ -22,7 +22,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public abstract class RootComponent extends ModelEntity implements VisitableComponent {
+public class RootComponent extends ModelEntity implements VisitableComponent {
 
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static final Attribute<Artifact> ARTIFACTS = new Attribute<>("artifacts", Artifact.class);

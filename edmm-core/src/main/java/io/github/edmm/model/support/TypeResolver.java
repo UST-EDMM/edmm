@@ -27,6 +27,7 @@ public abstract class TypeResolver {
 
     static {
         // Components
+        put("base", RootComponent.class);
         put("compute", Compute.class);
         put("software_component", SoftwareComponent.class);
         put("web_server", WebServer.class);
