@@ -14,7 +14,8 @@ component_types:
   base:
     extends: null
     operations:
-      create: ~
+      delete: ~
+      create: create.sh
   compute:
     extends: base
     operations:
@@ -24,3 +25,4 @@ component_types:
           label: configure
         artifacts:
           - script: configure.sh
+      delete: delete.sh

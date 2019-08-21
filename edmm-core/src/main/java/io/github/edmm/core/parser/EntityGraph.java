@@ -2,8 +2,12 @@ package io.github.edmm.core.parser;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +19,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -137,6 +142,55 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
             ScalarEntity scalarEntity = new ScalarEntity(value, id, this);
             addEntity(scalarEntity);
         }
+    }
+
+    public void generateYamlOutput(Writer writer) {
+        Optional<Entity> root = this.getEntity(ROOT);
+        if (root.isPresent()) {
+            Map<String, Object> graphAsMap = createMapFromGraph(root.get());
+
+            DumperOptions options = new DumperOptions();
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            options.setPrettyFlow(true);
+            new Yaml(options)
+                    .dump(graphAsMap, writer);
+        } else {
+            throw new IllegalStateException("No ROOT element defined!");
+        }
+    }
+
+    private Map<String, Object> createMapFromGraph(Entity entity) {
+        HashMap<String, Object> map = new HashMap<>();
+
+        entity.getDirectChildrenOnly().forEach(child -> {
+            if (child instanceof MappingEntity) {
+                Map<String, Object> childMap = createMapFromGraph(child);
+                map.put(child.getName(), childMap.isEmpty() ? null : childMap);
+            } else if (child instanceof SequenceEntity) {
+                List<Map> list = new ArrayList<>();
+                child.getDirectChildrenOnly().forEach(grandChild -> {
+                    HashMap<String, Object> localMap = new HashMap<>();
+                    if (grandChild instanceof ScalarEntity) {
+                        localMap.put(grandChild.getName(), ((ScalarEntity) grandChild).getValue());
+                    } else {
+                        Map<String, Object> grandChildMap = createMapFromGraph(grandChild);
+                        localMap.put(grandChild.getName(), grandChildMap.isEmpty() ? null : grandChildMap);
+                    }
+                    list.add(localMap);
+                });
+
+                if (!list.isEmpty()) {
+                    map.put(child.getName(), list);
+                }
+            } else if (child instanceof ScalarEntity) {
+                ScalarEntity scalar = (ScalarEntity) child;
+                if (Objects.nonNull(scalar.getValue()) && !scalar.getValue().isEmpty()) {
+                    map.put(child.getName(), scalar.getValue());
+                }
+            }
+        });
+
+        return map;
     }
 
     @Getter
