@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
+import io.github.edmm.model.visitor.ComponentVisitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -39,5 +40,10 @@ public class Compute extends RootComponent {
 
     public Optional<String> getPublicKey() {
         return getProperty(PUBLIC_KEY);
+    }
+
+    @Override
+    public void accept(ComponentVisitor v) {
+        v.visit(this);
     }
 }

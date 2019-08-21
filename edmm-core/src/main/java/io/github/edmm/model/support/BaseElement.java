@@ -26,6 +26,12 @@ public abstract class BaseElement {
         return entity.getName();
     }
 
+    public String getNormalizedName() {
+        return entity.getName()
+                .toLowerCase()
+                .replace(".", "_");
+    }
+
     protected <T> void set(Attribute<T> key, T value) {
         entity.setValue(key, value);
     }
