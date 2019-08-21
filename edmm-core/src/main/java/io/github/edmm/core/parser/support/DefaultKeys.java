@@ -5,6 +5,9 @@ public class DefaultKeys {
     // region *** root keys ***
     public static final String ARTIFACTS = "artifacts";
     public static final String CMD = "cmd";
+    public static final String CONFIGURE = "configure";
+    public static final String CREATE = "create";
+    public static final String DELETE = "delete";
     public static final String DESCRIPTION = "description";
     public static final String DEFAULT_VALUE = "default_value";
     public static final String EXTENDS = "extends";
@@ -13,6 +16,8 @@ public class DefaultKeys {
     public static final String OPERATIONS = "operations";
     public static final String PROPERTIES = "properties";
     public static final String RELATIONS = "relations";
+    public static final String START = "start";
+    public static final String STOP = "stop";
     public static final String TARGET = "target";
     public static final String TARGET_COMPONENT = "target_component";
     public static final String TYPE = "type";
