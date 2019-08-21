@@ -1,5 +1,7 @@
 package io.github.edmm.model.component;
 
+import java.util.Optional;
+
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import lombok.EqualsAndHashCode;
@@ -15,5 +17,18 @@ public class Database extends RootComponent {
 
     public Database(MappingEntity mappingEntity) {
         super(mappingEntity);
+    }
+
+    @Override
+    public String getName() {
+        return getProperty(NAME).orElseThrow(IllegalStateException::new);
+    }
+
+    public Optional<String> getUser() {
+        return getProperty(USER);
+    }
+
+    public Optional<String> getPassword() {
+        return getProperty(PASSWORD);
     }
 }

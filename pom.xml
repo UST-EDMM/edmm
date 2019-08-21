@@ -21,10 +21,37 @@
         <picocli.version>4.0.0-alpha-1</picocli.version>
         <progressbar.version>0.7.3</progressbar.version>
         <guava.version>27.1-jre</guava.version>
+        <freemarker.version>2.3.29</freemarker.version>
+        <commons-io.version>2.5</commons-io.version>
     </properties>
 
     <modules>
         <module>edmm-core</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>${jgrapht.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

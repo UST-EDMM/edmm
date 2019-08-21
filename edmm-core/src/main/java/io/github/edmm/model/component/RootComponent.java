@@ -9,20 +9,20 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.MappingEntity;
-import io.github.edmm.model.Operation;
-import io.github.edmm.model.support.TypeWrapper;
-import io.github.edmm.model.visitor.ComponentVisitor;
-import io.github.edmm.model.visitor.VisitableComponent;
 import io.github.edmm.model.Artifact;
+import io.github.edmm.model.Operation;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.ModelEntity;
+import io.github.edmm.model.support.TypeWrapper;
+import io.github.edmm.model.visitor.ComponentVisitor;
+import io.github.edmm.model.visitor.VisitableComponent;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public abstract class RootComponent extends ModelEntity implements VisitableComponent {
+public class RootComponent extends ModelEntity implements VisitableComponent {
 
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static final Attribute<Artifact> ARTIFACTS = new Attribute<>("artifacts", Artifact.class);
@@ -58,7 +58,6 @@ public abstract class RootComponent extends ModelEntity implements VisitableComp
         Set<Entity> children = entity.getChildren();
         for (Entity child : children) {
             MappingEntity relationEntity = (MappingEntity) child;
-
             RootRelation relation = TypeWrapper.wrapRelation(relationEntity, this.entity);
             result.add(relation);
         }

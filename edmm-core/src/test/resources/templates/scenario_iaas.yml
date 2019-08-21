@@ -3,10 +3,12 @@ version: edm_1_0
 
 components:
 
+  ## Order Application
+
   order_app:
     type: web_application
     artifacts:
-      - war: order.war
+      - war: ./order/order.war
     relations:
       - hosted_on: order_app_tomcat
 
