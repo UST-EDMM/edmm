@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
@@ -44,7 +45,7 @@ public abstract class ModelEntity extends DescribableElement {
         Optional<Entity> propertiesEntity = entity.getChild(PROPERTIES);
         propertiesEntity.ifPresent(value -> populateProperties(result, value));
         // Update current map by property definitions
-        for (MappingEntity typeEntity : typeChain) {
+        for (MappingEntity typeEntity : Lists.reverse(typeChain)) {
             propertiesEntity = typeEntity.getChild(PROPERTIES.getName());
             propertiesEntity.ifPresent(value -> populateProperties(result, value));
         }
@@ -57,8 +58,20 @@ public abstract class ModelEntity extends DescribableElement {
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getProperty(Attribute<T> attribute) {
+        Class<T> targetType = attribute.getType();
         Optional<Property> property = getProperty(attribute.getName());
-        return (Optional<T>) property.map(Property::getValue);
+        if (!property.isPresent()) {
+            return Optional.empty();
+        }
+        if (String.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) property.map(Property::getValue);
+        } else if (Integer.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) Optional.of(Integer.valueOf(property.get().getValue()));
+        } else if (Boolean.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) Optional.of(Boolean.valueOf(property.get().getValue()));
+        } else {
+            throw new IllegalStateException(String.format("Cannot get value of type '%s' from attribute '%s'", targetType, attribute));
+        }
     }
 
     public Map<String, Operation> getOperations() {
@@ -72,7 +85,7 @@ public abstract class ModelEntity extends DescribableElement {
         Optional<Entity> operationsEntity = entity.getChild(OPERATIONS);
         operationsEntity.ifPresent(value -> populateOperations(result, value));
         // Update current map by property definitions
-        for (MappingEntity typeEntity : typeChain) {
+        for (MappingEntity typeEntity : Lists.reverse(typeChain)) {
             operationsEntity = typeEntity.getChild(OPERATIONS.getName());
             operationsEntity.ifPresent(value -> populateOperations(result, value));
         }
@@ -105,7 +118,10 @@ public abstract class ModelEntity extends DescribableElement {
         for (Entity child : children) {
             MappingEntity operationEntity = (MappingEntity) child;
             Operation operation = new Operation(operationEntity, this.entity);
-            result.put(operation.getName(), operation);
+            // TODO: Merge attributes from type chain
+            if (!result.containsKey(operation.getName())) {
+                result.put(operation.getName(), operation);
+            }
         }
     }
 }

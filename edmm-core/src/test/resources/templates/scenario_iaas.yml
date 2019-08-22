@@ -11,6 +11,7 @@ components:
       - war: ./order/order.war
     relations:
       - hosted_on: order_app_tomcat
+      - connects_to: db
 
   order_app_tomcat:
     type: tomcat
@@ -21,6 +22,35 @@ components:
       - hosted_on: order_app_ubuntu
 
   order_app_ubuntu:
+    type: compute
+    properties:
+      machine_image: ubuntu
+      instance_type: large
+      key_name: edmm
+      public_key: |
+        -----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0
+        FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
+        3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
+        -----END PUBLIC KEY-----
+
+  ## Database
+
+  db:
+    type: mysql_database
+    properties:
+      name: orders
+    artifacts:
+      - sql: ./order/order.sql
+    relations:
+      - hosted_on: dbms
+
+  dbms:
+    type: mysql_dbms
+    relations:
+      - hosted_on: db_ubuntu
+
+  db_ubuntu:
     type: compute
     properties:
       machine_image: ubuntu
@@ -89,6 +119,7 @@ component_types:
     properties:
       port:
         type: integer
+        default_value: 3306
       root_password:
         type: string
 

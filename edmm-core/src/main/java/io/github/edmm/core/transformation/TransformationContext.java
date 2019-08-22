@@ -5,8 +5,11 @@ import java.nio.file.Paths;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.DeploymentModel;
+import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.relation.RootRelation;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jgrapht.Graph;
 
 @Getter
 public final class TransformationContext {
@@ -21,6 +24,10 @@ public final class TransformationContext {
 
     public DeploymentModel getModel() {
         return transformation.getModel();
+    }
+
+    public Graph<RootComponent, RootRelation> getTopologyGraph() {
+        return getModel().getTopology();
     }
 
     /**

@@ -1,7 +1,9 @@
 package io.github.edmm.model;
 
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.SoftwareComponent;
+import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import org.junit.Assert;
@@ -64,5 +66,21 @@ public class DeploymentModelTest {
         Assert.assertEquals(6, hostedOn.getOperations().size());
         Assert.assertEquals(2, model.getTopology().vertexSet().size());
         Assert.assertEquals(2, model.getTopology().edgeSet().size());
+    }
+
+    @Test
+    public void testResolveLifecycleOperations() throws Exception {
+        ClassPathResource resource = new ClassPathResource("templates/scenario_iaas.yml");
+        DeploymentModel model = DeploymentModel.of(resource.getFile());
+        Tomcat component = (Tomcat) model.getComponent("order_app_tomcat").orElseThrow(IllegalStateException::new);
+        RootComponent.StandardLifecycle lifecycle = component.getStandardLifecycle();
+        Operation createOperation = lifecycle.getCreate().orElseThrow(IllegalStateException::new);
+        Assert.assertEquals(1, createOperation.getArtifacts().size());
+        Assert.assertEquals("cmd", createOperation.getArtifacts().get(0).getName());
+        Assert.assertEquals("./tomcat/create.sh", createOperation.getArtifacts().get(0).getValue());
+        Operation startOperation = lifecycle.getStart().orElseThrow(IllegalStateException::new);
+        Assert.assertEquals(1, startOperation.getArtifacts().size());
+        Assert.assertEquals("cmd", startOperation.getArtifacts().get(0).getName());
+        Assert.assertEquals("./tomcat/start.sh", startOperation.getArtifacts().get(0).getValue());
     }
 }
