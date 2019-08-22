@@ -184,9 +184,7 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
                 }
             } else if (child instanceof ScalarEntity) {
                 ScalarEntity scalar = (ScalarEntity) child;
-                if (Objects.nonNull(scalar.getValue()) && !scalar.getValue().isEmpty()) {
-                    map.put(child.getName(), scalar.getValue());
-                }
+                map.put(child.getName(), scalar.getValue());
             }
         });
 

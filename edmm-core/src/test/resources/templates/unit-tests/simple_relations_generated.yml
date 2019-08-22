@@ -31,6 +31,7 @@ relation_types:
       target_changed:
         artifacts:
         - cmd: null
+    extends: null
     properties: null
   hosted_on:
     extends: depends_on
@@ -70,6 +71,7 @@ component_types:
       delete:
         artifacts:
         - cmd: null
+    extends: null
     description: The base type
 properties:
   bar:
