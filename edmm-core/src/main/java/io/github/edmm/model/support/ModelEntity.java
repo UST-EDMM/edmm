@@ -57,8 +57,20 @@ public abstract class ModelEntity extends DescribableElement {
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getProperty(Attribute<T> attribute) {
+        Class<T> targetType = attribute.getType();
         Optional<Property> property = getProperty(attribute.getName());
-        return (Optional<T>) property.map(Property::getValue);
+        if (!property.isPresent()) {
+            return Optional.empty();
+        }
+        if (String.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) property.map(Property::getValue);
+        } else if (Integer.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) Optional.of(Integer.valueOf(property.get().getValue()));
+        } else if (Boolean.class.isAssignableFrom(targetType)) {
+            return (Optional<T>) Optional.of(Boolean.valueOf(property.get().getValue()));
+        } else {
+            throw new IllegalStateException(String.format("Cannot get value of type '%s' from attribute '%s'", targetType, attribute));
+        }
     }
 
     public Map<String, Operation> getOperations() {
