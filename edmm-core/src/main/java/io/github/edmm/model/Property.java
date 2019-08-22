@@ -20,7 +20,7 @@ public class Property extends DescribableElement {
 
     public static Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static Attribute<Boolean> REQUIRED = new Attribute<>("required", Boolean.class);
-    public static Attribute<String> DEFAULT = new Attribute<>("default", String.class);
+    public static Attribute<String> DEFAULT_VALUE = new Attribute<>("default_value", String.class);
     public static Attribute<String> VALUE = new Attribute<>("value", String.class);
 
     private final MappingEntity entity;
@@ -47,7 +47,7 @@ public class Property extends DescribableElement {
     }
 
     public String getDefault() {
-        return get(DEFAULT);
+        return get(DEFAULT_VALUE);
     }
 
     public String getValue() {
