@@ -11,7 +11,7 @@ public class EntityGraphTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ClassPathResource resource = new ClassPathResource("templates/unit-tests/simple_props_only.yml");
+        ClassPathResource resource = new ClassPathResource("templates/unit-tests/properties.yml");
         graph = new EntityGraph(resource.getInputStream());
     }
 
