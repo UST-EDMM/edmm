@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.model.component.RootComponent;
@@ -15,11 +16,15 @@ import lombok.SneakyThrows;
 import lombok.ToString;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 public final class DeploymentModel {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentModel.class);
 
     private final String name;
     private final EntityGraph graph;
@@ -47,7 +52,8 @@ public final class DeploymentModel {
                 Optional<RootComponent> targetComponent = getComponent(relation.getTarget());
                 targetComponent.ifPresent(value -> {
                     if (!topology.addEdge(sourceComponent, value, relation)) {
-                        System.out.println("ERROR");
+                        logger.error("Failed initializing topology");
+                        throw new IllegalStateException("Failed initializing topology");
                     }
                 });
             }
@@ -63,7 +69,15 @@ public final class DeploymentModel {
         return new DeploymentModel(file.getName(), graph);
     }
 
+    public Set<RootComponent> getComponents() {
+        return topology.vertexSet();
+    }
+
     public Optional<RootComponent> getComponent(String name) {
         return Optional.ofNullable(componentMap.get(name));
+    }
+
+    public Set<RootRelation> getRelations() {
+        return topology.edgeSet();
     }
 }

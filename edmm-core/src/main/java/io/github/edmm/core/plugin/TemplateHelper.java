@@ -43,6 +43,15 @@ public abstract class TemplateHelper {
         return cfg;
     }
 
+    public static Template getTemplate(Configuration cfg, String name) {
+        try {
+            return cfg.getTemplate(name);
+        } catch (Exception e) {
+            logger.error("Failed to load template", e);
+            throw new IllegalStateException("Failed to load template");
+        }
+    }
+
     public static String toString(Template template, Map<String, Object> data) {
         StringWriter sw = new StringWriter();
         try {

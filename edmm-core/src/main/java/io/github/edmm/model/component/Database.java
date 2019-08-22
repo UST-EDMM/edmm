@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
+import io.github.edmm.model.visitor.ComponentVisitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -30,5 +31,10 @@ public class Database extends RootComponent {
 
     public Optional<String> getPassword() {
         return getProperty(PASSWORD);
+    }
+
+    @Override
+    public void accept(ComponentVisitor v) {
+        v.visit(this);
     }
 }
