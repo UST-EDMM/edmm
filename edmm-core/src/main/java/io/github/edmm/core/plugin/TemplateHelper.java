@@ -52,6 +52,10 @@ public abstract class TemplateHelper {
         }
     }
 
+    public static String toString(Configuration cfg, String name, Map<String, Object> data) {
+        return toString(getTemplate(cfg, name), data);
+    }
+
     public static String toString(Template template, Map<String, Object> data) {
         StringWriter sw = new StringWriter();
         try {
