@@ -1,0 +1,19 @@
+---
+<#list plays as play>
+# Play
+- name: ${play.name}
+  hosts: ${play.host}
+  become: yes
+  become_user: root
+  tasks:
+    <#list tasks as task>
+    - name: ${task.name}
+      user:
+        name: apacheadm
+        group: users,admin
+        shell: /bin/bash
+        home: /home/weblogic
+
+    </#list>
+
+</#list>
