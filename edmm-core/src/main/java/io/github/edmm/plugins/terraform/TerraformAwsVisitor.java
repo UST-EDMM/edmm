@@ -80,6 +80,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                             componentEntry.getValue().stream()
                                     .filter(Objects::nonNull)
                                     .forEach(value -> scripts
+                                            .append("      ")
                                             .append(Consts.DOUBLE_QUOTE)
                                             .append(value)
                                             .append(Consts.DOUBLE_QUOTE)

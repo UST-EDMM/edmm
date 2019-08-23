@@ -7,7 +7,7 @@ resource "aws_security_group" "${aws_security_group_name}" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  ${ingress}
+${ingress}
   egress {
     from_port = 0
     to_port = 0
