@@ -21,8 +21,10 @@ public abstract class VisitorHelper {
         components.stream()
                 .filter(filter)
                 .forEach(component -> {
-                    logger.debug("Visit '{}' object for '{}' component  ", component.getClass().getSimpleName(), component.getName());
-                    component.accept(visitor);
+                    if (!component.isTransformed()) {
+                        logger.debug("Visit '{}' object for '{}' component", component.getClass().getSimpleName(), component.getName());
+                        component.accept(visitor);
+                    }
                 });
     }
 
@@ -34,8 +36,10 @@ public abstract class VisitorHelper {
         relations.stream()
                 .filter(filter)
                 .forEach(relation -> {
-                    logger.debug("Visit '{}' object for '{}' relation", relation.getClass().getSimpleName(), relation.getName());
-                    relation.accept(visitor);
+                    if (!relation.isTransformed()) {
+                        logger.debug("Visit '{}' object for '{}' relation", relation.getClass().getSimpleName(), relation.getName());
+                        relation.accept(visitor);
+                    }
                 });
     }
 }
