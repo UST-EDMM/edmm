@@ -8,8 +8,9 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
+import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
-import io.github.edmm.model.Artifact;
+import io.github.edmm.core.parser.support.GraphHelper;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.Attribute;
@@ -25,22 +26,20 @@ import lombok.ToString;
 public class RootComponent extends ModelEntity implements VisitableComponent {
 
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
-    public static final Attribute<Artifact> ARTIFACTS = new Attribute<>("artifacts", Artifact.class);
     public static final Attribute<RootRelation> RELATIONS = new Attribute<>("relations", RootRelation.class);
 
     public RootComponent(MappingEntity mappingEntity) {
         super(mappingEntity);
+        // Resolve the chain of types
+        EntityGraph graph = entity.getGraph();
+        MappingEntity typeRef = GraphHelper.findTypeEntity(graph, entity).
+                orElseThrow(() -> new IllegalStateException("A component must be an instance of an existing type"));
+        List<MappingEntity> typeChain = GraphHelper.resolveInheritanceChain(graph, typeRef);
+        typeChain.forEach(this::updateEntityChain);
     }
 
     public String getType() {
         return get(TYPE);
-    }
-
-    public List<Artifact> getArtifacts() {
-        List<Artifact> result = new ArrayList<>();
-        Optional<Entity> artifactsEntity = getEntity().getChild(ARTIFACTS);
-        artifactsEntity.ifPresent(value -> populateArtifacts(result, value));
-        return Lists.reverse(result);
     }
 
     public List<RootRelation> getRelations() {

@@ -26,7 +26,6 @@ public class TerraformLifecycleTest {
 
         when(transformation.getModel()).thenReturn(model);
 
-
         File rootDirectory = Files.createTempDirectory("terraform-").toFile();
         logger.info("Root directory is '{}'", rootDirectory);
         TransformationContext context = new TransformationContext(transformation, rootDirectory);
