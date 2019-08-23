@@ -16,9 +16,13 @@ import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.Database;
+import io.github.edmm.model.component.Dbms;
+import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.MysqlDbms;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
+import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.utils.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,15 +124,40 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     }
 
     @Override
-    public void visit(Tomcat component) {
+    public void visit(RootComponent component) {
         collectIngressData(component);
         collectProvisionerScripts(component);
+        component.setTransformed(true);
+    }
+
+    @Override
+    public void visit(Tomcat component) {
+        visit((RootComponent) component);
     }
 
     @Override
     public void visit(MysqlDbms component) {
-        collectIngressData(component);
-        collectProvisionerScripts(component);
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(Database component) {
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(Dbms component) {
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(MysqlDatabase component) {
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(WebApplication component) {
+        visit((RootComponent) component);
     }
 
     private void collectIngressData(RootComponent component) {
