@@ -3,7 +3,6 @@ package io.github.edmm.model.support;
 import java.util.Collection;
 
 import io.github.edmm.core.parser.MappingEntity;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +10,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
 public abstract class BaseElement {
 
     protected final MappingEntity entity;
