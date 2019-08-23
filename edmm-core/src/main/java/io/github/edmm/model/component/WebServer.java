@@ -12,7 +12,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class WebServer extends SoftwareComponent {
 
-    public static Attribute<Integer> PORT = new Attribute<>("port", Integer.class);
+    public static final Attribute<Integer> PORT = new Attribute<>("port", Integer.class);
 
     public WebServer(MappingEntity mappingEntity) {
         super(mappingEntity);
