@@ -8,11 +8,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode
 public class Metadata implements Map<String, Object> {
 
     private final Map<String, Object> values = new LinkedHashMap<>();

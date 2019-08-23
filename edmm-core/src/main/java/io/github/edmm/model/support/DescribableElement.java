@@ -12,11 +12,9 @@ import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Metadata;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public abstract class DescribableElement extends BaseElement {
 
     public static final Attribute<String> DESCRIPTION = new Attribute<>("description", String.class);

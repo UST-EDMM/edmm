@@ -10,7 +10,6 @@ import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.TypeWrapper;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.ToString;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 public final class DeploymentModel {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentModel.class);

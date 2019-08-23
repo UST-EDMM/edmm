@@ -5,11 +5,9 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Dbms extends SoftwareComponent {
 
     public static final Attribute<Integer> PORT = new Attribute<>("port", Integer.class);

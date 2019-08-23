@@ -5,11 +5,9 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Database extends RootComponent {
 
     public static final Attribute<String> SCHEMA_NAME = new Attribute<>("schema_name", String.class);
@@ -21,7 +19,8 @@ public class Database extends RootComponent {
     }
 
     public String getSchemaName() {
-        return getProperty(SCHEMA_NAME).orElseThrow(IllegalStateException::new);
+        return getProperty(SCHEMA_NAME)
+                .orElseThrow(() -> new IllegalStateException("Database needs to specify the schema_name property"));
     }
 
     public Optional<String> getUser() {
