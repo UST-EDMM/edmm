@@ -2,17 +2,21 @@
 <#list plays as play>
 # Play
 - name: ${play.name}
-  hosts: ${play.host}
+  hosts: ${play.hosts}
   become: yes
   become_user: root
+  vars:
+    <#list play.variables as variable>
+    ${variable.name}: ${variable.value}
+    </#list>
   tasks:
-    <#list tasks as task>
+    <#list play.tasks as task>
     - name: ${task.name}
-      user:
-        name: apacheadm
-        group: users,admin
-        shell: /bin/bash
-        home: /home/weblogic
+      script: ${task.script}
+      args:
+      <#list task.args as arg>
+        ${arg.name}: ${arg.value}
+      </#list>
 
     </#list>
 
