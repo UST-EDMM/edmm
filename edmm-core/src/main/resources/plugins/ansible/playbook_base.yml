@@ -2,13 +2,19 @@
 <#list plays as play>
 # Play
 - name: ${play.name}
+  <#if play.hosts??>
   hosts: ${play.hosts}
+  <#else>
+  </#if>
   become: yes
   become_user: root
+  <#if play.vars??>
   vars:
-    <#list play.variables as variable>
+    <#list play.vars as variable>
     ${variable.name}: ${variable.value}
     </#list>
+  <#else>
+  </#if>
   tasks:
     <#list play.tasks as task>
     - name: ${task.name}

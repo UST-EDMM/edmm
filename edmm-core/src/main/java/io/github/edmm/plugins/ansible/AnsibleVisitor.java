@@ -1,10 +1,12 @@
 package io.github.edmm.plugins.ansible;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -43,7 +45,7 @@ public class AnsibleVisitor implements ComponentVisitor {
 
         try {
             Template baseTemplate = cfg.getTemplate("playbook_base.yml");
-            fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, null));
+            //fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, null));
 
             CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
             if (cycleDetector.detectCycles()) {
@@ -62,13 +64,21 @@ public class AnsibleVisitor implements ComponentVisitor {
                 while (iterator.hasNext()) {
                     RootComponent component = iterator.next();
                     LOGGER.info("Generate a play for component " + component.getName());
+                    AnsiblePlay play = AnsiblePlay.builder()
+                            .name(component.getName())
+                            .hosts("")
+                            //.vars(new HashMap<>())
+                            .tasks(new PriorityQueue<>())
+                            .build();
 
+                    plays.add(play);
                     //component.getProperties().forEach(p -> {});
                     //component.getOperations();
 
                 }
 
                 templateData.put("plays", plays);
+                fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, templateData));
             }
         } catch (IOException e) {
             LOGGER.error("Failed to write Ansible file: {}", e.getMessage(), e);
