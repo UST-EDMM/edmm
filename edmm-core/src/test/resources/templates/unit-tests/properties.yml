@@ -1,0 +1,41 @@
+---
+version: edm_1_0
+
+components:
+  ubuntu:
+    type: compute
+    description: ubuntu
+    properties:
+      test: ubuntu
+      machine_image: ubuntu
+      instance_type: large
+
+component_types:
+  base:
+    extends: null
+    properties:
+      test:
+        type: string
+        description: test
+        default_value: base
+  compute:
+    extends: base
+    properties:
+      os_family:
+        type: string
+        description: Specifies the type of operating system
+        default_value: linux
+      machine_image:
+        type: string
+        description: The name of the machine image to use
+      instance_type:
+        type: string
+        description: The name of the instance type to provision
+      key_name:
+        type: string
+        description: The name of the key pair to use for authentication
+      public_key:
+        type: string
+        description: The public key of the key pair to use for authentication
+      test:
+        default_value: compute

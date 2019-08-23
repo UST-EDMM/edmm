@@ -3,7 +3,6 @@ package io.github.edmm.model.support;
 import java.util.Collection;
 
 import io.github.edmm.core.parser.MappingEntity;
-import io.github.edmm.core.transformation.Transformation;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,6 @@ import lombok.ToString;
 public abstract class BaseElement {
 
     protected final MappingEntity entity;
-    protected Transformation.State state = Transformation.State.READY;
 
     public BaseElement(MappingEntity entity) {
         this.entity = entity;
@@ -24,6 +22,12 @@ public abstract class BaseElement {
 
     public String getName() {
         return entity.getName();
+    }
+
+    public String getNormalizedName() {
+        return entity.getName()
+                .toLowerCase()
+                .replace(".", "_");
     }
 
     protected <T> void set(Attribute<T> key, T value) {
