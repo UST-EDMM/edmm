@@ -1,0 +1,81 @@
+---
+components:
+  ubuntu:
+    type: compute
+  tomcat:
+    relations:
+    - depends_on:
+        target: ubuntu
+    - hosted_on:
+        target: ubuntu
+    type: software_component
+metadata:
+  maintainer: Michael Wurster
+relation_types:
+  depends_on:
+    operations:
+      pre_configure_source:
+        artifacts:
+        - cmd: null
+      pre_configure_target:
+        artifacts:
+        - cmd: null
+      target_removed:
+        artifacts:
+        - cmd: null
+      post_configure_source:
+        artifacts:
+        - cmd: null
+      post_configure_target:
+        artifacts:
+        - cmd: null
+      target_changed:
+        artifacts:
+        - cmd: null
+    extends: null
+    properties: null
+  hosted_on:
+    extends: depends_on
+  connects_to:
+    extends: depends_on
+description: Very simple example
+version: edm_1_0
+component_types:
+  compute:
+    operations:
+      configure:
+        artifacts:
+        - cmd: configure.sh
+    extends: base
+    properties:
+      os_family:
+        description: Specifies the type of operating system
+        default_value: linux
+        type: string
+  software_component:
+    extends: base
+  base:
+    metadata: null
+    operations:
+      stop:
+        artifacts:
+        - cmd: null
+      start:
+        artifacts:
+        - cmd: null
+      create:
+        artifacts:
+        - cmd: null
+      configure:
+        artifacts:
+        - cmd: null
+      delete:
+        artifacts:
+        - cmd: null
+    extends: null
+    description: The base type
+properties:
+  bar:
+    type: integer
+  foo:
+    type: string
