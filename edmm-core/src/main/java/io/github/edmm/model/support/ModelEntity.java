@@ -1,18 +1,15 @@
 package io.github.edmm.model.support;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.support.GraphHelper;
-import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
 import lombok.EqualsAndHashCode;

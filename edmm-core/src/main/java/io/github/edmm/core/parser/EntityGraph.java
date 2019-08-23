@@ -148,27 +148,25 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
         Optional<Entity> root = this.getEntity(ROOT);
         if (root.isPresent()) {
             Map<String, Object> graphAsMap = createMapFromGraph(root.get());
-
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setPrettyFlow(true);
-            new Yaml(options)
-                    .dump(graphAsMap, writer);
+            options.setExplicitStart(true);
+            new Yaml(options).dump(graphAsMap, writer);
         } else {
-            throw new IllegalStateException("No ROOT element defined!");
+            throw new IllegalStateException("No ROOT element defined");
         }
     }
 
     private Map<String, Object> createMapFromGraph(Entity entity) {
         HashMap<String, Object> map = new HashMap<>();
-
-        entity.getDirectChildrenOnly().forEach(child -> {
+        entity.getDirectChildren().forEach(child -> {
             if (child instanceof MappingEntity) {
                 Map<String, Object> childMap = createMapFromGraph(child);
                 map.put(child.getName(), childMap.isEmpty() ? null : childMap);
             } else if (child instanceof SequenceEntity) {
                 List<Map> list = new ArrayList<>();
-                child.getDirectChildrenOnly().forEach(grandChild -> {
+                child.getDirectChildren().forEach(grandChild -> {
                     HashMap<String, Object> localMap = new HashMap<>();
                     if (grandChild instanceof ScalarEntity) {
                         localMap.put(grandChild.getName(), ((ScalarEntity) grandChild).getValue());
@@ -178,7 +176,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
                     }
                     list.add(localMap);
                 });
-
                 if (!list.isEmpty()) {
                     map.put(child.getName(), list);
                 }
@@ -187,7 +184,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
                 map.put(child.getName(), scalar.getValue());
             }
         });
-
         return map;
     }
 
