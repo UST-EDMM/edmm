@@ -11,12 +11,13 @@ public class EntityGraphTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ClassPathResource resource = new ClassPathResource("templates/unit-tests/simple_props_only.yml");
+        ClassPathResource resource = new ClassPathResource("templates/unit-tests/properties.yml");
         graph = new EntityGraph(resource.getInputStream());
     }
 
     @Test
     public void testBasicParsing() {
-        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version")).orElseThrow(IllegalStateException::new)).getValue());
+        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version"))
+                .orElseThrow(IllegalStateException::new)).getValue());
     }
 }
