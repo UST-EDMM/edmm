@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
+import io.github.edmm.model.visitor.ComponentVisitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -19,5 +20,10 @@ public class WebServer extends SoftwareComponent {
 
     public Optional<Integer> getPort() {
         return getProperty(PORT);
+    }
+
+    @Override
+    public void accept(ComponentVisitor v) {
+        v.visit(this);
     }
 }

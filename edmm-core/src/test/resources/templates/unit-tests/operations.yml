@@ -1,0 +1,32 @@
+---
+version: edm_1_0
+
+components:
+  ubuntu:
+    type: compute
+    operations:
+      configure: test.sh
+      start: start.sh
+    artifacts:
+      - iso: ubuntu.iso
+      - war: app.war
+
+component_types:
+  base:
+    extends: null
+    operations:
+      create: ~
+      configure:
+        description: configure
+      start: ~
+      stop: ~
+      delete: delete.sh
+  compute:
+    extends: base
+    artifacts:
+      - test: test.sh
+    operations:
+      configure:
+        artifacts:
+          - script: configure.sh
+      stop: stop.sh

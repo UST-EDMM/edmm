@@ -3,16 +3,19 @@ version: edm_1_0
 
 components:
 
-  ## Order Application
+  ## Spring PetClinic Application
 
-  order_app:
+  pet_clinic:
     type: web_application
     artifacts:
-      - war: ./order/order.war
+      - war: ./petclinic/petclinic.war
+    operations:
+      start: ./petclinic/start.sh
     relations:
       - hosted_on: order_app_tomcat
+      - connects_to: db
 
-  order_app_tomcat:
+  pet_clinic_tomcat:
     type: tomcat
     operations:
       create: ./tomcat/create.sh
@@ -20,7 +23,7 @@ components:
     relations:
       - hosted_on: order_app_ubuntu
 
-  order_app_ubuntu:
+  pet_clinic_ubuntu:
     type: compute
     properties:
       machine_image: ubuntu
@@ -32,6 +35,45 @@ components:
         FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
         3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
         -----END PUBLIC KEY-----
+    operations:
+      configure: ./ubuntu/configure.sh
+
+  ## Database
+
+  db:
+    type: mysql_database
+    properties:
+      name: petclinic
+      user: root
+      password: petclinic
+    artifacts:
+      - sql: ./petclinic/db.sql
+    operations:
+      configure: ./mysql_database/configure.sh
+    relations:
+      - hosted_on: dbms
+
+  dbms:
+    type: mysql_dbms
+    properties:
+      root_password: petclinic
+    relations:
+      - hosted_on: db_ubuntu
+
+  db_ubuntu:
+    type: compute
+    properties:
+      machine_image: ubuntu
+      instance_type: large
+      key_name: edmm
+      public_key: |
+        -----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0
+        FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
+        3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
+        -----END PUBLIC KEY-----
+    operations:
+      configure: ./ubuntu/configure.sh
 
 ###############################################
 ## Component Types

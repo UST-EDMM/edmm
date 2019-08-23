@@ -41,8 +41,6 @@ public abstract class GraphHelper {
             entities.add(parent);
             optionalParent = findParentEntity(graph, parent);
         }
-
-        Collections.reverse(entities);
         return entities;
     }
 

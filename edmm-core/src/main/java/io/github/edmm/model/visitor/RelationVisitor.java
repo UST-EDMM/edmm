@@ -7,8 +7,8 @@ import io.github.edmm.model.relation.RootRelation;
 
 public interface RelationVisitor {
 
-    default void visit(RootRelation relation) {
-        // noop;
+    default void visit(ConnectsTo relation) {
+        // noop
     }
 
     default void visit(DependsOn relation) {
@@ -19,7 +19,7 @@ public interface RelationVisitor {
         // noop
     }
 
-    default void visit(ConnectsTo relation) {
-        // noop
+    default void visit(RootRelation relation) {
+        // noop;
     }
 }
