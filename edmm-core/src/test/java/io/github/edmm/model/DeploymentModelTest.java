@@ -9,11 +9,14 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.SoftwareComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
-import org.junit.Assert;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DeploymentModelTest {
 
@@ -22,23 +25,23 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/properties.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         Compute ubuntu = (Compute) model.getComponent("ubuntu").orElseThrow(IllegalStateException::new);
-        Assert.assertEquals("ubuntu", ubuntu.getDescription().orElse(null));
-        Assert.assertEquals(6, ubuntu.getProperties().size());
-        Assert.assertFalse(ubuntu.getProperty("port").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("os_family").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("machine_image").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("instance_type").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("key_name").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("public_key").isPresent());
-        Assert.assertTrue(ubuntu.getProperty("test").isPresent());
-        Assert.assertEquals("linux", ubuntu.getProperties().get("os_family").getValue());
-        Assert.assertNull(ubuntu.getProperties().get("key_name").getValue());
-        Assert.assertEquals("ubuntu", ubuntu.getProperties().get("machine_image").getValue());
-        Assert.assertEquals("large", ubuntu.getProperties().get("instance_type").getValue());
-        Assert.assertEquals("string", ubuntu.getProperties().get("test").getType());
-        Assert.assertEquals("test", ubuntu.getProperties().get("test").getDescription().orElse(null));
-        Assert.assertEquals("compute", ubuntu.getProperties().get("test").getDefaultValue());
-        Assert.assertEquals("ubuntu", ubuntu.getProperties().get("test").getValue());
+        assertEquals("ubuntu", ubuntu.getDescription().orElse(null));
+        assertEquals(6, ubuntu.getProperties().size());
+        assertFalse(ubuntu.getProperty("port").isPresent());
+        assertTrue(ubuntu.getProperty("os_family").isPresent());
+        assertTrue(ubuntu.getProperty("machine_image").isPresent());
+        assertTrue(ubuntu.getProperty("instance_type").isPresent());
+        assertTrue(ubuntu.getProperty("key_name").isPresent());
+        assertTrue(ubuntu.getProperty("public_key").isPresent());
+        assertTrue(ubuntu.getProperty("test").isPresent());
+        assertEquals("linux", ubuntu.getProperties().get("os_family").getValue());
+        assertNull(ubuntu.getProperties().get("key_name").getValue());
+        assertEquals("ubuntu", ubuntu.getProperties().get("machine_image").getValue());
+        assertEquals("large", ubuntu.getProperties().get("instance_type").getValue());
+        assertEquals("string", ubuntu.getProperties().get("test").getType());
+        assertEquals("test", ubuntu.getProperties().get("test").getDescription().orElse(null));
+        assertEquals("compute", ubuntu.getProperties().get("test").getDefaultValue());
+        assertEquals("ubuntu", ubuntu.getProperties().get("test").getValue());
     }
 
     @Test
@@ -46,24 +49,24 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/operations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         Compute ubuntu = (Compute) model.getComponent("ubuntu").orElseThrow(IllegalStateException::new);
-        Assert.assertEquals(5, ubuntu.getOperations().size());
+        assertEquals(5, ubuntu.getOperations().size());
         RootComponent.StandardLifecycle lifecycle = ubuntu.getStandardLifecycle();
         Operation configureOperation = lifecycle.getConfigure().orElseThrow(IllegalStateException::new);
-        Assert.assertEquals(2, configureOperation.getArtifacts().size());
-        Assert.assertEquals("script", configureOperation.getArtifacts().get(0).getName());
-        Assert.assertEquals("configure.sh", configureOperation.getArtifacts().get(0).getValue());
-        Assert.assertEquals("cmd", configureOperation.getArtifacts().get(1).getName());
-        Assert.assertEquals("test.sh", configureOperation.getArtifacts().get(1).getValue());
+        assertEquals(2, configureOperation.getArtifacts().size());
+        assertEquals("script", configureOperation.getArtifacts().get(0).getName());
+        assertEquals("configure.sh", configureOperation.getArtifacts().get(0).getValue());
+        assertEquals("cmd", configureOperation.getArtifacts().get(1).getName());
+        assertEquals("test.sh", configureOperation.getArtifacts().get(1).getValue());
         Operation startOperation = lifecycle.getStart().orElseThrow(IllegalStateException::new);
-        Assert.assertEquals("cmd", startOperation.getArtifacts().get(0).getName());
-        Assert.assertEquals("start.sh", startOperation.getArtifacts().get(0).getValue());
+        assertEquals("cmd", startOperation.getArtifacts().get(0).getName());
+        assertEquals("start.sh", startOperation.getArtifacts().get(0).getValue());
         Operation deleteOperation = lifecycle.getDelete().orElseThrow(IllegalStateException::new);
-        Assert.assertEquals("cmd", deleteOperation.getArtifacts().get(0).getName());
-        Assert.assertEquals("delete.sh", deleteOperation.getArtifacts().get(0).getValue());
+        assertEquals("cmd", deleteOperation.getArtifacts().get(0).getName());
+        assertEquals("delete.sh", deleteOperation.getArtifacts().get(0).getValue());
         Operation stopOperation = lifecycle.getStop().orElseThrow(IllegalStateException::new);
-        Assert.assertEquals(1, stopOperation.getArtifacts().size());
+        assertEquals(1, stopOperation.getArtifacts().size());
         Operation createOperation = lifecycle.getCreate().orElseThrow(IllegalStateException::new);
-        Assert.assertEquals(0, createOperation.getArtifacts().size());
+        assertEquals(0, createOperation.getArtifacts().size());
     }
 
     @Test
@@ -71,13 +74,13 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/operations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         Compute ubuntu = (Compute) model.getComponent("ubuntu").orElseThrow(IllegalStateException::new);
-        Assert.assertEquals(3, ubuntu.getArtifacts().size());
-        Assert.assertEquals("test", ubuntu.getArtifacts().get(0).getName());
-        Assert.assertEquals("test.sh", ubuntu.getArtifacts().get(0).getValue());
-        Assert.assertEquals("iso", ubuntu.getArtifacts().get(1).getName());
-        Assert.assertEquals("ubuntu.iso", ubuntu.getArtifacts().get(1).getValue());
-        Assert.assertEquals("war", ubuntu.getArtifacts().get(2).getName());
-        Assert.assertEquals("app.war", ubuntu.getArtifacts().get(2).getValue());
+        assertEquals(3, ubuntu.getArtifacts().size());
+        assertEquals("test", ubuntu.getArtifacts().get(0).getName());
+        assertEquals("test.sh", ubuntu.getArtifacts().get(0).getValue());
+        assertEquals("iso", ubuntu.getArtifacts().get(1).getName());
+        assertEquals("ubuntu.iso", ubuntu.getArtifacts().get(1).getValue());
+        assertEquals("war", ubuntu.getArtifacts().get(2).getName());
+        assertEquals("app.war", ubuntu.getArtifacts().get(2).getValue());
     }
 
     @Test
@@ -89,7 +92,7 @@ public class DeploymentModelTest {
         assertEquals("hosted_on", tomcat.getRelations().get(0).getName());
         assertEquals("depends_on", tomcat.getRelations().get(1).getName());
         RootRelation hostedOn = tomcat.getRelations().get(0);
-        Assert.assertTrue(hostedOn instanceof HostedOn);
+        assertTrue(hostedOn instanceof HostedOn);
         assertEquals("ubuntu", hostedOn.getTarget());
         assertEquals(0, hostedOn.getProperties().size());
         assertEquals(6, hostedOn.getOperations().size());
@@ -99,15 +102,12 @@ public class DeploymentModelTest {
 
     @Test
     public void testGenerateYaml() throws Exception {
-        ClassPathResource resource = new ClassPathResource("templates/unit-tests/simple_relations.yml");
+        ClassPathResource resource = new ClassPathResource("templates/unit-tests/relations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
-        StringWriter stringWriter = new StringWriter();
-        model.getGraph().generateYamlOutput(stringWriter);
-
-        String expectedString = new String(Files.readAllBytes(
-                new ClassPathResource("templates/unit-tests/simple_relations_generated.yml").getFile().toPath()),
-                StandardCharsets.UTF_8);
-
-        assertEquals(expectedString, stringWriter.toString());
+        StringWriter yaml = new StringWriter();
+        model.getGraph().generateYamlOutput(yaml);
+        ClassPathResource expectedResource = new ClassPathResource("templates/unit-tests/relations_generated.yml");
+        String expectedString = FileUtils.readFileToString(expectedResource.getFile(), StandardCharsets.UTF_8);
+        assertEquals(expectedString, yaml.toString());
     }
 }

@@ -1,8 +1,8 @@
 package io.github.edmm.core.parser.support;
 
-public class DefaultKeys {
+public abstract class DefaultKeys {
 
-    // region *** root keys ***
+    // region *** attribute keys ***
     public static final String ARTIFACTS = "artifacts";
     public static final String CMD = "cmd";
     public static final String CONFIGURE = "configure";
@@ -24,7 +24,9 @@ public class DefaultKeys {
     public static final String VALUE = "value";
     // endregion
 
-    // region *** attribute values ***
+    // region *** attribute value types ***
     public static final String STRING = "string";
+    public static final String INTEGER = "integer";
+    public static final String FLOAT = "float";
     // endregion
 }

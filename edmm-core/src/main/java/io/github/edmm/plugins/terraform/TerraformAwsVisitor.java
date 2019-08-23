@@ -43,12 +43,12 @@ public class TerraformAwsVisitor extends TerraformVisitor {
         PluginFileAccess fileAccess = context.getFileAccess();
 
         try {
-            Template baseTemplate = cfg.getTemplate("aws_base.tf");
+            Template baseTemplate = cfg.getTemplate("aws_base.tpl");
             fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, null));
 
             // If there are compute nodes, add some defaults
             if (!computeTemplateData.isEmpty()) {
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2_default.tf", null));
+                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2_default.tpl", null));
             }
 
             for (Map.Entry<Compute, Map<String, Object>> computeEntry : computeTemplateData.entrySet()) {
@@ -97,8 +97,8 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                     data.put("provisioner", provisionerData);
                 }
 
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_security_group.tf", data));
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2.tf", data));
+                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_security_group.tpl", data));
+                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2.tpl", data));
             }
         } catch (IOException e) {
             logger.error("Failed to write Terraform file: {}", e.getMessage(), e);

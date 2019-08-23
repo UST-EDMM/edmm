@@ -45,7 +45,7 @@ public abstract class Entity implements Comparable<Entity> {
         return children;
     }
 
-    public Set<Entity> getDirectChildrenOnly() {
+    public Set<Entity> getDirectChildren() {
         return graph.outgoingEdgesOf(this).stream()
                 .filter(edge -> !(edge.getName().equals(DefaultKeys.INSTANCE_OF)
                         || edge.getName().equals(DefaultKeys.TARGET_COMPONENT)
