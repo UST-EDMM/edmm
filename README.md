@@ -12,5 +12,5 @@
 We use Maven as our build tool:
 
 ```shell
-mvnw clean package
+./mvnw clean package
 ```
