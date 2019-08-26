@@ -6,10 +6,11 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
+import io.github.edmm.model.visitor.RelationVisitor;
 import org.jgrapht.Graph;
 import org.springframework.core.io.ClassPathResource;
 
-public abstract class TerraformVisitor implements ComponentVisitor {
+public abstract class TerraformVisitor implements ComponentVisitor, RelationVisitor {
 
     protected final TransformationContext context;
     protected final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/terraform"));

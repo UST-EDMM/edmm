@@ -22,6 +22,7 @@ import io.github.edmm.model.component.MysqlDbms;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
+import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.plugins.terraform.model.Provisioner;
 import io.github.edmm.plugins.terraform.model.aws.Ec2;
 import org.slf4j.Logger;
@@ -63,11 +64,25 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 .instanceType("t2.micro")
                 .ingressPorts(Lists.newArrayList())
                 .provisioners(Lists.newArrayList())
+                .dependsOn(Lists.newArrayList())
                 .build();
         List<String> operations = collectOperations(component);
         ec2.getProvisioners().add(Provisioner.builder().operations(operations).build());
         computeInstances.put(component, ec2);
         component.setTransformed(true);
+    }
+
+    @Override
+    public void visit(ConnectsTo relation) {
+        RootComponent source = graph.getEdgeSource(relation);
+        RootComponent target = graph.getEdgeTarget(relation);
+        Optional<Compute> optionalSourceCompute = GraphHelper.resolveHostingComputeComponent(graph, source);
+        Optional<Compute> optionalTargetCompute = GraphHelper.resolveHostingComputeComponent(graph, target);
+        if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
+            Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
+            Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
+            sourceCompute.getDependsOn().add(targetCompute.getName());
+        }
     }
 
     @Override

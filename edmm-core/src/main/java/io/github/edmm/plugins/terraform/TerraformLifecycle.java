@@ -27,6 +27,7 @@ public class TerraformLifecycle extends AbstractLifecycle {
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
         // ... then all others
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        VisitorHelper.visit(context.getModel().getRelations(), visitor);
         visitor.populateTerraformFile();
         logger.info("Transformation to Terraform successful");
     }
