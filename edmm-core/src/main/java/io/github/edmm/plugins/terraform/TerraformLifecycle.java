@@ -20,11 +20,6 @@ public class TerraformLifecycle extends AbstractLifecycle {
     }
 
     @Override
-    public void prepare() {
-        logger.info("Prepare transformation for Terraform...");
-    }
-
-    @Override
     public void transform() {
         logger.info("Begin transformation to Terraform...");
         TerraformVisitor visitor = new TerraformAwsVisitor(context);
@@ -34,11 +29,5 @@ public class TerraformLifecycle extends AbstractLifecycle {
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
         visitor.populateTerraformFile();
         logger.info("Transformation to Terraform successful");
-    }
-
-    @Override
-    public void cleanup() {
-        logger.info("Cleanup transformation leftovers...");
-        // noop
     }
 }
