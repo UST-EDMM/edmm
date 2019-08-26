@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform;
+package io.github.edmm.plugins;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +9,8 @@ import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
+import io.github.edmm.plugins.terraform.TerraformLifecycle;
+import io.github.edmm.plugins.terraform.TerraformPlugin;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
