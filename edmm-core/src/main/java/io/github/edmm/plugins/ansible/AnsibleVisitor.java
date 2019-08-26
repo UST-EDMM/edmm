@@ -5,18 +5,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.ansible.model.AnsiblePlay;
+import io.github.edmm.plugins.ansible.model.AnsibleTask;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.EdgeReversedGraph;
@@ -45,7 +46,6 @@ public class AnsibleVisitor implements ComponentVisitor {
 
         try {
             Template baseTemplate = cfg.getTemplate("playbook_base.yml");
-            //fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, null));
 
             CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
             if (cycleDetector.detectCycles()) {
@@ -65,21 +65,19 @@ public class AnsibleVisitor implements ComponentVisitor {
                     RootComponent component = iterator.next();
                     LOGGER.info("Generate a play for component " + component.getName());
                     Map<String, String> properties = new HashMap<>();
+                    List<AnsibleTask> tasks = new ArrayList<>();
+
                     prepareProperties(properties, component.getProperties());
-
-
+                    prepareTasks(tasks, component.getOperations());
 
                     AnsiblePlay play = AnsiblePlay.builder()
                             .name(component.getName())
                             .hosts("")
                             .vars(properties)
-                            .tasks(new PriorityQueue<>())
+                            .tasks(tasks)
                             .build();
 
                     plays.add(play);
-
-                    //component.getOperations();
-
                 }
 
                 templateData.put("plays", plays);
@@ -91,9 +89,19 @@ public class AnsibleVisitor implements ComponentVisitor {
     }
 
     private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
-        properties.forEach((key, value) -> {
-            targetMap.put(key, value.getValue());
-        });
+        properties.forEach((key, property) -> targetMap.put(key, property.getValue()));
     }
 
+    private void prepareTasks(List<AnsibleTask> targetQueue, Map<String, Operation> operations) {
+        operations.forEach((key, operation) -> {
+            if (!operation.getArtifacts().isEmpty()) {
+                AnsibleTask task = AnsibleTask.builder()
+                        .name(operation.getNormalizedName())
+                        .script(operation.getArtifacts().get(0).getValue())
+                        .build();
+
+                targetQueue.add(task);
+            }
+        });
+    }
 }

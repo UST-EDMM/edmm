@@ -1,7 +1,7 @@
 package io.github.edmm.plugins.ansible.model;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +16,5 @@ public class AnsiblePlay {
     private boolean become;
     private String becomeUser;
     private Map<String, String> vars;
-    private Queue<AnsibleTask> tasks;
-
-
+    private List<AnsibleTask> tasks;
 }
