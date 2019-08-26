@@ -10,8 +10,8 @@
   become_user: root
   <#if play.vars??>
   vars:
-    <#list play.vars as variable>
-    ${variable.name}: ${variable.value}
+    <#list play.vars?keys as key>
+    ${key}: ${play.vars[key]}
     </#list>
   <#else>
   </#if>

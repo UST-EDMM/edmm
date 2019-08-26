@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.ansible;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
@@ -64,15 +64,20 @@ public class AnsibleVisitor implements ComponentVisitor {
                 while (iterator.hasNext()) {
                     RootComponent component = iterator.next();
                     LOGGER.info("Generate a play for component " + component.getName());
+                    Map<String, String> properties = new HashMap<>();
+                    prepareProperties(properties, component.getProperties());
+
+
+
                     AnsiblePlay play = AnsiblePlay.builder()
                             .name(component.getName())
                             .hosts("")
-                            //.vars(new HashMap<>())
+                            .vars(properties)
                             .tasks(new PriorityQueue<>())
                             .build();
 
                     plays.add(play);
-                    //component.getProperties().forEach(p -> {});
+
                     //component.getOperations();
 
                 }
@@ -84,4 +89,11 @@ public class AnsibleVisitor implements ComponentVisitor {
             LOGGER.error("Failed to write Ansible file: {}", e.getMessage(), e);
         }
     }
+
+    private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
+        properties.forEach((key, value) -> {
+            targetMap.put(key, value.getValue());
+        });
+    }
+
 }
