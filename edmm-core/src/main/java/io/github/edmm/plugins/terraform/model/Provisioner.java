@@ -8,6 +8,5 @@ import lombok.Data;
 @Data
 @Builder
 public class Provisioner {
-
     private List<String> operations;
 }
