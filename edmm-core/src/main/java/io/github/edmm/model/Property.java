@@ -6,11 +6,9 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.DescribableElement;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Property extends DescribableElement {
 
     public static Attribute<String> TYPE = new Attribute<>("type", String.class);

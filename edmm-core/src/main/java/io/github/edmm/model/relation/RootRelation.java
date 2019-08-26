@@ -10,11 +10,9 @@ import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.ModelEntity;
 import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.model.visitor.VisitableRelation;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class RootRelation extends ModelEntity implements VisitableRelation {
 
     public static Attribute<String> TARGET = new Attribute<>("target", String.class);
@@ -44,7 +42,6 @@ public class RootRelation extends ModelEntity implements VisitableRelation {
     }
 
     @ToString
-    @EqualsAndHashCode
     public static class StandardLifecycle {
 
         private final Map<String, Operation> operations;
