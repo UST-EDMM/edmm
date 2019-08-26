@@ -15,4 +15,5 @@ public class Ec2 {
     private String instanceType;
     private List<String> ingressPorts;
     private List<Provisioner> provisioners;
+    private List<String> dependsOn;
 }

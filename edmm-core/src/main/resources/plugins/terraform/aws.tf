@@ -89,7 +89,16 @@ resource "aws_instance" "${ec2.name}" {
   <#else>
   </#if>
   </#list>
+  <#if ec2.dependsOn?size != 0>
+  depends_on = [
+    <#list ec2.dependsOn as dep>
+    ${dep},
+    </#list>
+  ]
+  <#else>
+  </#if>
 }
+
 </#list>
 <#else>
 </#if>
