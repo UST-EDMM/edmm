@@ -89,7 +89,7 @@ public class AnsibleVisitor implements ComponentVisitor {
     }
 
     private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
-        properties.forEach((key, property) -> targetMap.put(key, property.getValue()));
+        properties.forEach((key, property) -> targetMap.put(key, property.getValue().replaceAll("\n", "")));
     }
 
     private void prepareTasks(List<AnsibleTask> targetQueue, Map<String, Operation> operations) {
