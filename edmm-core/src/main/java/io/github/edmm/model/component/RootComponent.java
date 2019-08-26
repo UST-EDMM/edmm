@@ -18,11 +18,9 @@ import io.github.edmm.model.support.ModelEntity;
 import io.github.edmm.model.support.TypeWrapper;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.VisitableComponent;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class RootComponent extends ModelEntity implements VisitableComponent {
 
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
@@ -68,7 +66,6 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
     }
 
     @ToString
-    @EqualsAndHashCode
     public static class StandardLifecycle {
 
         private final Map<String, Operation> operations;

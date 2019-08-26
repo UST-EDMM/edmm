@@ -12,11 +12,9 @@ import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.support.GraphHelper;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public abstract class ModelEntity extends DescribableElement {
 
     public static final Attribute<String> EXTENDS = new Attribute<>("extends", String.class);

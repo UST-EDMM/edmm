@@ -43,7 +43,7 @@ components:
   db:
     type: mysql_database
     properties:
-      name: petclinic
+      schema_name: petclinic
       user: root
       password: petclinic
     artifacts:
@@ -137,7 +137,7 @@ component_types:
   database:
     extends: base
     properties:
-      name:
+      schema_name:
         type: string
       user:
         type: string
