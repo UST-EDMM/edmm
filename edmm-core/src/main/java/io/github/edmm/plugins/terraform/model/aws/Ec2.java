@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 @Builder
 public class Ec2 {
-
     private String name;
     private String ami;
     private String instanceType;
