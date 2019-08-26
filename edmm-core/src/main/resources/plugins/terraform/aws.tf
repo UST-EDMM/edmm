@@ -82,7 +82,7 @@ resource "aws_instance" "${ec2.name}" {
     }
     scripts = [
       <#list provisioner.operations as operation>
-      "${operation}",
+      "${operation}"<#sep>,</#sep>
       </#list>
     ]
   }
@@ -90,11 +90,7 @@ resource "aws_instance" "${ec2.name}" {
   </#if>
   </#list>
   <#if ec2.dependsOn?size != 0>
-  depends_on = [
-    <#list ec2.dependsOn as dep>
-    ${dep},
-    </#list>
-  ]
+  depends_on = [<#list ec2.dependsOn as dep>${dep}<#sep>, </#sep></#list>]
   <#else>
   </#if>
 }
