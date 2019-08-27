@@ -10,7 +10,7 @@ components:
     artifacts:
       - war: ./petclinic/petclinic.war
     operations:
-      start: ./petclinic/start.sh
+      configure: ./petclinic/configure.sh
     relations:
       - hosted_on: pet_clinic_tomcat
       - connects_to: db
@@ -44,10 +44,10 @@ components:
     type: mysql_database
     properties:
       schema_name: petclinic
-      user: root
+      user: pc
       password: petclinic
     artifacts:
-      - sql: ./petclinic/db.sql
+      - sql: ./petclinic/schema.sql
     operations:
       configure: ./mysql_database/configure.sh
     relations:

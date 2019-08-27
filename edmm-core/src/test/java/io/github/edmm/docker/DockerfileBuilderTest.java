@@ -13,30 +13,33 @@ public class DockerfileBuilderTest {
     public void init() {
         builder = new DockerfileBuilder();
         builder.from("ubuntu")
-                .env("foo", "bar")
                 .run("echo \"foo\"")
                 .run("echo \"bar\"")
-                .copy("./config.txt", "/tmp")
-                .add("./config.txt", "/tmp")
+                .env("foo", "bar")
+                .copy("./test.txt", "/tmp")
+                .workdir("/tmp")
+                .add("./test.txt", "/tmp")
+                .workdir("/opt")
                 .expose(80)
                 .volume("/tmp")
-                .workdir("/tmp")
                 .entrypoint("sh", "echo")
                 .cmd("hello")
-                .build();
+                .env("baz", "qux");
     }
 
     @Test
     public void testWithoutCompression() {
         String expected = "FROM ubuntu" + Consts.NL +
                 "ENV foo=bar" + Consts.NL +
+                "ENV baz=qux" + Consts.NL +
                 "RUN echo \"foo\"" + Consts.NL +
                 "RUN echo \"bar\"" + Consts.NL +
-                "COPY ./config.txt /tmp" + Consts.NL +
-                "ADD ./config.txt /tmp" + Consts.NL +
+                "COPY ./test.txt /tmp" + Consts.NL +
+                "WORKDIR /tmp" + Consts.NL +
+                "ADD ./test.txt /tmp" + Consts.NL +
+                "WORKDIR /opt" + Consts.NL +
                 "EXPOSE 80" + Consts.NL +
                 "VOLUME /tmp" + Consts.NL +
-                "WORKDIR /tmp" + Consts.NL +
                 "ENTRYPOINT [\"sh\", \"echo\"]" + Consts.NL +
                 "CMD [\"hello\"]";
         Assert.assertEquals(expected.trim(), builder.build().trim());
@@ -47,13 +50,15 @@ public class DockerfileBuilderTest {
         builder.compress();
         String expected = "FROM ubuntu" + Consts.NL +
                 "ENV foo=bar" + Consts.NL +
+                "ENV baz=qux" + Consts.NL +
                 "RUN echo \"foo\" && \\" + Consts.NL +
                 "    echo \"bar\"" + Consts.NL +
-                "COPY ./config.txt /tmp" + Consts.NL +
-                "ADD ./config.txt /tmp" + Consts.NL +
+                "COPY ./test.txt /tmp" + Consts.NL +
+                "WORKDIR /tmp" + Consts.NL +
+                "ADD ./test.txt /tmp" + Consts.NL +
+                "WORKDIR /opt" + Consts.NL +
                 "EXPOSE 80" + Consts.NL +
                 "VOLUME /tmp" + Consts.NL +
-                "WORKDIR /tmp" + Consts.NL +
                 "ENTRYPOINT [\"sh\", \"echo\"]" + Consts.NL +
                 "CMD [\"hello\"]";
         Assert.assertEquals(expected.trim(), builder.build().trim());
