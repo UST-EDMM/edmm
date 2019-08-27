@@ -12,6 +12,7 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.kubernetes.model.ComponentStack;
+import io.github.edmm.plugins.kubernetes.visitor.ImageMappingVisitor;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class KubernetesLifecycle extends AbstractLifecycle {
 
     @Override
     public void prepare() {
-        // Populate component stacks
+        // Populate initial component stacks
         List<Compute> computeComponents = GraphHelper.getComponents(graph, Compute.class);
         for (Compute compute : computeComponents) {
             ComponentStack stack = new ComponentStack();
@@ -46,7 +47,17 @@ public class KubernetesLifecycle extends AbstractLifecycle {
     public void transform() {
         logger.info("Begin transformation to Kubernetes...");
 
-        // TODO
+
+        for (ComponentStack stack : componentStacks) {
+            // Resolve base image
+            ImageMappingVisitor imageMapper = new ImageMappingVisitor();
+            stack.getComponents().forEach(component -> component.accept(imageMapper));
+            stack.setBaseImage(imageMapper.getBaseImage());
+
+
+
+
+        }
 
         logger.info("Transformation to Kubernetes successful");
     }
