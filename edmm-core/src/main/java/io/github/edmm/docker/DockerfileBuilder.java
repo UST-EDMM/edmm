@@ -20,6 +20,9 @@ import io.github.edmm.docker.support.WorkdirEntry;
 public final class DockerfileBuilder {
 
     private boolean compress = false;
+    private List<AddEntry> addEntries = new ArrayList<>();
+    private List<EnvEntry> envEntries = new ArrayList<>();
+    private int workdirIndex = -1;
 
     private final List<DockerfileEntry> entries = new ArrayList<>();
 
@@ -29,17 +32,27 @@ public final class DockerfileBuilder {
     }
 
     public DockerfileBuilder env(String name, String value) {
-        entries.add(new EnvEntry(name, value));
+        envEntries.add(new EnvEntry(name, value));
         return this;
     }
 
     public DockerfileBuilder copy(String src, String dest) {
-        entries.add(new CopyEntry(src, dest));
+        CopyEntry entry = new CopyEntry(src, dest);
+        if (workdirIndex < 0) {
+            entries.add(entry);
+        } else {
+            addEntries.add(entry);
+        }
         return this;
     }
 
     public DockerfileBuilder add(String src, String dest) {
-        entries.add(new AddEntry(src, dest));
+        AddEntry entry = new AddEntry(src, dest);
+        if (workdirIndex < 0) {
+            entries.add(entry);
+        } else {
+            addEntries.add(entry);
+        }
         return this;
     }
 
@@ -59,7 +72,9 @@ public final class DockerfileBuilder {
     }
 
     public DockerfileBuilder workdir(String directory) {
+        populateAddEntries();
         entries.add(new WorkdirEntry(directory));
+        workdirIndex = entries.size() - 1;
         return this;
     }
 
@@ -79,6 +94,8 @@ public final class DockerfileBuilder {
     }
 
     public String build() {
+        populateAddEntries();
+        populateEnvEntries();
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
         for (int i = 0; i < entries.size(); i++) {
@@ -90,8 +107,21 @@ public final class DockerfileBuilder {
         return writer.toString();
     }
 
-    @Override
-    public String toString() {
-        return build();
+    private void populateEnvEntries() {
+        entries.addAll(1, envEntries);
+        envEntries.clear();
+    }
+
+    private void populateAddEntries() {
+        if (entries.size() <= 1) {
+            return;
+        }
+        if (workdirIndex < 0) {
+            entries.addAll(addEntries);
+        } else {
+            int index = (workdirIndex == 0) ? 1 : workdirIndex;
+            entries.addAll(++index, addEntries);
+        }
+        addEntries.clear();
     }
 }

@@ -1,9 +1,14 @@
 package io.github.edmm.plugins.kubernetes.model;
 
-import lombok.Data;
+import io.github.edmm.model.Artifact;
+import io.github.edmm.model.Operation;
+import io.github.edmm.model.component.RootComponent;
+import lombok.Value;
 
-@Data
+@Value
 public class FileMapping {
-    private String source;
-    private String target;
+
+    private final RootComponent component;
+    private final Operation operation;
+    private final Artifact artifact;
 }

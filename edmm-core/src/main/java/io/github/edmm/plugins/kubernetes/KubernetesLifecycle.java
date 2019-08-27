@@ -6,12 +6,14 @@ import java.util.Set;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.GraphHelper;
+import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.kubernetes.model.ComponentStack;
+import io.github.edmm.plugins.kubernetes.visitor.DockerfileBuildingVisitor;
 import io.github.edmm.plugins.kubernetes.visitor.ImageMappingVisitor;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
@@ -46,19 +48,16 @@ public class KubernetesLifecycle extends AbstractLifecycle {
     @Override
     public void transform() {
         logger.info("Begin transformation to Kubernetes...");
-
-
+        PluginFileAccess fileAccess = context.getFileAccess();
         for (ComponentStack stack : componentStacks) {
             // Resolve base image
             ImageMappingVisitor imageMapper = new ImageMappingVisitor();
             stack.getComponents().forEach(component -> component.accept(imageMapper));
             stack.setBaseImage(imageMapper.getBaseImage());
-
-
-
-
+            // Build Dockerfile
+            DockerfileBuildingVisitor dockerfileBuilder = new DockerfileBuildingVisitor(stack, fileAccess);
+            dockerfileBuilder.populateDockerfile();
         }
-
         logger.info("Transformation to Kubernetes successful");
     }
 

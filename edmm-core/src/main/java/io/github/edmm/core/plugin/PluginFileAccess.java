@@ -24,8 +24,8 @@ public class PluginFileAccess {
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
         logger.debug("Requesting file access:");
-        logger.debug("  > [source] {}", sourceDirectory);
-        logger.debug("  > [target] {}", targetDirectory);
+        logger.debug("> [source] {}", sourceDirectory);
+        logger.debug("> [target] {}", targetDirectory);
     }
 
     /**
