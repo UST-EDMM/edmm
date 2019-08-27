@@ -25,7 +25,6 @@ public class KubernetesTests {
 
     private File targetDirectory;
     private TransformationContext context;
-    // private PluginFileAccess fileAccess;
 
     @Before
     public void init() throws Exception {
