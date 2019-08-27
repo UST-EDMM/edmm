@@ -23,17 +23,7 @@ public class NoopPlugin extends Plugin<NoopPlugin.NoopLifecycle> {
         private static final Logger logger = LoggerFactory.getLogger(NoopLifecycle.class);
 
         @Override
-        public void prepare() {
-            logger.info("NOOP");
-        }
-
-        @Override
         public void transform() {
-            logger.info("NOOP");
-        }
-
-        @Override
-        public void cleanup() {
             logger.info("NOOP");
         }
     }

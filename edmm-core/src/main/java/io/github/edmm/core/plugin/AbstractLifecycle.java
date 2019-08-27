@@ -14,6 +14,26 @@ public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePha
         this.phases = populatePhases();
     }
 
+    @Override
+    public boolean checkEnvironment() {
+        return true;
+    }
+
+    @Override
+    public boolean checkModel() {
+        return true;
+    }
+
+    @Override
+    public void prepare() {
+        // NOOP
+    }
+
+    @Override
+    public void cleanup() {
+        // NOOP
+    }
+
     private List<LifecyclePhase> populatePhases() {
         List<LifecyclePhase> phases = new ArrayList<>();
         phases.add(new LifecyclePhase<>("check_environment", this, (e) -> {

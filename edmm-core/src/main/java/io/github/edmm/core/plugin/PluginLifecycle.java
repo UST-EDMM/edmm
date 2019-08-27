@@ -4,13 +4,9 @@ import io.github.edmm.core.plugin.support.LifecyclePhaseAccess;
 
 public interface PluginLifecycle extends LifecyclePhaseAccess {
 
-    default boolean checkEnvironment() {
-        return true;
-    }
+    boolean checkEnvironment();
 
-    default boolean checkModel() {
-        return true;
-    }
+    boolean checkModel();
 
     void prepare();
 
