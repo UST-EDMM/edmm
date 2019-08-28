@@ -2,17 +2,21 @@ package io.github.edmm.plugins.terraform.aws;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
@@ -24,7 +28,8 @@ import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.plugins.terraform.TerraformVisitor;
-import io.github.edmm.plugins.terraform.model.Provisioner;
+import io.github.edmm.plugins.terraform.model.FileProvisioner;
+import io.github.edmm.plugins.terraform.model.RemoteExecProvisioner;
 import io.github.edmm.plugins.terraform.model.aws.Ec2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +51,36 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     public void populateTerraformFile() {
         PluginFileAccess fileAccess = context.getFileAccess();
         Map<String, Object> data = new HashMap<>();
-        // Populate the data
         data.put("instances", computeInstances);
         try {
             fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws.tf", data));
         } catch (IOException e) {
-            logger.error("Failed to write Terraform file: {}", e.getMessage(), e);
+            logger.error("Failed to write Terraform file", e);
+            throw new TransformationException(e);
+        }
+        for (Ec2 ec2 : computeInstances.values()) {
+            // Copy artifacts to target directory
+            for (FileProvisioner provisioner : ec2.getFileProvisioners()) {
+                try {
+                    fileAccess.copy(provisioner.getSource(), provisioner.getSource());
+                } catch (IOException e) {
+                    logger.error("Failed to copy artifacts", e);
+                    throw new TransformationException(e);
+                }
+            }
+            // Copy operations to target directory
+            List<String> operations = ec2.getRemoteExecProvisioners().stream()
+                    .map(RemoteExecProvisioner::getScripts)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            for (String op : operations) {
+                try {
+                    fileAccess.copy(op, op);
+                } catch (IOException e) {
+                    logger.error("Failed to copy operations", e);
+                    throw new TransformationException(e);
+                }
+            }
         }
     }
 
@@ -64,11 +93,12 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 // TODO: Try to resolve instance type
                 .instanceType("t2.micro")
                 .ingressPorts(Lists.newArrayList())
-                .provisioners(Lists.newArrayList())
-                .dependsOn(Lists.newArrayList())
+                .remoteExecProvisioners(Lists.newArrayList())
+                .fileProvisioners(Lists.newArrayList())
+                .dependencies(Lists.newArrayList())
                 .build();
         List<String> operations = collectOperations(component);
-        ec2.getProvisioners().add(Provisioner.builder().operations(operations).build());
+        ec2.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
         computeInstances.put(component, ec2);
         component.setTransformed(true);
     }
@@ -82,14 +112,15 @@ public class TerraformAwsVisitor extends TerraformVisitor {
         if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
             Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
             Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
-            sourceCompute.getDependsOn().add(targetCompute.getName());
+            sourceCompute.addDependency(targetCompute.getName());
         }
     }
 
     @Override
     public void visit(RootComponent component) {
         collectIngressPorts(component);
-        collectProvisioners(component);
+        collectFileProvisioners(component);
+        collectRemoteExecProvisioners(component);
         component.setTransformed(true);
     }
 
@@ -98,18 +129,30 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
             if (optionalCompute.isPresent()) {
                 Compute hostingCompute = optionalCompute.get();
-                computeInstances.get(hostingCompute).getIngressPorts().add(String.valueOf(port));
+                computeInstances.get(hostingCompute).addIngressPort(String.valueOf(port));
             }
         });
     }
 
-    private void collectProvisioners(RootComponent component) {
+    private void collectFileProvisioners(RootComponent component) {
+        Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
+        if (optionalCompute.isPresent()) {
+            Compute hostingCompute = optionalCompute.get();
+            Ec2 ec2 = computeInstances.get(hostingCompute);
+            for (Artifact artifact : component.getArtifacts()) {
+                String destination = "/opt/" + component.getNormalizedName();
+                ec2.addFileProvisioner(new FileProvisioner(artifact.getValue(), destination));
+            }
+        }
+    }
+
+    private void collectRemoteExecProvisioners(RootComponent component) {
         Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
         if (optionalCompute.isPresent()) {
             Compute hostingCompute = optionalCompute.get();
             Ec2 ec2 = computeInstances.get(hostingCompute);
             List<String> operations = collectOperations(component);
-            ec2.getProvisioners().add(Provisioner.builder().operations(operations).build());
+            ec2.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
         }
     }
 

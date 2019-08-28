@@ -28,7 +28,7 @@ public class TerraformTests extends PluginTest {
     @Before
     public void init() throws Exception {
         ClassPathResource sourceResource = new ClassPathResource("templates");
-        ClassPathResource templateResource = new ClassPathResource("templates/scenario_iaas_single_compute.yml");
+        ClassPathResource templateResource = new ClassPathResource("templates/scenario_iaas.yml");
         DeploymentModel model = DeploymentModel.of(templateResource.getFile());
         Transformation transformation = mock(Transformation.class);
         when(transformation.getModel()).thenReturn(model);
