@@ -68,7 +68,7 @@ public class AnsibleVisitor implements ComponentVisitor {
                     List<AnsibleTask> tasks = new ArrayList<>();
 
                     prepareProperties(properties, component.getProperties());
-                    prepareTasks(tasks, component.getOperations());
+                    prepareTasks(tasks, collectOperations(component));
 
                     AnsiblePlay play = AnsiblePlay.builder()
                             .name(component.getName())
@@ -92,8 +92,8 @@ public class AnsibleVisitor implements ComponentVisitor {
         properties.forEach((key, property) -> targetMap.put(key, property.getValue().replaceAll("\n", "")));
     }
 
-    private void prepareTasks(List<AnsibleTask> targetQueue, Map<String, Operation> operations) {
-        operations.forEach((key, operation) -> {
+    private void prepareTasks(List<AnsibleTask> targetQueue, List<Operation> operations) {
+        operations.forEach(operation -> {
             if (!operation.getArtifacts().isEmpty()) {
                 AnsibleTask task = AnsibleTask.builder()
                         .name(operation.getNormalizedName())
@@ -103,5 +103,14 @@ public class AnsibleVisitor implements ComponentVisitor {
                 targetQueue.add(task);
             }
         });
+    }
+
+    private List<Operation> collectOperations(RootComponent component) {
+        List<Operation> operations = new ArrayList<>();
+
+        component.getStandardLifecycle().getCreate().ifPresent(operations::add);
+        component.getStandardLifecycle().getConfigure().ifPresent(operations::add);
+        component.getStandardLifecycle().getStart().ifPresent(operations::add);
+        return operations;
     }
 }
