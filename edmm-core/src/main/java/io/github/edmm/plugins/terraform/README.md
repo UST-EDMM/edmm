@@ -2,6 +2,7 @@
 
 ## Limitations
 
+* Artifacts are not copied to target directory
 * Properties of all related components need to be transferred into an `env.sh` script.
   This script will be then sourced by each operations.
   The following template is used: `'target_name'_'property_name'`

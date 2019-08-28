@@ -15,11 +15,18 @@ import org.jgrapht.Graph;
 public final class TransformationContext {
 
     private final Transformation transformation;
-    private final File rootDirectory;
 
-    public TransformationContext(@NonNull Transformation transformation, @NonNull File rootDirectory) {
+    private final File sourceDirectory;
+    private final File targetDirectory;
+
+    public TransformationContext(@NonNull Transformation transformation, @NonNull File targetDirectory) {
+        this(transformation, Paths.get("").toFile(), targetDirectory);
+    }
+
+    public TransformationContext(@NonNull Transformation transformation, @NonNull File sourceDirectory, @NonNull File targetDirectory) {
         this.transformation = transformation;
-        this.rootDirectory = rootDirectory;
+        this.sourceDirectory = sourceDirectory;
+        this.targetDirectory = targetDirectory;
     }
 
     public DeploymentModel getModel() {
@@ -30,21 +37,7 @@ public final class TransformationContext {
         return getModel().getTopology();
     }
 
-    /**
-     * Creates a {@link PluginFileAccess} object that is able to create and modify files inside the plugin's root
-     * directory. It uses the current working directory as the source directory.
-     */
     public PluginFileAccess getFileAccess() {
-        return new PluginFileAccess(Paths.get("").toFile(), rootDirectory);
-    }
-
-    /**
-     * Creates a {@link PluginFileAccess} object that is able to create and modify files inside the plugin's root
-     * directory. It uses the specified directory as the source directory.
-     *
-     * @param sourceDirectory The source directory to use
-     */
-    public PluginFileAccess getFileAccess(File sourceDirectory) {
-        return new PluginFileAccess(sourceDirectory, rootDirectory);
+        return new PluginFileAccess(sourceDirectory, targetDirectory);
     }
 }

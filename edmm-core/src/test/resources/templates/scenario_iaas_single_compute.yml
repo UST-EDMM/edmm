@@ -21,22 +21,7 @@ components:
       create: ./tomcat/create.sh
       start: ./tomcat/start.sh
     relations:
-      - hosted_on: pet_clinic_ubuntu
-
-  pet_clinic_ubuntu:
-    type: compute
-    properties:
-      machine_image: ubuntu
-      instance_type: large
-      key_name: edmm
-      public_key: |
-        -----BEGIN PUBLIC KEY-----
-        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0
-        FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
-        3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
-        -----END PUBLIC KEY-----
-    operations:
-      configure: ./ubuntu/configure.sh
+      - hosted_on: ubuntu
 
   ## Database
 
@@ -58,9 +43,11 @@ components:
     properties:
       root_password: petclinic
     relations:
-      - hosted_on: db_ubuntu
+      - hosted_on: ubuntu
 
-  db_ubuntu:
+  ## Compute
+
+  ubuntu:
     type: compute
     properties:
       machine_image: ubuntu
@@ -72,8 +59,6 @@ components:
         FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
         3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
         -----END PUBLIC KEY-----
-    operations:
-      configure: ./ubuntu/configure.sh
 
 ###############################################
 ## Component Types
