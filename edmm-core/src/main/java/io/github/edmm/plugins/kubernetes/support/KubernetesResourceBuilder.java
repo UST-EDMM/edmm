@@ -46,7 +46,7 @@ public class KubernetesResourceBuilder {
                 fileAccess.append(targetDirectory + "/" + resource.getName() + ".yaml", resource.toYaml());
             }
         } catch (Exception e) {
-            logger.error("Failed to create Dockerfile for stack '{}'", stack.getName());
+            logger.error("Failed to create Kubernetes resource files for stack '{}'", stack.getName(), e);
             throw new TransformationException(e);
         }
     }
