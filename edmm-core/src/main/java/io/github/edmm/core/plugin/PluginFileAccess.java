@@ -37,7 +37,7 @@ public class PluginFileAccess {
         File source = new File(sourceDirectory, relativeSourcePath);
         File target = new File(targetDirectory, relativeTargetPath);
         if (!source.exists()) {
-            logger.error("Failed to copy '{}': file not found", source);
+            logger.error("Failed to copy '{}': file not found", source.getName());
             throw new FileNotFoundException();
         }
         try {

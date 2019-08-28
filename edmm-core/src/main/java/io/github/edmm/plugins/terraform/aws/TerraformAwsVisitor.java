@@ -2,6 +2,7 @@ package io.github.edmm.plugins.terraform.aws;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
+import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
@@ -50,6 +51,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     @Override
     public void populateTerraformFile() {
         PluginFileAccess fileAccess = context.getFileAccess();
+        BashScript envScript = new BashScript(fileAccess, "env.sh");
         Map<String, Object> data = new HashMap<>();
         data.put("instances", computeInstances);
         try {
@@ -64,8 +66,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 try {
                     fileAccess.copy(provisioner.getSource(), provisioner.getSource());
                 } catch (IOException e) {
-                    logger.error("Failed to copy artifacts", e);
-                    throw new TransformationException(e);
+                    logger.warn("Failed to copy file '{}'", provisioner.getSource());
                 }
             }
             // Copy operations to target directory
@@ -77,10 +78,11 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 try {
                     fileAccess.copy(op, op);
                 } catch (IOException e) {
-                    logger.error("Failed to copy operations", e);
-                    throw new TransformationException(e);
+                    logger.warn("Failed to copy file '{}'", op);
                 }
             }
+            // Write env.sh script entries
+            ec2.getEnvVars().forEach((name, value) -> envScript.append("export " + name + "=" + value));
         }
     }
 
@@ -92,13 +94,10 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 .ami("ami-0bbc25e23a7640b9b")
                 // TODO: Try to resolve instance type
                 .instanceType("t2.micro")
-                .ingressPorts(Lists.newArrayList())
-                .remoteExecProvisioners(Lists.newArrayList())
-                .fileProvisioners(Lists.newArrayList())
-                .dependencies(Lists.newArrayList())
                 .build();
         List<String> operations = collectOperations(component);
         ec2.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
+        ec2.addFileProvisioner(new FileProvisioner("./env.sh", "/opt/env.sh"));
         computeInstances.put(component, ec2);
         component.setTransformed(true);
     }
@@ -121,6 +120,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
         collectIngressPorts(component);
         collectFileProvisioners(component);
         collectRemoteExecProvisioners(component);
+        collectEnvVars(component);
         component.setTransformed(true);
     }
 
@@ -153,6 +153,21 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             Ec2 ec2 = computeInstances.get(hostingCompute);
             List<String> operations = collectOperations(component);
             ec2.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
+        }
+    }
+
+    private void collectEnvVars(RootComponent component) {
+        Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
+        if (optionalCompute.isPresent()) {
+            Compute hostingCompute = optionalCompute.get();
+            Ec2 ec2 = computeInstances.get(hostingCompute);
+            String[] blacklist = {"key_name", "public_key"};
+            component.getProperties().values().stream()
+                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                    .forEach(p -> {
+                        String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
+                        ec2.addEnvVar(name, p.getValue());
+                    });
         }
     }
 
