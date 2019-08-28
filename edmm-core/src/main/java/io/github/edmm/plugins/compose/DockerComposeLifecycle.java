@@ -3,6 +3,7 @@ package io.github.edmm.plugins.compose;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.docker.Container;
+import io.github.edmm.plugins.compose.support.DockerComposeBuilder;
 import io.github.edmm.plugins.kubernetes.KubernetesLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public class DockerComposeLifecycle extends KubernetesLifecycle {
             resolveBaseImage(stack);
             buildDockerfile(stack, fileAccess);
         }
+        DockerComposeBuilder composeBuilder = new DockerComposeBuilder(containers, dependencyGraph, fileAccess);
+        composeBuilder.populateComposeFile();
         logger.info("Transformation to Docker Compose successful");
     }
 }
