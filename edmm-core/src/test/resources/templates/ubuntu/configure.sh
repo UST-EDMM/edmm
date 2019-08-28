@@ -1,4 +1,4 @@
 #!/bin/bash
-sudo useradd edmm
-sudo usermod -aG sudo edmm
+useradd edmm
+usermod -aG sudo edmm
 exit 0
