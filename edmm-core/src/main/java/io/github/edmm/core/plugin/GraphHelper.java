@@ -16,15 +16,15 @@ import org.jgrapht.Graph;
 public abstract class GraphHelper {
 
     /**
-     * Find the leaf components in the graph (components that have no outgoing edges).
+     * Find the leafs in the graph (vertex that have no outgoing edges).
      *
      * @param graph The graph to search
      * @return mutable snapshot of all leaf vertices.
      */
-    public static Set<RootComponent> getLeafComponents(Graph<RootComponent, RootRelation> graph) {
-        Set<RootComponent> vertexSet = graph.vertexSet();
-        Set<RootComponent> leaves = new HashSet<>(vertexSet.size() * 2);
-        for (RootComponent vertex : vertexSet) {
+    public static <V, E> Set<V> getLeafComponents(Graph<V, E> graph) {
+        Set<V> vertexSet = graph.vertexSet();
+        Set<V> leaves = new HashSet<>(vertexSet.size() * 2);
+        for (V vertex : vertexSet) {
             if (graph.outgoingEdgesOf(vertex).isEmpty()) {
                 leaves.add(vertex);
             }
@@ -33,14 +33,14 @@ public abstract class GraphHelper {
     }
 
     /**
-     * Fetch all of the dependents of the given target component.
+     * Fetch all of the dependents of the given target.
      *
-     * @return mutable snapshot of the source components of all incoming edges
+     * @return mutable snapshot of the sources of all incoming edges
      */
-    public static Set<RootComponent> getSourceComponents(Graph<RootComponent, RootRelation> graph, RootComponent target, Class<? extends RootRelation> clazz) {
-        Set<RootRelation> edges = graph.incomingEdgesOf(target);
-        Set<RootComponent> sources = new LinkedHashSet<>();
-        for (RootRelation edge : edges) {
+    public static <V, E> Set<V> getSourceComponents(Graph<V, E> graph, V target, Class<? extends E> clazz) {
+        Set<E> edges = graph.incomingEdgesOf(target);
+        Set<V> sources = new LinkedHashSet<>();
+        for (E edge : edges) {
             if (clazz.isInstance(edge)) {
                 sources.add(graph.getEdgeSource(edge));
             }
@@ -49,14 +49,14 @@ public abstract class GraphHelper {
     }
 
     /**
-     * Fetch all of the dependencies of the given source components.
+     * Fetch all of the dependencies of the given source.
      *
-     * @return mutable snapshot of the target components of all outgoing edges
+     * @return mutable snapshot of the targets of all outgoing edges
      */
-    public static Set<RootComponent> getTargetComponents(Graph<RootComponent, RootRelation> graph, RootComponent source, Class<? extends RootRelation> clazz) {
-        Set<RootRelation> edges = graph.outgoingEdgesOf(source);
-        Set<RootComponent> targets = new LinkedHashSet<>();
-        for (RootRelation edge : edges) {
+    public static <V, E> Set<V> getTargetComponents(Graph<V, E> graph, V source, Class<? extends E> clazz) {
+        Set<E> edges = graph.outgoingEdgesOf(source);
+        Set<V> targets = new LinkedHashSet<>();
+        for (E edge : edges) {
             if (clazz.isInstance(edge)) {
                 targets.add(graph.getEdgeTarget(edge));
             }
@@ -74,7 +74,8 @@ public abstract class GraphHelper {
     public static Optional<RootComponent> getComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {
         return graph.vertexSet()
                 .stream()
-                .filter(c -> c.equals(component)).findFirst();
+                .filter(c -> c.equals(component))
+                .findFirst();
     }
 
     /**
