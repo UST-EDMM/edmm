@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import io.github.edmm.utils.Consts;
+import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Getter
 public class PluginFileAccess {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginFileAccess.class);
@@ -21,8 +24,8 @@ public class PluginFileAccess {
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
         logger.debug("Requesting file access:");
-        logger.debug("  > [source] {}", sourceDirectory);
-        logger.debug("  > [target] {}", targetDirectory);
+        logger.debug("> [source] {}", sourceDirectory);
+        logger.debug("> [target] {}", targetDirectory);
     }
 
     /**

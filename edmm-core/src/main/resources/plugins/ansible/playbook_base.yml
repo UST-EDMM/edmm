@@ -1,0 +1,30 @@
+---
+<#list plays as play>
+# Play for component ${play.name}
+- name: ${play.name}
+  <#if play.hosts??>
+  hosts: ${play.hosts}
+  <#else>
+  </#if>
+  become: yes
+  become_user: root
+  <#if play.vars??>
+  vars:
+    <#list play.vars?keys as key>
+    ${key}: ${play.vars[key]}
+    </#list>
+  <#else>
+  </#if>
+  tasks:
+    <#list play.tasks as task>
+    - name: ${task.name}
+      script: ${task.script}
+      <#if task.args??>
+      args:
+      <#list task.args as arg>
+        ${arg.name}: ${arg.value}
+      </#list>
+      <#else>
+      </#if>
+    </#list>
+</#list>

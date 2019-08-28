@@ -5,24 +5,22 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Database extends RootComponent {
 
-    public static Attribute<String> NAME = new Attribute<>("name", String.class);
-    public static Attribute<String> USER = new Attribute<>("user", String.class);
-    public static Attribute<String> PASSWORD = new Attribute<>("password", String.class);
+    public static final Attribute<String> SCHEMA_NAME = new Attribute<>("schema_name", String.class);
+    public static final Attribute<String> USER = new Attribute<>("user", String.class);
+    public static final Attribute<String> PASSWORD = new Attribute<>("password", String.class);
 
     public Database(MappingEntity mappingEntity) {
         super(mappingEntity);
     }
 
-    @Override
-    public String getName() {
-        return getProperty(NAME).orElseThrow(IllegalStateException::new);
+    public String getSchemaName() {
+        return getProperty(SCHEMA_NAME)
+                .orElseThrow(() -> new IllegalStateException("Database needs to specify the schema_name property"));
     }
 
     public Optional<String> getUser() {

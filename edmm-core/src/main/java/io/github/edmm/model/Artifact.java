@@ -1,13 +1,12 @@
 package io.github.edmm.model;
 
+import com.google.common.base.CaseFormat;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.model.support.BaseElement;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Artifact extends BaseElement {
 
     private final ScalarEntity entity;
@@ -20,6 +19,11 @@ public class Artifact extends BaseElement {
     @Override
     public String getName() {
         return entity.getName();
+    }
+
+    public String getNormalizedName() {
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entity.getName().toLowerCase())
+                .replace(".", "_");
     }
 
     public String getValue() {

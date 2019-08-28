@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.model.support.Attribute;
 import lombok.Getter;
 
@@ -41,6 +43,15 @@ public abstract class Entity implements Comparable<Entity> {
             children.add(e.getTarget());
         }
         return children;
+    }
+
+    public Set<Entity> getDirectChildren() {
+        return graph.outgoingEdgesOf(this).stream()
+                .filter(edge -> !(edge.getName().equals(DefaultKeys.INSTANCE_OF)
+                        || edge.getName().equals(DefaultKeys.TARGET_COMPONENT)
+                        || edge.getName().equals(DefaultKeys.EXTENDS_TYPE))
+                ).map(EntityGraph.Edge::getTarget)
+                .collect(Collectors.toSet());
     }
 
     public Optional<Entity> getChild(Attribute<?> key) {

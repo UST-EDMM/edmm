@@ -2,8 +2,10 @@ package io.github.edmm.core.plugin;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
@@ -73,6 +75,38 @@ public abstract class GraphHelper {
         return graph.vertexSet()
                 .stream()
                 .filter(c -> c.equals(component)).findFirst();
+    }
+
+    /**
+     * Find all components of a certain type in the graph.
+     *
+     * @param graph The graph to search
+     * @param clazz The type of component to search for
+     * @param <T>   subclass of {@link RootComponent}
+     * @return list of components
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends RootComponent> List<T> getComponents(Graph<RootComponent, RootRelation> graph, Class<T> clazz) {
+        return (List<T>) graph.vertexSet()
+                .stream()
+                .filter(clazz::isInstance)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find all relations of a certain type in the graph.
+     *
+     * @param graph The graph to search
+     * @param clazz The type of component to search for
+     * @param <T>   subclass of {@link RootComponent}
+     * @return list of relations
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends RootRelation> List<T> getRelations(Graph<RootComponent, RootRelation> graph, Class<T> clazz) {
+        return (List<T>) graph.edgeSet()
+                .stream()
+                .filter(clazz::isInstance)
+                .collect(Collectors.toList());
     }
 
     public static Optional<Compute> resolveHostingComputeComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {

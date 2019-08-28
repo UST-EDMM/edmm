@@ -5,18 +5,16 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class Compute extends RootComponent {
 
-    public static Attribute<String> OS_FAMILY = new Attribute<>("os_family", String.class);
-    public static Attribute<String> MACHINE_IMAGE = new Attribute<>("machine_image", String.class);
-    public static Attribute<String> INSTANCE_TYPE = new Attribute<>("instance_type", String.class);
-    public static Attribute<String> KEY_NAME = new Attribute<>("key_name", String.class);
-    public static Attribute<String> PUBLIC_KEY = new Attribute<>("public_key", String.class);
+    public static final Attribute<String> OS_FAMILY = new Attribute<>("os_family", String.class);
+    public static final Attribute<String> MACHINE_IMAGE = new Attribute<>("machine_image", String.class);
+    public static final Attribute<String> INSTANCE_TYPE = new Attribute<>("instance_type", String.class);
+    public static final Attribute<String> KEY_NAME = new Attribute<>("key_name", String.class);
+    public static final Attribute<String> PUBLIC_KEY = new Attribute<>("public_key", String.class);
 
     public Compute(MappingEntity mappingEntity) {
         super(mappingEntity);

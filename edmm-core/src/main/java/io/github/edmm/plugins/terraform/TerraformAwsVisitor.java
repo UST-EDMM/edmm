@@ -5,21 +5,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import freemarker.template.Template;
+import com.google.common.collect.Lists;
 import io.github.edmm.core.plugin.GraphHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.Database;
+import io.github.edmm.model.component.Dbms;
+import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.MysqlDbms;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
-import io.github.edmm.utils.Consts;
+import io.github.edmm.model.component.WebApplication;
+import io.github.edmm.model.relation.ConnectsTo;
+import io.github.edmm.plugins.terraform.model.Provisioner;
+import io.github.edmm.plugins.terraform.model.aws.Ec2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +35,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(TerraformAwsVisitor.class);
 
-    private final Map<Compute, Map<String, Object>> computeTemplateData = new HashMap<>();
-    private final Map<RootComponent, String> securityGroupIngressTemplateData = new HashMap<>();
-    private final Map<RootComponent, List<String>> provisionerTemplateData = new HashMap<>();
+    private final Map<Compute, Ec2> computeInstances = new HashMap<>();
 
     public TerraformAwsVisitor(TransformationContext context) {
         super(context);
@@ -41,65 +44,11 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     @Override
     public void populateTerraformFile() {
         PluginFileAccess fileAccess = context.getFileAccess();
-
+        Map<String, Object> data = new HashMap<>();
+        // Populate the data
+        data.put("instances", computeInstances);
         try {
-            Template baseTemplate = cfg.getTemplate("aws_base.tf");
-            fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, null));
-
-            // If there are compute nodes, add some defaults
-            if (!computeTemplateData.isEmpty()) {
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2_default.tf", null));
-            }
-
-            for (Map.Entry<Compute, Map<String, Object>> computeEntry : computeTemplateData.entrySet()) {
-                Compute compute = computeEntry.getKey();
-                Map<String, Object> data = computeEntry.getValue();
-                // Prepare ingress for respective security group
-                StringBuilder securityGroupIngress = new StringBuilder(Consts.EMPTY);
-                for (Map.Entry<RootComponent, String> componentEntry : securityGroupIngressTemplateData.entrySet()) {
-                    RootComponent component = GraphHelper.getComponent(graph, componentEntry.getKey()).orElseThrow(IllegalStateException::new);
-                    Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
-                    if (optionalCompute.isPresent()) {
-                        Compute hostingCompute = optionalCompute.get();
-                        if (compute.equals(hostingCompute)) {
-                            securityGroupIngress.append(componentEntry.getValue());
-                            securityGroupIngress.append(Consts.NL);
-                        }
-                    }
-                }
-                data.put("ingress", securityGroupIngress.toString());
-
-                // Prepare script values
-                StringBuilder scripts = new StringBuilder(Consts.EMPTY);
-                for (Map.Entry<RootComponent, List<String>> componentEntry : provisionerTemplateData.entrySet()) {
-                    RootComponent component = GraphHelper.getComponent(graph, componentEntry.getKey()).orElseThrow(IllegalStateException::new);
-                    Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
-                    if (optionalCompute.isPresent()) {
-                        Compute hostingCompute = optionalCompute.get();
-                        if (compute.equals(hostingCompute)) {
-                            componentEntry.getValue().stream()
-                                    .filter(Objects::nonNull)
-                                    .forEach(value -> scripts
-                                            .append(Consts.DOUBLE_QUOTE)
-                                            .append(value)
-                                            .append(Consts.DOUBLE_QUOTE)
-                                            .append(",")
-                                            .append(Consts.NL));
-                        }
-                    }
-                }
-                data.put("scripts", scripts.toString());
-
-                // Add provisioner statement if there are scripts available
-                data.put("provisioner", Consts.NL);
-                if (!scripts.toString().isEmpty()) {
-                    String provisionerData = TemplateHelper.toString(cfg, "provisioner_remote_exec.tpl", data);
-                    data.put("provisioner", provisionerData);
-                }
-
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_security_group.tf", data));
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws_ec2.tf", data));
-            }
+            fileAccess.append(FILE_NAME, TemplateHelper.toString(cfg, "aws.tf", data));
         } catch (IOException e) {
             logger.error("Failed to write Terraform file: {}", e.getMessage(), e);
         }
@@ -107,45 +56,99 @@ public class TerraformAwsVisitor extends TerraformVisitor {
 
     @Override
     public void visit(Compute component) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("aws_ec2_name", component.getNormalizedName());
-        data.put("aws_security_group_name", component.getNormalizedName() + "_security_group");
-        // TODO: Try to resolve image
-        data.put("aws_ec2_ami", "ami-0bbc25e23a7640b9b");
-        // TODO: Try to resolve instance type
-        data.put("aws_ec2_instance_type", "t2.micro");
-        computeTemplateData.put(component, data);
+        Ec2 ec2 = Ec2.builder()
+                .name(component.getNormalizedName())
+                // TODO: Try to resolve image
+                .ami("ami-0bbc25e23a7640b9b")
+                // TODO: Try to resolve instance type
+                .instanceType("t2.micro")
+                .ingressPorts(Lists.newArrayList())
+                .provisioners(Lists.newArrayList())
+                .dependsOn(Lists.newArrayList())
+                .build();
+        List<String> operations = collectOperations(component);
+        ec2.getProvisioners().add(Provisioner.builder().operations(operations).build());
+        computeInstances.put(component, ec2);
         component.setTransformed(true);
     }
 
     @Override
+    public void visit(ConnectsTo relation) {
+        RootComponent source = graph.getEdgeSource(relation);
+        RootComponent target = graph.getEdgeTarget(relation);
+        Optional<Compute> optionalSourceCompute = GraphHelper.resolveHostingComputeComponent(graph, source);
+        Optional<Compute> optionalTargetCompute = GraphHelper.resolveHostingComputeComponent(graph, target);
+        if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
+            Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
+            Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
+            sourceCompute.getDependsOn().add(targetCompute.getName());
+        }
+    }
+
+    @Override
+    public void visit(RootComponent component) {
+        collectIngressPorts(component);
+        collectProvisioners(component);
+        component.setTransformed(true);
+    }
+
+    private void collectIngressPorts(RootComponent component) {
+        component.getProperty(PORT).ifPresent(port -> {
+            Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
+            if (optionalCompute.isPresent()) {
+                Compute hostingCompute = optionalCompute.get();
+                computeInstances.get(hostingCompute).getIngressPorts().add(String.valueOf(port));
+            }
+        });
+    }
+
+    private void collectProvisioners(RootComponent component) {
+        Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
+        if (optionalCompute.isPresent()) {
+            Compute hostingCompute = optionalCompute.get();
+            Ec2 ec2 = computeInstances.get(hostingCompute);
+            List<String> operations = collectOperations(component);
+            ec2.getProvisioners().add(Provisioner.builder().operations(operations).build());
+        }
+    }
+
+    @Override
     public void visit(Tomcat component) {
-        collectIngressData(component);
-        collectProvisionerScripts(component);
+        visit((RootComponent) component);
     }
 
     @Override
     public void visit(MysqlDbms component) {
-        collectIngressData(component);
-        collectProvisionerScripts(component);
+        visit((RootComponent) component);
     }
 
-    private void collectIngressData(RootComponent component) {
-        component.getProperty(PORT).ifPresent(port -> {
-            Map<String, Object> data = new HashMap<>();
-            data.put("from_port", port.toString());
-            data.put("to_port", port.toString());
-            String ingress = TemplateHelper.toString(cfg, "aws_security_group_ingress.tpl", data);
-            securityGroupIngressTemplateData.put(component, ingress);
-        });
+    @Override
+    public void visit(Database component) {
+        visit((RootComponent) component);
     }
 
-    private void collectProvisionerScripts(RootComponent component) {
-        provisionerTemplateData.put(component, new ArrayList<>());
-        Consumer<Operation> listArtifactsConsumer = op -> op.getArtifacts()
-                .forEach(artifact -> provisionerTemplateData.get(component).add(artifact.getValue()));
-        component.getStandardLifecycle().getCreate().ifPresent(listArtifactsConsumer);
-        component.getStandardLifecycle().getConfigure().ifPresent(listArtifactsConsumer);
-        component.getStandardLifecycle().getStart().ifPresent(listArtifactsConsumer);
+    @Override
+    public void visit(Dbms component) {
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(MysqlDatabase component) {
+        visit((RootComponent) component);
+    }
+
+    @Override
+    public void visit(WebApplication component) {
+        visit((RootComponent) component);
+    }
+
+    private List<String> collectOperations(RootComponent component) {
+        List<String> operations = new ArrayList<>();
+        Consumer<Operation> artifactsConsumer = op -> op.getArtifacts()
+                .forEach(artifact -> operations.add(artifact.getValue()));
+        component.getStandardLifecycle().getCreate().ifPresent(artifactsConsumer);
+        component.getStandardLifecycle().getConfigure().ifPresent(artifactsConsumer);
+        component.getStandardLifecycle().getStart().ifPresent(artifactsConsumer);
+        return operations;
     }
 }

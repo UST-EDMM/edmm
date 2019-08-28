@@ -5,6 +5,7 @@ components:
   ubuntu:
     type: compute
     operations:
+      configure: test.sh
       start: start.sh
     artifacts:
       - iso: ubuntu.iso
@@ -15,12 +16,17 @@ component_types:
     extends: null
     operations:
       create: ~
-  compute:
-    extends: base
-    operations:
       configure:
         description: configure
-        metadata:
-          label: configure
+      start: ~
+      stop: ~
+      delete: delete.sh
+  compute:
+    extends: base
+    artifacts:
+      - test: test.sh
+    operations:
+      configure:
         artifacts:
           - script: configure.sh
+      stop: stop.sh
