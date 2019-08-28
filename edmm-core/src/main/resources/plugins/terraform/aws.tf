@@ -72,25 +72,36 @@ resource "aws_instance" "${ec2.name}" {
   key_name = aws_key_pair.auth.id
   vpc_security_group_ids = [aws_security_group.${ec2.name}_security_group.id]
   subnet_id = aws_subnet.default.id
-  <#list ec2.provisioners as provisioner>
-  <#if provisioner.operations?size != 0>
-  provisioner "remote-exec" {
+  <#list ec2.fileProvisioners as provisioner>
+  provisioner "file" {
+    source      = "${provisioner.source}"
+    destination = "${provisioner.destination}"
     connection {
       type  = "ssh"
       user  = var.ssh_user
       agent = true
     }
+  }
+  </#list>
+  <#list ec2.remoteExecProvisioners as provisioner>
+  <#if provisioner.scripts?size != 0>
+  provisioner "remote-exec" {
     scripts = [
-      <#list provisioner.operations as operation>
-      "${operation}"<#sep>,</#sep>
+      <#list provisioner.scripts as script>
+      "${script}"<#sep>,</#sep>
       </#list>
     ]
+    connection {
+      type  = "ssh"
+      user  = var.ssh_user
+      agent = true
+    }
   }
   <#else>
   </#if>
   </#list>
-  <#if ec2.dependsOn?size != 0>
-  depends_on = [<#list ec2.dependsOn as dep>${dep}<#sep>, </#sep></#list>]
+  <#if ec2.dependencies?size != 0>
+  depends_on = [<#list ec2.dependencies as dep>${dep}<#sep>, </#sep></#list>]
   <#else>
   </#if>
 }
