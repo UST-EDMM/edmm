@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.kubernetes.model;
+package io.github.edmm.docker;
 
 import io.fabric8.kubernetes.api.model.ContainerPort;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;

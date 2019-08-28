@@ -4,7 +4,10 @@ import java.util.Arrays;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DockerfileBuilder;
+import io.github.edmm.docker.FileMapping;
+import io.github.edmm.docker.PortMapping;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
@@ -14,9 +17,6 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import io.github.edmm.plugins.kubernetes.model.ComponentStack;
-import io.github.edmm.plugins.kubernetes.model.FileMapping;
-import io.github.edmm.plugins.kubernetes.model.PortMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +26,11 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(DockerfileBuildingVisitor.class);
 
-    private final ComponentStack stack;
+    private final Container stack;
     private final PluginFileAccess fileAccess;
     private final DockerfileBuilder builder;
 
-    public DockerfileBuildingVisitor(ComponentStack stack, PluginFileAccess fileAccess) {
+    public DockerfileBuildingVisitor(Container stack, PluginFileAccess fileAccess) {
         this.stack = stack;
         this.fileAccess = fileAccess;
         this.builder = new DockerfileBuilder().compress();

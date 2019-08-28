@@ -4,13 +4,14 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
-import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.docker.Container;
+import io.github.edmm.docker.PortMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +20,15 @@ public final class DeploymentResource implements KubernetesResource {
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResource.class);
 
     private Deployment deployment;
-    private final ComponentStack stack;
+    private final Container stack;
 
-    public DeploymentResource(ComponentStack stack) {
+    public DeploymentResource(Container stack) {
         this.stack = stack;
     }
 
     @Override
     public void build() {
-        Container container = new ContainerBuilder()
+        io.fabric8.kubernetes.api.model.Container container = new ContainerBuilder()
                 .withImage(stack.getLabel() + ":latest")
                 .withName(stack.getLabel())
                 .withImagePullPolicy("Always")
