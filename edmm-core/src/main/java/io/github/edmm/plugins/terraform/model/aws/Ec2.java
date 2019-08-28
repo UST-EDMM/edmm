@@ -1,6 +1,9 @@
 package io.github.edmm.plugins.terraform.model.aws;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.github.edmm.plugins.terraform.model.FileProvisioner;
 import io.github.edmm.plugins.terraform.model.RemoteExecProvisioner;
@@ -8,7 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class Ec2 {
 
     private String name;
@@ -18,6 +20,23 @@ public class Ec2 {
     private List<FileProvisioner> fileProvisioners;
     private List<RemoteExecProvisioner> remoteExecProvisioners;
     private List<String> dependencies;
+    private Map<String, String> envVars;
+
+    public Ec2() {
+        this.ingressPorts = new ArrayList<>();
+        this.fileProvisioners = new ArrayList<>();
+        this.remoteExecProvisioners = new ArrayList<>();
+        this.dependencies = new ArrayList<>();
+        this.envVars = new HashMap<>();
+    }
+
+    @Builder
+    public Ec2(String name, String ami, String instanceType) {
+        this();
+        this.name = name;
+        this.ami = ami;
+        this.instanceType = instanceType;
+    }
 
     public void addIngressPort(String port) {
         ingressPorts.add(port);
@@ -33,5 +52,9 @@ public class Ec2 {
 
     public void addDependency(String dependency) {
         dependencies.add(dependency);
+    }
+
+    public void addEnvVar(String name, String value) {
+        envVars.put(name, value);
     }
 }
