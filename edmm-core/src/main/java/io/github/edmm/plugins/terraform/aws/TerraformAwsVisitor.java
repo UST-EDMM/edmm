@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform;
+package io.github.edmm.plugins.terraform.aws;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.relation.ConnectsTo;
+import io.github.edmm.plugins.terraform.TerraformVisitor;
 import io.github.edmm.plugins.terraform.model.Provisioner;
 import io.github.edmm.plugins.terraform.model.aws.Ec2;
 import org.slf4j.Logger;

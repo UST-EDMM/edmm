@@ -23,6 +23,8 @@
         <guava.version>27.1-jre</guava.version>
         <freemarker.version>2.3.29</freemarker.version>
         <commons-io.version>2.5</commons-io.version>
+        <commons-text.version>1.7</commons-text.version>
+        <commons-collections.version>4.4</commons-collections.version>
     </properties>
 
     <modules>
@@ -50,6 +52,16 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

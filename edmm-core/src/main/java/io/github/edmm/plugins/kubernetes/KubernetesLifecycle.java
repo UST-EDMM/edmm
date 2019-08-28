@@ -13,8 +13,10 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.kubernetes.model.ComponentStack;
-import io.github.edmm.plugins.kubernetes.visitor.DockerfileBuildingVisitor;
-import io.github.edmm.plugins.kubernetes.visitor.ImageMappingVisitor;
+import io.github.edmm.plugins.kubernetes.support.DependencyGraph;
+import io.github.edmm.plugins.kubernetes.support.DockerfileBuildingVisitor;
+import io.github.edmm.plugins.kubernetes.support.ImageMappingVisitor;
+import io.github.edmm.plugins.kubernetes.support.KubernetesResourceBuilder;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ public class KubernetesLifecycle extends AbstractLifecycle {
     private final Graph<RootComponent, RootRelation> graph;
 
     private List<ComponentStack> componentStacks = new ArrayList<>();
+    private DependencyGraph dependencyGraph;
 
     public KubernetesLifecycle(TransformationContext context) {
         this.context = context;
@@ -43,6 +46,7 @@ public class KubernetesLifecycle extends AbstractLifecycle {
             componentStacks.add(stack);
             populateComponentStacks(graph, componentStacks, stack, compute);
         }
+        dependencyGraph = new DependencyGraph(componentStacks, graph);
     }
 
     @Override
@@ -57,6 +61,11 @@ public class KubernetesLifecycle extends AbstractLifecycle {
             // Build Dockerfile
             DockerfileBuildingVisitor dockerfileBuilder = new DockerfileBuildingVisitor(stack, fileAccess);
             dockerfileBuilder.populateDockerfile();
+        }
+        for (ComponentStack stack : componentStacks) {
+            // Build Kubernetes resource files
+            KubernetesResourceBuilder resourceBuilder = new KubernetesResourceBuilder(stack, dependencyGraph, fileAccess);
+            resourceBuilder.populateResources();
         }
         logger.info("Transformation to Kubernetes successful");
     }
