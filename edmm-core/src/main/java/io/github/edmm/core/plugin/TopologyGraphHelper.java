@@ -13,7 +13,7 @@ import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import org.jgrapht.Graph;
 
-public abstract class GraphHelper {
+public abstract class TopologyGraphHelper {
 
     /**
      * Find the leafs in the graph (vertex that have no outgoing edges).
@@ -64,46 +64,20 @@ public abstract class GraphHelper {
         return targets;
     }
 
-    /**
-     * Find a certain component in the graph.
-     *
-     * @param graph     The graph to search
-     * @param component The component to find
-     * @return optional {@link RootComponent}
-     */
-    public static Optional<RootComponent> getComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {
-        return graph.vertexSet()
-                .stream()
-                .filter(c -> c.equals(component))
-                .findFirst();
+    public static <V, E> boolean hasVertex(Graph<V, E> graph, V component) {
+        return graph.containsVertex(component);
     }
 
-    /**
-     * Find all components of a certain type in the graph.
-     *
-     * @param graph The graph to search
-     * @param clazz The type of component to search for
-     * @param <T>   subclass of {@link RootComponent}
-     * @return list of components
-     */
     @SuppressWarnings("unchecked")
-    public static <T extends RootComponent> List<T> getComponents(Graph<RootComponent, RootRelation> graph, Class<T> clazz) {
+    public static <V, E, T> List<T> getVertices(Graph<V, E> graph, Class<T> clazz) {
         return (List<T>) graph.vertexSet()
                 .stream()
                 .filter(clazz::isInstance)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find all relations of a certain type in the graph.
-     *
-     * @param graph The graph to search
-     * @param clazz The type of component to search for
-     * @param <T>   subclass of {@link RootComponent}
-     * @return list of relations
-     */
     @SuppressWarnings("unchecked")
-    public static <T extends RootRelation> List<T> getRelations(Graph<RootComponent, RootRelation> graph, Class<T> clazz) {
+    public static <V, E, T> List<T> getEdges(Graph<V, E> graph, Class<T> clazz) {
         return (List<T>) graph.edgeSet()
                 .stream()
                 .filter(clazz::isInstance)

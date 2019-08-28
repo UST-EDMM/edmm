@@ -9,6 +9,8 @@ import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.docker.Container;
+import io.github.edmm.docker.PortMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +19,9 @@ public final class ServiceResource implements KubernetesResource {
     private static final Logger logger = LoggerFactory.getLogger(ServiceResource.class);
 
     private Service service;
-    private final ComponentStack stack;
+    private final Container stack;
 
-    public ServiceResource(ComponentStack stack) {
+    public ServiceResource(Container stack) {
         this.stack = stack;
     }
 

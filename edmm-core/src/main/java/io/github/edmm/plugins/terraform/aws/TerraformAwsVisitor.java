@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
-import io.github.edmm.core.plugin.GraphHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
+import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
@@ -77,8 +77,8 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     public void visit(ConnectsTo relation) {
         RootComponent source = graph.getEdgeSource(relation);
         RootComponent target = graph.getEdgeTarget(relation);
-        Optional<Compute> optionalSourceCompute = GraphHelper.resolveHostingComputeComponent(graph, source);
-        Optional<Compute> optionalTargetCompute = GraphHelper.resolveHostingComputeComponent(graph, target);
+        Optional<Compute> optionalSourceCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, source);
+        Optional<Compute> optionalTargetCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, target);
         if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
             Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
             Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
@@ -95,7 +95,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
 
     private void collectIngressPorts(RootComponent component) {
         component.getProperty(PORT).ifPresent(port -> {
-            Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
+            Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
             if (optionalCompute.isPresent()) {
                 Compute hostingCompute = optionalCompute.get();
                 computeInstances.get(hostingCompute).getIngressPorts().add(String.valueOf(port));
@@ -104,7 +104,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     }
 
     private void collectProvisioners(RootComponent component) {
-        Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
+        Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
         if (optionalCompute.isPresent()) {
             Compute hostingCompute = optionalCompute.get();
             Ec2 ec2 = computeInstances.get(hostingCompute);

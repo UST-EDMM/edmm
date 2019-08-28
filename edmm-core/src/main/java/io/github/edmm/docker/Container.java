@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.kubernetes.model;
+package io.github.edmm.docker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,12 +8,13 @@ import java.util.Map;
 import io.github.edmm.model.component.RootComponent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public final class ComponentStack {
+public final class Container {
 
     private List<RootComponent> components = new ArrayList<>();
 
@@ -24,7 +25,7 @@ public final class ComponentStack {
     private List<FileMapping> operations = new ArrayList<>();
     private List<FileMapping> startOperations = new ArrayList<>();
 
-    public ComponentStack(ComponentStack stack) {
+    public Container(@NonNull Container stack) {
         this.components = new ArrayList<>(stack.components);
         this.baseImage = stack.baseImage;
         this.envVars = new HashMap<>(stack.envVars);
