@@ -3,6 +3,7 @@ package io.github.edmm.cli;
 import io.github.edmm.cli.command.TransformCommand;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import picocli.CommandLine;
@@ -22,24 +23,30 @@ import static picocli.CommandLine.usage;
         }
 )
 @SpringBootApplication
-public class Application implements CommandLineRunner, Runnable {
+public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
+
+    private int exitCode = 0;
 
     public static void main(String[] args) {
+        AnsiConsole.systemInstall();
+        System.setProperty("picocli.ansi", "true");
         SpringApplication.run(Application.class, args);
+        AnsiConsole.systemUninstall();
     }
 
     @Override
     public void run(String... args) {
-        AnsiConsole.systemInstall();
-        System.setProperty("picocli.ansi", "true");
         CommandLine cmd = new CommandLine(this);
-        int exitCode = cmd.execute(args);
-        AnsiConsole.systemUninstall();
-        System.exit(exitCode);
+        exitCode = cmd.execute(args);
     }
 
     @Override
     public void run() {
         usage(this, System.out);
+    }
+
+    @Override
+    public int getExitCode() {
+        return exitCode;
     }
 }
