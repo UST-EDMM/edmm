@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 import io.github.edmm.utils.Consts;
 import lombok.Getter;
-import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class PluginFileAccess {
         File source = new File(sourceDirectory, relativeSourcePath);
         File target = new File(targetDirectory, relativeTargetPath);
         if (!source.exists()) {
-            logger.error("Failed to copy '{}': file not found", source);
+            logger.error("Failed to copy '{}': file not found", source.getName());
             throw new FileNotFoundException();
         }
         try {

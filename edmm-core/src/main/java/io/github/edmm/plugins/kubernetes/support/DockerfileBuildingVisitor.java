@@ -1,14 +1,13 @@
-package io.github.edmm.plugins.kubernetes.visitor;
+package io.github.edmm.plugins.kubernetes.support;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DockerfileBuilder;
+import io.github.edmm.docker.FileMapping;
+import io.github.edmm.docker.PortMapping;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
@@ -18,8 +17,6 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.visitor.ComponentVisitor;
-import io.github.edmm.plugins.kubernetes.model.ComponentStack;
-import io.github.edmm.plugins.kubernetes.model.FileMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +26,11 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(DockerfileBuildingVisitor.class);
 
-    private final ComponentStack stack;
+    private final Container stack;
     private final PluginFileAccess fileAccess;
     private final DockerfileBuilder builder;
 
-    private final Set<Integer> ports = new HashSet<>();
-    private final List<FileMapping> files = new ArrayList<>();
-    private final List<FileMapping> operations = new ArrayList<>();
-    private final List<FileMapping> startOperations = new ArrayList<>();
-
-    public DockerfileBuildingVisitor(ComponentStack stack, PluginFileAccess fileAccess) {
+    public DockerfileBuildingVisitor(Container stack, PluginFileAccess fileAccess) {
         this.stack = stack;
         this.fileAccess = fileAccess;
         this.builder = new DockerfileBuilder().compress();
@@ -50,14 +42,14 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
         String targetDirectory = stack.getName();
         stack.getComponents().forEach(component -> component.accept(this));
         try {
-            for (FileMapping mapping : files) {
+            for (FileMapping mapping : stack.getArtifacts()) {
                 String sourcePath = mapping.getArtifact().getValue();
                 String filename = determineFilename(mapping.getArtifact());
                 String targetPath = targetDirectory + "/" + filename;
                 fileAccess.copy(sourcePath, targetPath);
                 builder.add("./" + filename, filename);
             }
-            for (FileMapping mapping : operations) {
+            for (FileMapping mapping : stack.getOperations()) {
                 String sourcePath = mapping.getArtifact().getValue();
                 String filename = mapping.getComponent().getNormalizedName() +
                         "_" + determineFilename(mapping.getArtifact());
@@ -67,10 +59,10 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
                 builder.run("./" + filename);
             }
             // Expose ports
-            ports.forEach(builder::expose);
+            stack.getPorts().forEach(port -> builder.expose(port.getValue()));
             // Add final CMD statement
-            if (!startOperations.isEmpty()) {
-                FileMapping mapping = startOperations.get(startOperations.size() - 1);
+            if (!stack.getStartOperations().isEmpty()) {
+                FileMapping mapping = stack.getStartOperations().get(stack.getStartOperations().size() - 1);
                 String sourcePath = mapping.getArtifact().getValue();
                 String filename = mapping.getComponent().getNormalizedName() +
                         "_" + determineFilename(mapping.getArtifact());
@@ -81,7 +73,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
             }
             fileAccess.append(targetDirectory + "/Dockerfile", builder.build());
         } catch (Exception e) {
-            logger.error("Failed to create Dockerfile for stack '{}'", stack.getName());
+            logger.error("Failed to create Dockerfile for stack '{}'", stack.getName(), e);
             throw new TransformationException(e);
         }
     }
@@ -96,7 +88,8 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     }
 
     private void collectPorts(RootComponent component) {
-        component.getProperty(PORT).ifPresent(ports::add);
+        component.getProperty(PORT)
+                .ifPresent(port -> stack.addPort(new PortMapping(component.getNormalizedName(), port)));
     }
 
     private void collectEnvVars(RootComponent component) {
@@ -104,8 +97,9 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
         component.getProperties().values().stream()
                 .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
                 .forEach(p -> {
-                    String name = component.getNormalizedName() + "_" + p.getNormalizedName();
-                    builder.env(name.toUpperCase(), p.getValue());
+                    String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
+                    builder.env(name, p.getValue());
+                    stack.addEnvVar(name, p.getValue());
                 });
     }
 
@@ -113,9 +107,9 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
         for (Artifact artifact : operation.getArtifacts()) {
             FileMapping mapping = new FileMapping(component, operation, artifact);
             if (!isStartOperation) {
-                operations.add(mapping);
+                stack.addOperation(mapping);
             } else {
-                startOperations.add(mapping);
+                stack.addStartOperation(mapping);
             }
         }
     }
@@ -123,7 +117,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     private void collectArtifacts(RootComponent component) {
         for (Artifact artifact : component.getArtifacts()) {
             FileMapping mapping = new FileMapping(component, null, artifact);
-            files.add(mapping);
+            stack.addArtifact(mapping);
         }
     }
 

@@ -57,6 +57,9 @@ components:
     type: mysql_dbms
     properties:
       root_password: petclinic
+    operations:
+      create: ./mysql_dbms/create.sh
+      start: ./mysql_dbms/start.sh
     relations:
       - hosted_on: db_ubuntu
 

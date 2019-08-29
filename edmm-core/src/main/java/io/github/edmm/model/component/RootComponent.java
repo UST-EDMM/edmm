@@ -26,6 +26,8 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static final Attribute<RootRelation> RELATIONS = new Attribute<>("relations", RootRelation.class);
 
+    private final List<RootRelation> relationCache = new ArrayList<>();
+
     public RootComponent(MappingEntity mappingEntity) {
         super(mappingEntity);
         // Resolve the chain of types
@@ -41,10 +43,13 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
     }
 
     public List<RootRelation> getRelations() {
-        List<RootRelation> result = new ArrayList<>();
-        Optional<Entity> artifactsEntity = getEntity().getChild(RELATIONS);
-        artifactsEntity.ifPresent(value -> populateRelations(result, value));
-        return Lists.reverse(result);
+        if (relationCache.isEmpty()) {
+            List<RootRelation> result = new ArrayList<>();
+            Optional<Entity> artifactsEntity = getEntity().getChild(RELATIONS);
+            artifactsEntity.ifPresent(value -> populateRelations(result, value));
+            relationCache.addAll(Lists.reverse(result));
+        }
+        return relationCache;
     }
 
     public StandardLifecycle getStandardLifecycle() {

@@ -1,0 +1,28 @@
+version: '3'
+services:
+<#list services as service>
+  ${service.name}:
+    image: ${service.image}
+    build: ${service.targetDirectory}
+    <#if service.ports?size != 0>
+    ports:
+      <#list service.ports as port>
+      - '${port}:${port}'
+      </#list>
+    <#else>
+    </#if>
+    <#if service.envVars?size != 0>
+    environment:
+      <#list service.envVars as name, value>
+      ${name}: ${value}
+      </#list>
+    <#else>
+    </#if>
+    <#if service.dependencies?size != 0>
+    depends_on:
+      <#list service.dependencies as dep>
+      - ${dep}
+      </#list>
+    <#else>
+    </#if>
+</#list>

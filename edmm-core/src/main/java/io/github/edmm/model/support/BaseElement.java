@@ -24,7 +24,7 @@ public abstract class BaseElement {
     }
 
     public String getNormalizedName() {
-        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entity.getName().toLowerCase())
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName().toLowerCase())
                 .replace(".", "_");
     }
 
