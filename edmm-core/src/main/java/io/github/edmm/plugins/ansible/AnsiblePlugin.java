@@ -6,7 +6,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 
 public class AnsiblePlugin extends Plugin<AnsibleLifecycle> {
 
-    public static final Platform ANSIBLE = Platform.builder().id("plugins.ansible").name("Ansible").build();
+    public static final Platform ANSIBLE = Platform.builder().id("ansible").name("Ansible").build();
 
     public AnsiblePlugin() {
         super(ANSIBLE);

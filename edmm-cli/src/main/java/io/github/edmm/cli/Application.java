@@ -57,7 +57,8 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
     public static void main(String[] args) {
         AnsiConsole.systemInstall();
         System.setProperty(PICOCLI_ANSI, String.valueOf(true));
-        SpringApplication.run(Application.class, args);
+        int exitCode = SpringApplication.exit(SpringApplication.run(Application.class, args));
         AnsiConsole.systemUninstall();
+        System.exit(exitCode);
     }
 }
