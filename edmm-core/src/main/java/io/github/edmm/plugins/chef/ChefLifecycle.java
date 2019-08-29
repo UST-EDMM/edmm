@@ -33,9 +33,8 @@ public class ChefLifecycle extends AbstractLifecycle {
     @Override
     public void transform() {
         LOGGER.info("Begin transformation to Chef...");
-        ChefVisitor visitor = new ChefVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        visitor.populateChefRepository();
+        ChefTransformer transformer = new ChefTransformer(context);
+        transformer.populateChefRepository();
         LOGGER.info("Transformation to Chef successful");
     }
 
