@@ -25,11 +25,13 @@ import static picocli.CommandLine.usage;
 @SpringBootApplication
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
+    public static final String PICOCLI_ANSI = "picocli.ansi";
+
     private int exitCode = 0;
 
     public static void main(String[] args) {
         AnsiConsole.systemInstall();
-        System.setProperty("picocli.ansi", "true");
+        System.setProperty(PICOCLI_ANSI, String.valueOf(true));
         SpringApplication.run(Application.class, args);
         AnsiConsole.systemUninstall();
     }
