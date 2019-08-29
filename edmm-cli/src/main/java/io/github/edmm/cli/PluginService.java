@@ -1,4 +1,4 @@
-package io.github.edmm.core.plugin;
+package io.github.edmm.cli;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +8,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import io.github.edmm.core.plugin.Plugin;
 import io.github.edmm.core.transformation.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PluginService {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginService.class);
@@ -19,6 +23,7 @@ public class PluginService {
     private final List<Plugin> plugins;
     private final Set<Platform> platforms = new HashSet<>();
 
+    @Autowired
     public PluginService(List<Plugin> plugins) {
         this.plugins = plugins;
         Map<String, Plugin> pluginMap = new HashMap<>();
@@ -32,7 +37,7 @@ public class PluginService {
         for (Plugin plugin : plugins) {
             platforms.add(plugin.getPlatform());
         }
-        logger.info("Loaded {} plugins", plugins.size());
+        logger.debug("Loaded {} plugins", plugins.size());
     }
 
     public List<Plugin> getPlugins() {

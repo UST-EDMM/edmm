@@ -25,6 +25,7 @@
         <commons-io.version>2.5</commons-io.version>
         <commons-text.version>1.7</commons-text.version>
         <commons-collections.version>4.4</commons-collections.version>
+        <jansi.version>1.18</jansi.version>
     </properties>
 
     <modules>
@@ -66,8 +67,13 @@
             </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
-                <artifactId>picocli</artifactId>
+                <artifactId>picocli-spring-boot-starter</artifactId>
                 <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fusesource.jansi</groupId>
+                <artifactId>jansi</artifactId>
+                <version>${jansi.version}</version>
             </dependency>
             <dependency>
                 <groupId>me.tongfei</groupId>
