@@ -1,16 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2018 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Apache Software License 2.0
- * which is available at https://www.apache.org/licenses/LICENSE-2.0.
- *
- * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
- *******************************************************************************/
+
 package io.github.edmm.plugins.azure.model.resource;
 
 import java.util.HashMap;
@@ -20,9 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.Parameter;
 import io.github.edmm.plugins.azure.model.ParameterTypeEnum;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * A generic Azure resource. It includes the values that are expected to exist in all concrete resource classes.
@@ -38,20 +24,22 @@ public abstract class Resource {
      * Used to retrieve the full type name of this resource. Set by child types.
      */
     private final ResourceTypeEnum type;
-    private String name;
+    private final String name;
     private String location;
     private List<String> dependsOn;
     private Properties properties;
 
-    public Resource(ResourceTypeEnum type) {
+    public Resource(ResourceTypeEnum type, String name) {
         this.type = type;
+        this.name = name;
         setDefaults();
     }
 
     protected void setDefaults() {
         this.setLocation("[parameters('location')]");
     }
-    protected Map<String,Parameter> getRequiredParameters() {
+
+    protected Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = new HashMap<>();
         params.put("location", Parameter.builder()
                 .type(ParameterTypeEnum.STRING)
@@ -59,5 +47,9 @@ public abstract class Resource {
                 .build());
 
         return params;
+    }
+
+    protected Map<String, String> getRequiredVariables() {
+        return new HashMap<>();
     }
 }

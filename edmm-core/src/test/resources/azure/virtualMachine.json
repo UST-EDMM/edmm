@@ -1,0 +1,77 @@
+{
+  "apiVersion" : "2019-03-01",
+  "type" : "Microsoft.Compute/virtualMachines",
+  "name" : "vm1",
+  "location" : "[parameters('location')]",
+  "properties" : {
+    "hardwareProfile" : {
+      "vmSize" : "Standard_A0"
+    },
+    "osProfile" : {
+      "computerName" : "[parameters('vm1_computerName')]",
+      "adminUsername" : "[parameters('vm1_adminUserName')]",
+      "adminPassword" : "[parameters('vm1_adminKeyOrPassword')]",
+      "linuxConfiguration" : {
+        "disablePasswordAuthentication" : "[equals(parameters('vm1_authentication'), 'ssh')]",
+        "ssh" : {
+          "publicKeys" : [ {
+            "path" : "[concat('/home/', parameters('vm1_adminUserName'), '/.ssh/authorized_keys')]",
+            "keyData" : "[parameters('vm1_adminKeyOrPassword')]"
+          } ]
+        }
+      }
+    },
+    "storageProfile" : {
+      "imageReference" : {
+        "publisher" : "Canonical",
+        "offer" : "UbuntuServer",
+        "sku" : "14.04.5-LTS"
+      },
+      "osDisk" : {
+        "name" : "vm1_OSDisk",
+        "caching" : "ReadWrite",
+        "createOptions" : "FromImage"
+      }
+    },
+    "networkProfile" : {
+      "networkInterfaces" : [ {
+        "apiVersion" : "2019-04-01",
+        "type" : "Microsoft.Network/networkInterfaces",
+        "name" : "vm1_networkInterface",
+        "location" : "[parameters('location')]",
+        "properties" : {
+          "networkSecurityGroup" : {
+            "apiVersion" : "2019-04-01",
+            "type" : "Microsoft.Network/networkSecurityGroups",
+            "name" : "vm1_networkInterface_securityGroup",
+            "location" : "[parameters('location')]",
+            "properties" : {
+              "securityRules" : [ ]
+            }
+          },
+          "ipConfiguration" : {
+            "name" : "vm1_networkInterface_ipConfiguration",
+            "properties" : {
+              "privateIpAllocationMethod" : "Dynamic",
+              "publicIpAddress" : {
+                "apiVersion" : "2019-04-01",
+                "type" : "Microsoft.Network/publicIPAddresses",
+                "name" : "vm1_networkInterface_publicIpAddress",
+                "location" : "[parameters('location')]",
+                "properties" : {
+                  "publicIpAllocationMethod" : "Dynamic",
+                  "dnsSettings" : {
+                    "domainNameLabel" : "[parameters('DnsName')]"
+                  }
+                }
+              },
+              "subnet" : {
+                "id" : "[variables('subnet_id')]"
+              }
+            }
+          }
+        }
+      } ]
+    }
+  }
+}
