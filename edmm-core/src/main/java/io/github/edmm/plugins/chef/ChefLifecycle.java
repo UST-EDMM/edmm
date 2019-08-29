@@ -11,8 +11,11 @@ public class ChefLifecycle extends AbstractLifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChefLifecycle.class);
     public static final String COOKBOOKS_FOLDER = "cookbooks";
     public static final String POLICIES_FOLDER = "policies";
+    public static final String POLICY_FILENAME = "Policyfile.rb";
     public static final String COOKBOOK_RECIPES_FOLDER = "recipes";
+    public static final String COOKBOOK_FILES_FOLDER = "files";
     public static final String COOKBOOK_ATTRIBUTES_FOLDER = "attributes";
+    public static final String COOKBOOK_DEFAULT_RECIPE_FILENAME = "default.rb";
     public static final String COOKBOOK_METADATA_FILENAME = "metadata.rb";
     public static final String COOKBOOK_CHEFIGNORE_FILENAME = "chefignore";
 

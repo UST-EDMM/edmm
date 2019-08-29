@@ -52,8 +52,8 @@ public class ChefTests {
         lifecycle.cleanup();
     }
 
-    @After
+    /*@After
     public void destroy() throws Exception {
         FileUtils.deleteDirectory(targetDirectory);
-    }
+    }*/
 }
