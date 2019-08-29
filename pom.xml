@@ -23,6 +23,7 @@
         <guava.version>27.1-jre</guava.version>
         <freemarker.version>2.3.29</freemarker.version>
         <commons-io.version>2.5</commons-io.version>
+        <jackson.versoin>2.9.9</jackson.versoin>
     </properties>
 
     <modules>
