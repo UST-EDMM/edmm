@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class PropertyGetParam implements PropertyAssignment {
+public class PropertyGetResource implements PropertyAssignment {
 
-    @JsonProperty("get_param")
+    @JsonProperty("get_resource")
     private String name;
 }
