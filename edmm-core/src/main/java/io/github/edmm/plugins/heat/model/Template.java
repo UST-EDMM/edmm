@@ -42,6 +42,7 @@ public class Template {
         if (mapper == null) {
             YAMLFactory f = new YAMLFactory();
             f.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES);
+            f.enable(YAMLGenerator.Feature.SPLIT_LINES);
             f.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
             mapper = new ObjectMapper(f);
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
