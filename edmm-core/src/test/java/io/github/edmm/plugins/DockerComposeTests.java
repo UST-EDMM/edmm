@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
-import io.github.edmm.plugins.terraform.TerraformPlugin;
+import io.github.edmm.plugins.compose.DockerComposePlugin;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -15,14 +15,14 @@ import org.springframework.core.io.ClassPathResource;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TerraformTests extends PluginTest {
+public class DockerComposeTests extends PluginTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TerraformTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(DockerComposeTests.class);
 
     private TransformationContext context;
 
-    public TerraformTests() throws Exception {
-        super(Files.createTempDirectory("terraform-").toFile());
+    public DockerComposeTests() throws Exception {
+        super(Files.createTempDirectory("compose-").toFile());
     }
 
     @Before
@@ -39,6 +39,6 @@ public class TerraformTests extends PluginTest {
 
     @Test
     public void testLifecycleExecution() {
-        executeLifecycle(new TerraformPlugin(), context);
+        executeLifecycle(new DockerComposePlugin(), context);
     }
 }

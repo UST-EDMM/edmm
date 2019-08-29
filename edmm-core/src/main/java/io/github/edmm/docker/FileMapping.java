@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.kubernetes.model;
+package io.github.edmm.docker;
 
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
