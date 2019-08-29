@@ -18,6 +18,8 @@ public class Template {
 
     private static ObjectMapper mapper;
 
+    @JsonIgnore
+    private String name;
     private String heatTemplateVersion = "2016-10-14";
     private String description;
     private Map<String, Parameter> parameters;
