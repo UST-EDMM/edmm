@@ -1,5 +1,10 @@
-<#if tasks??>
+<#if properties??>
+<#list properties as k, property>
+ENV['${k}'] = '${property}'
+</#list>
+</#if>
 
+<#if tasks??>
 <#list tasks as task>
 cookbook_file '${task.targetPath}' do
   source '${task.sourcePath}'
@@ -9,8 +14,8 @@ end
 execute '${task.name}' do
   command 'sh ${task.targetPath}'
 end
-</#list>
 
+</#list>
 </#if>
 
 

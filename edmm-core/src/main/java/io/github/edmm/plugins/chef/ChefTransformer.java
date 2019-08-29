@@ -15,10 +15,10 @@ import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
-import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.chef.model.Metadata;
 import io.github.edmm.plugins.chef.model.PolicyFile;
 import io.github.edmm.plugins.chef.model.ShellRecipe;
@@ -39,15 +39,15 @@ import static io.github.edmm.plugins.chef.ChefLifecycle.COOKBOOK_RECIPES_FOLDER;
 import static io.github.edmm.plugins.chef.ChefLifecycle.POLICIES_FOLDER;
 import static io.github.edmm.plugins.chef.ChefLifecycle.POLICY_FILENAME;
 
-public class ChefVisitor implements ComponentVisitor {
+public class ChefTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChefVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChefTransformer.class);
 
     protected final TransformationContext context;
-    protected final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/chef"));
+    private final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/chef"));
     protected final Graph<RootComponent, RootRelation> graph;
 
-    public ChefVisitor(TransformationContext context) {
+    public ChefTransformer(TransformationContext context) {
         this.context = context;
         this.graph = context.getTopologyGraph();
     }
@@ -69,14 +69,21 @@ public class ChefVisitor implements ComponentVisitor {
                 List<String> runningOrder = new ArrayList<>();
                 Map<String, Object> templateData = new HashMap<>();
 
+                // initialize templates
                 Template chefIgnore = cfg.getTemplate("chefignore");
+                Template metadata = cfg.getTemplate("metadata.rb");
+                Template shellRecipe = cfg.getTemplate("shell_script_recipe.rb");
 
                 LOGGER.info("Generate a repository structure for application stack: " + context.getModel().getName());
+
+                // generate the chefignore file
                 fileAccess.append(COOKBOOK_CHEFIGNORE_FILENAME, TemplateHelper.toString(chefIgnore, null));
+
                 while (iterator.hasNext()) {
                     RootComponent component = iterator.next();
                     Path cookbookPath = Paths.get(COOKBOOKS_FOLDER, component.getNormalizedName());
-                    Template metadata = cfg.getTemplate("metadata.rb");
+
+                    // generate component's metadata.rb file
                     templateData.put("metadata", Metadata.builder().name(component.getNormalizedName()).build());
                     fileAccess.append(
                             cookbookPath.resolve(COOKBOOK_METADATA_FILENAME).toString(),
@@ -90,25 +97,37 @@ public class ChefVisitor implements ComponentVisitor {
                     LOGGER.info("Generate a cookbook for component " + component.getName());
                     if (component instanceof Compute) {
                         LOGGER.info("found compute component " + component.getName());
-                        // TODO generate a chef-provisioning cookbook
+                        // TODO generate a cookbook using chef-provisioning plugin
 
                     } else {
-                        // TODO generate shell script recipes
                         Path recipePath = cookbookPath.resolve(COOKBOOK_RECIPES_FOLDER).resolve(COOKBOOK_DEFAULT_RECIPE_FILENAME);
-                        Template shellRecipe = cfg.getTemplate("shell_script_recipe.rb");
+
                         List<ShellRecipe> recipes = new ArrayList<>();
+                        Map<String, String> properties = new HashMap<>();
+
+                        // set properties as Ruby environment variables within a recipe
+                        prepareProperties(properties, component.getProperties());
+                        templateData.put("properties", properties);
 
                         collectOperations(component).forEach(o -> {
                             if (!o.getArtifacts().isEmpty()) {
                                 Artifact a = o.getArtifacts().get(0);
                                 Path p = Paths.get(a.getValue());
 
+                                Path recipeFilePath= cookbookPath.resolve(COOKBOOK_FILES_FOLDER).resolve(p.getFileName().toString());
+
+                                try {
+                                    fileAccess.copy(a.getValue(), recipeFilePath.toString());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 ShellRecipe recipe = ShellRecipe.builder()
                                         .name(o.getNormalizedName())
                                         .fileName(p.getFileName().toString())
                                         .filePath(a.getValue())
                                         .targetPath("/tmp/".concat(p.getFileName().toString()))
-                                        .sourcePath(cookbookPath.resolve(COOKBOOK_FILES_FOLDER).resolve(p.getFileName().toString()).toString())
+                                        .sourcePath(recipeFilePath.toString().replace("\\","/"))
                                         .build();
 
                                 recipes.add(recipe);
@@ -130,6 +149,10 @@ public class ChefVisitor implements ComponentVisitor {
         } catch (IOException e) {
             LOGGER.error("Failed to write Ansible file: {}", e.getMessage(), e);
         }
+    }
+
+    private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
+        properties.forEach((key, property) -> targetMap.put(key, property.getValue().replaceAll("\n", "")));
     }
 
     private List<Operation> collectOperations(RootComponent component) {
