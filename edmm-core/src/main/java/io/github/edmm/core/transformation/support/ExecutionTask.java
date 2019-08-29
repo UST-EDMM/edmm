@@ -16,14 +16,17 @@ public final class ExecutionTask implements Callable<Void> {
 
     private final Plugin plugin;
     private final Transformation transformation;
-    private final File rootDirectory;
+    private final File sourceDirectory;
+    private final File targetDirectory;
 
     private boolean failed = false;
 
-    public ExecutionTask(@NonNull Plugin plugin, @NonNull Transformation transformation, @NonNull File rootDirectory) {
+    public ExecutionTask(@NonNull Plugin plugin, @NonNull Transformation transformation,
+                         @NonNull File sourceDirectory, @NonNull File targetDirectory) {
         this.plugin = plugin;
         this.transformation = transformation;
-        this.rootDirectory = rootDirectory;
+        this.sourceDirectory = sourceDirectory;
+        this.targetDirectory = targetDirectory;
     }
 
     @Override
@@ -32,18 +35,18 @@ public final class ExecutionTask implements Callable<Void> {
         String platformId = plugin.getPlatform().getId();
         logger.info("Starting transformation executor for {}/{}", templateName, platformId);
         transformation.setState(Transformation.State.TRANSFORMING);
-        if (!rootDirectory.exists() && !rootDirectory.mkdirs()) {
-            logger.error("Could not create directory at '{}'", rootDirectory.getAbsolutePath());
+        if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
+            logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
             transformation.setState(Transformation.State.ERROR);
             return null;
         }
-        if (!rootDirectory.isDirectory() || !rootDirectory.canWrite()) {
-            logger.error("Given value is not a directory or not writable: {}", rootDirectory.getAbsolutePath());
+        if (!targetDirectory.isDirectory() || !targetDirectory.canWrite()) {
+            logger.error("Given value is not a directory or not writable: {}", targetDirectory.getAbsolutePath());
             transformation.setState(Transformation.State.ERROR);
             return null;
         }
         try {
-            plugin.transform(new TransformationContext(transformation, rootDirectory));
+            plugin.transform(new TransformationContext(transformation, sourceDirectory, targetDirectory));
             transformation.setState(Transformation.State.DONE);
         } catch (Exception e) {
             logger.info("Transformation of {}/{} failed", templateName, platformId);

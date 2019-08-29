@@ -28,11 +28,11 @@ public class PluginService {
         this.plugins = plugins;
         Map<String, Plugin> pluginMap = new HashMap<>();
         for (Plugin plugin : plugins) {
-            if (pluginMap.get(plugin.getPlatform().id) != null) {
-                logger.error("Found duplicate plugin identifier '{}'", plugin.getPlatform().id);
-                throw new IllegalArgumentException("The platform id '" + plugin.getPlatform().id + "' is not unique");
+            if (pluginMap.get(plugin.getPlatform().getId()) != null) {
+                logger.error("Found duplicate plugin identifier '{}'", plugin.getPlatform().getId());
+                throw new IllegalArgumentException("The platform id '" + plugin.getPlatform().getId() + "' is not unique");
             }
-            pluginMap.put(plugin.getPlatform().id, plugin);
+            pluginMap.put(plugin.getPlatform().getId(), plugin);
         }
         for (Plugin plugin : plugins) {
             platforms.add(plugin.getPlatform());

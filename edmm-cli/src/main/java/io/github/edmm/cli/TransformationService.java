@@ -35,24 +35,22 @@ public class TransformationService {
         return new Transformation(model, platform);
     }
 
-    public boolean startTransformation(Transformation transformation, File outputDirectory) {
+    public void startTransformation(Transformation transformation, File sourceDirectory, File targetDirectory) {
         Platform targetPlatform = transformation.getTargetPlatform();
         Optional<Plugin> plugin = pluginService.findByPlatform(targetPlatform);
         if (!plugin.isPresent()) {
             logger.error("Plugin for given platform '{}' could not be found", targetPlatform.getId());
-            return false;
+            return;
         }
         if (transformation.getState() == Transformation.State.READY) {
-            Future<Void> task = executor.submit(
-                    new ExecutionTask(plugin.get(), transformation, outputDirectory)
+            Future<?> task = executor.submit(
+                    new ExecutionTask(plugin.get(), transformation, sourceDirectory, targetDirectory)
             );
             try {
                 task.get();
-                return true;
             } catch (Exception e) {
                 logger.error("Error executing transformation task", e);
             }
         }
-        return false;
     }
 }

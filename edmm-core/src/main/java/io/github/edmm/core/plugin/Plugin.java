@@ -18,9 +18,9 @@ public abstract class Plugin<LifecycleT extends AbstractLifecycle> {
 
     public Plugin(@NonNull Platform platform) {
         this.platform = platform;
-        logger.debug("Initializing plugin '{}'", platform.name);
+        logger.debug("Initializing plugin '{}'", platform.getName());
         this.init();
-        logger.debug("Initialized plugin '{}'", platform.name);
+        logger.debug("Initialized plugin '{}'", platform.getName());
     }
 
     protected void init() {
