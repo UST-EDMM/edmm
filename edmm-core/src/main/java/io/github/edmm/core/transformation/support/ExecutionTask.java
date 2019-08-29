@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.transformation.Platform;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import lombok.NonNull;
@@ -32,8 +33,8 @@ public final class ExecutionTask implements Callable<Void> {
     @Override
     public Void call() {
         String templateName = transformation.getModel().getName();
-        String platformId = plugin.getPlatform().getId();
-        logger.info("Starting transformation executor for {}/{}", templateName, platformId);
+        Platform platform = plugin.getPlatform();
+        logger.info("Starting transformation for {}", platform.getName());
         transformation.setState(Transformation.State.TRANSFORMING);
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
             logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
@@ -49,7 +50,7 @@ public final class ExecutionTask implements Callable<Void> {
             plugin.transform(new TransformationContext(transformation, sourceDirectory, targetDirectory));
             transformation.setState(Transformation.State.DONE);
         } catch (Exception e) {
-            logger.info("Transformation of {}/{} failed", templateName, platformId);
+            logger.info("Transformation to {} failed", platform.getName());
             logger.error("Something went wrong while transforming", e);
             failed = true;
         }

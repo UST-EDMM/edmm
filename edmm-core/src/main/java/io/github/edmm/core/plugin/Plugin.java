@@ -32,16 +32,16 @@ public abstract class Plugin<LifecycleT extends AbstractLifecycle> {
         LifecycleT lifecycle = getLifecycle(context);
         List<LifecyclePhase> phases = lifecycle.getLifecyclePhases();
         int taskCount = countExecutionPhases(context, phases);
-        logger.info("This transformation has {} phases", taskCount);
+        logger.debug("This transformation has {} phases", taskCount);
         for (int i = 0; i < phases.size(); i++) {
             @SuppressWarnings("unchecked")
             LifecyclePhase<LifecycleT> phase = (LifecyclePhase<LifecycleT>) phases.get(i);
             if (phase.shouldExecute(context)) {
-                logger.info("Executing phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
+                logger.debug("Executing phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
                 phase.execute(lifecycle);
             } else {
                 phase.skip();
-                logger.info("Skipping phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
+                logger.debug("Skipping phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
             }
         }
         time = System.currentTimeMillis() - time;
