@@ -64,10 +64,6 @@ public abstract class TopologyGraphHelper {
         return targets;
     }
 
-    public static <V, E> boolean hasVertex(Graph<V, E> graph, V component) {
-        return graph.containsVertex(component);
-    }
-
     @SuppressWarnings("unchecked")
     public static <V, E, T> List<T> getVertices(Graph<V, E> graph, Class<T> clazz) {
         return (List<T>) graph.vertexSet()
