@@ -18,7 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <jgrapht.version>1.1.0</jgrapht.version>
-        <picocli.version>4.0.0-alpha-1</picocli.version>
+        <picocli.version>4.0.3</picocli.version>
         <progressbar.version>0.7.3</progressbar.version>
         <guava.version>27.1-jre</guava.version>
         <freemarker.version>2.3.29</freemarker.version>
@@ -29,6 +29,7 @@
 
     <modules>
         <module>edmm-core</module>
+        <module>edmm-cli</module>
     </modules>
 
     <dependencyManagement>
@@ -62,6 +63,16 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.tongfei</groupId>
+                <artifactId>progressbar</artifactId>
+                <version>${progressbar.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
