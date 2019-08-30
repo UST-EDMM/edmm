@@ -111,7 +111,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
         if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
             Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
             Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
-            sourceCompute.addDependency(targetCompute.getName());
+            sourceCompute.addDependency("aws_instance." + targetCompute.getName());
         }
     }
 
