@@ -19,6 +19,7 @@ public abstract class DescribableElement extends BaseElement {
 
     public static final Attribute<String> DESCRIPTION = new Attribute<>("description", String.class);
     public static final Attribute<Metadata> METADATA = new Attribute<>("metadata", Metadata.class);
+    // todo why is "artifacts" at this level of abstraction (all properties now have artifacts!)
     public static final Attribute<Artifact> ARTIFACTS = new Attribute<>("artifacts", Artifact.class);
 
     protected final List<MappingEntity> entityChain = new ArrayList<>();

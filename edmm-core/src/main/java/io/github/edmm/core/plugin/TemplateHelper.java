@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * Helps with template creation tasks using the freemarker library
+ */
 public abstract class TemplateHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateHelper.class);
