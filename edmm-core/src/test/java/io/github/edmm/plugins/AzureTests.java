@@ -1,19 +1,12 @@
-package io.github.edmm.plugins.azure;
+package io.github.edmm.plugins;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Objects;
 
-import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
-import io.github.edmm.plugins.PluginTest;
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Assert;
+import io.github.edmm.plugins.azure.AzurePlugin;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -23,11 +16,11 @@ import org.springframework.core.io.ClassPathResource;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AzurePluginTest extends PluginTest {
-    private static final Logger logger = LoggerFactory.getLogger(AzurePluginTest.class);
+public class AzureTests extends PluginTest {
+    private static final Logger logger = LoggerFactory.getLogger(AzureTests.class);
     private TransformationContext context;
 
-    public AzurePluginTest() throws IOException {
+    public AzureTests() throws IOException {
         super(Files.createTempDirectory("azure-").toFile());
     }
 

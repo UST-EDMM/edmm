@@ -1,9 +1,0 @@
-{
-  "apiVersion" : "2019-04-01",
-  "type" : "Microsoft.Storage/storageAccounts",
-  "name" : "[parameters('storageAccountName')]",
-  "location" : "[parameters('location')]",
-  "properties" : { },
-  "kind" : "Storage",
-  "sku" : "Standard_LRS"
-}
