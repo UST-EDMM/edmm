@@ -6,4 +6,5 @@
     <bean id="kubernetesPlugin" class="io.github.edmm.plugins.kubernetes.KubernetesPlugin"/>
     <bean id="terraformPlugin" class="io.github.edmm.plugins.terraform.TerraformPlugin"/>
     <bean id="heatPlugin" class="io.github.edmm.plugins.heat.HeatPlugin"/>
+    <bean id="azurePlugin" class="io.github.edmm.plugins.azure.AzurePlugin"/>
 </beans>
