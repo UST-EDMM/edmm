@@ -1,7 +1,9 @@
 package io.github.edmm.plugins.azure.model.resource.compute.virtualmachines;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -59,9 +61,12 @@ public class VirtualMachine extends Resource {
     protected void setDefaults() {
         super.setDefaults();
         setApiVersion("2019-03-01");
-        setDependsOn(Arrays.asList(
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]"));
+
+        List<String> dependencies = new ArrayList();
+        dependencies.add("[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]");
+        dependencies.add("[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]");
+        setDependsOn(dependencies);
+
         final HardwareProfile hardwareProfile = HardwareProfile
                 .builder()
                 .vmSize("Standard_A0")

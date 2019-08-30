@@ -1,0 +1,347 @@
+{
+  "contentVersion" : "1.0.0.0",
+  "parameters" : {
+    "DnsName" : {
+      "type" : "string"
+    },
+    "vm_db_ubuntu_adminUserName" : {
+      "type" : "string",
+      "defaultValue" : "vm_db_ubuntu_Admin"
+    },
+    "vm_pet_clinic_ubuntu_computerName" : {
+      "type" : "string",
+      "defaultValue" : "vm_pet_clinic_ubuntu_Computer"
+    },
+    "vm_pet_clinic_ubuntu_adminUserName" : {
+      "type" : "string",
+      "defaultValue" : "vm_pet_clinic_ubuntu_Admin"
+    },
+    "vm_db_ubuntu_computerName" : {
+      "type" : "string",
+      "defaultValue" : "vm_db_ubuntu_Computer"
+    },
+    "storageAccountName" : {
+      "type" : "string",
+      "defaultValue" : "[concat(uniquestring(resourceGroup().id), 'myvmsa')]"
+    },
+    "location" : {
+      "type" : "string",
+      "defaultValue" : "[resourceGroup().location]"
+    },
+    "subnet_addressPrefix" : {
+      "type" : "string",
+      "defaultValue" : "10.0.0.0/24"
+    },
+    "vnetAddressSpace" : {
+      "type" : "string",
+      "defaultValue" : "10.0.0.0/16"
+    }
+  },
+  "variables" : {
+    "vnet_name" : "MyVNET",
+    "subnet_id" : "[concat(variables('vnet_id'),'/subnets/',variables('subnet_name'))]",
+    "vnet_id" : "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]",
+    "subnet_name" : "[variables('subnet_name')]"
+  },
+  "resources" : [ {
+    "apiVersion" : "2019-04-01",
+    "type" : "Microsoft.Network/virtualNetworks",
+    "name" : "[variables('vnet_name')]",
+    "location" : "[parameters('location')]",
+    "properties" : {
+      "addressSpace" : {
+        "addressPrefixes" : [ "[parameters('vnetAddressSpace')]" ]
+      },
+      "subnets" : [ {
+        "type" : "Microsoft.Network/virtualNetworks/subnets",
+        "name" : "Subnet-1",
+        "location" : "[parameters('location')]",
+        "properties" : {
+          "addressPrefix" : "[parameters('subnet_addressPrefix')]"
+        }
+      } ]
+    }
+  }, {
+    "apiVersion" : "2019-04-01",
+    "type" : "Microsoft.Storage/storageAccounts",
+    "name" : "[parameters('storageAccountName')]",
+    "location" : "[parameters('location')]",
+    "properties" : { },
+    "kind" : "Storage",
+    "sku" : "Standard_LRS"
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines",
+    "name" : "vm_pet_clinic_ubuntu",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]", "[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]", "Microsoft.Compute/virtualMachines/vm_db_ubuntu" ],
+    "properties" : {
+      "hardwareProfile" : {
+        "vmSize" : "Standard_A0"
+      },
+      "osProfile" : {
+        "computerName" : "[parameters('vm_pet_clinic_ubuntu_computerName')]",
+        "adminUsername" : "[parameters('vm_pet_clinic_ubuntu_adminUserName')]",
+        "linuxConfiguration" : {
+          "disablePasswordAuthentication" : true,
+          "ssh" : {
+            "publicKeys" : [ {
+              "path" : "[concat('/home/', parameters('vm_pet_clinic_ubuntu_adminUserName'), '/.ssh/authorized_keys')]",
+              "keyData" : "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0\nFPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/\n3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB\n-----END PUBLIC KEY-----\n"
+            } ]
+          }
+        }
+      },
+      "storageProfile" : {
+        "imageReference" : {
+          "publisher" : "Canonical",
+          "offer" : "UbuntuServer",
+          "sku" : "14.04.5-LTS"
+        },
+        "osDisk" : {
+          "name" : "vm_pet_clinic_ubuntu_OSDisk",
+          "caching" : "ReadWrite",
+          "createOptions" : "FromImage"
+        }
+      },
+      "networkProfile" : {
+        "networkInterfaces" : [ {
+          "apiVersion" : "2019-04-01",
+          "type" : "Microsoft.Network/networkInterfaces",
+          "name" : "vm_pet_clinic_ubuntu_networkInterface",
+          "location" : "[parameters('location')]",
+          "properties" : {
+            "networkSecurityGroup" : {
+              "apiVersion" : "2019-04-01",
+              "type" : "Microsoft.Network/networkSecurityGroups",
+              "name" : "vm_pet_clinic_ubuntu_networkInterface_securityGroup",
+              "location" : "[parameters('location')]",
+              "properties" : {
+                "securityRules" : [ {
+                  "apiVersion" : "2019-04-01",
+                  "type" : "Microsoft.Network/networkSecurityGroups/securityRules",
+                  "name" : "sr_pet_clinic_tomcat",
+                  "location" : "[parameters('location')]",
+                  "properties" : {
+                    "protocol" : "Tcp",
+                    "direction" : "Inbound",
+                    "access" : "Allow",
+                    "sourcePortRange" : "*",
+                    "targetPortRange" : "8080",
+                    "destinationAddressPrefix" : "*"
+                  }
+                } ]
+              }
+            },
+            "ipConfiguration" : {
+              "name" : "vm_pet_clinic_ubuntu_networkInterface_ipConfiguration",
+              "properties" : {
+                "privateIpAllocationMethod" : "Dynamic",
+                "publicIpAddress" : {
+                  "apiVersion" : "2019-04-01",
+                  "type" : "Microsoft.Network/publicIPAddresses",
+                  "name" : "vm_pet_clinic_ubuntu_networkInterface_publicIpAddress",
+                  "location" : "[parameters('location')]",
+                  "properties" : {
+                    "publicIpAllocationMethod" : "Dynamic",
+                    "dnsSettings" : {
+                      "domainNameLabel" : "[parameters('DnsName')]"
+                    }
+                  }
+                },
+                "subnet" : {
+                  "id" : "[variables('subnet_id')]"
+                }
+              }
+            }
+          }
+        } ]
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_pet_clinic_ubuntu_extension_configure_configure",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_pet_clinic_ubuntu" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./ubuntu/configure.sh" ],
+        "commandToExecute" : "'sh ./ubuntu/configure.sh'"
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines",
+    "name" : "vm_db_ubuntu",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]", "[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]" ],
+    "properties" : {
+      "hardwareProfile" : {
+        "vmSize" : "Standard_A0"
+      },
+      "osProfile" : {
+        "computerName" : "[parameters('vm_db_ubuntu_computerName')]",
+        "adminUsername" : "[parameters('vm_db_ubuntu_adminUserName')]",
+        "linuxConfiguration" : {
+          "disablePasswordAuthentication" : true,
+          "ssh" : {
+            "publicKeys" : [ {
+              "path" : "[concat('/home/', parameters('vm_db_ubuntu_adminUserName'), '/.ssh/authorized_keys')]",
+              "keyData" : "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0\nFPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/\n3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB\n-----END PUBLIC KEY-----\n"
+            } ]
+          }
+        }
+      },
+      "storageProfile" : {
+        "imageReference" : {
+          "publisher" : "Canonical",
+          "offer" : "UbuntuServer",
+          "sku" : "14.04.5-LTS"
+        },
+        "osDisk" : {
+          "name" : "vm_db_ubuntu_OSDisk",
+          "caching" : "ReadWrite",
+          "createOptions" : "FromImage"
+        }
+      },
+      "networkProfile" : {
+        "networkInterfaces" : [ {
+          "apiVersion" : "2019-04-01",
+          "type" : "Microsoft.Network/networkInterfaces",
+          "name" : "vm_db_ubuntu_networkInterface",
+          "location" : "[parameters('location')]",
+          "properties" : {
+            "networkSecurityGroup" : {
+              "apiVersion" : "2019-04-01",
+              "type" : "Microsoft.Network/networkSecurityGroups",
+              "name" : "vm_db_ubuntu_networkInterface_securityGroup",
+              "location" : "[parameters('location')]",
+              "properties" : {
+                "securityRules" : [ {
+                  "apiVersion" : "2019-04-01",
+                  "type" : "Microsoft.Network/networkSecurityGroups/securityRules",
+                  "name" : "sr_dbms",
+                  "location" : "[parameters('location')]",
+                  "properties" : {
+                    "protocol" : "Tcp",
+                    "direction" : "Inbound",
+                    "access" : "Allow",
+                    "sourcePortRange" : "*",
+                    "targetPortRange" : "3306",
+                    "destinationAddressPrefix" : "*"
+                  }
+                } ]
+              }
+            },
+            "ipConfiguration" : {
+              "name" : "vm_db_ubuntu_networkInterface_ipConfiguration",
+              "properties" : {
+                "privateIpAllocationMethod" : "Dynamic",
+                "publicIpAddress" : {
+                  "apiVersion" : "2019-04-01",
+                  "type" : "Microsoft.Network/publicIPAddresses",
+                  "name" : "vm_db_ubuntu_networkInterface_publicIpAddress",
+                  "location" : "[parameters('location')]",
+                  "properties" : {
+                    "publicIpAllocationMethod" : "Dynamic",
+                    "dnsSettings" : {
+                      "domainNameLabel" : "[parameters('DnsName')]"
+                    }
+                  }
+                },
+                "subnet" : {
+                  "id" : "[variables('subnet_id')]"
+                }
+              }
+            }
+          }
+        } ]
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_db_ubuntu_extension_configure_configure",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_db_ubuntu" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./ubuntu/configure.sh" ],
+        "commandToExecute" : "'sh ./ubuntu/configure.sh'"
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_pet_clinic_ubuntu_extension_create_create",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_pet_clinic_ubuntu", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_configure_configure" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./tomcat/create.sh" ],
+        "commandToExecute" : "'sh ./tomcat/create.sh'"
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_pet_clinic_ubuntu_extension_start_start",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_pet_clinic_ubuntu", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_configure_configure", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_create_create" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./tomcat/start.sh" ],
+        "commandToExecute" : "'sh ./tomcat/start.sh'"
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_pet_clinic_ubuntu_extension_start_start",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_pet_clinic_ubuntu", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_configure_configure", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_create_create", "Microsoft.Compute/virtualMachines/extensions/vm_pet_clinic_ubuntu_extension_start_start" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./petclinic/start.sh" ],
+        "commandToExecute" : "'sh ./petclinic/start.sh'"
+      }
+    }
+  }, {
+    "apiVersion" : "2019-03-01",
+    "type" : "Microsoft.Compute/virtualMachines/extensions",
+    "name" : "vm_db_ubuntu_extension_configure_configure",
+    "location" : "[parameters('location')]",
+    "dependsOn" : [ "Microsoft.Compute/virtualMachines/vm_db_ubuntu", "Microsoft.Compute/virtualMachines/extensions/vm_db_ubuntu_extension_configure_configure" ],
+    "properties" : {
+      "publisher" : "Microsoft.Azure.Extensions",
+      "type" : "CustomScript",
+      "typeHandlerVersion" : "2.0",
+      "autoUpgradeMinorVersion" : true,
+      "settings" : {
+        "fileUrls" : [ "./mysql_database/configure.sh" ],
+        "commandToExecute" : "'sh ./mysql_database/configure.sh'"
+      }
+    }
+  } ]
+}
