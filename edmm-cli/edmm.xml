@@ -7,7 +7,7 @@
     <files>
         <file>
             <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <destName>edmm-cli.jar</destName>
         </file>
         <file>

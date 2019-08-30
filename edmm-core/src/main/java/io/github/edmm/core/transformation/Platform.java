@@ -12,11 +12,8 @@ public final class Platform {
 
     public static final Platform NOOP = Platform.builder().id("noop").name("noop").build();
 
-    @NonNull
-    public final String id;
-
-    @NonNull
-    public final String name;
+    private final String id;
+    private final String name;
 
     public Platform(@NonNull String id, @NonNull String name) {
         this.id = id;
