@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
 import io.github.edmm.plugins.azure.model.resource.network.publicipaddresses.PublicIpAddress;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 

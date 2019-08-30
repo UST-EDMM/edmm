@@ -1,6 +1,10 @@
 package io.github.edmm.plugins.azure.model.resource.network.networkinterfaces;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.edmm.plugins.azure.model.Parameter;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
@@ -9,7 +13,7 @@ import io.github.edmm.plugins.azure.model.resource.network.publicipaddresses.Pub
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NetworkInterface extends Resource {
 
-    // todo setting the name of a network interface happens when detecting a Compute node in the topology
+    // setting the name of a network interface happens when detecting a Compute node in the topology
     public NetworkInterface(String name) {
         super(ResourceTypeEnum.NETWORK_INTERFACES, name);
     }
@@ -38,5 +42,33 @@ public class NetworkInterface extends Resource {
                                 .build())
                         .build())
                 .build());
+    }
+
+    @JsonIgnore
+    public NetworkSecurityGroup getNetworkSecurityGroup(){
+        return ((NetworkInterfaceProperties) this.getProperties()).getNetworkSecurityGroup();
+    }
+
+    @JsonIgnore
+    public PublicIpAddress getPublicIpAddress() {
+        return ((NetworkInterfaceProperties) this.getProperties()).getIpConfiguration().getProperties().getPublicIpAddress();
+    }
+
+    @Override
+    public Map<String, Parameter> getRequiredParameters() {
+        Map<String, Parameter> params = super.getRequiredParameters();
+        params.putAll(getNetworkSecurityGroup().getRequiredParameters());
+        params.putAll(getPublicIpAddress().getRequiredParameters());
+
+        return params;
+    }
+
+    @Override
+    public Map<String, String> getRequiredVariables() {
+        Map<String, String> vars = super.getRequiredVariables();
+        vars.putAll(getNetworkSecurityGroup().getRequiredVariables());
+        vars.putAll(getPublicIpAddress().getRequiredVariables());
+
+        return vars;
     }
 }

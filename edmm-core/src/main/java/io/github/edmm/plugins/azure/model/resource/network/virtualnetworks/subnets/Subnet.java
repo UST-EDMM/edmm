@@ -25,7 +25,7 @@ public class Subnet extends Resource {
     }
 
     @Override
-    protected Map<String, Parameter> getRequiredParameters() {
+    public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put("subnet_addressPrefix", Parameter.builder().type(ParameterTypeEnum.STRING).defaultValue("10.0.0.0/24").build());
 
@@ -33,9 +33,9 @@ public class Subnet extends Resource {
     }
 
     @Override
-    protected Map<String, String> getRequiredVariables() {
+    public Map<String, String> getRequiredVariables() {
         Map<String, String> vars = super.getRequiredVariables();
-        vars.put("subnet_name", "Subnet-1");
+        vars.put("subnet_name", "[variables('subnet_name')]");
         vars.put("subnet_id", "[concat(variables('vnet_id'),'/subnets/',variables('subnet_name'))]");
 
         return vars;

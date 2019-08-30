@@ -32,7 +32,7 @@ public class PublicIpAddress extends Resource {
     }
 
     @Override
-    protected Map<String, Parameter> getRequiredParameters() {
+    public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put("DnsName", Parameter.builder().type(ParameterTypeEnum.STRING).build());
 

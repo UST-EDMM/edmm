@@ -22,6 +22,8 @@ public class VirtualNetworkProperties extends Properties {
 }
 
 @Builder
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class AddressSpace {
     private List<String> addressPrefixes;
 }

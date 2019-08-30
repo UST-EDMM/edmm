@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.azure.model.resource.compute.virtualmachines;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -9,7 +10,9 @@ import io.github.edmm.plugins.azure.model.ParameterTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.network.networkinterfaces.NetworkInterface;
-import sun.nio.ch.Net;
+import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
+import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules.SecurityRule;
+import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules.SecurityRuleProperties;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VirtualMachine extends Resource {
@@ -17,34 +20,58 @@ public class VirtualMachine extends Resource {
         super(ResourceTypeEnum.VIRTUAL_MACHINES, name);
     }
 
+    // setting a value for the password or the linux configuration happens when examining the compute node
+    public void setAuthentication(boolean isPassword, String passwordOrSsh) {
+        if(isPassword) {
+            ((VirtualMachineProperties)this.getProperties()).getOsProfile().setAdminPassword(passwordOrSsh);
+        } else {
+            final LinuxConfiguration linuxConfiguration = LinuxConfiguration
+                    .builder()
+                    .disablePasswordAuthentication(true)
+                    .ssh(SshConfiguratoin
+                            .builder()
+                            .publicKeys(Collections.singletonList(PublicKey
+                                    .builder()
+                                    .keyData(passwordOrSsh)
+                                    .path(String.format("[concat('/home/', parameters('%s_adminUserName'), '/.ssh/authorized_keys')]", this.getName()))
+                                    .build()))
+                            .build()
+                    )
+                    .build();
+
+            ((VirtualMachineProperties)this.getProperties()).getOsProfile().setLinuxConfiguration(linuxConfiguration);
+        }
+    }
+
+    // adding a port to the security group happens when detecting a node depending on this virtual machine that needs this port
+    public void addPort(String targetNodeName, String port) {
+        final SecurityRule newRule = new SecurityRule(String.format("sr_%s", targetNodeName));
+        ((SecurityRuleProperties)newRule.getProperties()).setTargetPortRange(port);
+        NetworkSecurityGroup sg = ((VirtualMachineProperties)this.getProperties())
+                .getNetworkProfile()
+                .getNetworkInterfaces()
+                .get(0)
+                .getNetworkSecurityGroup();
+        sg.getSecurityRules().add(newRule);
+    }
+
     @Override
     protected void setDefaults() {
         super.setDefaults();
         setApiVersion("2019-03-01");
+        setDependsOn(Arrays.asList(
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]"));
         final HardwareProfile hardwareProfile = HardwareProfile
                 .builder()
                 .vmSize("Standard_A0")
                 .build();
 
-        final LinuxConfiguration linuxConfiguration = LinuxConfiguration
-                .builder()
-                .disablePasswordAuthentication(String.format("[equals(parameters('%s_authentication'), 'ssh')]", this.getName()))
-                .ssh(SshConfiguratoin
-                        .builder()
-                        .publicKeys(Collections.singletonList(PublicKey
-                                .builder()
-                                .keyData(String.format("[parameters('%s_adminKeyOrPassword')]", this.getName()))
-                                .path(String.format("[concat('/home/', parameters('%s_adminUserName'), '/.ssh/authorized_keys')]", this.getName()))
-                                .build()))
-                        .build()
-                )
-                .build();
+
         final OsProfile osProfile = OsProfile
                 .builder()
                 .computerName(String.format("[parameters('%s_computerName')]", this.getName()))
                 .adminUsername(String.format("[parameters('%s_adminUserName')]", this.getName()))
-                .adminPassword(String.format("[parameters('%s_adminKeyOrPassword')]", this.getName()))
-                .linuxConfiguration(linuxConfiguration)
                 .build();
 
         final StorageProfile storageProfile = StorageProfile
@@ -79,7 +106,7 @@ public class VirtualMachine extends Resource {
     }
 
     @Override
-    protected Map<String, Parameter> getRequiredParameters() {
+    public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put(this.getName() + "_computerName",
                 Parameter.builder()
@@ -91,17 +118,23 @@ public class VirtualMachine extends Resource {
                         .type(ParameterTypeEnum.STRING)
                         .defaultValue(this.getName() + "_Admin")
                         .build());
-        // todo setting the default value for this parameter happens when examining the Compute node
-        params.put(this.getName() + "_adminKeyOrPassword",
-                Parameter.builder()
-                        .type(ParameterTypeEnum.SECURE_STRING)
-                        .build());
-        // todo setting the default value for this parameter happens when examining the Compute node
-        params.put(this.getName() + "_authentication",
-                Parameter.builder()
-                        .type(ParameterTypeEnum.BOOLEAN)
-                        .build());
 
-        return  params;
+        for (NetworkInterface nic : ((VirtualMachineProperties) this.getProperties()).getNetworkProfile().getNetworkInterfaces()) {
+            Map<String, Parameter> networkInterfaceParams = nic.getRequiredParameters();
+            params.putAll(networkInterfaceParams);
+        }
+
+        return params;
+    }
+
+    @Override
+    public Map<String, String> getRequiredVariables() {
+        Map<String, String> vars = super.getRequiredVariables();
+        for (NetworkInterface nic : ((VirtualMachineProperties) this.getProperties()).getNetworkProfile().getNetworkInterfaces()) {
+            Map<String, String> networkInterfaceVars = nic.getRequiredVariables();
+            vars.putAll(networkInterfaceVars);
+        }
+
+        return vars;
     }
 }

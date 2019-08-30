@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.Parameter;
 import io.github.edmm.plugins.azure.model.ParameterTypeEnum;
@@ -39,7 +40,8 @@ public abstract class Resource {
         this.setLocation("[parameters('location')]");
     }
 
-    protected Map<String, Parameter> getRequiredParameters() {
+    @JsonIgnore
+    public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = new HashMap<>();
         params.put("location", Parameter.builder()
                 .type(ParameterTypeEnum.STRING)
@@ -49,7 +51,8 @@ public abstract class Resource {
         return params;
     }
 
-    protected Map<String, String> getRequiredVariables() {
+    @JsonIgnore
+    public Map<String, String> getRequiredVariables() {
         return new HashMap<>();
     }
 }

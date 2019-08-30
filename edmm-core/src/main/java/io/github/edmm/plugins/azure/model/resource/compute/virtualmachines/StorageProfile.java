@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.azure.model.resource.compute.virtualmachines;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.edmm.plugins.azure.model.resource.storage.storageaccounts.SkuTypeEnum;
 import lombok.Builder;
 import lombok.Data;
 

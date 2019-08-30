@@ -3,23 +3,14 @@
   "type" : "Microsoft.Compute/virtualMachines",
   "name" : "vm1",
   "location" : "[parameters('location')]",
+  "dependsOn" : [ "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]", "[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]" ],
   "properties" : {
     "hardwareProfile" : {
       "vmSize" : "Standard_A0"
     },
     "osProfile" : {
       "computerName" : "[parameters('vm1_computerName')]",
-      "adminUsername" : "[parameters('vm1_adminUserName')]",
-      "adminPassword" : "[parameters('vm1_adminKeyOrPassword')]",
-      "linuxConfiguration" : {
-        "disablePasswordAuthentication" : "[equals(parameters('vm1_authentication'), 'ssh')]",
-        "ssh" : {
-          "publicKeys" : [ {
-            "path" : "[concat('/home/', parameters('vm1_adminUserName'), '/.ssh/authorized_keys')]",
-            "keyData" : "[parameters('vm1_adminKeyOrPassword')]"
-          } ]
-        }
-      }
+      "adminUsername" : "[parameters('vm1_adminUserName')]"
     },
     "storageProfile" : {
       "imageReference" : {
