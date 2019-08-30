@@ -25,6 +25,9 @@
         <commons-io.version>2.5</commons-io.version>
         <commons-text.version>1.7</commons-text.version>
         <commons-collections.version>4.4</commons-collections.version>
+        <jansi.version>1.18</jansi.version>
+        <jackson.versoin>2.9.9</jackson.versoin>
+        <kubernetes-client.version>4.4.2</kubernetes-client.version>
     </properties>
 
     <modules>
@@ -66,13 +69,43 @@
             </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
-                <artifactId>picocli</artifactId>
+                <artifactId>picocli-spring-boot-starter</artifactId>
                 <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fusesource.jansi</groupId>
+                <artifactId>jansi</artifactId>
+                <version>${jansi.version}</version>
             </dependency>
             <dependency>
                 <groupId>me.tongfei</groupId>
                 <artifactId>progressbar</artifactId>
                 <version>${progressbar.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${kubernetes-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.versoin}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

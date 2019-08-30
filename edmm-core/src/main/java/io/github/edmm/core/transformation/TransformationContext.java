@@ -1,7 +1,6 @@
 package io.github.edmm.core.transformation;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.DeploymentModel;
@@ -19,11 +18,8 @@ public final class TransformationContext {
     private final File sourceDirectory;
     private final File targetDirectory;
 
-    public TransformationContext(@NonNull Transformation transformation, @NonNull File targetDirectory) {
-        this(transformation, Paths.get("").toFile(), targetDirectory);
-    }
-
-    public TransformationContext(@NonNull Transformation transformation, @NonNull File sourceDirectory, @NonNull File targetDirectory) {
+    public TransformationContext(@NonNull Transformation transformation, @NonNull File sourceDirectory,
+                                 @NonNull File targetDirectory) {
         this.transformation = transformation;
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
