@@ -23,8 +23,8 @@ public class PluginFileAccess {
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
         logger.debug("Requesting file access:");
-        logger.debug("  > [source] {}", sourceDirectory);
-        logger.debug("  > [target] {}", targetDirectory);
+        logger.debug("> [source] {}", sourceDirectory);
+        logger.debug("> [target] {}", targetDirectory);
     }
 
     /**
@@ -37,7 +37,7 @@ public class PluginFileAccess {
         File source = new File(sourceDirectory, relativeSourcePath);
         File target = new File(targetDirectory, relativeTargetPath);
         if (!source.exists()) {
-            logger.error("Failed to copy '{}': file not found", source);
+            logger.error("Failed to copy '{}': file not found", source.getName());
             throw new FileNotFoundException();
         }
         try {

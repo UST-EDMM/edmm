@@ -1,5 +1,7 @@
 # Terraform Plugin
 
+* Supports AWS provider by Terraform
+
 ## Limitations
 
 * Properties of all related components need to be transferred into an `env.sh` script.
