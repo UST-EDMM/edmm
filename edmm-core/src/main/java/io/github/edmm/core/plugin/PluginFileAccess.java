@@ -90,7 +90,27 @@ public class PluginFileAccess {
      */
     public void append(String relativePath, String data) throws IOException {
         File file = new File(targetDirectory, relativePath);
-        FileUtils.writeStringToFile(file, data + Consts.NL, StandardCharsets.UTF_8, true);
+        try {
+            FileUtils.writeStringToFile(file, data + Consts.NL, StandardCharsets.UTF_8, true);
+        } catch (IOException e) {
+            logger.error("Failed to write data to file '{}'", file);
+            throw e;
+        }
+    }
+
+    /**
+     * Returns the content of a file in the source content directory denoted by given path.
+     *
+     * @param relativePath path to a file contained in the csar content directory, relative said directory
+     */
+    public String readToString(String relativePath) throws IOException {
+        File file = new File(sourceDirectory, relativePath);
+        try {
+            return FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            logger.error("Failed to read content from file '{}'", file);
+            throw e;
+        }
     }
 
     /**

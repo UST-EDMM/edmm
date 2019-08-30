@@ -52,6 +52,14 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
         return relationCache;
     }
 
+    public boolean hasRelations() {
+        return getRelations().size() > 0;
+    }
+
+    public boolean hasOperations() {
+        return getOperations().size() > 0;
+    }
+
     public StandardLifecycle getStandardLifecycle() {
         return new StandardLifecycle(getOperations());
     }

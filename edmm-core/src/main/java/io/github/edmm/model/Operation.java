@@ -13,4 +13,8 @@ public class Operation extends DescribableElement {
         super(operationDefinition);
         this.componentEntity = componentEntity;
     }
+
+    public boolean hasArtifacts() {
+        return getArtifacts().size() > 0;
+    }
 }
