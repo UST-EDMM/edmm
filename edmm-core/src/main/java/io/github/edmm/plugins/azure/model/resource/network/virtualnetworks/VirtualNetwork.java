@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.virtualnetworks;
 
 import java.util.Collections;
@@ -40,7 +39,6 @@ public class VirtualNetwork extends Resource {
     public List<Subnet> getSubnets() {
         return ((VirtualNetworkProperties) this.getProperties()).getSubnets();
     }
-
 
     @Override
     public Map<String, Parameter> getRequiredParameters() {

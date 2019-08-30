@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.virtualnetworks.subnets;
 
 import java.util.Map;

@@ -23,5 +23,5 @@ public class VirtualMachineExtensionProperties extends Properties {
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class CustomScriptSettings {
     private List<String> fileUrls;
-    private  String commandToExecute;
+    private String commandToExecute;
 }

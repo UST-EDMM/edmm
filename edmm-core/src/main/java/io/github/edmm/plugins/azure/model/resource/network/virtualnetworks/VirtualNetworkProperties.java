@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.virtualnetworks;
 
 import java.util.List;
@@ -15,10 +14,6 @@ import lombok.Data;
 public class VirtualNetworkProperties extends Properties {
     private AddressSpace addressSpace;
     private List<Subnet> subnets;
-
-
-
-
 }
 
 @Builder

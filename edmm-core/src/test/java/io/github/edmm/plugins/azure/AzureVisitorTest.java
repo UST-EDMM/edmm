@@ -21,7 +21,7 @@ public class AzureVisitorTest {
         ClassPathResource resource = new ClassPathResource("templates/one_compute/definitions.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         AzureVisitor visitor = new AzureVisitor(model.getTopology());
-        visitor.visit((Compute)model.getComponent("pet_clinic_ubuntu").get());
+        visitor.visit((Compute) model.getComponent("pet_clinic_ubuntu").get());
         String json = JsonHelper.serializeObj(visitor.getResultTemplate());
         logger.debug(json);
         ClassPathResource expectedResource = new ClassPathResource("azure/oneCompute.json");

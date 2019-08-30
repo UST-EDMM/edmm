@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;

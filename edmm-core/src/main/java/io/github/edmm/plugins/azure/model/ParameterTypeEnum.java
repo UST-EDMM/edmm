@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -13,6 +12,7 @@ public enum ParameterTypeEnum {
     ARRAY("array");
 
     private String typeName;
+
     ParameterTypeEnum(String name) {
         this.typeName = name;
     }
@@ -21,5 +21,4 @@ public enum ParameterTypeEnum {
     public String getTypeName() {
         return typeName;
     }
-
 }

@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.publicipaddresses;
 
 import java.util.HashMap;

@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource;
 
 import java.util.HashMap;
@@ -18,14 +17,14 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class Resource {
     /**
-     * The api version of this resource. Each resource type has a set of allowed api versions.
-     */
-    private String apiVersion;
-    /**
      * Used to retrieve the full type name of this resource. Set by child types.
      */
     private final ResourceTypeEnum type;
     private final String name;
+    /**
+     * The api version of this resource. Each resource type has a set of allowed api versions.
+     */
+    private String apiVersion;
     private String location;
     private List<String> dependsOn;
     private Properties properties;

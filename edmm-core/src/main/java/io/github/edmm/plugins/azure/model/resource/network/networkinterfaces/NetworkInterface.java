@@ -45,7 +45,7 @@ public class NetworkInterface extends Resource {
     }
 
     @JsonIgnore
-    public NetworkSecurityGroup getNetworkSecurityGroup(){
+    public NetworkSecurityGroup getNetworkSecurityGroup() {
         return ((NetworkInterfaceProperties) this.getProperties()).getNetworkSecurityGroup();
     }
 

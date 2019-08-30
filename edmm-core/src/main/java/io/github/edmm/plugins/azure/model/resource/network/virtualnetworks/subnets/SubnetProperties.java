@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.virtualnetworks.subnets;
 
 import com.fasterxml.jackson.annotation.JsonInclude;

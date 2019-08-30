@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -16,6 +15,7 @@ public enum ResourceTypeEnum {
 
     private String providerNamespace;
     private String serviceName;
+
     ResourceTypeEnum(String providerNamespace, String serviceName) {
         this.providerNamespace = providerNamespace;
         this.serviceName = serviceName;
@@ -25,5 +25,4 @@ public enum ResourceTypeEnum {
     public String getTypeName() {
         return String.format("%s/%s", providerNamespace, serviceName);
     }
-
 }

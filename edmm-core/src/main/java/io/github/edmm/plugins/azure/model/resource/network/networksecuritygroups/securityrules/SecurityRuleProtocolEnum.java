@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -17,7 +16,7 @@ public enum SecurityRuleProtocolEnum {
     }
 
     @JsonValue
-    public String getProtocolName(){
+    public String getProtocolName() {
         return this.protocolName;
     }
 }

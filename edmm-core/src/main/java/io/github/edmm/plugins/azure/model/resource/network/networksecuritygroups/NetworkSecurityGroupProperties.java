@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups;
 
 import java.util.List;
