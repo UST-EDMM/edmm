@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
@@ -36,13 +35,12 @@ public class AzureLifeCycleTest {
         Transformation transformation = mock(Transformation.class);
         when(transformation.getModel()).thenReturn(model);
         logger.info("Root directory is '{}'", rootDirectory);
-        context = new TransformationContext(transformation, rootDirectory);
-        PluginFileAccess fileAccess = context.getFileAccess();
+        context = new TransformationContext(transformation, rootDirectory, rootDirectory);
     }
 
     @Test
     public void test() throws Exception {
-        initTest("templates/one_stack/definitions.yml");
+        initTest("azure/specialTemplates/one_stack/definitions.yml");
         AzureLifeCycle lifeCycle = new AzureLifeCycle(context);
         lifeCycle.transform();
     }
