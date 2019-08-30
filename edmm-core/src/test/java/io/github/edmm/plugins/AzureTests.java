@@ -37,8 +37,7 @@ public class AzureTests extends PluginTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testLifecycleExecution() {
         executeLifecycle(new AzurePlugin(), context);
     }
-
 }

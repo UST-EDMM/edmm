@@ -5,6 +5,7 @@ import io.github.edmm.core.transformation.Platform;
 import io.github.edmm.core.transformation.TransformationContext;
 
 public class AzurePlugin extends Plugin<AzureLifeCycle> {
+
     public static final Platform AZURE = Platform.builder().id("azure").name("Azure").build();
 
     public AzurePlugin() {

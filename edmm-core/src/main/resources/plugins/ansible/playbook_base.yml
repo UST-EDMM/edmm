@@ -1,5 +1,5 @@
 ---
-<#list plays as play>
+  <#list plays as play>
 # Play for component ${play.name}
 - name: ${play.name}
   <#if play.hosts??>
@@ -16,15 +16,15 @@
   <#else>
   </#if>
   tasks:
-    <#list play.tasks as task>
-    - name: ${task.name}
-      script: ${task.script}
-      <#if task.args??>
-      args:
-      <#list task.args as arg>
+      <#list play.tasks as task>
+        - name: ${task.name}
+        script: ${task.script}
+        <#if task.args??>
+        args:
+        <#list task.args as arg>
         ${arg.name}: ${arg.value}
-      </#list>
-      <#else>
-      </#if>
-    </#list>
-</#list>
+        </#list>
+        <#else>
+        </#if>
+        </#list>
+  </#list>

@@ -35,14 +35,16 @@ import org.slf4j.LoggerFactory;
 import static io.github.edmm.model.component.WebServer.PORT;
 
 public class AzureVisitor implements ComponentVisitor, RelationVisitor {
+
     private static final Logger logger = LoggerFactory.getLogger(AzureVisitor.class);
     private final Graph<RootComponent, RootRelation> graph;
+
     @Getter
-    private ResourceManagerTemplate resultTemplate;
+    private final ResourceManagerTemplate resultTemplate;
 
     public AzureVisitor(Graph<RootComponent, RootRelation> graph) {
         this.graph = graph;
-        resultTemplate = new ResourceManagerTemplate();
+        this.resultTemplate = new ResourceManagerTemplate();
     }
 
     @Override
