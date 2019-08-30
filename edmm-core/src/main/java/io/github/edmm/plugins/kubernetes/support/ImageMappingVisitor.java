@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.kubernetes.visitor;
+package io.github.edmm.plugins.kubernetes.support;
 
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.MysqlDbms;

@@ -1,15 +1,12 @@
 package io.github.edmm.plugins;
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
-import io.github.edmm.plugins.ansible.AnsibleLifecycle;
 import io.github.edmm.plugins.ansible.AnsiblePlugin;
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,16 +16,18 @@ import org.springframework.core.io.ClassPathResource;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AnsibleTests {
+public class AnsibleTests extends PluginTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AnsibleTests.class);
 
-    private File targetDirectory;
     private TransformationContext context;
+
+    public AnsibleTests() throws IOException {
+        super(Files.createTempDirectory("ansible-").toFile());
+    }
 
     @Before
     public void init() throws Exception {
-        targetDirectory = Files.createTempDirectory("ansible-").toFile();
         ClassPathResource sourceResource = new ClassPathResource("templates");
         ClassPathResource templateResource = new ClassPathResource("templates/scenario_iaas.yml");
         DeploymentModel model = DeploymentModel.of(templateResource.getFile());
@@ -40,20 +39,7 @@ public class AnsibleTests {
     }
 
     @Test
-    public void test() {
-        // Setup plugin
-        AnsiblePlugin plugin = new AnsiblePlugin();
-        AnsibleLifecycle lifecycle = plugin.getLifecycle(context);
-        // Execute lifecycle phases
-        lifecycle.checkEnvironment();
-        lifecycle.checkModel();
-        lifecycle.prepare();
-        lifecycle.transform();
-        lifecycle.cleanup();
-    }
-
-    @After
-    public void destroy() throws Exception {
-        FileUtils.deleteDirectory(targetDirectory);
+    public void testLifecycleExecution() {
+        executeLifecycle(new AnsiblePlugin(), context);
     }
 }
