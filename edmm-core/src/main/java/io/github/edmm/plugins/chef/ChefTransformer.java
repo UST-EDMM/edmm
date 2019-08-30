@@ -13,6 +13,7 @@ import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
@@ -58,96 +59,117 @@ public class ChefTransformer {
         try {
             CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
             if (cycleDetector.detectCycles()) {
-                // TODO handle cycle in the topology notification
                 throw new RuntimeException("The given topology is not acyclic");
             } else {
-                // reverse the graph to find sources
-                EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = new EdgeReversedGraph<>(context.getModel().getTopology());
-                // apply the topological sort
-                TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(dependencyGraph);
-
-                List<String> runningOrder = new ArrayList<>();
-                Map<String, Object> templateData = new HashMap<>();
-
                 // initialize templates
                 Template chefIgnore = cfg.getTemplate("chefignore");
                 Template metadata = cfg.getTemplate("metadata.rb");
                 Template shellRecipe = cfg.getTemplate("shell_script_recipe.rb");
-
-                LOGGER.info("Generate a repository structure for application stack: " + context.getModel().getName());
+                Template machineRecipe = cfg.getTemplate("chef-provisioning.rb");
 
                 // generate the chefignore file
                 fileAccess.append(COOKBOOK_CHEFIGNORE_FILENAME, TemplateHelper.toString(chefIgnore, null));
 
-                while (iterator.hasNext()) {
-                    RootComponent component = iterator.next();
-                    Path cookbookPath = Paths.get(COOKBOOKS_FOLDER, component.getNormalizedName());
+                int stackCount = 0;
+                context.getModel().findComponentStacks().forEach(stack -> {
+                    try {
+                        // TODO check if compute node is present in the stack
+                        String stackName = stack.vertexSet()
+                                .stream()
+                                .filter(v -> v instanceof Compute)
+                                .findFirst()
+                                .get()
+                                .getNormalizedName();
 
-                    // generate component's metadata.rb file
-                    templateData.put("metadata", Metadata.builder().name(component.getNormalizedName()).build());
-                    fileAccess.append(
-                            cookbookPath.resolve(COOKBOOK_METADATA_FILENAME).toString(),
-                            TemplateHelper.toString(metadata, templateData)
-                    );
+                        // sort the reversed topology topologically to have a global order
+                        TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(stack);
 
-                    // store cookbook names with the reference to default recipes
-                    // this lsit is concatenated for a run_list directive in a policy file
-                    runningOrder.add("'" + component.getNormalizedName() + "::default'");
+                        List<String> runningOrder = new ArrayList<>();
+                        Map<String, Object> templateData = new HashMap<>();
+                        LOGGER.info("Generate a repository structure for application stack: " + stack.toString());
 
-                    LOGGER.info("Generate a cookbook for component " + component.getName());
-                    if (component instanceof Compute) {
-                        LOGGER.info("found compute component " + component.getName());
-                        // TODO generate a cookbook using chef-provisioning plugin
+                        while (iterator.hasNext()) {
+                            RootComponent component = iterator.next();
+                            Path cookbookPath = Paths.get(COOKBOOKS_FOLDER, component.getNormalizedName());
 
-                    } else {
-                        Path recipePath = cookbookPath.resolve(COOKBOOK_RECIPES_FOLDER).resolve(COOKBOOK_DEFAULT_RECIPE_FILENAME);
+                            // generate component's metadata.rb file
+                            templateData.put("metadata", Metadata.builder().name(component.getNormalizedName()).build());
+                            fileAccess.append(
+                                    cookbookPath.resolve(COOKBOOK_METADATA_FILENAME).toString(),
+                                    TemplateHelper.toString(metadata, templateData)
+                            );
 
-                        List<ShellRecipe> recipes = new ArrayList<>();
-                        Map<String, String> properties = new HashMap<>();
+                            // store cookbook names with the reference to default recipes
+                            // this lsit is concatenated for a run_list directive in a policy file
+                            runningOrder.add("'" + component.getNormalizedName() + "::default'");
 
-                        // set properties as Ruby environment variables within a recipe
-                        prepareProperties(properties, component.getProperties());
-                        templateData.put("properties", properties);
+                            LOGGER.info("Generate a cookbook for component " + component.getName());
+                            Path recipePath = cookbookPath.resolve(COOKBOOK_RECIPES_FOLDER).resolve(COOKBOOK_DEFAULT_RECIPE_FILENAME);
+                            if (component instanceof Compute) {
+                                LOGGER.info("found compute component " + component.getName());
+                                // TODO generate a cookbook using chef-provisioning plugin
+                                Map<String, Object> machineData = new HashMap<>();
+                                machineData.put("name", component.getNormalizedName());
+                                String image = ((Compute) component).getMachineImage()
+                                        .orElseThrow(() -> new TransformationException("Error transforming Machine "));
+                                machineData.put("image", image );
 
-                        collectOperations(component).forEach(o -> {
-                            if (!o.getArtifacts().isEmpty()) {
-                                Artifact a = o.getArtifacts().get(0);
-                                Path p = Paths.get(a.getValue());
+                                fileAccess.append(recipePath.toString(), TemplateHelper.toString(machineRecipe, machineData));
 
-                                Path recipeFilePath= cookbookPath.resolve(COOKBOOK_FILES_FOLDER).resolve(p.getFileName().toString());
+                            } else {
 
-                                try {
-                                    fileAccess.copy(a.getValue(), recipeFilePath.toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                List<ShellRecipe> recipes = new ArrayList<>();
+                                Map<String, String> properties = new HashMap<>();
 
-                                ShellRecipe recipe = ShellRecipe.builder()
-                                        .name(o.getNormalizedName())
-                                        .fileName(p.getFileName().toString())
-                                        .filePath(a.getValue())
-                                        .targetPath("/tmp/".concat(p.getFileName().toString()))
-                                        .sourcePath(recipeFilePath.toString().replace("\\","/"))
-                                        .build();
+                                // set properties as Ruby environment variables within a recipe
+                                prepareProperties(properties, component.getProperties());
+                                templateData.put("properties", properties);
 
-                                recipes.add(recipe);
+                                collectOperations(component).forEach(o -> {
+                                    if (!o.getArtifacts().isEmpty()) {
+                                        Artifact a = o.getArtifacts().get(0);
+                                        Path p = Paths.get(a.getValue());
+
+                                        Path recipeFilePath= cookbookPath.resolve(COOKBOOK_FILES_FOLDER).resolve(p.getFileName().toString());
+
+                                        try {
+                                            fileAccess.copy(a.getValue(), recipeFilePath.toString());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        ShellRecipe recipe = ShellRecipe.builder()
+                                                .name(o.getNormalizedName())
+                                                .fileName(p.getFileName().toString())
+                                                .filePath(a.getValue())
+                                                .targetPath("/tmp/".concat(p.getFileName().toString()))
+                                                .sourcePath(recipeFilePath.toString().replace("\\","/"))
+                                                .build();
+
+                                        recipes.add(recipe);
+                                    }
+                                });
+                                templateData.put("tasks", recipes);
+
+                                fileAccess.append(recipePath.toString(), TemplateHelper.toString(shellRecipe, templateData));
                             }
-                        });
-                        templateData.put("tasks", recipes);
+                        }
 
-                        fileAccess.append(recipePath.toString(), TemplateHelper.toString(shellRecipe, templateData));
+                        // generate a policyfile per stack
+                        Template policyFile = cfg.getTemplate("Policyfile.rb");
+                        PolicyFile pf = PolicyFile.builder().name(context.getModel().getName()).runningOrder(String.join(", ", runningOrder)).build();
+                        templateData.put("policyfile", pf);
+
+                        Path policyPath = Paths.get(POLICIES_FOLDER, stackName.concat("_").concat(POLICY_FILENAME));
+                        fileAccess.append(policyPath.toString(), TemplateHelper.toString(policyFile, templateData));
+                    } catch(IOException e) {
+                        LOGGER.error("Failed to generate stacks for Chef: {}", e.getMessage(), e);
                     }
-                }
+                });
 
-                Template policyFile = cfg.getTemplate("Policyfile.rb");
-                PolicyFile pf = PolicyFile.builder().name(context.getModel().getName()).runningOrder(String.join(", ", runningOrder)).build();
-                templateData.put("policyfile", pf);
-
-                Path policyPath = Paths.get(POLICIES_FOLDER, POLICY_FILENAME);
-                fileAccess.append(policyPath.toString(), TemplateHelper.toString(policyFile, templateData));
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to write Ansible file: {}", e.getMessage(), e);
+            LOGGER.error("Failed to write Chef cookbooks : {}", e.getMessage(), e);
         }
     }
 
@@ -157,7 +179,6 @@ public class ChefTransformer {
 
     private List<Operation> collectOperations(RootComponent component) {
         List<Operation> operations = new ArrayList<>();
-
         component.getStandardLifecycle().getCreate().ifPresent(operations::add);
         component.getStandardLifecycle().getConfigure().ifPresent(operations::add);
         component.getStandardLifecycle().getStart().ifPresent(operations::add);

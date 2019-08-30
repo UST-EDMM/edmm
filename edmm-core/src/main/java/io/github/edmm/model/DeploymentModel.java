@@ -85,6 +85,10 @@ public final class DeploymentModel {
         return topology.edgeSet();
     }
 
+    public EdgeReversedGraph<RootComponent, RootRelation> getReversedTopology() {
+        return new EdgeReversedGraph<>(topology);
+    }
+
     public Set<Graph<RootComponent, RootRelation>> findComponentStacks() {
         EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = new EdgeReversedGraph<>(topology);
         List<RootComponent> stackSources = topology.vertexSet()
