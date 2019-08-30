@@ -1,6 +1,8 @@
 package io.github.edmm.plugins.azure;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.JsonHelper;
@@ -9,6 +11,9 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.CustomScriptSettings;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtension;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtensionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +45,27 @@ public class AzureLifeCycle extends AbstractLifecycle {
         });
     }
 
+    private void copyOperationsToTargetDirectory(ResourceManagerTemplate resultTemplate) {
+        List<String> toCopy = resultTemplate.getResources()
+                .stream()
+                .filter(resource -> resource instanceof VirtualMachineExtension).map(resource -> {
+                    VirtualMachineExtension extension = (VirtualMachineExtension) resource;
+                    VirtualMachineExtensionProperties properties = (VirtualMachineExtensionProperties) extension.getProperties();
+                    CustomScriptSettings settings = properties.getSettings();
+                    return settings.getFileUrls();
+                })
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        toCopy.forEach(toCopyArtifact -> {
+            try {
+                context.getFileAccess().copy(toCopyArtifact, toCopyArtifact);
+            } catch (IOException e) {
+                logger.warn("Failed to copy file '{}'", toCopyArtifact);
+            }
+        });
+
+    }
+
     @Override
     public void transform() {
         logger.info("Begin transformation to Azure Resource Manager...");
@@ -54,6 +80,8 @@ public class AzureLifeCycle extends AbstractLifecycle {
         this.addParametersAndVariables(resultTemplate);
         // ... then write result to disk!
         this.populateAzureTemplateFile(resultTemplate);
+        // ... then copy artifact files to target directory
+        this.copyOperationsToTargetDirectory(resultTemplate);
         logger.info("Transformation to Terraform successful");
     }
 }

@@ -18,10 +18,4 @@ public class VirtualMachineExtensionProperties extends Properties {
     private CustomScriptSettings settings;
 }
 
-@Data
-@Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class CustomScriptSettings {
-    private List<String> fileUrls;
-    private String commandToExecute;
-}
+

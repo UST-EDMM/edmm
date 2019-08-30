@@ -18,7 +18,7 @@ public class AzureVisitorTest {
 
     @Test
     public void testVisitingComputeNode() throws IOException {
-        ClassPathResource resource = new ClassPathResource("templates/one_compute/definitions.yml");
+        ClassPathResource resource = new ClassPathResource("azure/specialTemplates/one_compute/definitions.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         AzureVisitor visitor = new AzureVisitor(model.getTopology());
         visitor.visit((Compute) model.getComponent("pet_clinic_ubuntu").get());

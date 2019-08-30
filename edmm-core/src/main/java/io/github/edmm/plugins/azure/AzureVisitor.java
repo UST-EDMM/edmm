@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.github.edmm.core.plugin.GraphHelper;
+import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
@@ -197,7 +197,7 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             hostingCompute = (Compute) component;
         } else {
             // now check if it is hosted by a compute node
-            Optional<Compute> optionalCompute = GraphHelper.resolveHostingComputeComponent(graph, component);
+            Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
             if (optionalCompute.isPresent()) {
                 hostingCompute = optionalCompute.get();
             }
