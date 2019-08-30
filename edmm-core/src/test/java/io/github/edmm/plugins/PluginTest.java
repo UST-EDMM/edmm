@@ -29,7 +29,7 @@ public abstract class PluginTest {
         lifecycle.cleanup();
     }
 
-    @After
+    // @After
     public void destroy() throws Exception {
         if (targetDirectory != null) {
             logger.info("Clean up working directory...");
