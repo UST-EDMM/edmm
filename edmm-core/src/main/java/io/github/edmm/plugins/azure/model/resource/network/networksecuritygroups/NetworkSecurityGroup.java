@@ -1,4 +1,3 @@
-
 package io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class NetworkSecurityGroup extends Resource {
 
     @JsonIgnore
     public List<SecurityRule> getSecurityRules() {
-        return ((NetworkSecurityGroupProperties)this.getProperties()).getSecurityRules();
+        return ((NetworkSecurityGroupProperties) this.getProperties()).getSecurityRules();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.azure.model.resource.compute.virtualmachines;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,8 @@ public class VirtualMachine extends Resource {
 
     // setting a value for the password or the linux configuration happens when examining the compute node
     public void setAuthentication(boolean isPassword, String passwordOrSsh) {
-        if(isPassword) {
-            ((VirtualMachineProperties)this.getProperties()).getOsProfile().setAdminPassword(passwordOrSsh);
+        if (isPassword) {
+            ((VirtualMachineProperties) this.getProperties()).getOsProfile().setAdminPassword(passwordOrSsh);
         } else {
             final LinuxConfiguration linuxConfiguration = LinuxConfiguration
                     .builder()
@@ -41,15 +40,15 @@ public class VirtualMachine extends Resource {
                     )
                     .build();
 
-            ((VirtualMachineProperties)this.getProperties()).getOsProfile().setLinuxConfiguration(linuxConfiguration);
+            ((VirtualMachineProperties) this.getProperties()).getOsProfile().setLinuxConfiguration(linuxConfiguration);
         }
     }
 
     // adding a port to the security group happens when detecting a node depending on this virtual machine that needs this port
     public void addPort(String targetNodeName, String port) {
         final SecurityRule newRule = new SecurityRule(String.format("sr_%s", targetNodeName));
-        ((SecurityRuleProperties)newRule.getProperties()).setTargetPortRange(port);
-        NetworkSecurityGroup sg = ((VirtualMachineProperties)this.getProperties())
+        ((SecurityRuleProperties) newRule.getProperties()).setTargetPortRange(port);
+        NetworkSecurityGroup sg = ((VirtualMachineProperties) this.getProperties())
                 .getNetworkProfile()
                 .getNetworkInterfaces()
                 .get(0)
@@ -71,7 +70,6 @@ public class VirtualMachine extends Resource {
                 .builder()
                 .vmSize("Standard_A0")
                 .build();
-
 
         final OsProfile osProfile = OsProfile
                 .builder()

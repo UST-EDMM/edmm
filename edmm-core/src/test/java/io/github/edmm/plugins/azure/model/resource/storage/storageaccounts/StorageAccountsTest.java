@@ -27,6 +27,7 @@ import org.springframework.core.io.ClassPathResource;
 
 public class StorageAccountsTest {
     private static final Logger logger = LoggerFactory.getLogger(StorageAccountsTest.class);
+
     @Test
     public void testSerialization() throws IOException {
         StorageAccount defaultObject = new StorageAccount();
@@ -36,5 +37,4 @@ public class StorageAccountsTest {
         String expected = FileUtils.readFileToString(expectedResource.getFile(), StandardCharsets.UTF_8);
         Assert.assertEquals(expected.trim(), serializedObj.trim());
     }
-
 }

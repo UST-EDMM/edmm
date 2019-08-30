@@ -9,9 +9,6 @@ import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
-import io.github.edmm.plugins.terraform.TerraformLifecycle;
-import io.github.edmm.plugins.terraform.TerraformPlugin;
-import io.github.edmm.plugins.terraform.TerraformTests;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -21,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,15 +53,14 @@ public class AzurePluginTest {
         lifecycle.cleanup();
         // Assert ...
         Assert.assertEquals(1, Objects.requireNonNull(fileAccess.getTargetDirectory().listFiles()).length);
-         ClassPathResource expectedResource = new ClassPathResource("azure/deploy.json");
-         String expected = FileUtils.readFileToString(expectedResource.getFile(), StandardCharsets.UTF_8);
+        ClassPathResource expectedResource = new ClassPathResource("azure/deploy.json");
+        String expected = FileUtils.readFileToString(expectedResource.getFile(), StandardCharsets.UTF_8);
         String test = FileUtils.readFileToString(new File(fileAccess.getAbsolutePath("deploy.json")), StandardCharsets.UTF_8);
-         Assert.assertEquals(expected.trim(), test.trim());
+        Assert.assertEquals(expected.trim(), test.trim());
     }
 
     @After
     public void destroy() throws Exception {
         FileUtils.deleteDirectory(rootDirectory);
     }
-
 }

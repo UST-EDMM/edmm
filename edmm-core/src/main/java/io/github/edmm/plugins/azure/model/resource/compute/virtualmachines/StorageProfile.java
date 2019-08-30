@@ -4,6 +4,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
+enum CachingEnum {
+    None,
+    ReadOnly,
+    ReadWrite
+}
+
+enum CreateOptionsEnum {
+    Attache,
+    FromImage,
+    Empty
+}
+
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -29,16 +41,4 @@ class OsDisk {
     private String name;
     private CachingEnum caching;
     private CreateOptionsEnum createOptions;
-}
-
-enum CachingEnum {
-    None,
-    ReadOnly,
-    ReadWrite
-}
-
-enum CreateOptionsEnum {
-    Attache,
-    FromImage,
-    Empty
 }
