@@ -35,7 +35,7 @@ public class StorageAccount extends Resource {
     }
 
     @Override
-    protected Map<String, Parameter> getRequiredParameters() {
+    public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put("storageAccountName", Parameter.builder()
                 .type(ParameterTypeEnum.STRING)

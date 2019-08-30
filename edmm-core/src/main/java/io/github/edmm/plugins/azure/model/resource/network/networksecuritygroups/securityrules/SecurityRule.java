@@ -8,7 +8,7 @@ import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecurityRule extends Resource {
 
-    // todo setting a name for the security rule should happen when detecting a node that has a PORT attribute
+    // setting a name for the security rule should happen when detecting a node that has a PORT attribute
     public SecurityRule(String name) {
         super(ResourceTypeEnum.SECURITY_RULES, name);
     }

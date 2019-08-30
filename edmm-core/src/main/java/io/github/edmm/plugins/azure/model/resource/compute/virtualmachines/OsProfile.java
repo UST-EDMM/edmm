@@ -20,7 +20,7 @@ public class OsProfile {
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class LinuxConfiguration {
-    private String disablePasswordAuthentication;
+    private boolean disablePasswordAuthentication;
     private SshConfiguratoin ssh;
 }
 

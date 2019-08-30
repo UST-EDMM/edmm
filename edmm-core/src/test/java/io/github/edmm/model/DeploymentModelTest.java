@@ -2,7 +2,6 @@ package io.github.edmm.model;
 
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
