@@ -57,5 +57,4 @@ public class AzureLifeCycle extends AbstractLifecycle {
         logger.info("Transformation to Terraform successful");
     }
 
-
 }

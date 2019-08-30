@@ -84,22 +84,21 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
         // Check self operations
         this.collectVmExtensions(component);
 
-
-
         component.setTransformed(true);
     }
 
     @Override
     public void visit(ConnectsTo relation) {
-//        RootComponent source = graph.getEdgeSource(relation);
-//        RootComponent target = graph.getEdgeTarget(relation);
-//        Optional<Compute> optionalSourceCompute = GraphHelper.resolveHostingComputeComponent(graph, source);
-//        Optional<Compute> optionalTargetCompute = GraphHelper.resolveHostingComputeComponent(graph, target);
-//        if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
-//            Ec2 sourceCompute = computeInstances.get(optionalSourceCompute.get());
-//            Ec2 targetCompute = computeInstances.get(optionalTargetCompute.get());
-//            sourceCompute.getDependsOn().add(targetCompute.getName());
-//        }
+        RootComponent source = graph.getEdgeSource(relation);
+        RootComponent target = graph.getEdgeTarget(relation);
+        Optional<VirtualMachine> optionalSourceVm = this.getHostingVirtualMachine(source);
+        Optional<VirtualMachine> optionalTargetVm = this.getHostingVirtualMachine(target);
+
+        if (optionalSourceVm.isPresent() && optionalTargetVm.isPresent()) {
+            VirtualMachine sourceCompute = optionalSourceVm.get();
+            VirtualMachine targetCompute = optionalTargetVm.get();
+            sourceCompute.getDependsOn().add(String.format("Microsoft.Compute/virtualMachines/%s", targetCompute.getName()));
+        }
     }
 
     @Override
