@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AzureLifeCycle extends AbstractLifecycle {
+
     public static final String FILE_NAME = "deploy.json";
     private static final Logger logger = LoggerFactory.getLogger(AzureLifeCycle.class);
     private final TransformationContext context;
@@ -63,7 +64,6 @@ public class AzureLifeCycle extends AbstractLifecycle {
                 logger.warn("Failed to copy file '{}'", toCopyArtifact);
             }
         });
-
     }
 
     @Override
