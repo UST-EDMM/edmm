@@ -20,23 +20,27 @@ public class Template {
 
     @JsonIgnore
     private String name;
-    private String heatTemplateVersion = "2016-10-14";
+    private String heatTemplateVersion = "2015-10-15";
     private String description;
     private Map<String, Parameter> parameters;
     private Map<String, Resource> resources;
 
-    public void addParameter(Parameter parameter) {
-        if (parameters == null) {
-            parameters = new HashMap<>();
+    public void addParameter(Parameter... parameters) {
+        if (this.parameters == null) {
+            this.parameters = new HashMap<>();
         }
-        parameters.put(parameter.getName(), parameter);
+        for (Parameter parameter : parameters) {
+            this.parameters.put(parameter.getName(), parameter);
+        }
     }
 
-    public void addResource(Resource resource) {
-        if (resources == null) {
-            resources = new HashMap<>();
+    public void addResource(Resource... resources) {
+        if (this.resources == null) {
+            this.resources = new HashMap<>();
         }
-        resources.put(resource.getName(), resource);
+        for (Resource resource : resources) {
+            this.resources.put(resource.getName(), resource);
+        }
     }
 
     @JsonIgnore
