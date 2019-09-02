@@ -8,11 +8,13 @@ import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Default configuration assumes: - a parameter called 'location' - a parameter called 'storageAccountName'
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class StorageAccount extends Resource {
     private StorageAccountKindEnum kind;
     private SkuTypeEnum sku;
