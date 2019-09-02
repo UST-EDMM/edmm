@@ -39,7 +39,7 @@ In this demonstration, all listed plugins only focus on application deployments 
 The following figure shows the application stacks that were used in our tests. 
 Further, this [example](edmm-core/src/test/resources/templates/scenario_iaas.yml) shows basically the resulting EDMM-based model.
   
-![Supported Scenario](docs/iaas-scenario)
+![Supported Scenario](docs/iaas-scenario.jpg)
 
 ## Built-in Component Types
 
