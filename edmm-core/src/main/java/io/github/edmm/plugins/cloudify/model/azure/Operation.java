@@ -8,12 +8,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Operation {
+
     @Setter
     @Getter
     private String name;
+
     @Setter
     @Getter
     private String source;
+
     @Getter
     private List<Script> scripts = new ArrayList<>();
 

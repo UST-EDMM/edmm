@@ -1,35 +1,34 @@
-package io.github.edmm.plugins.cloudify;
+package io.github.edmm.plugins.cfn;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
-import io.github.edmm.plugins.cloudify.azure.CloudifyAzureVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CloudifyLifecycle extends AbstractLifecycle {
+public class CloudFormationLifecycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(CloudifyLifecycle.class);
+    private static final Logger logger = LoggerFactory.getLogger(CloudFormationLifecycle.class);
 
-    public static final String FILE_NAME = "deploy.yml";
+    public static final String FILE_NAME = "deploy.tf";
 
     private final TransformationContext context;
 
-    public CloudifyLifecycle(TransformationContext context) {
+    public CloudFormationLifecycle(TransformationContext context) {
         this.context = context;
     }
 
     @Override
     public void transform() {
-        logger.info("Begin transformation to Cloudify Azure...");
-        CloudifyAzureVisitor visitor = new CloudifyAzureVisitor(context);
+        logger.info("Begin transformation to AWS CloudFormation...");
+        CloudFormationVisitor visitor = new CloudFormationVisitor(context);
         // Visit compute components first
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
         // ... then all others
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
         VisitorHelper.visit(context.getModel().getRelations(), visitor);
-        visitor.populateCloudifyFile();
-        logger.info("Transformation to Cloudify Azure successful");
+        visitor.populateFile();
+        logger.info("Transformation to AWS CloudFormation successful");
     }
 }
