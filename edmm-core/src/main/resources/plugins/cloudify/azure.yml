@@ -1,0 +1,280 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-azure-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+  resource_group_name:
+    type: string
+    description: Your Azure Resource Group.
+    default: myRG
+
+  network_name:
+    type: string
+    description: Your Azure Virtual Network.
+    default: myVN
+
+  subnet_name:
+    type: string
+    description: Your Azure Virtual Network Subnet.
+    default: mySN
+
+  location:
+    type: string
+    description: Your Azure Region.
+
+  virtual_network_address_prefix:
+    type: string
+    default: 10.0.0.0/16
+
+  subnet_address_prefix:
+    type: string
+    default: 10.0.0.0/24
+
+  image:
+    default:
+      publisher: Canonical
+      offer: UbuntuServer
+      sku: 14.04.5-LTS
+      version: latest
+
+  size:
+    default: Standard_A0
+
+  resource_prefix:
+    default: cfyhw
+
+  resource_suffix:
+    default: '0'
+
+  retry_after:
+    type: integer
+    default: 60
+
+  dns_name:
+    type: string
+    description:  The concatenation of the domain name label and the regionalized DNS zone, resulting in the fully qualified domain name associated with the public IP addresses
+
+<#list computes as k, compute>
+  ${compute.name}_agent_user:
+    description: The user name of the agent on the instance created from the image.
+    default: ubuntu
+
+</#list>
+
+dsl_definitions:
+
+  azure_config: &azure_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+
+node_templates:
+
+  # In this section global resources are defined
+  resource_group:
+    type: cloudify.azure.nodes.ResourceGroup
+    properties:
+      api_version: 2018-05-01
+      name: { get_input: resource_group_name }
+      location: { get_input: location }
+      azure_config: *azure_config
+
+  storage_account:
+    type: cloudify.azure.nodes.storage.StorageAccount
+    properties:
+      api_version: 2019-04-01
+      location: { get_input: location }
+      azure_config: *azure_config
+      retry_after: { get_input: retry_after }
+      resource_config:
+        accountType: Standard_LRS
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      api_version: 2019-04-01
+      resource_group_name: { get_input: resource_group_name }
+      virtual_network_name: network
+      name: { get_input: subnet_name }
+      azure_config: *azure_config
+      location: { get_input: location }
+      resource_config:
+        addressPrefix: { get_input: subnet_address_prefix }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_virtual_network
+        target: network
+
+  network:
+    type: cloudify.azure.nodes.network.VirtualNetwork
+    properties:
+      api_version: 2019-04-01
+      resource_group_name: { get_input: resource_group_name }
+      name: { get_input: network_name }
+      azure_config: *azure_config
+      location: { get_input: location }
+      resource_config:
+        addressSpace:
+          addressPrefixes: [{ get_input: virtual_networ_address_prefix }]
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  # In this section, VM-specific resources are defined
+  <#list computes as k, compute>
+  ${compute.name}_ip:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      api_version: 2019-04-01
+      location: { get_input: location }
+      azure_config: *azure_config
+      retry_after: { get_input: retry_after }
+      resource_config:
+        publicIPAllocationMethod: Dynamic
+        domainNameLabel: { get_input: dns_name }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  ${compute.name}_ip_config:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      api_version: 2019-04-01
+      location: { get_input: location }
+      azure_config: *azure_config
+      retry_after: { get_input: retry_after }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: ${compute.name}_ip
+
+  ${compute.name}_network_security_group:
+    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    properties:
+      api_version: 2019-04-01
+      name: {concat:[{get_input: resource_prefix},nsg,{get_input: resource_suffix}]}
+      location: { get_input: location }
+      azure_config: *azure_config
+      retry_after: { get_input: retry_after }
+      resource_config:
+        securityRules:
+        # always add the ssh ports
+          - name: ssh
+            properties:
+              description: SSH access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 22
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 100
+              access: Allow
+              direction: Inbound
+          <#list compute.ingressPorts as ingressPort>
+          - name: ${compute.name}_${ingressPort.name}
+            properties:
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: ${ingressPort.port}
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: ${100 + ingressPort?counter}
+              access: Allow
+              direction: Inbound
+          </#list>
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  ${compute.name}_nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      api_version: 2019-04-01
+      location: { get_input: location }
+      azure_config: *azure_config
+      retry_after: { get_input: retry_after }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: ${compute.name}_network_security_group
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: ${compute.name}_ip_config
+
+  ${compute.name}:
+    type: cloudify.azure.nodes.compute.VirtualMachine
+    properties:
+      api_version: 2019-03-01
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      os_family: linux
+      azure_config: *azure_config
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: size }
+        storageProfile:
+          imageReference: { get_input: image }
+        osProfile:
+          adminUsername: { get_input: ${compute.name}_agent_user }
+          <#if compute.passwordAuthentication>
+          adminPassword: ${compute.password}
+          <#else>
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+                - keydata: |
+                          ${compute.ssh}
+                  path: { concat: [ '/home/', { get_input: ${compute.name}_agent_user }, '/.ssh/authorized_keys' ] }
+            disablePasswordAuthentication: true
+          </#if>
+      agent_config:
+        install_method: none
+        key: { get_secret: ${compute.name}_agent_key_private }
+        user: { get_input: ${compute.name}_agent_user }
+      use_public_ip: true
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.connected_to_storage_account
+        target: storage_account
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: ${compute.name}_nic
+      <#list compute.dependsOn as dependency>
+      - type: cloudify.relationships.connected_to
+        target: ${dependency}
+      </#list>
+
+  <#list compute.operations as operation>
+  <#list operation.scripts as script>
+  ${operation.source}_extension_${operation.name}_${script.name}:
+    type: cloudify.azure.nodes.compute.VirtualMachineExtension
+    properties:
+      api_version: 2019-03-01
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        publisher: Microsoft.Azure.Extensions
+        ext_type: CustomScript
+        typeHandlerVersion: 2.0
+        settings:
+          fileUrls: [${script.path}]
+          commandToExecute: 'sh ${script.path}'
+    relationships:
+      - type: cloudify.azure.relationships.vmx_contained_in_vm
+        target: ${compute.name}
+    <#list script.previous as prev>
+      - type: cloudify.relationships.depends_on
+        target: ${compute.name}_extension_${operation.name}_${prev}
+    </#list>
+  </#list>
+  </#list>
+  </#list>
