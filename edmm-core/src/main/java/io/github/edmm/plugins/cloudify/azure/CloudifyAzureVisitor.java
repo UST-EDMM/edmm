@@ -32,6 +32,7 @@ import static io.github.edmm.model.component.WebServer.PORT;
 import static io.github.edmm.plugins.cloudify.CloudifyLifecycle.FILE_NAME;
 
 public class CloudifyAzureVisitor extends CloudifyVisitor {
+
     private static final Logger logger = LoggerFactory.getLogger(TerraformAwsVisitor.class);
 
     private final Map<Compute, VirtualMachine> computeInstances = new HashMap<>();

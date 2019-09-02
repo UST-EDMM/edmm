@@ -1,6 +1,5 @@
 package io.github.edmm.plugins.cloudify.model.azure;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class VirtualMachine {
+
     private String name;
     private boolean passwordAuthentication;
     private String password;
@@ -29,14 +29,12 @@ public class VirtualMachine {
     public void addScript(String componentName, String operationName, String scriptName, String scriptPath) {
         Operation theOp;
         Optional<Operation> existing = operations.stream().filter(operation -> operation.getName().equals(operationName)).findFirst();
-
         if (existing.isPresent()) {
             theOp = existing.get();
         } else {
             theOp = new Operation(operationName, componentName);
             this.operations.add(theOp);
         }
-
         theOp.addScript(scriptName, scriptPath);
     }
 }

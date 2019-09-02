@@ -1,6 +1,5 @@
 package io.github.edmm.plugins.cloudify;
 
-
 import freemarker.template.Configuration;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -8,8 +7,8 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.RelationVisitor;
-import org.springframework.core.io.ClassPathResource;
 import org.jgrapht.Graph;
+import org.springframework.core.io.ClassPathResource;
 
 public abstract class CloudifyVisitor implements ComponentVisitor, RelationVisitor {
 
