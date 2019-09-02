@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.StuPro-TOSCAna</groupId>
             <artifactId>cloudformation-builder</artifactId>
-            <version>0c1e7aa007adf16644c83e721a76dda76579ff20</version>
+            <version>v1.0.0</version>
         </dependency>
     </dependencies>
 
