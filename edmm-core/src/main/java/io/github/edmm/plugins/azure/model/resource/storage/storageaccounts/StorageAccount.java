@@ -10,9 +10,7 @@ import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import lombok.Data;
 
 /**
- * Default configuration assumes:
- * - a parameter called 'location'
- * - a parameter called 'storageAccountName'
+ * Default configuration assumes: - a parameter called 'location' - a parameter called 'storageAccountName'
  */
 @Data
 public class StorageAccount extends Resource {
