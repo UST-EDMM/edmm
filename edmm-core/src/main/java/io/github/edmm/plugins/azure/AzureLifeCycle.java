@@ -30,7 +30,7 @@ public class AzureLifeCycle extends AbstractLifecycle {
     private void populateAzureTemplateFile(ResourceManagerTemplate resultTemplate) {
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
-            final String templateString = JsonHelper.serializeObj(resultTemplate);
+            final String templateString = JsonHelper.toJson(resultTemplate);
             logger.debug(templateString);
             fileAccess.append(FILE_NAME, templateString);
         } catch (IOException e) {
