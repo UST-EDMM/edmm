@@ -16,7 +16,9 @@ The following figure shows an high-level overview of the EDMM Transformation Fra
  
 ![Framework Architecture](docs/architecture.png)
 
-## Demo
+## [Demo](https://youtu.be/byui0-opy2E)
+
+[LINK TO VIDEO](https://youtu.be/byui0-opy2E)
 
 ![Demonstration Overview](docs/overview.png)
 
@@ -32,7 +34,8 @@ The generated Kubernetes resource files are located relative to the `edmm_model.
 For the supported scenario, the tool will create two separate Kubernetes stacks, each consisting of a Service resource, a Deployment resource wired with the service, and a generated `Dockerfile` containing the layers expressed by the EDMM model.
 By building the Docker images (`docker build -t <name> .`) one can apply the Kubernetes resources to a cluster (`kubectl apply -f <files>`).
 
-The following video shows this demonstration on a live system: <https://youtu.be/byui0-opy2E>
+The following video shows this demonstration on a live system: 
+* <https://youtu.be/byui0-opy2E>
 
 ## Usage
 
