@@ -11,4 +11,4 @@ We therefore employ the visitor pattern to traverse the graph and find all requi
 
 As EDMM operations on components use artifacts to define installation steps, we create one `VirtualMachineExtension` for every artifact associated with the lifecycle operations of the components. 
 
-The plugin currently supports OS authentication to be either a password or SSH.
+The plugin currently supports OS authentication to be either password or SSH.
