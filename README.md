@@ -18,7 +18,25 @@ The following figure shows an high-level overview of the EDMM Transformation Fra
 
 ## Demo
 
-TODO
+![Demonstration Overview](docs/overview.png)
+
+The demo is split into two parts.
+First, we start with the EDMM Modeling Tool, which is based on [Eclipse Winery](https://github.com/eclipse/winery), in order to graphically model an EDMM-based application deployment.
+The EDMM Modeling Tool is able to export an EDMM YAML file according to the [specification](https://github.com/UST-EDMM/spec-yaml).
+After the EDMM model has been downloaded it can be fed into the EDMM Transformation Framework.
+For example, to convert the supported [scenario](#supported-scenario) into Kubernetes resource files one can run the `edmm` as follows:
+```shell
+edmm transform kubernetes ./edmm_model.yml
+```
+The generated Kubernetes resource files are located relative to the `edmm_model.yml` file inside a `kubernetes` directory.
+For the supported scenario, the tool will create two separate Kubernetes stack: 
+* Service resource
+* Deployment resource wired with the previously mentioned service 
+* A generated `Dockerfile` containing the layers expressed by the EDMM model
+By building the Docker images (`docker build -t <name> .`) one can apply the Kubernetes resources to a cluster (`kubectl apply -f <files>`).
+
+The following video shows this demonstration on a live system:
+* <https://youtu.be/byui0-opy2E>
 
 ## Usage
 
@@ -26,7 +44,7 @@ The final distribution package can be downloaded form the [releases](https://git
 Extract the files to a location on your filesystem and add it to your path variable (Linux: `$PATH`, Windows: `%PATH%`). 
 Afterwards you can invoke the `edmm` command from a command prompt.
 
-The transformation framework supports YAML files as input, according to the published [YAML specification](https://github.com/UST-EDMM/spec-yaml). 
+The transformation framework supports YAML files as input, according to the published [YAML specification](https://github.com/UST-EDMM/spec-yaml).
 Specified components and their respective component types must be supplied in a single file at the moment. 
 However, we introduce a couple of built-in component types that can be used to model an application deployment.
 An [example](edmm-core/src/test/resources/templates/scenario_iaas.yml) shows the usage of the built-in types to model an application deployment based on virtual compute resources, e.g., virtual machines having some software components installed.  
