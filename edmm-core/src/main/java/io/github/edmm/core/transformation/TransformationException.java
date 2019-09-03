@@ -2,6 +2,9 @@ package io.github.edmm.core.transformation;
 
 public class TransformationException extends RuntimeException {
 
+    public TransformationException() {
+    }
+
     public TransformationException(String message) {
         super(message);
     }
