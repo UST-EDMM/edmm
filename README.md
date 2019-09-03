@@ -24,19 +24,15 @@ The demo is split into two parts.
 First, we start with the EDMM Modeling Tool, which is based on [Eclipse Winery](https://github.com/eclipse/winery), in order to graphically model an EDMM-based application deployment.
 The EDMM Modeling Tool is able to export an EDMM YAML file according to the [specification](https://github.com/UST-EDMM/spec-yaml).
 After the EDMM model has been downloaded it can be fed into the EDMM Transformation Framework.
-For example, to convert the supported [scenario](#supported-scenario) into Kubernetes resource files one can run the `edmm` as follows:
+For example, to convert the supported [scenario](#supported-scenario) into Kubernetes resource files one can run the `edmm` CLI tool as follows:
 ```shell
 edmm transform kubernetes ./edmm_model.yml
 ```
 The generated Kubernetes resource files are located relative to the `edmm_model.yml` file inside a `kubernetes` directory.
-For the supported scenario, the tool will create two separate Kubernetes stack: 
-* Service resource
-* Deployment resource wired with the previously mentioned service 
-* A generated `Dockerfile` containing the layers expressed by the EDMM model
+For the supported scenario, the tool will create two separate Kubernetes stacks, each consisting of a Service resource, a Deployment resource wired with the service, and a generated `Dockerfile` containing the layers expressed by the EDMM model.
 By building the Docker images (`docker build -t <name> .`) one can apply the Kubernetes resources to a cluster (`kubectl apply -f <files>`).
 
-The following video shows this demonstration on a live system:
-* <https://youtu.be/byui0-opy2E>
+The following video shows this demonstration on a live system: <https://youtu.be/byui0-opy2E>
 
 ## Usage
 
