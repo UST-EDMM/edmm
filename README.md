@@ -16,6 +16,10 @@ The following figure shows an high-level overview of the EDMM Transformation Fra
  
 ![Framework Architecture](docs/architecture.png)
 
+## System Demonstration
+
+TODO
+
 ## Usage
 
 The final distribution package can be downloaded form the [releases](https://github.com/UST-EDMM/transformation-framework/releases) page.
