@@ -16,7 +16,7 @@ The following figure shows an high-level overview of the EDMM Transformation Fra
  
 ![Framework Architecture](docs/architecture.png)
 
-## System Demonstration
+## Demo
 
 TODO
 
