@@ -90,6 +90,10 @@
             <artifactId>cloudformation-builder</artifactId>
             <version>v1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-ec2</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
