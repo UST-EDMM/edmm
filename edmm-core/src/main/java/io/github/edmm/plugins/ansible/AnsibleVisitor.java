@@ -18,7 +18,6 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.ansible.model.AnsiblePlay;
 import io.github.edmm.plugins.ansible.model.AnsibleTask;
-import org.jgrapht.Graph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -32,13 +31,11 @@ public class AnsibleVisitor implements ComponentVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnsibleVisitor.class);
 
-    protected final TransformationContext context;
-    protected final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/ansible"));
-    protected final Graph<RootComponent, RootRelation> graph;
+    private final TransformationContext context;
+    private final Configuration cfg = TemplateHelper.forClasspath(AnsiblePlugin.class, "/plugins/ansible");
 
     public AnsibleVisitor(TransformationContext context) {
         this.context = context;
-        this.graph = context.getTopologyGraph();
     }
 
     public void populateAnsibleFile() {
@@ -107,7 +104,6 @@ public class AnsibleVisitor implements ComponentVisitor {
 
     private List<Operation> collectOperations(RootComponent component) {
         List<Operation> operations = new ArrayList<>();
-
         component.getStandardLifecycle().getCreate().ifPresent(operations::add);
         component.getStandardLifecycle().getConfigure().ifPresent(operations::add);
         component.getStandardLifecycle().getStart().ifPresent(operations::add);

@@ -17,7 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AzureTests extends PluginTest {
+
     private static final Logger logger = LoggerFactory.getLogger(AzureTests.class);
+
     private TransformationContext context;
 
     public AzureTests() throws IOException {

@@ -15,10 +15,10 @@ import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DependencyGraph;
 import io.github.edmm.model.relation.ConnectsTo;
+import io.github.edmm.plugins.compose.DockerComposePlugin;
 import io.github.edmm.plugins.compose.model.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 public class DockerComposeBuilder {
 
@@ -28,7 +28,7 @@ public class DockerComposeBuilder {
     private final DependencyGraph dependencyGraph;
     private final PluginFileAccess fileAccess;
 
-    private final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/compose"));
+    private final Configuration cfg = TemplateHelper.forClasspath(DockerComposePlugin.class, "/plugins/compose");
 
     public DockerComposeBuilder(List<Container> containers, DependencyGraph dependencyGraph, PluginFileAccess fileAccess) {
         this.containers = containers;
