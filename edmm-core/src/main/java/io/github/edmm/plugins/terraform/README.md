@@ -19,4 +19,4 @@ The idea is, that this can be sourced by each operation to access the informatio
 ## Future Work
 
 * Use `local-exec` provisioner to [extract](https://learn.hashicorp.com/terraform/getting-started/provision) the ip address of a dependant compute instance (target node).
-  This intel is added to the `env.sh` script in the form `'target_name'_HOSTNAME`.
+  This intel is added to the `env.sh` script in the form `'component_name'_HOSTNAME`.
