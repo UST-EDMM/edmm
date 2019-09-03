@@ -74,8 +74,8 @@ Currently we support the following list of plugins:
 * [Kubernetes](edmm-core/src/main/java/io/github/edmm/plugins/kubernetes)
 * [Terraform](edmm-core/src/main/java/io/github/edmm/plugins/terraform)
 * [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
-* [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn)
 * [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
+* [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn) (beta)
 
 The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
 
