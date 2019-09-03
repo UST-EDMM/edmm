@@ -12,7 +12,6 @@ import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.utils.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * Helps with template creation tasks using the freemarker library
@@ -20,15 +19,6 @@ import org.springframework.core.io.ClassPathResource;
 public abstract class TemplateHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateHelper.class);
-
-    public static Configuration fromClasspath(ClassPathResource resource) {
-        try {
-            return fromFile(resource.getFile());
-        } catch (IOException e) {
-            logger.error("Failed loading template fragments", e);
-            throw new TransformationException("Failed loading template fragments");
-        }
-    }
 
     public static Configuration fromFile(File file) {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
@@ -38,6 +28,17 @@ public abstract class TemplateHelper {
             logger.error("Failed loading template fragments", e);
             throw new TransformationException("Failed loading template fragments");
         }
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        cfg.setLogTemplateExceptions(false);
+        cfg.setWrapUncheckedExceptions(true);
+        cfg.setFallbackOnNullLoopVariable(false);
+        return cfg;
+    }
+
+    public static Configuration forClasspath(Class clazz, String basePath) {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
+        cfg.setClassForTemplateLoading(clazz, basePath);
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(false);

@@ -1,5 +1,13 @@
 package io.github.edmm.plugins.chef;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
@@ -20,15 +28,6 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static io.github.edmm.plugins.chef.ChefLifecycle.COOKBOOKS_FOLDER;
 import static io.github.edmm.plugins.chef.ChefLifecycle.COOKBOOK_CHEFIGNORE_FILENAME;
@@ -45,7 +44,7 @@ public class ChefTransformer {
 
     protected final TransformationContext context;
     protected final Graph<RootComponent, RootRelation> graph;
-    private final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/chef"));
+    private final Configuration cfg = TemplateHelper.forClasspath(ChefPlugin.class, "/plugins/chef");
 
     public ChefTransformer(TransformationContext context) {
         this.context = context;
@@ -108,7 +107,6 @@ public class ChefTransformer {
                         LOGGER.error("Failed to generate stacks for Chef: {}", e.getMessage(), e);
                     }
                 });
-
             }
         } catch (IOException e) {
             LOGGER.error("Failed to write Chef cookbooks : {}", e.getMessage(), e);
@@ -194,5 +192,4 @@ public class ChefTransformer {
         Path policyPath = Paths.get(POLICIES_FOLDER, stackName.concat("_").concat(POLICY_FILENAME));
         context.getFileAccess().append(policyPath.toString(), TemplateHelper.toString(policyFile, templateData));
     }
-
 }

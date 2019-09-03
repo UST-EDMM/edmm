@@ -25,7 +25,6 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_EXTENSION;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_MAIN;
@@ -38,7 +37,7 @@ public class PuppetTransformer {
 
     protected final TransformationContext context;
     protected final Graph<RootComponent, RootRelation> graph;
-    private final Configuration cfg = TemplateHelper.fromClasspath(new ClassPathResource("plugins/puppet"));
+    private final Configuration cfg = TemplateHelper.forClasspath(PuppetPlugin.class, "/plugins/puppet");
 
     public PuppetTransformer(TransformationContext context) {
         this.context = context;
