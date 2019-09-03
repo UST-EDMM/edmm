@@ -56,7 +56,7 @@ Currently we support the following list of plugins:
 * [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn)
 * [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
 
-The corresponding plugin README.md contains detailed information of the transformation rule each plugin employs.
+The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
 
 ## Built-in Component Types
 
