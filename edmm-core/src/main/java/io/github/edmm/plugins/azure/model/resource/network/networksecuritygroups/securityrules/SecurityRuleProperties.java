@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.resource.Properties;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Builder
 @Data
+@Builder
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecurityRuleProperties extends Properties {
     private SecurityRuleProtocolEnum protocol;

@@ -61,7 +61,7 @@ public class VirtualMachine extends Resource {
         super.setDefaults();
         setApiVersion("2019-03-01");
 
-        List<String> dependencies = new ArrayList();
+        List<String> dependencies = new ArrayList<>();
         dependencies.add("[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]");
         dependencies.add("[concat('Microsoft.Network/virtualNetworks/', variables('vnet_name'))]");
         setDependsOn(dependencies);

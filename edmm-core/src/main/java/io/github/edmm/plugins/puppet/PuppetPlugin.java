@@ -6,7 +6,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 
 public class PuppetPlugin extends Plugin<PuppetLifecycle> {
 
-    public static final Platform PUPPET = Platform.builder().id("plugins.puppet").name("Puppet").build();
+    public static final Platform PUPPET = Platform.builder().id("puppet").name("Puppet").build();
 
     public PuppetPlugin() {
         super(PUPPET);

@@ -7,9 +7,11 @@ import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.network.virtualnetworks.subnets.Subnet;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VirtualNetworkProperties extends Properties {
     private AddressSpace addressSpace;
