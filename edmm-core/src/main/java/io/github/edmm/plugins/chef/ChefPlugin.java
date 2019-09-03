@@ -6,7 +6,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 
 public class ChefPlugin extends Plugin<ChefLifecycle> {
 
-    public static final Platform CHEF = Platform.builder().id("plugins.chef").name("Chef").build();
+    public static final Platform CHEF = Platform.builder().id("chef").name("Chef").build();
 
     public ChefPlugin() {
         super(CHEF);
