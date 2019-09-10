@@ -3,12 +3,10 @@ package io.github.edmm.plugins.chef.model;
 import java.util.List;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
-@ToString
 public class CookBook {
     private String name;
     private String path;

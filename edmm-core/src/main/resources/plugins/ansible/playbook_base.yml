@@ -8,7 +8,7 @@
   </#if>
   become: yes
   become_user: root
-  <#if play.vars??>
+  <#if play.vars?? && play.vars?size != 0>
   vars:
     <#list play.vars?keys as key>
     ${key}: ${play.vars[key]}
@@ -19,7 +19,7 @@
     <#list play.tasks as task>
     - name: ${task.name}
       script: ${task.script}
-      <#if task.args??>
+      <#if task.args?? && task.args?size != 0>
       args:
       <#list task.args as arg>
         ${arg.name}: ${arg.value}
@@ -27,4 +27,5 @@
       <#else>
       </#if>
     </#list>
+
 </#list>
