@@ -35,6 +35,6 @@ class SshConfiguratoin {
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class PublicKey {
-    String path;
-    String keyData;
+    private String path;
+    private String keyData;
 }

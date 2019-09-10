@@ -32,7 +32,6 @@ public final class ExecutionTask implements Callable<Void> {
 
     @Override
     public Void call() {
-        String templateName = transformation.getModel().getName();
         Platform platform = plugin.getPlatform();
         logger.info("Starting transformation for {}", platform.getName());
         transformation.setState(Transformation.State.TRANSFORMING);

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.github.edmm.core.plugin.support.LifecyclePhaseAccess;
+import io.github.edmm.core.transformation.TransformationException;
 
 public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePhaseAccess {
 
@@ -38,12 +39,12 @@ public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePha
         List<LifecyclePhase> phases = new ArrayList<>();
         phases.add(new LifecyclePhase<>("check_environment", this, (e) -> {
             if (!e.checkEnvironment()) {
-                throw new Exception("Transformation failed, because the environment check has failed");
+                throw new TransformationException("Transformation failed, because the environment check has failed");
             }
         }));
         phases.add(new LifecyclePhase<>("check_model", this, (e) -> {
             if (!e.checkModel()) {
-                throw new Exception("Transformation failed, because the model check has failed");
+                throw new TransformationException("Transformation failed, because the model check has failed");
             }
         }));
         phases.add(new LifecyclePhase<>("prepare", this, PluginLifecycle::prepare));
