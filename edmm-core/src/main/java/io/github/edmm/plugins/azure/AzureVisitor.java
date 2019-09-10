@@ -38,6 +38,7 @@ import static io.github.edmm.model.component.WebServer.PORT;
 public class AzureVisitor implements ComponentVisitor, RelationVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(AzureVisitor.class);
+
     private final Graph<RootComponent, RootRelation> graph;
 
     @Getter
@@ -50,36 +51,33 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
 
     @Override
     public void visit(Compute component) {
-        long previousVmCount = resultTemplate.getResources().stream().filter(resource -> resource.getType().equals(ResourceTypeEnum.VIRTUAL_MACHINES)).count();
-        logger.debug("Processing compute node #{}", previousVmCount + 1);
+        long vmCount = resultTemplate.getResources().stream().filter(resource -> resource.getType().equals(ResourceTypeEnum.VIRTUAL_MACHINES)).count();
+        logger.debug("Processing compute node #{}", vmCount + 1);
 
-        // this is the first vm we add!
-        if (previousVmCount == 0) {
+        // This is the first VM we add, therefore we apply defaults
+        if (vmCount == 0) {
             final VirtualNetwork virtualNetwork = new VirtualNetwork();
             final StorageAccount storageProfile = new StorageAccount();
             resultTemplate.getResources().add(virtualNetwork);
             resultTemplate.getResources().add(storageProfile);
         }
-        final String vmName = "vm_" + component.getNormalizedName();
-        final VirtualMachine vm = new VirtualMachine(vmName);
+        final String name = "vm_" + component.getNormalizedName();
+        final VirtualMachine vm = new VirtualMachine(name);
         resultTemplate.getResources().add(vm);
         Optional<String> sshPublicKey = component.getPublicKey();
 
-        // Check ssh public key
+        // Check SSH public key
         if (sshPublicKey.isPresent()) {
             vm.setAuthentication(false, sshPublicKey.get());
-            logger.info("Setting an ssh public key for vm " + vmName);
+            logger.info("Setting an ssh public key for vm " + name);
         }
 
-        // Check OS
+        // Check OS and image
         Optional<String> osFamily = component.getOsFamily();
-
         if (osFamily.isPresent() && !osFamily.get().toLowerCase().contains("linux")) {
             throw new TransformationException("Only linux-based operating systems are currently supported!");
         }
-
         Optional<String> image = component.getMachineImage();
-
         if (image.isPresent() && !image.get().toLowerCase().contains("ubuntu")) {
             throw new TransformationException("Only Ubuntu OS is currently supported!");
         }
@@ -128,18 +126,18 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
 
             for (Pair<String, String> artifact : artifacts) {
                 final String extensionName = String.format("%s_extension_%s", vm.get().getName(), artifact.getKey());
-                // create new extension (script) and set its name
+                // Create new extension (script) and set its name
                 currentExtension = new VirtualMachineExtension(extensionName);
-                // set the path of the script file to be executed
+                // Set the path of the script file to be executed
                 currentExtension.setScriptPath(artifact.getValue());
-                // set dependencies for the vm extension
+                // Set dependencies for the vm extension
                 List<String> dependencies = new ArrayList<>();
-                // set a dependency on the virtual machine
+                // Set a dependency on the virtual machine
                 dependencies.add(String.format("Microsoft.Compute/virtualMachines/%s", vm.get().getName()));
-                // set dependencies on previous scripts
+                // Set dependencies on previous scripts
                 existingExtensions.forEach(extension -> dependencies.add(String.format("Microsoft.Compute/virtualMachines/extensions/%s", extension.getName())));
                 currentExtension.setDependsOn(dependencies);
-                // add extension to resources
+                // Add extension to resources
                 this.resultTemplate.getResources().add(currentExtension);
                 existingExtensions.add(currentExtension);
             }
@@ -195,11 +193,11 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
     private Optional<VirtualMachine> getHostingVirtualMachine(RootComponent component) {
         Compute hostingCompute = null;
 
-        // first check if the component is a Compute node
+        // First check if the component is a Compute node
         if (component instanceof Compute) {
             hostingCompute = (Compute) component;
         } else {
-            // now check if it is hosted by a compute node
+            // Now check if it is hosted by a compute node
             Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component);
             if (optionalCompute.isPresent()) {
                 hostingCompute = optionalCompute.get();
