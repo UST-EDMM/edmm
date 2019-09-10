@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
@@ -74,13 +75,13 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
         Optional<String> osFamily = component.getOsFamily();
 
         if (osFamily.isPresent() && !osFamily.get().toLowerCase().contains("linux")) {
-            throw new RuntimeException("Only linux-based operating systems are currently supported!");
+            throw new TransformationException("Only linux-based operating systems are currently supported!");
         }
 
         Optional<String> image = component.getMachineImage();
 
         if (image.isPresent() && !image.get().toLowerCase().contains("ubuntu")) {
-            throw new RuntimeException("Only Ubuntu OS is currently supported!");
+            throw new TransformationException("Only Ubuntu OS is currently supported!");
         }
 
         // Check self operations

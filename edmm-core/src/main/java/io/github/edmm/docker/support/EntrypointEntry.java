@@ -6,7 +6,7 @@ public class EntrypointEntry extends DockerfileEntry {
 
     private final String[] commands;
 
-    String command = "ENTRYPOINT ";
+    protected String command = "ENTRYPOINT ";
 
     public EntrypointEntry(String... commands) {
         this.commands = commands;

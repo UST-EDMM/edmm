@@ -1,10 +1,13 @@
 package io.github.edmm.plugins.heat;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import io.github.edmm.core.plugin.PluginFileAccess;
@@ -13,6 +16,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
 import io.github.edmm.model.component.Dbms;
@@ -67,6 +71,7 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
     private static final String HEAT_GROUP = "group";
     private static final String HEAT_SCRIPT = "script";
     private static final String HEAT_INPUTS = "inputs";
+    private static final String HEAT_NAME = "name";
 
     private static final Logger logger = LoggerFactory.getLogger(HeatVisitor.class);
 
@@ -103,42 +108,63 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
             Compute compute = optionalCompute.get();
             Resource instance = computeResources.get(compute);
 
-            for (Operation operation : component.getOperations().values()) {
-                if (operation.hasArtifacts()) {
-                    // We only deal with one artifact
-                    Artifact artifact = operation.getArtifacts().get(0);
-                    // Set properties on instance
-                    instance.addPropertyAssignment(HEAT_USER_DATA_FORMAT, new PropertyValue(HEAT_SOFTWARE_CONFIG));
-                    // Create software deployment resource
-                    Resource deployment = Resource.builder()
-                            .name(component.getNormalizedName() + "_" + operation.getNormalizedName())
-                            .type(HEAT_SOFTWARE_DEPLOYMENT_TYPE)
-                            .build();
-                    // Create respective config resource
-                    Resource config = Resource.builder()
-                            .name(deployment.getName() + "_config")
-                            .type(HEAT_SOFTWARE_CONFIG_TYPE)
-                            .build();
-                    // Set deployment properties
-                    deployment.addDependsOn(instance.getName(), config.getName());
-                    deployment.addPropertyAssignment(HEAT_CONFIG, new PropertyGetResource(config.getName()));
-                    deployment.addPropertyAssignment(HEAT_SERVER, new PropertyGetResource(instance.getName()));
-                    // TODO: Collect properties from underlying stack and connected stacks
-                    // deployment.addPropertyAssignment(HEAT_INPUT_VALUES, new PropertyObject());
-                    // Set config properties
-                    config.addPropertyAssignment(HEAT_GROUP, new PropertyValue(HEAT_SCRIPT));
-                    PluginFileAccess fileAccess = context.getFileAccess();
-                    try {
-                        String artifactContent = fileAccess.readToString(artifact.getValue());
-                        config.addPropertyAssignment(HEAT_CONFIG, new PropertyValue(artifactContent));
-                    } catch (IOException e) {
-                        throw new TransformationException(e);
-                    }
-                    template.addResource(deployment, config);
+            List<Operation> operations = collectOperations(component);
+            for (int i = 0; i < operations.size(); i++) {
+                Operation operation = operations.get(i);
+
+                // We only deal with one artifact
+                Artifact artifact = operation.getArtifacts().get(0);
+                // Set properties on instance
+                instance.addPropertyAssignment(HEAT_USER_DATA_FORMAT, new PropertyValue(HEAT_SOFTWARE_CONFIG));
+                // Create software deployment resource
+                Resource deployment = Resource.builder()
+                        .name(getDeploymentName(component, operation))
+                        .type(HEAT_SOFTWARE_DEPLOYMENT_TYPE)
+                        .build();
+                // Create respective config resource
+                Resource config = Resource.builder()
+                        .name(getConfigName(component, operation))
+                        .type(HEAT_SOFTWARE_CONFIG_TYPE)
+                        .build();
+                deployment.addDependsOn(instance.getName(), config.getName());
+                // Set order of operations
+                if (i > 0) {
+                    Operation previousOperation = operations.get(i - 1);
+                    deployment.addDependsOn(getDeploymentName(component, previousOperation));
                 }
+                // Set deployment properties
+                deployment.addPropertyAssignment(HEAT_CONFIG, new PropertyGetResource(config.getName()));
+                deployment.addPropertyAssignment(HEAT_SERVER, new PropertyGetResource(instance.getName()));
+                // Collect properties from underlying stack
+                List<RootComponent> stack = Lists.newArrayList(component);
+                TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), stack, component);
+                Map<String, String> inputValues = new HashMap<>();
+                prepareProperties(inputValues, stack);
+                deployment.addPropertyAssignment(HEAT_INPUT_VALUES, new PropertyObject(inputValues));
+                // Set config properties
+                config.addPropertyAssignment(HEAT_GROUP, new PropertyValue(HEAT_SCRIPT));
+                List<ImmutablePair<String, String>> inputs = new ArrayList<>();
+                inputValues.forEach((name, value) -> inputs.add(new ImmutablePair<>(HEAT_NAME, name)));
+                config.addPropertyAssignment(HEAT_INPUTS, new PropertyObject(inputs));
+                PluginFileAccess fileAccess = context.getFileAccess();
+                try {
+                    String artifactContent = fileAccess.readToString(artifact.getValue());
+                    config.addPropertyAssignment(HEAT_CONFIG, new PropertyValue(artifactContent));
+                } catch (IOException e) {
+                    throw new TransformationException(e);
+                }
+                template.addResource(deployment, config);
             }
         }
         component.setTransformed(true);
+    }
+
+    private String getDeploymentName(RootComponent component, Operation operation) {
+        return component.getNormalizedName() + "_" + operation.getNormalizedName();
+    }
+
+    private String getConfigName(RootComponent component, Operation operation) {
+        return getDeploymentName(component, operation) + "_config";
     }
 
     @Override
@@ -237,5 +263,26 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(WebServer component) {
         handleSoftwareDeployment(component);
+    }
+
+    private void prepareProperties(Map<String, String> inputs, List<RootComponent> stack) {
+        String[] blacklist = {"key_name", "public_key"};
+        for (RootComponent component : stack) {
+            Map<String, Property> properties = component.getProperties();
+            properties.values().stream()
+                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                    .forEach(p -> inputs.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
+        }
+    }
+
+    private List<Operation> collectOperations(RootComponent component) {
+        List<Operation> operations = new ArrayList<>();
+        component.getStandardLifecycle().getCreate().ifPresent(operations::add);
+        component.getStandardLifecycle().getConfigure().ifPresent(operations::add);
+        component.getStandardLifecycle().getStart().ifPresent(operations::add);
+        return operations
+                .stream()
+                .filter(Operation::hasArtifacts)
+                .collect(Collectors.toList());
     }
 }

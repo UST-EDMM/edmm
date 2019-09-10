@@ -7,7 +7,7 @@ public class AddEntry extends DockerfileEntry {
     private final String src;
     private final String dest;
 
-    String command;
+    protected String command;
 
     public AddEntry(String src, String dest) {
         this.src = src;
