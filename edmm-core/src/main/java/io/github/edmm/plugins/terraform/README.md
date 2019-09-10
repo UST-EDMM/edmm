@@ -14,9 +14,9 @@ The idea is, that this can be sourced by each operation to access the informatio
 
 ## Limitations
 
-  * The `env.sh` script needs to be sourced by EDMM operations individually
+* The `env.sh` script needs to be sourced by EDMM operations individually
 
 ## Future Work
 
-  * Use `local-exec` provisioner to [extract](https://learn.hashicorp.com/terraform/getting-started/provision) the ip address of a dependant compute instance (target node).
-    This intel is added to the `env.sh` script in the form `'component_name'_HOSTNAME`.
+* Use `local-exec` provisioner to [extract](https://learn.hashicorp.com/terraform/getting-started/provision) the ip address of a dependant compute instance (target node).
+  This intel is added to the `env.sh` script in the form `'component_name'_HOSTNAME`.
