@@ -4,12 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
-@ToString
 public class AnsiblePlay {
     private String name;
     private String hosts;

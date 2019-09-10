@@ -2,17 +2,22 @@ package io.github.edmm.plugins.ansible;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
+import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
+import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
@@ -23,53 +28,56 @@ import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import static io.github.edmm.plugins.ansible.AnsibleLifecycle.FILE_NAME;
 
-public class AnsibleVisitor implements ComponentVisitor {
+public class AnsibleTransformer implements ComponentVisitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnsibleVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnsibleTransformer.class);
 
     private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(AnsiblePlugin.class, "/plugins/ansible");
 
-    public AnsibleVisitor(TransformationContext context) {
+    public AnsibleTransformer(TransformationContext context) {
         this.context = context;
     }
 
     public void populateAnsibleFile() {
         PluginFileAccess fileAccess = context.getFileAccess();
-
         try {
             Template baseTemplate = cfg.getTemplate("playbook_base.yml");
-
             CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
             if (cycleDetector.detectCycles()) {
-                // TODO handle cycle in the topology notification
-                throw new RuntimeException("The given topology is not acyclic");
+                throw new TransformationException("The given topology has cycles");
             } else {
-                // reverse the graph to find sources
-                EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = new EdgeReversedGraph<>(context.getModel().getTopology());
-                // apply the topological sort
-                TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(dependencyGraph);
+                // Reverse the graph to find sources
+                EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
+                        = new EdgeReversedGraph<>(context.getModel().getTopology());
+                // Apply the topological sort
+                TopologicalOrderIterator<RootComponent, RootRelation> iterator
+                        = new TopologicalOrderIterator<>(dependencyGraph);
 
-                LOGGER.info("topological order");
                 Map<String, Object> templateData = new HashMap<>();
                 List<AnsiblePlay> plays = new ArrayList<>();
 
                 while (iterator.hasNext()) {
                     RootComponent component = iterator.next();
-                    LOGGER.info("Generate a play for component " + component.getName());
+                    logger.info("Generate a play for component " + component.getName());
                     Map<String, String> properties = new HashMap<>();
                     List<AnsibleTask> tasks = new ArrayList<>();
 
                     prepareProperties(properties, component.getProperties());
                     prepareTasks(tasks, collectOperations(component));
 
+                    String hosts = component.getNormalizedName();
+                    Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(context.getTopologyGraph(), component);
+                    if (optionalCompute.isPresent()) {
+                        hosts = optionalCompute.get().getNormalizedName();
+                    }
+
                     AnsiblePlay play = AnsiblePlay.builder()
                             .name(component.getName())
-                            .hosts("")
+                            .hosts(hosts)
                             .vars(properties)
                             .tasks(tasks)
                             .build();
@@ -81,23 +89,33 @@ public class AnsibleVisitor implements ComponentVisitor {
                 fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, templateData));
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to write Ansible file: {}", e.getMessage(), e);
+            logger.error("Failed to write Ansible file: {}", e.getMessage(), e);
         }
     }
 
     private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
-        properties.forEach((key, property) -> targetMap.put(key, property.getValue().replaceAll("\n", "")));
+        String[] blacklist = {"key_name", "public_key"};
+        properties.values().stream()
+                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                .forEach(p -> targetMap.put(p.getName(), p.getValue().replaceAll("\n", "")));
     }
 
     private void prepareTasks(List<AnsibleTask> targetQueue, List<Operation> operations) {
         operations.forEach(operation -> {
             if (!operation.getArtifacts().isEmpty()) {
+                String file = operation.getArtifacts().get(0).getValue();
                 AnsibleTask task = AnsibleTask.builder()
                         .name(operation.getNormalizedName())
-                        .script(operation.getArtifacts().get(0).getValue())
+                        .script(file)
                         .build();
-
                 targetQueue.add(task);
+                // Copy artifact files to target directory
+                PluginFileAccess fileAccess = context.getFileAccess();
+                try {
+                    fileAccess.copy(file, file);
+                } catch (IOException e) {
+                    logger.warn("Failed to copy file '{}'", file);
+                }
             }
         });
     }
