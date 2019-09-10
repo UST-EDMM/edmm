@@ -7,6 +7,7 @@ import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.azure.AzurePlugin;
+import io.github.edmm.plugins.chef.ChefPlugin;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -40,6 +41,6 @@ public class ChefTests extends PluginTest {
 
     @Test
     public void testLifecycleExecution() {
-        executeLifecycle(new AzurePlugin(), context);
+        executeLifecycle(new ChefPlugin(), context);
     }
 }

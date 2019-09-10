@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.parser.EntityGraph;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
@@ -18,6 +19,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.ToString;
 import org.jgrapht.Graph;
+import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.slf4j.Logger;
@@ -85,12 +87,20 @@ public final class DeploymentModel {
         return topology.edgeSet();
     }
 
+    public Graph<RootComponent, RootRelation> getTopology() {
+        CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(topology);
+        if (cycleDetector.detectCycles()) {
+            throw new TransformationException("The given topology has cycles");
+        }
+        return topology;
+    }
+
     public EdgeReversedGraph<RootComponent, RootRelation> getReversedTopology() {
         return new EdgeReversedGraph<>(topology);
     }
 
     public Set<Graph<RootComponent, RootRelation>> findComponentStacks() {
-        EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = new EdgeReversedGraph<>(topology);
+        EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = getReversedTopology();
         List<RootComponent> stackSources = topology.vertexSet()
                 .stream()
                 .filter(v -> dependencyGraph.inDegreeOf(v) == 0)
