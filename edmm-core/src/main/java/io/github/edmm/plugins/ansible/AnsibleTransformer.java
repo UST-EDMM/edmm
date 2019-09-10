@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.Lists;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
@@ -61,7 +62,10 @@ public class AnsibleTransformer implements ComponentVisitor {
                 Map<String, String> properties = new HashMap<>();
                 List<AnsibleTask> tasks = new ArrayList<>();
 
-                prepareProperties(properties, component.getProperties());
+                List<RootComponent> stack = Lists.newArrayList(component);
+                TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), stack, component);
+
+                prepareProperties(properties, stack);
                 prepareTasks(tasks, collectOperations(component));
 
                 String hosts = component.getNormalizedName();
@@ -87,11 +91,14 @@ public class AnsibleTransformer implements ComponentVisitor {
         }
     }
 
-    private void prepareProperties(Map<String, String> targetMap, Map<String, Property> properties) {
+    private void prepareProperties(Map<String, String> envVars, List<RootComponent> stack) {
         String[] blacklist = {"key_name", "public_key"};
-        properties.values().stream()
-                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                .forEach(p -> targetMap.put(p.getName(), p.getValue().replaceAll("\n", "")));
+        for (RootComponent component : stack) {
+            Map<String, Property> properties = component.getProperties();
+            properties.values().stream()
+                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                    .forEach(p -> envVars.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
+        }
     }
 
     private void prepareTasks(List<AnsibleTask> targetQueue, List<Operation> operations) {
