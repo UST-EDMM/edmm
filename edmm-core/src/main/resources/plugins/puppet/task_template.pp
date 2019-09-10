@@ -1,4 +1,4 @@
-class ${component}::${task.name}{
+class ${component}::${task.name} {
   file { '${task.scriptFileName}':
     ensure => 'file',
     source => 'puppet:///modules/${component}/${task.scriptFileName}',
@@ -9,7 +9,13 @@ class ${component}::${task.name}{
     notify => Exec['run_${task.scriptFileName}'],
   }
   exec { 'run_${task.scriptFileName}':
-    environment => ["${task.varString}"],
+    <#if task.envVars?? && task.envVars?size != 0>
+    environment => [
+        <#list task.envVars as var>
+        '${var}'<#sep>,</#sep>
+        </#list>
+    ],
+    </#if>
     command => '/usr/local/bin/${task.scriptFileName}',
     refreshonly => true
   }

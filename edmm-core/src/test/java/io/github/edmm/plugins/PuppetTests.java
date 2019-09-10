@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
+import io.github.edmm.plugins.puppet.PuppetPlugin;
 import io.github.edmm.plugins.terraform.TerraformPlugin;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,6 @@ public class PuppetTests extends PluginTest {
 
     @Test
     public void testLifecycleExecution() {
-        executeLifecycle(new TerraformPlugin(), context);
+        executeLifecycle(new PuppetPlugin(), context);
     }
 }

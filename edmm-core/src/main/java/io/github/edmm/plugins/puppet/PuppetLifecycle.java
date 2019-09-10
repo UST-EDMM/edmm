@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 
 public class PuppetLifecycle extends AbstractLifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PuppetLifecycle.class);
+    private static final Logger logger = LoggerFactory.getLogger(PuppetLifecycle.class);
+
     public static final String MODULE_FILES_FOLDER = "files";
     public static final String MODULE_MANIFESTS_FOLDER = "manifests";
     public static final String MANIFEST_MAIN = "init";
@@ -20,20 +21,10 @@ public class PuppetLifecycle extends AbstractLifecycle {
     }
 
     @Override
-    public void prepare() {
-        LOGGER.info("Prepare transformation for Puppet...");
-    }
-
-    @Override
     public void transform() {
-        LOGGER.info("Begin transformation to Puppet...");
+        logger.info("Begin transformation to Puppet...");
         PuppetTransformer transformer = new PuppetTransformer(context);
         transformer.populateManifest();
-        LOGGER.info("Transformation to Puppet successful");
-    }
-
-    @Override
-    public void cleanup() {
-        LOGGER.info("Cleanup transformation leftovers...");
+        logger.info("Transformation to Puppet successful");
     }
 }
