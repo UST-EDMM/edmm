@@ -1,8 +1,8 @@
-
 # EDMM Transformation Framework
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](https://travis-ci.org/UST-EDMM/transformation-framework.svg?branch=master)](https://travis-ci.org/UST-EDMM/transformation-framework)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d46d2287b3084689be0247e1aed91bc9)](https://www.codacy.com/app/miwurster/transformation-framework?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UST-EDMM/transformation-framework&amp;utm_campaign=Badge_Grade)
 [![](https://jitpack.io/v/UST-EDMM/transformation-framework.svg)](https://jitpack.io/#UST-EDMM/transformation-framework)
 
 > Transformation framework for the Essential Deployment Metamodel.
@@ -63,16 +63,16 @@ Each plugin implements its own transformation logic by providing a respective `P
 Further, a plugin implements different lifecycle methods, e.g., `checkModel()`, `prepare()`, and `cleanup()`, but must provide an implementation for the `transform()` method.
 Currently we support the following list of plugins:
 
-* [Ansible](edmm-core/src/main/java/io/github/edmm/plugins/ansible)
-* [Azure Resource Manager](edmm-core/src/main/java/io/github/edmm/plugins/azure)
-* [Chef](edmm-core/src/main/java/io/github/edmm/plugins/chef)
-* [Docker Compose](edmm-core/src/main/java/io/github/edmm/plugins/compose)
-* [Heat Orchestration Template](edmm-core/src/main/java/io/github/edmm/plugins/heat)
-* [Kubernetes](edmm-core/src/main/java/io/github/edmm/plugins/kubernetes)
-* [Terraform](edmm-core/src/main/java/io/github/edmm/plugins/terraform)
-* [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
-* [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
-* [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn) (beta)
+  * [Ansible](edmm-core/src/main/java/io/github/edmm/plugins/ansible)
+  * [Azure Resource Manager](edmm-core/src/main/java/io/github/edmm/plugins/azure)
+  * [Chef](edmm-core/src/main/java/io/github/edmm/plugins/chef)
+  * [Docker Compose](edmm-core/src/main/java/io/github/edmm/plugins/compose)
+  * [Heat Orchestration Template](edmm-core/src/main/java/io/github/edmm/plugins/heat)
+  * [Kubernetes](edmm-core/src/main/java/io/github/edmm/plugins/kubernetes)
+  * [Terraform](edmm-core/src/main/java/io/github/edmm/plugins/terraform)
+  * [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
+  * [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
+  * [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn) (beta)
 
 The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
 

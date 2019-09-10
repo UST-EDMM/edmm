@@ -6,6 +6,7 @@ import java.util.Optional;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.DescribableElement;
+import io.github.edmm.utils.Consts;
 import lombok.ToString;
 
 @ToString
@@ -52,6 +53,6 @@ public class Property extends DescribableElement {
         if (Objects.isNull(value)) {
             return getDefaultValue();
         }
-        return value;
+        return value.replaceAll(Consts.NL, Consts.EMPTY);
     }
 }

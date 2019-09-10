@@ -3,12 +3,10 @@ package io.github.edmm.plugins.ansible.model;
 import java.util.Map;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
-@ToString
 public class AnsibleTask {
     private String name;
     private String script;

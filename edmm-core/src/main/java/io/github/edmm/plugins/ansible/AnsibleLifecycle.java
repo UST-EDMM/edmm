@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 public class AnsibleLifecycle extends AbstractLifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnsibleLifecycle.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnsibleLifecycle.class);
+
     public static final String FILE_NAME = "deployment.yml";
 
     private final TransformationContext context;
@@ -19,10 +20,10 @@ public class AnsibleLifecycle extends AbstractLifecycle {
 
     @Override
     public void transform() {
-        LOGGER.info("Begin transformation to Ansible...");
-        AnsibleVisitor visitor = new AnsibleVisitor(context);
+        logger.info("Begin transformation to Ansible...");
+        AnsibleTransformer visitor = new AnsibleTransformer(context);
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
         visitor.populateAnsibleFile();
-        LOGGER.info("Transformation to Ansible successful");
+        logger.info("Transformation to Ansible successful");
     }
 }
