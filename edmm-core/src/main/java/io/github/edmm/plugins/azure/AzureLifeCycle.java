@@ -8,6 +8,7 @@ import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.JsonHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
@@ -19,8 +20,10 @@ import org.slf4j.LoggerFactory;
 
 public class AzureLifeCycle extends AbstractLifecycle {
 
-    public static final String FILE_NAME = "deploy.json";
     private static final Logger logger = LoggerFactory.getLogger(AzureLifeCycle.class);
+
+    public static final String FILE_NAME = "deploy.json";
+
     private final TransformationContext context;
 
     public AzureLifeCycle(TransformationContext context) {
@@ -31,16 +34,16 @@ public class AzureLifeCycle extends AbstractLifecycle {
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
             final String templateString = JsonHelper.toJson(resultTemplate);
-            logger.debug(templateString);
             fileAccess.append(FILE_NAME, templateString);
         } catch (IOException e) {
             logger.error("Failed to write Azure Resource Manager file: {}", e.getMessage(), e);
+            throw new TransformationException(e);
         }
     }
 
     private void addParametersAndVariables(ResourceManagerTemplate resultTemplate) {
         resultTemplate.getResources().forEach(resource -> {
-            // the following statements should discard duplicates
+            // The following statements should discard duplicates
             resultTemplate.getParameters().putAll(resource.getRequiredParameters());
             resultTemplate.getVariables().putAll(resource.getRequiredVariables());
         });
@@ -82,6 +85,6 @@ public class AzureLifeCycle extends AbstractLifecycle {
         this.populateAzureTemplateFile(resultTemplate);
         // ... then copy artifact files to target directory
         this.copyOperationsToTargetDirectory(resultTemplate);
-        logger.info("Transformation to Terraform successful");
+        logger.info("Transformation to Azure Resource Manager successful");
     }
 }
