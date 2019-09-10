@@ -1,4 +1,3 @@
-
 # EDMM Transformation Framework
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -68,16 +67,16 @@ Each plugin implements its own transformation logic by providing a respective `P
 Further, a plugin implements different lifecycle methods, e.g., `checkModel()`, `prepare()`, and `cleanup()`, but must provide an implementation for the `transform()` method.
 Currently we support the following list of plugins:
 
-* [Ansible](edmm-core/src/main/java/io/github/edmm/plugins/ansible)
-* [Azure Resource Manager](edmm-core/src/main/java/io/github/edmm/plugins/azure)
-* [Chef](edmm-core/src/main/java/io/github/edmm/plugins/chef)
-* [Docker Compose](edmm-core/src/main/java/io/github/edmm/plugins/compose)
-* [Heat Orchestration Template](edmm-core/src/main/java/io/github/edmm/plugins/heat)
-* [Kubernetes](edmm-core/src/main/java/io/github/edmm/plugins/kubernetes)
-* [Terraform](edmm-core/src/main/java/io/github/edmm/plugins/terraform)
-* [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
-* [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn)
-* [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
+  * [Ansible](edmm-core/src/main/java/io/github/edmm/plugins/ansible)
+  * [Azure Resource Manager](edmm-core/src/main/java/io/github/edmm/plugins/azure)
+  * [Chef](edmm-core/src/main/java/io/github/edmm/plugins/chef)
+  * [Docker Compose](edmm-core/src/main/java/io/github/edmm/plugins/compose)
+  * [Heat Orchestration Template](edmm-core/src/main/java/io/github/edmm/plugins/heat)
+  * [Kubernetes](edmm-core/src/main/java/io/github/edmm/plugins/kubernetes)
+  * [Terraform](edmm-core/src/main/java/io/github/edmm/plugins/terraform)
+  * [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
+  * [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn)
+  * [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
 
 The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
 

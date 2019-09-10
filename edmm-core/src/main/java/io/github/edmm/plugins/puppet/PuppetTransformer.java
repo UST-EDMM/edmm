@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
+import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
@@ -20,8 +23,6 @@ import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.puppet.model.Task;
-import org.jgrapht.Graph;
-import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,68 +34,60 @@ import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULE_MANIFESTS_FOL
 
 public class PuppetTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PuppetTransformer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PuppetTransformer.class);
 
-    protected final TransformationContext context;
-    protected final Graph<RootComponent, RootRelation> graph;
+    private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(PuppetPlugin.class, "/plugins/puppet");
 
     public PuppetTransformer(TransformationContext context) {
         this.context = context;
-        this.graph = context.getTopologyGraph();
     }
 
     public void populateManifest() {
-        PluginFileAccess fileAccess = context.getFileAccess();
-
         try {
-            CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
-            if (cycleDetector.detectCycles()) {
-                throw new RuntimeException("The given topology is not acyclic");
-            } else {
-                context.getModel().findComponentStacks().forEach(stack -> {
-                    try {
-                        // TODO check if compute node is present in the stack
-                        String stackName = stack.vertexSet()
-                                .stream()
-                                .filter(v -> v instanceof Compute)
-                                .findFirst()
-                                .get()
-                                .getNormalizedName();
-                        // sort the reversed topology topologically to have a global order
-                        TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(stack);
+            context.getModel().findComponentStacks().forEach(stack -> {
+                try {
+                    // TODO check if compute node is present in the stack
+                    String stackName = stack.vertexSet()
+                            .stream()
+                            .filter(v -> v instanceof Compute)
+                            .findFirst()
+                            .get()
+                            .getNormalizedName();
+                    logger.info("Generate a repository structure for application stack '{}'", stackName);
 
-                        LOGGER.info("Generate a repository structure for application stack: " + stackName);
+                    // Sort the reversed topology topologically to have a global order
+                    TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(stack);
 
-                        while (iterator.hasNext()) {
-                            RootComponent component = iterator.next();
-                            LOGGER.info("Generate a cookbook for component " + component.getName());
-                            if (component instanceof Compute) {
-                                LOGGER.info("ignore generating a module for compute component: " + component.getName());
-                            } else {
-                                LOGGER.info("generate task modules for component: " + component.getName());
-                                generateComponentModule(component);
-                            }
+                    while (iterator.hasNext()) {
+                        RootComponent component = iterator.next();
+                        logger.info("Generate a cookbook for component '{}'", component.getName());
+                        if (component instanceof Compute) {
+                            logger.info("Ignore generating a module for compute component '{}'", component.getName());
+                        } else {
+                            logger.info("Generate task modules for component '{}'", component.getName());
+                            generateComponentModule(component);
                         }
-                    } catch (IOException e) {
-                        LOGGER.error("Failed to generate stacks for Chef: {}", e.getMessage(), e);
                     }
-                });
-            }
+                } catch (IOException e) {
+                    logger.error("Failed to generate stacks: {}", e.getMessage(), e);
+                }
+            });
         } catch (Exception e) {
-            LOGGER.error("Failed to write Chef cookbooks : {}", e.getMessage(), e);
+            logger.error("Failed to generate Puppet files: {}", e.getMessage(), e);
         }
     }
 
-    private String prepareProperties(Map<String, Property> properties) {
-        StringBuilder sb = new StringBuilder();
-        properties.forEach((key, property) -> {
-            sb.append(key);
-            sb.append("=");
-            sb.append(property.getValue().replaceAll("\n", ""));
-            sb.append(",");
-        });
-        return sb.toString();
+    private List<String> prepareProperties(List<RootComponent> stack) {
+        String[] blacklist = {"key_name", "public_key"};
+        List<String> envVars = new ArrayList<>();
+        for (RootComponent component : stack) {
+            Map<String, Property> properties = component.getProperties();
+            properties.values().stream()
+                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                    .forEach(p -> envVars.add(String.format("%s=%s", component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue())));
+        }
+        return envVars;
     }
 
     private List<Operation> collectOperations(RootComponent component) {
@@ -113,8 +106,11 @@ public class PuppetTransformer {
 
         Path componentClassPath = componentManifestsFolder.resolve(MANIFEST_MAIN.concat(MANIFEST_EXTENSION));
 
+        List<RootComponent> stack = Lists.newArrayList(component);
+        TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), stack, component);
+
         Map<String, Object> componentData = new HashMap<>();
-        String propsString = prepareProperties(component.getProperties());
+        List<String> envVars = prepareProperties(stack);
 
         componentData.put("component", component.getNormalizedName());
         List<Task> tasks = new ArrayList<>();
@@ -129,7 +125,7 @@ public class PuppetTransformer {
 
                 Task t = Task.builder()
                         .name(o.getNormalizedName())
-                        .varString(propsString)
+                        .envVars(envVars)
                         .scriptFileName(p.getFileName().toString())
                         .build();
 
@@ -138,10 +134,10 @@ public class PuppetTransformer {
 
                 try {
                     context.getFileAccess().copy(a.getValue(), componentFilesFolder.resolve(p.getFileName().toString()).toString());
-
                     context.getFileAccess().append(taskClassPath.toString(), TemplateHelper.toString(taskTemplate, taskData));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to create modules", e);
+                    throw new TransformationException(e);
                 }
             }
         });

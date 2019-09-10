@@ -95,4 +95,14 @@ public abstract class TopologyGraphHelper {
             return Optional.empty();
         }
     }
+
+    public static void resolveChildComponents(Graph<RootComponent, RootRelation> graph, List<RootComponent> children, RootComponent component) {
+        Set<RootComponent> targetComponents = getTargetComponents(graph, component, HostedOn.class);
+        Optional<RootComponent> optionalComponent = targetComponents.stream().findFirst();
+        if (optionalComponent.isPresent()) {
+            RootComponent child = optionalComponent.get();
+            children.add(child);
+            resolveChildComponents(graph, children, child);
+        }
+    }
 }

@@ -14,7 +14,6 @@ import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
-import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
@@ -23,7 +22,6 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.ansible.model.AnsiblePlay;
 import io.github.edmm.plugins.ansible.model.AnsibleTask;
-import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
@@ -46,48 +44,44 @@ public class AnsibleTransformer implements ComponentVisitor {
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
             Template baseTemplate = cfg.getTemplate("playbook_base.yml");
-            CycleDetector<RootComponent, RootRelation> cycleDetector = new CycleDetector<>(context.getModel().getTopology());
-            if (cycleDetector.detectCycles()) {
-                throw new TransformationException("The given topology has cycles");
-            } else {
-                // Reverse the graph to find sources
-                EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
-                        = new EdgeReversedGraph<>(context.getModel().getTopology());
-                // Apply the topological sort
-                TopologicalOrderIterator<RootComponent, RootRelation> iterator
-                        = new TopologicalOrderIterator<>(dependencyGraph);
 
-                Map<String, Object> templateData = new HashMap<>();
-                List<AnsiblePlay> plays = new ArrayList<>();
+            // Reverse the graph to find sources
+            EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
+                    = new EdgeReversedGraph<>(context.getModel().getTopology());
+            // Apply the topological sort
+            TopologicalOrderIterator<RootComponent, RootRelation> iterator
+                    = new TopologicalOrderIterator<>(dependencyGraph);
 
-                while (iterator.hasNext()) {
-                    RootComponent component = iterator.next();
-                    logger.info("Generate a play for component " + component.getName());
-                    Map<String, String> properties = new HashMap<>();
-                    List<AnsibleTask> tasks = new ArrayList<>();
+            Map<String, Object> templateData = new HashMap<>();
+            List<AnsiblePlay> plays = new ArrayList<>();
 
-                    prepareProperties(properties, component.getProperties());
-                    prepareTasks(tasks, collectOperations(component));
+            while (iterator.hasNext()) {
+                RootComponent component = iterator.next();
+                logger.info("Generate a play for component " + component.getName());
+                Map<String, String> properties = new HashMap<>();
+                List<AnsibleTask> tasks = new ArrayList<>();
 
-                    String hosts = component.getNormalizedName();
-                    Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(context.getTopologyGraph(), component);
-                    if (optionalCompute.isPresent()) {
-                        hosts = optionalCompute.get().getNormalizedName();
-                    }
+                prepareProperties(properties, component.getProperties());
+                prepareTasks(tasks, collectOperations(component));
 
-                    AnsiblePlay play = AnsiblePlay.builder()
-                            .name(component.getName())
-                            .hosts(hosts)
-                            .vars(properties)
-                            .tasks(tasks)
-                            .build();
-
-                    plays.add(play);
+                String hosts = component.getNormalizedName();
+                Optional<Compute> optionalCompute = TopologyGraphHelper.resolveHostingComputeComponent(context.getTopologyGraph(), component);
+                if (optionalCompute.isPresent()) {
+                    hosts = optionalCompute.get().getNormalizedName();
                 }
 
-                templateData.put("plays", plays);
-                fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, templateData));
+                AnsiblePlay play = AnsiblePlay.builder()
+                        .name(component.getName())
+                        .hosts(hosts)
+                        .vars(properties)
+                        .tasks(tasks)
+                        .build();
+
+                plays.add(play);
             }
+
+            templateData.put("plays", plays);
+            fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, templateData));
         } catch (IOException e) {
             logger.error("Failed to write Ansible file: {}", e.getMessage(), e);
         }

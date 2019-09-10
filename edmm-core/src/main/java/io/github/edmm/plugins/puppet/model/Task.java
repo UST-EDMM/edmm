@@ -1,14 +1,14 @@
 package io.github.edmm.plugins.puppet.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import java.util.List;
 
-@Getter
+import lombok.Builder;
+import lombok.Data;
+
+@Data
 @Builder
-@ToString
 public class Task {
     private String name;
     private String scriptFileName;
-    private String varString;
+    private List<String> envVars;
 }

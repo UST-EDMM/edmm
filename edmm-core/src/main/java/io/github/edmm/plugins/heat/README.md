@@ -25,6 +25,6 @@ openstack orchestration template validate \
 
 ## Limitations
 
-* Only the first artifact of an operations is considered at the moment
-* Order of operations is not considered at the moment
-* Properties from an underlying and connected stacks are not provided as script inputs
+  * Only the first artifact of an operations is considered at the moment
+  * Order of operations is not considered at the moment
+  * Properties from an underlying and connected stacks are not provided as script inputs
