@@ -1,10 +1,7 @@
 package io.github.edmm.plugins.cfn;
 
 import java.io.IOException;
-import java.util.UUID;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -20,17 +17,12 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
 
     private final TransformationContext context;
 
-    private CloudFormationModule module;
+    private final CloudFormationModule module;
 
     public CloudFormationLifecycle(TransformationContext context) {
         this.context = context;
-    }
-
-    @Override
-    public void prepare() {
-        AWSCredentials credentials = new BasicAWSCredentials("edmm", UUID.randomUUID().toString());
-        this.module = new CloudFormationModule(context.getFileAccess(), "eu-west-1", credentials);
-        this.module.setKeyPair(false);
+        this.module = new CloudFormationModule("eu-west-1");
+        this.module.setKeyPair(true);
     }
 
     @Override
@@ -40,8 +32,8 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
         // Visit compute components first
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
         // ... then all others
-        // VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        // VisitorHelper.visit(context.getModel().getRelations(), visitor);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        VisitorHelper.visit(context.getModel().getRelations(), visitor);
         // Write template file
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
