@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public abstract class Plugin<LifecycleT extends AbstractLifecycle> {
+public abstract class Plugin<L extends AbstractLifecycle> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,13 +29,13 @@ public abstract class Plugin<LifecycleT extends AbstractLifecycle> {
 
     public void transform(TransformationContext context) throws Exception {
         long time = System.currentTimeMillis();
-        LifecycleT lifecycle = getLifecycle(context);
+        L lifecycle = getLifecycle(context);
         List<LifecyclePhase> phases = lifecycle.getLifecyclePhases();
         int taskCount = countExecutionPhases(context, phases);
         logger.debug("This transformation has {} phases", taskCount);
         for (int i = 0; i < phases.size(); i++) {
             @SuppressWarnings("unchecked")
-            LifecyclePhase<LifecycleT> phase = (LifecyclePhase<LifecycleT>) phases.get(i);
+            LifecyclePhase<L> phase = (LifecyclePhase<L>) phases.get(i);
             if (phase.shouldExecute(context)) {
                 logger.debug("Executing phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
                 phase.execute(lifecycle);
@@ -52,5 +52,5 @@ public abstract class Plugin<LifecycleT extends AbstractLifecycle> {
         return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 
-    public abstract LifecycleT getLifecycle(TransformationContext context);
+    public abstract L getLifecycle(TransformationContext context);
 }

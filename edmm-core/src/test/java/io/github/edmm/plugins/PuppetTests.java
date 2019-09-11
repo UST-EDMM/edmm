@@ -6,7 +6,6 @@ import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.puppet.PuppetPlugin;
-import io.github.edmm.plugins.terraform.TerraformPlugin;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
