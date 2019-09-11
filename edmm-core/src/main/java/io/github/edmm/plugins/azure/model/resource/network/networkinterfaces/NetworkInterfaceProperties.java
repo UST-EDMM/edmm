@@ -2,7 +2,6 @@ package io.github.edmm.plugins.azure.model.resource.network.networkinterfaces;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
