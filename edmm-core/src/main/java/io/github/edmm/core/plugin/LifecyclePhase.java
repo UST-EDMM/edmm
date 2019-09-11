@@ -11,18 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public class LifecyclePhase<LifecycleT extends PluginLifecycle> {
+public class LifecyclePhase<L extends PluginLifecycle> {
 
     private static final Logger logger = LoggerFactory.getLogger(LifecyclePhase.class);
 
     private final String name;
     private final LifecyclePhaseAccess phaseAccess;
-    private final ExecutionFunction<LifecycleT> function;
+    private final ExecutionFunction<L> function;
 
     private State state = State.PENDING;
     private Predicate<TransformationContext> predicate = (c) -> true;
 
-    public LifecyclePhase(@NonNull String name, @NonNull LifecyclePhaseAccess phaseAccess, @NonNull ExecutionFunction<LifecycleT> function) {
+    public LifecyclePhase(@NonNull String name, @NonNull LifecyclePhaseAccess phaseAccess, @NonNull ExecutionFunction<L> function) {
         this.name = name;
         this.phaseAccess = phaseAccess;
         this.function = function;
@@ -49,7 +49,7 @@ public class LifecyclePhase<LifecycleT extends PluginLifecycle> {
         return shouldExecute;
     }
 
-    public void execute(LifecycleT lifecycle) throws Exception {
+    public void execute(L lifecycle) throws Exception {
         try {
             setState(State.EXECUTING);
             function.apply(lifecycle);
