@@ -11,4 +11,4 @@ The puppet plugin multiple template files and a simple Java data model to popula
 
 ## Limitations
 
-* The execution order of the generated module must be defined manually by the user
+The execution order of the generated module must be defined manually by the user.

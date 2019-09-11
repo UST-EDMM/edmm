@@ -22,3 +22,9 @@ openstack orchestration template validate \
     -t "<relative_file_path>" \
     [--parameter <name>=<value>]
 ```
+
+## Limitation
+
+OpenStack Heat cannot upload plain artifacts and handle them with assigned operations.
+As a workaround, an EDMM model has to supply the respective `create` operations that download the artifacts from an accessible location.
+This also requires, that the artifacts are publicly staged to such a location, which is not done during the transformation process. 

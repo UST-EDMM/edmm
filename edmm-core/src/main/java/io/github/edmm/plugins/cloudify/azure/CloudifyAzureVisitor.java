@@ -90,7 +90,7 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
         Optional<String> image = component.getMachineImage();
 
         if ((osFamily.isPresent() && !osFamily.get().toLowerCase().contains("linux")) || (image.isPresent() && !image.get().toLowerCase().contains("ubuntu"))) {
-            throw new RuntimeException("Only Ubuntu Linux OS is currently supported!");
+            throw new TransformationException("Only Ubuntu Linux OS is currently supported!");
         }
 
         // Add self operations
