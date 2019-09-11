@@ -1,19 +1,19 @@
 package io.github.edmm.plugins.cfn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.scaleset.cfbuilder.core.Fn;
 import com.scaleset.cfbuilder.core.Module;
 import com.scaleset.cfbuilder.core.Parameter;
 import com.scaleset.cfbuilder.core.Template;
-import com.scaleset.cfbuilder.ec2.metadata.CFNInit;
-import io.github.edmm.core.plugin.PluginFileAccess;
+import com.scaleset.cfbuilder.ec2.SecurityGroup;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.utils.Consts;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -25,11 +25,14 @@ public class CloudFormationModule extends Module {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudFormationModule.class);
 
-    //    public static final String CONFIG_SETS = "LifecycleOperations";
+    public static final String SECURITY_GROUP = "_security_group";
+    public static final String IP_OPEN = "0.0.0.0/0";
+    public static final String PROTOCOL_TCP = "tcp";
+
+//    public static final String CONFIG_SETS = "LifecycleOperations";
 //    public static final String CONFIG_CREATE = "Create";
 //    public static final String CONFIG_CONFIGURE = "Configure";
 //    public static final String CONFIG_START = "Start";
-    public static final String SECURITY_GROUP = "_security_group";
 //    public static final String ABSOLUTE_FILE_PATH = "/opt/";
 //    public static final String URL_HTTP = "http://";
 //    public static final String URL_S3_AMAZONAWS = ".s3.amazonaws.com";
@@ -37,43 +40,49 @@ public class CloudFormationModule extends Module {
 //    public static final String MODE_500 = "000500";
 //    public static final String MODE_644 = "000644";
 //    public static final String OWNER_GROUP_ROOT = "root";
-//    public static final String FILEPATH_NODEJS_CREATE = "create-nodejs.sh";
 
     private static final String KEY_NAME = "KeyName";
     private static final String KEY_NAME_DESCRIPTION = "Name of an existing EC2 key pair to enable SSH access to the instances";
     private static final String KEY_NAME_TYPE = "AWS::EC2::KeyPair::KeyName";
     private static final String KEY_NAME_CONSTRAINT_DESCRIPTION = "Must be the name of an existing EC2 key pair";
 
-    private PluginFileAccess fileAccess;
-    private String stackName;
-    private String bucketName;
-    private String awsRegion;
-    private AWSCredentials awsCredentials;
-    private Object keyNameVar;
-    private boolean keyPair;
-    private Set<String> computeSet;
-    private Map<String, CFNInit> cfnInitMap;
-    private Map<String, Fn> fnSaver;
-    private Set<String> authenticationSet;
-    private Map<String, Map<String, String>> environmentMap;
+    private final String region;
+    private final Object keyNameVar;
+    private final String stackName = CloudFormationUtils.getRandomStackName();
+    private final String bucketName = CloudFormationUtils.getRandomBucketName();
+    private final Set<String> computeResources = new HashSet<>();
+    private final Map<String, Set<Number>> portMapping = new HashMap<>();
 
-    public CloudFormationModule(PluginFileAccess fileAccess, String awsRegion, AWSCredentials awsCredentials) {
-        this.id("").template(new Template());
-        this.fileAccess = fileAccess;
-        this.stackName = CloudFormationUtils.getRandomStackName();
-        this.bucketName = CloudFormationUtils.getRandomBucketName();
-        this.awsRegion = awsRegion;
-        this.awsCredentials = awsCredentials;
+    private boolean keyPair;
+
+//    private Map<String, CFNInit> cfnInitMap;
+//    private Map<String, Fn> fnSaver;
+//    private Set<String> authenticationSet;
+//    private Map<String, Map<String, String>> environmentMap;
+
+    public CloudFormationModule(String region) {
+        id(Consts.EMPTY);
+        template(new Template());
+        this.region = region;
         this.keyNameVar = template.ref(KEY_NAME);
-        this.computeSet = new HashSet<>();
-        this.cfnInitMap = new HashMap<>();
-        this.fnSaver = new HashMap<>();
-        this.authenticationSet = new HashSet<>();
-        this.environmentMap = new HashMap<>();
     }
 
-    public boolean contains(Compute compute) {
-        return computeSet.contains(compute.getNormalizedName());
+    public void addComputeResource(Compute compute) {
+        computeResources.add(compute.getNormalizedName());
+    }
+
+    public boolean containsComputeResource(Compute compute) {
+        return computeResources.contains(compute.getNormalizedName());
+    }
+
+    public void addPortMapping(Compute compute, Number port) {
+        String name = compute.getNormalizedName();
+        Set<Number> ports = portMapping.get(name);
+        if (ports == null) {
+            ports = new HashSet<>();
+        }
+        ports.add(port);
+        portMapping.put(name, ports);
     }
 
     public Template getTemplate() {
@@ -103,5 +112,9 @@ public class CloudFormationModule extends Module {
                     .description(KEY_NAME_DESCRIPTION)
                     .constraintDescription(KEY_NAME_CONSTRAINT_DESCRIPTION);
         }
+        portMapping.forEach((name, ports) -> {
+            SecurityGroup securityGroup = (SecurityGroup) getResource(name + SECURITY_GROUP);
+            securityGroup.ingress(ingress -> ingress.cidrIp(IP_OPEN), PROTOCOL_TCP, ports.toArray());
+        });
     }
 }
