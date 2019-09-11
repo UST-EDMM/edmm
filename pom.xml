@@ -31,6 +31,7 @@
     </properties>
 
     <modules>
+        <module>cfn-builder</module>
         <module>edmm-core</module>
         <module>edmm-cli</module>
     </modules>

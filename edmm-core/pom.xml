@@ -86,9 +86,9 @@
         </dependency>
         <!-- AWS CloudFormation Plugin -->
         <dependency>
-            <groupId>com.github.StuPro-TOSCAna</groupId>
-            <artifactId>cloudformation-builder</artifactId>
-            <version>v1.0.0</version>
+            <groupId>io.github.ust.edmm</groupId>
+            <artifactId>cfn-builder</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>

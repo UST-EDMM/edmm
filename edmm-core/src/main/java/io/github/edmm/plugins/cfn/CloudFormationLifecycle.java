@@ -40,8 +40,8 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
         // Visit compute components first
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
         // ... then all others
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        VisitorHelper.visit(context.getModel().getRelations(), visitor);
+        // VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        // VisitorHelper.visit(context.getModel().getRelations(), visitor);
         // Write template file
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
