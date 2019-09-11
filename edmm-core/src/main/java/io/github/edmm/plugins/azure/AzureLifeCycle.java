@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
+import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.JsonHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -13,6 +14,7 @@ import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.CustomScriptSettings;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.EnvVarVirtualMachineExtension;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtension;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtensionProperties;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class AzureLifeCycle extends AbstractLifecycle {
     private void copyOperationsToTargetDirectory(ResourceManagerTemplate resultTemplate) {
         List<String> toCopy = resultTemplate.getResources()
                 .stream()
-                .filter(resource -> resource instanceof VirtualMachineExtension).map(resource -> {
+                .filter(resource -> resource instanceof VirtualMachineExtension && !(resource instanceof EnvVarVirtualMachineExtension)).map(resource -> {
                     VirtualMachineExtension extension = (VirtualMachineExtension) resource;
                     VirtualMachineExtensionProperties properties = (VirtualMachineExtensionProperties) extension.getProperties();
                     CustomScriptSettings settings = properties.getSettings();
@@ -69,6 +71,21 @@ public class AzureLifeCycle extends AbstractLifecycle {
         });
     }
 
+    private void createEnvironmentVariableScripts(ResourceManagerTemplate resultTemplate) {
+        resultTemplate.getResources()
+                .stream()
+                .filter(resource -> resource instanceof EnvVarVirtualMachineExtension)
+                .forEach(resource -> {
+                    EnvVarVirtualMachineExtension extension = (EnvVarVirtualMachineExtension) resource;
+                    extension.getScriptPath().ifPresent(path -> {
+                        BashScript envScript = new BashScript(context.getFileAccess(), path);
+                        extension.getEnvironmentVariables().forEach((key, value) -> {
+                            envScript.append("export " + key + "=" + value);
+                        });
+                    });
+                });
+    }
+
     @Override
     public void transform() {
         logger.info("Begin transformation to Azure Resource Manager...");
@@ -83,6 +100,8 @@ public class AzureLifeCycle extends AbstractLifecycle {
         this.addParametersAndVariables(resultTemplate);
         // ... then write result to disk!
         this.populateAzureTemplateFile(resultTemplate);
+        // ... then for each "stack" create a bash script that adds the stack's properties as environment variables!
+        this.createEnvironmentVariableScripts(resultTemplate);
         // ... then copy artifact files to target directory
         this.copyOperationsToTargetDirectory(resultTemplate);
         logger.info("Transformation to Azure Resource Manager successful");
