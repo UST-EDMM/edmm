@@ -9,12 +9,15 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Resource {
 
     @JsonIgnore
+    @EqualsAndHashCode.Include
     private String name;
     private String type;
     private List<String> dependsOn;

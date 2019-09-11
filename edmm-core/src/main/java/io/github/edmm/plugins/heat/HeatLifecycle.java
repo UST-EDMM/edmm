@@ -24,8 +24,8 @@ public class HeatLifecycle extends AbstractLifecycle {
         // Visit compute components first
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
         // ... then all others
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
         VisitorHelper.visit(context.getModel().getRelations(), visitor);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
         visitor.populateHeatTemplate();
         logger.info("Transformation to Heat Orchestration Template successful");
     }

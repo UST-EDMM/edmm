@@ -27,11 +27,14 @@ import io.github.edmm.model.component.SoftwareComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.component.WebServer;
+import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.plugins.heat.model.Parameter;
 import io.github.edmm.plugins.heat.model.PropertyAssignment;
+import io.github.edmm.plugins.heat.model.PropertyGetAttr;
+import io.github.edmm.plugins.heat.model.PropertyGetFile;
 import io.github.edmm.plugins.heat.model.PropertyGetParam;
 import io.github.edmm.plugins.heat.model.PropertyGetResource;
 import io.github.edmm.plugins.heat.model.PropertyObject;
@@ -39,6 +42,7 @@ import io.github.edmm.plugins.heat.model.PropertyValue;
 import io.github.edmm.plugins.heat.model.Resource;
 import io.github.edmm.plugins.heat.model.Template;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +84,7 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
     private final Template template;
 
     private Map<Compute, Resource> computeResources = new HashMap<>();
+    private List<Pair<RootComponent, RootComponent>> connectionPairs = new ArrayList<>();
 
     public HeatVisitor(TransformationContext context) {
         this.context = context;
@@ -138,20 +143,36 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
                 // Collect properties from underlying stack
                 List<RootComponent> stack = Lists.newArrayList(component);
                 TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), stack, component);
-                Map<String, String> inputValues = new HashMap<>();
+                Map<String, Object> inputValues = new HashMap<>();
                 prepareProperties(inputValues, stack);
+                // Collect properties from connected stacks
+                for (Pair<RootComponent, RootComponent> connection : connectionPairs) {
+                    RootComponent sourceComponent = connection.getLeft();
+                    if (!sourceComponent.equals(component)) {
+                        continue;
+                    }
+                    RootComponent targetComponent = connection.getRight();
+                    TopologyGraphHelper.resolveHostingComputeComponent(graph, targetComponent)
+                            .ifPresent(targetCompute -> {
+                                List<Object> attrs = Lists.newArrayList(targetCompute.getNormalizedName(), "networks", "private", "0");
+                                List<RootComponent> targetStack = Lists.newArrayList(targetComponent);
+                                TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), targetStack, targetComponent);
+                                prepareProperties(inputValues, targetStack);
+                                inputValues.put(targetComponent.getNormalizedName() + "_hostname", new PropertyGetAttr(attrs));
+                            });
+                }
                 deployment.addPropertyAssignment(HEAT_INPUT_VALUES, new PropertyObject(inputValues));
-                // Set config properties
+                // Set artifact and copy file
                 config.addPropertyAssignment(HEAT_GROUP, new PropertyValue(HEAT_SCRIPT));
                 List<ImmutablePair<String, String>> inputs = new ArrayList<>();
                 inputValues.forEach((name, value) -> inputs.add(new ImmutablePair<>(HEAT_NAME, name)));
                 config.addPropertyAssignment(HEAT_INPUTS, new PropertyObject(inputs));
+                config.addPropertyAssignment(HEAT_CONFIG, new PropertyGetFile(artifact.getValue()));
                 PluginFileAccess fileAccess = context.getFileAccess();
                 try {
-                    String artifactContent = fileAccess.readToString(artifact.getValue());
-                    config.addPropertyAssignment(HEAT_CONFIG, new PropertyValue(artifactContent));
+                    fileAccess.copy(artifact.getValue(), artifact.getValue());
                 } catch (IOException e) {
-                    throw new TransformationException(e);
+                    logger.warn("Failed to copy file '{}'", artifact.getValue());
                 }
                 template.addResource(deployment, config);
             }
@@ -265,7 +286,18 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
         handleSoftwareDeployment(component);
     }
 
-    private void prepareProperties(Map<String, String> inputs, List<RootComponent> stack) {
+    @Override
+    public void visit(ConnectsTo relation) {
+        RootComponent sourceComponent = graph.getEdgeSource(relation);
+        RootComponent targetComponent = graph.getEdgeTarget(relation);
+        Optional<Compute> optionalSourceCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, sourceComponent);
+        Optional<Compute> optionalTargetCompute = TopologyGraphHelper.resolveHostingComputeComponent(graph, targetComponent);
+        if (optionalSourceCompute.isPresent() && optionalTargetCompute.isPresent()) {
+            connectionPairs.add(new ImmutablePair<>(sourceComponent, targetComponent));
+        }
+    }
+
+    private void prepareProperties(Map<String, Object> inputs, List<RootComponent> stack) {
         String[] blacklist = {"key_name", "public_key"};
         for (RootComponent component : stack) {
             Map<String, Property> properties = component.getProperties();
