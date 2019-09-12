@@ -27,7 +27,7 @@ public abstract class Plugin<L extends AbstractLifecycle> {
         // noop
     }
 
-    public void transform(TransformationContext context) throws Exception {
+    public void execute(TransformationContext context) throws Exception {
         long time = System.currentTimeMillis();
         L lifecycle = getLifecycle(context);
         List<LifecyclePhase> phases = lifecycle.getLifecyclePhases();
