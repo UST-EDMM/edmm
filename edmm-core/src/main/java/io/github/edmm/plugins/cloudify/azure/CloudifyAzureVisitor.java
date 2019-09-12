@@ -135,7 +135,7 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
     }
 
     private void collectEnvironmentVariables(RootComponent component) {
-        this.getHostingVirtualMachine(component).ifPresent(vm->{
+        this.getHostingVirtualMachine(component).ifPresent(vm -> {
             Map<String, Property> propertyMap = component.getProperties();
             String[] blacklist = {"key_name", "public_key"};
             propertyMap.values().stream()
@@ -145,8 +145,6 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
                         vm.getEnvironmentVariables().put(name, p.getValue());
                     });
         });
-
-
     }
 
     private void collectIngressPorts(RootComponent component) {

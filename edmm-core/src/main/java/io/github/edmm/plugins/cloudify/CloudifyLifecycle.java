@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class CloudifyLifecycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(CloudifyLifecycle.class);
-
     public static final String FILE_NAME = "deploy.yml";
-
+    private static final Logger logger = LoggerFactory.getLogger(CloudifyLifecycle.class);
     private final TransformationContext context;
 
     public CloudifyLifecycle(TransformationContext context) {

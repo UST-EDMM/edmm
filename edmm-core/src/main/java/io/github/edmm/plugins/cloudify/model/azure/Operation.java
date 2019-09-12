@@ -1,8 +1,6 @@
 package io.github.edmm.plugins.cloudify.model.azure;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -22,10 +22,8 @@ import org.slf4j.LoggerFactory;
 
 public class AzureLifeCycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(AzureLifeCycle.class);
-
     public static final String FILE_NAME = "deploy.json";
-
+    private static final Logger logger = LoggerFactory.getLogger(AzureLifeCycle.class);
     private final TransformationContext context;
 
     public AzureLifeCycle(TransformationContext context) {

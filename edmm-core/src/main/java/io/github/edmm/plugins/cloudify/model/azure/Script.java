@@ -1,7 +1,5 @@
 package io.github.edmm.plugins.cloudify.model.azure;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 
