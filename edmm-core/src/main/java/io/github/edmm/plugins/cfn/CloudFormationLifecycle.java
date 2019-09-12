@@ -20,7 +20,7 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
 
     public CloudFormationLifecycle(TransformationContext context) {
         this.context = context;
-        this.module = new CloudFormationModule("eu-west-1", context);
+        this.module = new CloudFormationModule("eu-west-1");
         this.module.setKeyPair(true);
     }
 
@@ -34,6 +34,8 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
         VisitorHelper.visit(context.getModel().getRelations(), visitor);
         // ... finally all other components
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        // Finalize transformation
+        visitor.complete();
         try {
             // Write template file
             context.getFileAccess().append("template.yaml", module.toString());
