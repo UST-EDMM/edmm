@@ -18,7 +18,6 @@ public class EnvHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvHandler.class);
 
-    private static final String SET_ENV = "set-env-";
     private static final String ECHO = "echo ";
     private static final String EXPORT = "export ";
     private static final String REDIRECT_OUTPUT_TO = " >> ";
@@ -33,7 +32,7 @@ public class EnvHandler {
     }
 
     public void handleEnvVars() {
-        Map<String, Map<String, String>> envVars = this.module.getEnvVars();
+        Map<String, Map<String, Object>> envVars = this.module.getEnvVars();
         writeEnvScripts(envVars);
         addEnvScripts(envVars);
     }
@@ -42,19 +41,19 @@ public class EnvHandler {
         return "set-env-" + name.replace("_", "-") + ".sh";
     }
 
-    private void writeEnvScripts(Map<String, Map<String, String>> envVars) {
+    private void writeEnvScripts(Map<String, Map<String, Object>> envVars) {
         logger.debug("Writing setEnv scripts.");
-        for (Map.Entry<String, Map<String, String>> computeEntry : envVars.entrySet()) {
+        for (Map.Entry<String, Map<String, Object>> computeEntry : envVars.entrySet()) {
             String filename = getFilename(computeEntry.getKey());
             BashScript envScript = new BashScript(fileAccess, filename);
-            for (Map.Entry<String, String> entry : computeEntry.getValue().entrySet()) {
+            for (Map.Entry<String, Object> entry : computeEntry.getValue().entrySet()) {
                 envScript.append(ECHO + EXPORT + entry.getKey() + "=${" + entry.getKey() + "}" + REDIRECT_OUTPUT_TO + ETC_ENVIRONMENT);
             }
         }
     }
 
-    private void addEnvScripts(Map<String, Map<String, String>> envVars) {
-        for (Map.Entry<String, Map<String, String>> computeEntry : envVars.entrySet()) {
+    private void addEnvScripts(Map<String, Map<String, Object>> envVars) {
+        for (Map.Entry<String, Map<String, Object>> computeEntry : envVars.entrySet()) {
             String computeName = computeEntry.getKey();
             String filename = getFilename(computeName);
             String name = filename
@@ -68,16 +67,9 @@ public class EnvHandler {
                     .setGroup(OWNER_GROUP_ROOT);
             CFNCommand cfnCommand = new CFNCommand(name, "/opt/env.sh")
                     .setCwd("/opt/");
-
-            for (Map.Entry<String, String> environmentVariable : computeEntry.getValue().entrySet()) {
-                String value = environmentVariable.getValue();
-                if (module.containsFn(value)) {
-                    cfnCommand.addEnv(environmentVariable.getKey(), module.getFn(value));
-                } else {
-                    cfnCommand.addEnv(environmentVariable.getKey(), value);
-                }
+            for (Map.Entry<String, Object> var : computeEntry.getValue().entrySet()) {
+                cfnCommand.addEnv(var.getKey(), var.getValue());
             }
-
             module.getOperations(computeName).ifPresent(init -> init
                     .getOrAddConfig(CONFIG_SETS, CONFIG_INIT)
                     .putFile(cfnFile)

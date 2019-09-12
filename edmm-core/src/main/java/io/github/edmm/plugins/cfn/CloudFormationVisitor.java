@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.scaleset.cfbuilder.core.Fn;
 import com.scaleset.cfbuilder.ec2.Instance;
 import com.scaleset.cfbuilder.ec2.SecurityGroup;
+import com.scaleset.cfbuilder.ec2.metadata.CFNFile;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import static io.github.edmm.plugins.cfn.CloudFormationModule.CONFIG_INIT;
 import static io.github.edmm.plugins.cfn.CloudFormationModule.CONFIG_SETS;
+import static io.github.edmm.plugins.cfn.CloudFormationModule.MODE_777;
+import static io.github.edmm.plugins.cfn.CloudFormationModule.OWNER_GROUP_ROOT;
 import static io.github.edmm.plugins.cfn.CloudFormationModule.SECURITY_GROUP;
 
 public class CloudFormationVisitor implements ComponentVisitor, RelationVisitor {
@@ -46,12 +49,30 @@ public class CloudFormationVisitor implements ComponentVisitor, RelationVisitor 
     private final CloudFormationModule module;
     private final Graph<RootComponent, RootRelation> graph;
     private final OperationHandler operationHandler;
+    private final EnvHandler envHandler;
 
     public CloudFormationVisitor(TransformationContext context, CloudFormationModule module) {
         this.context = context;
         this.module = module;
         this.graph = context.getTopologyGraph();
         this.operationHandler = new OperationHandler(module);
+        this.envHandler = new EnvHandler(module, context.getFileAccess());
+    }
+
+    public void complete() {
+        // Set environment variable for connected components
+        for (Pair<RootComponent, RootComponent> connection : module.getConnectionPairs()) {
+            RootComponent sourceComponent = connection.getLeft();
+            RootComponent targetComponent = connection.getRight();
+            if (module.containsFn(targetComponent.getNormalizedName())) {
+                TopologyGraphHelper.resolveHostingComputeComponent(graph, sourceComponent)
+                        .ifPresent(compute -> {
+                            String name = targetComponent.getNormalizedName().toUpperCase() + "_HOSTNAME";
+                            module.addEnvVar(compute, name, module.getFn(targetComponent.getNormalizedName()));
+                        });
+            }
+        }
+        envHandler.handleEnvVars();
     }
 
     @Override
@@ -73,11 +94,6 @@ public class CloudFormationVisitor implements ComponentVisitor, RelationVisitor 
                 instance.keyName(module.getKeyNameVar());
                 module.addPortMapping(component, 22);
             }
-            // TODO Fn for ip addresses
-            Fn privateIpFn = Fn.fnGetAtt(name, "PrivateIp");
-            Fn publicIpFn = Fn.fnGetAtt(name, "PublicIp");
-            module.addFn(privateIpFn.toString(true), privateIpFn);
-            module.addFn(publicIpFn.toString(true), publicIpFn);
             // Add "Init" operation to be executed first
             module.getOperations(component).getOrAddConfig(CONFIG_SETS, CONFIG_INIT);
         }
@@ -130,6 +146,10 @@ public class CloudFormationVisitor implements ComponentVisitor, RelationVisitor 
         operationHandler.handleStart(component, compute);
         prepareProperties(component, compute);
         copyOperations(component);
+        copyArtifacts(component, compute);
+        // Fn pointer to public ip address
+        Fn publicIp = Fn.fnGetAtt(compute.getNormalizedName(), "PublicIp");
+        module.addFn(component.getNormalizedName(), publicIp);
     }
 
     @Override
@@ -199,6 +219,31 @@ public class CloudFormationVisitor implements ComponentVisitor, RelationVisitor 
                 } catch (IOException e) {
                     logger.warn("Failed to copy file '{}'", file);
                 }
+            }
+        });
+    }
+
+    private void copyArtifacts(RootComponent component, Compute compute) {
+        component.getArtifacts().forEach(artifact -> {
+            String file = artifact.getValue();
+            String filename = file;
+            if (filename.startsWith("./")) {
+                filename = filename.substring(2);
+            }
+            String source = String.format("http://%s.s3.amazonaws.com/%s", module.getBucketName(), filename);
+            CFNFile cfnFile = new CFNFile("/opt/" + filename)
+                    .setSource(source)
+                    .setMode(MODE_777)
+                    .setOwner(OWNER_GROUP_ROOT)
+                    .setGroup(OWNER_GROUP_ROOT);
+            module.getOperations(compute)
+                    .getOrAddConfig(CONFIG_SETS, CONFIG_INIT)
+                    .putFile(cfnFile);
+            PluginFileAccess fileAccess = context.getFileAccess();
+            try {
+                fileAccess.copy(file, file);
+            } catch (IOException e) {
+                logger.warn("Failed to copy file '{}'", file);
             }
         });
     }
