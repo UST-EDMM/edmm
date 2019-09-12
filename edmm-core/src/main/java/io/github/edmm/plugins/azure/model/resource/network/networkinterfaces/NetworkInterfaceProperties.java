@@ -1,5 +1,7 @@
 package io.github.edmm.plugins.azure.model.resource.network.networkinterfaces;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
@@ -15,6 +17,7 @@ import lombok.EqualsAndHashCode;
 public class NetworkInterfaceProperties extends Properties {
     private NetworkSecurityGroup networkSecurityGroup;
     private IpConfiguration ipConfiguration;
+    private DnsSettings dnsSettings;
 }
 
 @Data
@@ -39,4 +42,12 @@ class IpConfigurationProperties {
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class SubnetReference {
     private String id;
+}
+
+@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class DnsSettings {
+    private List<String> dnsServers;
+    private String internalDnsNameLabel;
 }
