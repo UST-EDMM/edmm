@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.azure.model.resource.network.networkinterfaces;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,9 +14,12 @@ import io.github.edmm.plugins.azure.model.resource.network.publicipaddresses.Pub
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NetworkInterface extends Resource {
 
+
     // setting the name of a network interface happens when detecting a Compute node in the topology
-    public NetworkInterface(String name) {
+    public NetworkInterface(String name, String vmName) {
         super(ResourceTypeEnum.NETWORK_INTERFACES, name);
+        // the following line cannot be done in the setDefaults method since vmName is not visible there !
+        ((NetworkInterfaceProperties) this.getProperties()).getDnsSettings().setInternalDnsNameLabel(vmName);
     }
 
     @Override
@@ -41,6 +45,13 @@ public class NetworkInterface extends Resource {
                                         .build())
                                 .build())
                         .build())
+                // this ensures internal communications between vms in the same virtual network to succeed using host names
+                .dnsSettings(DnsSettings
+                        .builder()
+                        // the magical server name that "switches to azure provided DNS resolution"
+                        // see https://docs.microsoft.com/en-us/azure/templates/microsoft.network/2019-04-01/networkinterfaces#networkinterfacednssettings-object
+                        .dnsServers(Collections.singletonList("AzureProvidedDNS"))
+                        .build())
                 .build());
     }
 
@@ -52,6 +63,11 @@ public class NetworkInterface extends Resource {
     @JsonIgnore
     public PublicIpAddress getPublicIpAddress() {
         return ((NetworkInterfaceProperties) this.getProperties()).getIpConfiguration().getProperties().getPublicIpAddress();
+    }
+
+    @JsonIgnore
+    public String getInternalDnsNameLabel() {
+        return ((NetworkInterfaceProperties) this.getProperties()).getDnsSettings().getInternalDnsNameLabel();
     }
 
     @Override

@@ -1,13 +1,22 @@
 package io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.VirtualMachine;
 
 public class VirtualMachineExtension extends Resource {
-    public VirtualMachineExtension(String name) {
-        super(ResourceTypeEnum.VIRTUAL_MACHINE_EXTENSIONS, name);
+    public VirtualMachineExtension(VirtualMachine vm, String artifactName) {
+        super(ResourceTypeEnum.VIRTUAL_MACHINE_EXTENSIONS, String.format("%s_extension_%s", vm.getName(), artifactName));
+        List<String> dependencies = new ArrayList<>();
+        // Set a dependency on the virtual machine
+        dependencies.add(String.format("Microsoft.Compute/virtualMachines/%s", vm.getName()));
+        this.setDependsOn(dependencies);
     }
 
     public void setScriptPath(String scriptPath) {
@@ -16,6 +25,11 @@ public class VirtualMachineExtension extends Resource {
                 .fileUrls(Collections.singletonList(scriptPath))
                 .commandToExecute(String.format("'sh %s'", scriptPath))
                 .build());
+    }
+
+    @JsonIgnore
+    public Optional<String> getScriptPath() {
+        return ((VirtualMachineExtensionProperties) getProperties()).getSettings().getFileUrls().stream().findFirst();
     }
 
     @Override
@@ -31,4 +45,5 @@ public class VirtualMachineExtension extends Resource {
                 // setting the settings happens when examining the corresponding operation
                 .build());
     }
+
 }
