@@ -104,7 +104,7 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
         if (optionalSourceVm.isPresent() && optionalTargetVm.isPresent()) {
             VirtualMachine sourceCompute = optionalSourceVm.get();
             VirtualMachine targetCompute = optionalTargetVm.get();
-            sourceCompute.getDependsOn().add(String.format("Microsoft.Compute/virtualMachines/%s", targetCompute.getName()));
+            sourceCompute.getDependsOn().add(targetCompute.getFullName());
 
             // add target env vars to source env vars (e.g., database-related properties like username)
             EnvVarVirtualMachineExtension sourceEnvVarExt = this.getEnvVarVmExtension(source);
@@ -148,13 +148,13 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
 
             for (Pair<String, String> artifact : artifacts) {
                 // Create new extension (script) and set its name
-                currentExtension = new VirtualMachineExtension(vm.get(), artifact.getKey());
+                currentExtension = new VirtualMachineExtension(vm.get(), component.getNormalizedName(), artifact.getKey());
                 // Set the path of the script file to be executed
                 currentExtension.setScriptPath(artifact.getValue());
                 // Get dependencies of the vm extension
                 List<String> dependencies = currentExtension.getDependsOn();
                 // Set dependencies on previous scripts
-                existingExtensions.forEach(extension -> dependencies.add(String.format("Microsoft.Compute/virtualMachines/extensions/%s", extension.getName())));
+                existingExtensions.forEach(extension -> dependencies.add(extension.getFullName()));
                 // Add extension to resources
                 this.resultTemplate.getResources().add(currentExtension);
                 existingExtensions.add(currentExtension);
@@ -195,17 +195,17 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
     private List<Pair<String, String>> collectOperations(RootComponent component) {
         List<Pair<String, String>> allArtifacts = new ArrayList<>();
 
-        Optional<Operation> createOptional = component.getStandardLifecycle().getCreate();
-        createOptional.ifPresent(operation -> this.addArtifacts(allArtifacts, "create", operation));
-        component.getStandardLifecycle().getConfigure().ifPresent(operation -> this.addArtifacts(allArtifacts, "configure", operation));
-        component.getStandardLifecycle().getStart().ifPresent(operation -> this.addArtifacts(allArtifacts, "start", operation));
+        component.getStandardLifecycle().getCreate().ifPresent(operation -> this.addArtifact(allArtifacts, "create", operation));
+        component.getStandardLifecycle().getConfigure().ifPresent(operation -> this.addArtifact(allArtifacts, "configure", operation));
+        component.getStandardLifecycle().getStart().ifPresent(operation -> this.addArtifact(allArtifacts, "start", operation));
 
         return allArtifacts;
     }
 
-    private void addArtifacts(List<Pair<String, String>> existingArtifacts, String operationBaseName, Operation operation) {
-        operation.getArtifacts().forEach(artifact ->
-                existingArtifacts.add(ImmutablePair.of(String.format("%s_%s", operationBaseName, artifact.getNormalizedName()), artifact.getValue())));
+    private void addArtifact(List<Pair<String, String>> existingArtifacts, String operationBaseName, Operation operation) {
+        // only consider the first artifact in an operation
+        operation.getArtifacts().stream().findFirst().ifPresent(artifact ->
+                existingArtifacts.add(ImmutablePair.of(operationBaseName, artifact.getValue())));
     }
 
     private Optional<VirtualMachine> getHostingVirtualMachine(RootComponent component) {
@@ -235,11 +235,12 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
     }
 
     private List<VirtualMachineExtension> getExistingExtensions(VirtualMachine virtualMachine) {
-        final String extensionNamePrefix = virtualMachine.getName() + "_extension_";
         return this.resultTemplate
                 .getResources()
                 .stream()
-                .filter(resource -> resource.getName().contains(extensionNamePrefix) && resource instanceof VirtualMachineExtension)
+                .filter(resource -> resource instanceof VirtualMachineExtension &&
+                        resource.getDependsOn().contains(virtualMachine.getFullName())
+                )
                 .map(resource -> (VirtualMachineExtension) resource)
                 .collect(Collectors.toList());
     }
