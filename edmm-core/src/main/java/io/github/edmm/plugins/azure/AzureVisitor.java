@@ -23,7 +23,10 @@ import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.VirtualMachine;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.VirtualMachineProperties;
+import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.EnvVarVirtualMachineExtension;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtension;
+import io.github.edmm.plugins.azure.model.resource.network.networkinterfaces.NetworkInterface;
 import io.github.edmm.plugins.azure.model.resource.network.virtualnetworks.VirtualNetwork;
 import io.github.edmm.plugins.azure.model.resource.storage.storageaccounts.StorageAccount;
 import lombok.Getter;
@@ -61,6 +64,7 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             resultTemplate.getResources().add(virtualNetwork);
             resultTemplate.getResources().add(storageProfile);
         }
+
         final String name = "vm_" + component.getNormalizedName();
         final VirtualMachine vm = new VirtualMachine(name);
         resultTemplate.getResources().add(vm);
@@ -82,6 +86,8 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             throw new TransformationException("Only Ubuntu OS is currently supported!");
         }
 
+        // Check self properties (turn them into environment variables)
+        this.collectEnvironmentVariables(component);
         // Check self operations
         this.collectVmExtensions(component);
 
@@ -99,12 +105,23 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             VirtualMachine sourceCompute = optionalSourceVm.get();
             VirtualMachine targetCompute = optionalTargetVm.get();
             sourceCompute.getDependsOn().add(String.format("Microsoft.Compute/virtualMachines/%s", targetCompute.getName()));
+
+            // add target env vars to source env vars (e.g., database-related properties like username)
+            EnvVarVirtualMachineExtension sourceEnvVarExt = this.getEnvVarVmExtension(source);
+            EnvVarVirtualMachineExtension targetEnvVarExt = this.getEnvVarVmExtension(target);
+            sourceEnvVarExt.getEnvironmentVariables().putAll(targetEnvVarExt.getEnvironmentVariables());
+            // add the target host name to the source environment variables.
+            this.getInternalHostname(targetCompute).ifPresent(hostname -> sourceEnvVarExt.getEnvironmentVariables().put(
+                    String.format("%s_HOSTNAME", target.getNormalizedName()).toUpperCase(),
+                    hostname
+            ));
         }
     }
 
     @Override
     public void visit(RootComponent component) {
         collectIngressPorts(component);
+        collectEnvironmentVariables(component);
         collectVmExtensions(component);
         component.setTransformed(true);
     }
@@ -116,6 +133,11 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
         });
     }
 
+    private void collectEnvironmentVariables(RootComponent component) {
+        EnvVarVirtualMachineExtension extension = this.getEnvVarVmExtension(component);
+        extension.addEnvironmentVariables(component);
+    }
+
     private void collectVmExtensions(RootComponent component) {
         Optional<VirtualMachine> vm = this.getHostingVirtualMachine(component);
 
@@ -125,18 +147,14 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             VirtualMachineExtension currentExtension;
 
             for (Pair<String, String> artifact : artifacts) {
-                final String extensionName = String.format("%s_extension_%s", vm.get().getName(), artifact.getKey());
                 // Create new extension (script) and set its name
-                currentExtension = new VirtualMachineExtension(extensionName);
+                currentExtension = new VirtualMachineExtension(vm.get(), artifact.getKey());
                 // Set the path of the script file to be executed
                 currentExtension.setScriptPath(artifact.getValue());
-                // Set dependencies for the vm extension
-                List<String> dependencies = new ArrayList<>();
-                // Set a dependency on the virtual machine
-                dependencies.add(String.format("Microsoft.Compute/virtualMachines/%s", vm.get().getName()));
+                // Get dependencies of the vm extension
+                List<String> dependencies = currentExtension.getDependsOn();
                 // Set dependencies on previous scripts
                 existingExtensions.forEach(extension -> dependencies.add(String.format("Microsoft.Compute/virtualMachines/extensions/%s", extension.getName())));
-                currentExtension.setDependsOn(dependencies);
                 // Add extension to resources
                 this.resultTemplate.getResources().add(currentExtension);
                 existingExtensions.add(currentExtension);
@@ -224,5 +242,41 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
                 .filter(resource -> resource.getName().contains(extensionNamePrefix) && resource instanceof VirtualMachineExtension)
                 .map(resource -> (VirtualMachineExtension) resource)
                 .collect(Collectors.toList());
+    }
+
+    private Optional<String> getInternalHostname(VirtualMachine vm) {
+        Optional<NetworkInterface> nicOpt = ((VirtualMachineProperties) vm.getProperties()).getNetworkProfile().getNetworkInterfaces().stream().findFirst();
+        Optional<String> result;
+        result = nicOpt.map(NetworkInterface::getInternalDnsNameLabel);
+
+        return result;
+    }
+
+    /**
+     * This also creates and adds the extension if it is not already created!
+     */
+    private EnvVarVirtualMachineExtension getEnvVarVmExtension(RootComponent component) {
+        Optional<VirtualMachine> vmOpt = getHostingVirtualMachine(component);
+        EnvVarVirtualMachineExtension result = null;
+
+        if (vmOpt.isPresent()) {
+            VirtualMachine vm = vmOpt.get();
+            List<VirtualMachineExtension> extensions = this.getExistingExtensions(vm);
+
+            if (extensions.size() == 0) {
+                result = new EnvVarVirtualMachineExtension(vm);
+                resultTemplate.getResources().add(result);
+            } else {
+                Optional<VirtualMachineExtension> envVarExtOpt = extensions.stream().filter(ext -> ext instanceof EnvVarVirtualMachineExtension).findFirst();
+
+                if (!envVarExtOpt.isPresent()) {
+                    throw new IllegalStateException("The virtual machine extension resource that describes environment variables should be the first extension added!");
+                } else {
+                    result = (EnvVarVirtualMachineExtension) envVarExtOpt.get();
+                }
+            }
+        }
+
+        return result;
     }
 }
