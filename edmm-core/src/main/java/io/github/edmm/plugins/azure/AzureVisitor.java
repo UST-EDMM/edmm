@@ -195,15 +195,15 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
     private List<Pair<String, String>> collectOperations(RootComponent component) {
         List<Pair<String, String>> allArtifacts = new ArrayList<>();
 
-        Optional<Operation> createOptional = component.getStandardLifecycle().getCreate();
-        createOptional.ifPresent(operation -> this.addArtifacts(allArtifacts, "create", operation));
+        component.getStandardLifecycle().getCreate().ifPresent(operation -> this.addArtifacts(allArtifacts, "create", operation));
         component.getStandardLifecycle().getConfigure().ifPresent(operation -> this.addArtifacts(allArtifacts, "configure", operation));
         component.getStandardLifecycle().getStart().ifPresent(operation -> this.addArtifacts(allArtifacts, "start", operation));
 
         return allArtifacts;
     }
 
-    private void addArtifacts(List<Pair<String, String>> existingArtifacts, String operationBaseName, Operation operation) {
+    private void addArtifacts(List<Pair<String, String>>
+            , String operationBaseName, Operation operation) {
         operation.getArtifacts().forEach(artifact ->
                 existingArtifacts.add(ImmutablePair.of(String.format("%s_%s", operationBaseName, artifact.getNormalizedName()), artifact.getValue())));
     }
