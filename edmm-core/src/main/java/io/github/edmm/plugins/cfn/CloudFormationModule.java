@@ -18,7 +18,6 @@ import com.scaleset.cfbuilder.ec2.SecurityGroup;
 import com.scaleset.cfbuilder.ec2.UserData;
 import com.scaleset.cfbuilder.ec2.metadata.CFNInit;
 import com.scaleset.cfbuilder.iam.Role;
-import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
@@ -60,18 +59,16 @@ public class CloudFormationModule extends Module {
     private final Map<String, Set<Number>> portMapping = new HashMap<>();
     private final Map<String, CFNInit> operationsMapping = new HashMap<>();
     private final List<Pair<RootComponent, RootComponent>> connectionPairs = new ArrayList<>();
-    private final Map<String, Map<String, String>> envVars = new HashMap<>();
+    private final Map<String, Map<String, Object>> envVars = new HashMap<>();
     private final Map<String, Fn> fnMapping = new HashMap<>();
-    private final EnvHandler envHandler;
 
     private boolean keyPair;
 
-    public CloudFormationModule(String region, TransformationContext context) {
+    public CloudFormationModule(String region) {
         id(Consts.EMPTY);
         template(new Template());
         this.region = region;
         this.keyNameVar = template.ref(KEY_NAME);
-        this.envHandler = new EnvHandler(this, context.getFileAccess());
     }
 
     public void addComputeResource(Compute compute) {
@@ -114,7 +111,7 @@ public class CloudFormationModule extends Module {
         connectionPairs.add(pair);
     }
 
-    public void addEnvVar(Compute compute, String name, String value) {
+    public void addEnvVar(Compute compute, String name, Object value) {
         String computeName = compute.getNormalizedName();
         envVars.computeIfAbsent(computeName, k -> new HashMap<>());
         envVars.get(computeName).put(name, value);
@@ -163,7 +160,6 @@ public class CloudFormationModule extends Module {
             SecurityGroup securityGroup = (SecurityGroup) getResource(name + SECURITY_GROUP);
             securityGroup.ingress(ingress -> ingress.cidrIp(IP_OPEN), PROTOCOL_TCP, ports.toArray());
         });
-        envHandler.handleEnvVars();
         operationsMapping.forEach((name, operations) -> {
             Instance compute = (Instance) this.getResource(name);
             if (!operations.getConfigs().isEmpty()) {
