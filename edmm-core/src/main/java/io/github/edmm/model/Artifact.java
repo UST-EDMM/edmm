@@ -1,5 +1,6 @@
 package io.github.edmm.model;
 
+import com.google.common.base.CaseFormat;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.model.support.BaseElement;
@@ -22,5 +23,12 @@ public class Artifact extends BaseElement {
 
     public String getValue() {
         return entity.getValue();
+    }
+
+    public String getNormalizedValue() {
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getValue().toLowerCase())
+                .replace(".", "_")
+                .replace("/", "_")
+                .replace("__", "");
     }
 }

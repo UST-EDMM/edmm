@@ -20,8 +20,6 @@ public final class ExecutionTask implements Callable<Void> {
     private final File sourceDirectory;
     private final File targetDirectory;
 
-    private boolean failed = false;
-
     public ExecutionTask(@NonNull Plugin plugin, @NonNull Transformation transformation,
                          @NonNull File sourceDirectory, @NonNull File targetDirectory) {
         this.plugin = plugin;
@@ -32,6 +30,7 @@ public final class ExecutionTask implements Callable<Void> {
 
     @Override
     public Void call() {
+        boolean failed = false;
         Platform platform = plugin.getPlatform();
         logger.info("Starting transformation for {}", platform.getName());
         transformation.setState(Transformation.State.TRANSFORMING);
@@ -46,7 +45,7 @@ public final class ExecutionTask implements Callable<Void> {
             return null;
         }
         try {
-            plugin.transform(new TransformationContext(transformation, sourceDirectory, targetDirectory));
+            plugin.execute(new TransformationContext(transformation, sourceDirectory, targetDirectory));
             transformation.setState(Transformation.State.DONE);
         } catch (Exception e) {
             logger.info("Transformation to {} failed", platform.getName());

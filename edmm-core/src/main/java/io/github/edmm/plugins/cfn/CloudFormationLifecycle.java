@@ -3,7 +3,6 @@ package io.github.edmm.plugins.cfn;
 import java.io.IOException;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
@@ -21,7 +20,7 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
 
     public CloudFormationLifecycle(TransformationContext context) {
         this.context = context;
-        this.module = new CloudFormationModule("eu-west-1");
+        this.module = new CloudFormationModule("eu-west-1", context);
         this.module.setKeyPair(true);
     }
 
@@ -31,13 +30,13 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
         CloudFormationVisitor visitor = new CloudFormationVisitor(context, module);
         // Visit compute components first
         VisitorHelper.visit(context.getModel().getComponents(), visitor, component -> component instanceof Compute);
-        // ... then all others
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        // ... then all relations
         VisitorHelper.visit(context.getModel().getRelations(), visitor);
-        // Write template file
-        PluginFileAccess fileAccess = context.getFileAccess();
+        // ... finally all other components
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
         try {
-            fileAccess.append("template.yaml", module.toString());
+            // Write template file
+            context.getFileAccess().append("template.yaml", module.toString());
         } catch (IOException e) {
             logger.error("Failed to write template file", e);
             throw new TransformationException(e);
