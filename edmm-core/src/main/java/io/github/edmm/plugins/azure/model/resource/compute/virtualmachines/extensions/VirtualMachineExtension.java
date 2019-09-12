@@ -11,11 +11,11 @@ import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.VirtualMachine;
 
 public class VirtualMachineExtension extends Resource {
-    public VirtualMachineExtension(VirtualMachine vm, String artifactName) {
-        super(ResourceTypeEnum.VIRTUAL_MACHINE_EXTENSIONS, String.format("%s_extension_%s", vm.getName(), artifactName));
+    public VirtualMachineExtension(VirtualMachine vm, String componentName, String artifactName) {
+        super(ResourceTypeEnum.VIRTUAL_MACHINE_EXTENSIONS, String.format("%s_extension_%s", componentName, artifactName));
         List<String> dependencies = new ArrayList<>();
         // Set a dependency on the virtual machine
-        dependencies.add(String.format("Microsoft.Compute/virtualMachines/%s", vm.getName()));
+        dependencies.add(vm.getFullName());
         this.setDependsOn(dependencies);
     }
 
