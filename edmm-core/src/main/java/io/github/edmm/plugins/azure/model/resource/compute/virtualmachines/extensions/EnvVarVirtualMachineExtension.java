@@ -36,5 +36,4 @@ public class EnvVarVirtualMachineExtension extends VirtualMachineExtension {
                     environmentVariables.put(name, p.getValue());
                 });
     }
-
 }

@@ -14,7 +14,6 @@ import io.github.edmm.plugins.azure.model.resource.network.publicipaddresses.Pub
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NetworkInterface extends Resource {
 
-
     // setting the name of a network interface happens when detecting a Compute node in the topology
     public NetworkInterface(String name, String vmName) {
         super(ResourceTypeEnum.NETWORK_INTERFACES, name);

@@ -19,17 +19,17 @@ public class VirtualMachineExtension extends Resource {
         this.setDependsOn(dependencies);
     }
 
+    @JsonIgnore
+    public Optional<String> getScriptPath() {
+        return ((VirtualMachineExtensionProperties) getProperties()).getSettings().getFileUrls().stream().findFirst();
+    }
+
     public void setScriptPath(String scriptPath) {
         ((VirtualMachineExtensionProperties) getProperties()).setSettings(CustomScriptSettings
                 .builder()
                 .fileUrls(Collections.singletonList(scriptPath))
                 .commandToExecute(String.format("'sh %s'", scriptPath))
                 .build());
-    }
-
-    @JsonIgnore
-    public Optional<String> getScriptPath() {
-        return ((VirtualMachineExtensionProperties) getProperties()).getSettings().getFileUrls().stream().findFirst();
     }
 
     @Override
@@ -45,5 +45,4 @@ public class VirtualMachineExtension extends Resource {
                 // setting the settings happens when examining the corresponding operation
                 .build());
     }
-
 }
