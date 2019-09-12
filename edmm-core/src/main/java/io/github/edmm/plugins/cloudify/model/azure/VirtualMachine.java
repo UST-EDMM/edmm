@@ -1,7 +1,8 @@
 package io.github.edmm.plugins.cloudify.model.azure;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class VirtualMachine {
     private List<IngressPort> ingressPorts;
     private List<Dependency> dependsOn;
     private List<Operation> operations;
+    private Map<String, String> environmentVariables;
 
     public void addIngressPort(String name, String port) {
         this.ingressPorts.add(new IngressPort(name, port));
@@ -26,15 +28,10 @@ public class VirtualMachine {
         this.dependsOn.add(new Dependency(dependency.name));
     }
 
-    public void addScript(String componentName, String operationName, String scriptName, String scriptPath) {
-        Operation theOp;
-        Optional<Operation> existing = operations.stream().filter(operation -> operation.getName().equals(operationName)).findFirst();
-        if (existing.isPresent()) {
-            theOp = existing.get();
-        } else {
-            theOp = new Operation(operationName, componentName);
-            this.operations.add(theOp);
-        }
-        theOp.addScript(scriptName, scriptPath);
+    public void addOperation(String componentName, String operationName, String scriptName, String scriptPath) {
+        List<Operation> previous = new ArrayList<>(operations);
+        Operation theOp = new Operation(operationName, componentName, previous);
+        theOp.setScript(scriptName, scriptPath);
+        this.getOperations().add(theOp);
     }
 }

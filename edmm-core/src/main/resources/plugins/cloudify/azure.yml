@@ -202,6 +202,10 @@ node_templates:
       location: { get_input: location }
       azure_config: *azure_config
       retry_after: { get_input: retry_after }
+      resource_config:
+        dnsSettings:
+          internalDnsNameLabel: ${compute.name}
+          appliedDnsServers: [AzureProvidedDNS]
     relationships:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
@@ -231,8 +235,11 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-                - keydata: |
-                          ${compute.ssh}
+                - keydata: >
+                    <#-- This ensures that the multiline ssh key is correctly indented.-->
+                    <#list compute.ssh?split("\n") as x>
+                    ${x}
+                    </#list>
                   path: { concat: [ '/home/', { get_input: ${compute.name}_agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
           </#if>
@@ -252,10 +259,7 @@ node_templates:
       - type: cloudify.relationships.connected_to
         target: ${dependency}
       </#list>
-
-  <#list compute.operations as operation>
-  <#list operation.scripts as script>
-  ${operation.source}_extension_${operation.name}_${script.name}:
+  ${compute.name}_extension_env:
     type: cloudify.azure.nodes.compute.VirtualMachineExtension
     properties:
       api_version: 2019-03-01
@@ -266,15 +270,33 @@ node_templates:
         ext_type: CustomScript
         typeHandlerVersion: 2.0
         settings:
-          fileUrls: [${script.path}]
-          commandToExecute: 'sh ${script.path}'
+          fileUrls: [./${compute.name}/env.sh]
+          commandToExecute: 'sh ./${compute.name}/env.sh'
+      relationships:
+        - type: cloudify.azure.relationships.vmx_contained_in_vm
+          target: ${compute.name}
+  <#list compute.operations as operation>
+  ${operation.source}_extension_${operation.name}:
+    type: cloudify.azure.nodes.compute.VirtualMachineExtension
+    properties:
+      api_version: 2019-03-01
+      location: { get_input: location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        publisher: Microsoft.Azure.Extensions
+        ext_type: CustomScript
+        typeHandlerVersion: 2.0
+        settings:
+          fileUrls: [${operation.script.path}]
+          commandToExecute: 'sh ${operation.script.path}'
     relationships:
       - type: cloudify.azure.relationships.vmx_contained_in_vm
         target: ${compute.name}
-    <#list script.previous as prev>
       - type: cloudify.relationships.depends_on
-        target: ${compute.name}_extension_${operation.name}_${prev}
+        target: ${compute.name}_extension_env
+    <#list operation.previous as prev>
+      - type: cloudify.relationships.depends_on
+        target: ${prev.source}_extension_${prev.name}
     </#list>
-  </#list>
   </#list>
   </#list>
