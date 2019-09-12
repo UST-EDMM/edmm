@@ -10,5 +10,4 @@ import lombok.Data;
 public class Script {
     private String name;
     private String path;
-    private List<String> previous;
 }

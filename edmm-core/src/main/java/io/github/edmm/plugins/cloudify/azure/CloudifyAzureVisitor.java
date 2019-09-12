@@ -2,16 +2,19 @@ package io.github.edmm.plugins.cloudify.azure;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
 import io.github.edmm.model.component.Dbms;
@@ -53,14 +56,19 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
             throw new TransformationException(e);
         }
         for (VirtualMachine vm : computeInstances.values()) {
+            // Create a script that initializes the required environment variables at the current vm.
+            String path = String.format("./%s/env.sh", vm.getName());
+            BashScript envScript = new BashScript(context.getFileAccess(), path);
+            vm.getEnvironmentVariables().forEach((key, value) -> {
+                envScript.append("export " + key + "=" + value);
+            });
             // Copy artifacts to target directory
             for (io.github.edmm.plugins.cloudify.model.azure.Operation operation : vm.getOperations()) {
-                for (Script script : operation.getScripts()) {
-                    try {
-                        fileAccess.copy(script.getPath(), script.getPath());
-                    } catch (IOException e) {
-                        logger.warn("Failed to copy file '{}'", script.getPath());
-                    }
+                Script script = operation.getScript();
+                try {
+                    fileAccess.copy(script.getPath(), script.getPath());
+                } catch (IOException e) {
+                    logger.warn("Failed to copy file '{}'", script.getPath());
                 }
             }
         }
@@ -73,6 +81,7 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
                 .ingressPorts(new ArrayList<>())
                 .dependsOn(new ArrayList<>())
                 .operations(new ArrayList<>())
+                .environmentVariables(new HashMap<>())
                 .build();
         this.computeInstances.put(component, vm);
         Optional<String> sshPublicKey = component.getPublicKey();
@@ -95,7 +104,7 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
 
         // Add self operations
         this.collectOperations(component);
-
+        this.collectEnvironmentVariables(component);
         component.setTransformed(true);
     }
 
@@ -110,6 +119,10 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
             VirtualMachine sourceCompute = optionalSourceVm.get();
             VirtualMachine targetCompute = optionalTargetVm.get();
             sourceCompute.addDependency(targetCompute);
+            // add an environment variable that describes the internal hostname of the target vm
+            sourceCompute.getEnvironmentVariables().put(String.format("%s_HOSTNAME", targetCompute.getName()).toUpperCase(), targetCompute.getName());
+            // add the environment variables of the target vm
+            sourceCompute.getEnvironmentVariables().putAll(targetCompute.getEnvironmentVariables());
         }
     }
 
@@ -117,7 +130,23 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
     public void visit(RootComponent component) {
         collectIngressPorts(component);
         collectOperations(component);
+        collectEnvironmentVariables(component);
         component.setTransformed(true);
+    }
+
+    private void collectEnvironmentVariables(RootComponent component) {
+        this.getHostingVirtualMachine(component).ifPresent(vm->{
+            Map<String, Property> propertyMap = component.getProperties();
+            String[] blacklist = {"key_name", "public_key"};
+            propertyMap.values().stream()
+                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                    .forEach(p -> {
+                        String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
+                        vm.getEnvironmentVariables().put(name, p.getValue());
+                    });
+        });
+
+
     }
 
     private void collectIngressPorts(RootComponent component) {
@@ -162,19 +191,20 @@ public class CloudifyAzureVisitor extends CloudifyVisitor {
 
         if (vmOpt.isPresent()) {
             VirtualMachine vm = vmOpt.get();
-            component.getStandardLifecycle().getCreate().ifPresent(operation -> this.addArtifacts(component, vm, operation));
-            component.getStandardLifecycle().getConfigure().ifPresent(operation -> this.addArtifacts(component, vm, operation));
-            component.getStandardLifecycle().getStart().ifPresent(operation -> this.addArtifacts(component, vm, operation));
+            component.getStandardLifecycle().getCreate().ifPresent(operation -> this.addOperation(component, vm, operation));
+            component.getStandardLifecycle().getConfigure().ifPresent(operation -> this.addOperation(component, vm, operation));
+            component.getStandardLifecycle().getStart().ifPresent(operation -> this.addOperation(component, vm, operation));
         }
     }
 
-    private void addArtifacts(RootComponent component, VirtualMachine vm, Operation operation) {
-        operation.getArtifacts().forEach(artifact -> {
+    private void addOperation(RootComponent component, VirtualMachine vm, Operation operation) {
+        // we only consider the first artifact of an operation
+        operation.getArtifacts().stream().findFirst().ifPresent(artifact -> {
                     String componentName = component.getNormalizedName();
                     String operationName = operation.getNormalizedName();
                     String artifactName = artifact.getName();
                     String artifactPath = artifact.getValue();
-                    vm.addScript(componentName, operationName, artifactName, artifactPath);
+                    vm.addOperation(componentName, operationName, artifactName, artifactPath);
                 }
         );
     }
