@@ -92,7 +92,7 @@ public class VirtualMachine extends Resource {
                         .name(String.format("%s_OSDisk", this.getName()))
                         .build())
                 .build();
-        final NetworkInterface networkInterface = new NetworkInterface(String.format("%s_networkInterface", this.getName()));
+        final NetworkInterface networkInterface = new NetworkInterface(String.format("%s_networkInterface", this.getName()), this.getName());
 
         final NetworkProfile networkProfile = NetworkProfile
                 .builder()
