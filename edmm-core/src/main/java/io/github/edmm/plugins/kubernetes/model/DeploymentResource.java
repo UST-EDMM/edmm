@@ -31,7 +31,7 @@ public final class DeploymentResource implements KubernetesResource {
         io.fabric8.kubernetes.api.model.Container container = new ContainerBuilder()
                 .withImage(stack.getLabel() + ":latest")
                 .withName(stack.getLabel())
-                .withImagePullPolicy("Always")
+                .withImagePullPolicy("Never")
                 .addAllToPorts(stack.getPorts().stream()
                         .map(PortMapping::toContainerPort)
                         .collect(Collectors.toList()))

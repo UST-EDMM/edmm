@@ -27,6 +27,10 @@ public final class PortMapping {
     }
 
     public String getName() {
-        return name.replace("_", "-");
+        String value = name.replace("_", "-");
+        if (value.length() > 14) {
+            return value.substring(0, 14);
+        }
+        return value;
     }
 }
