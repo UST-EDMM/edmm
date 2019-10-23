@@ -8,9 +8,9 @@ components:
   pet_clinic:
     type: web_application
     artifacts:
-      - war: ./petclinic/petclinic.war
+      - war: ./files/app.war
     operations:
-      configure: ./petclinic/configure.sh
+      configure: ./files/configure.sh
     relations:
       - hosted_on: pet_clinic_tomcat
       - connects_to: db
@@ -18,8 +18,8 @@ components:
   pet_clinic_tomcat:
     type: tomcat
     operations:
-      create: ./tomcat/create.sh
-      start: ./tomcat/start.sh
+      create: ./files/create.sh
+      start: ./files/start.sh
     relations:
       - hosted_on: ubuntu
 
@@ -32,9 +32,9 @@ components:
       user: pc
       password: petclinic
     artifacts:
-      - sql: ./petclinic/schema.sql
+      - sql: ./files/app.sql
     operations:
-      configure: ./mysql_database/configure.sh
+      configure: ./files/configure.sh
     relations:
       - hosted_on: dbms
 
