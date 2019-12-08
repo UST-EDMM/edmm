@@ -85,9 +85,10 @@ public class JujuTransformer {
         });
     }
 
-    // Private method for obtaining an iterator visiting a "stack" graph in topological order
-    // - Workaround needed since "TopologicalOrderIterator" was ignoring horizontal relationships
-    //   after running "FindComponentStacks"
+    /* Method for obtaining an iterator visiting a "stack" graph in topological order
+     * - Workaround needed since "TopologicalOrderIterator" was ignoring horizontal relationships
+     *   after running "FindComponentStacks"
+     */
     private Iterator<RootComponent> topologicalSort(Graph<RootComponent,RootRelation> stack) {
         List<RootComponent> sortedNodes = new ArrayList<RootComponent>();
         List<RootComponent> unsortedNodes = new ArrayList<RootComponent>();
@@ -111,7 +112,13 @@ public class JujuTransformer {
         return sortedNodes.iterator();
     }
 
+    /* Method for generating a to-be-compiled charm folder, given
+     * - the name of the charm
+     * - the environment variables to set, and
+     * - the operations to execute in its "install" hooks
+     */
     private void generateCharm(String name, Map<String,String> envVars, Map<String,List<Operation>> ops) {
+        // TODO implement generator (currently only printing info on stdout)
         System.out.println("Charm name: " + name);
         System.out.println("  Environment Variables:");
         for (String varName : envVars.keySet()) {
@@ -123,6 +130,5 @@ public class JujuTransformer {
                 System.out.println("    - " + op.getArtifacts());
             }
         }
-
     }
 }
