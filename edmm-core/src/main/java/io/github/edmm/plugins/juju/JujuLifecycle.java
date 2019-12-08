@@ -9,11 +9,6 @@ public class JujuLifecycle extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(JujuLifecycle.class);
 
-    public static final String CHARM_FOLDER_PREAMBLE = "layer-";
-    public static final String HOOKS_FOLDER = "hooks";
-    public static final String LAYER_FILENAME = "layer.yaml";
-    public static final String METADATA_FILENAME = "metadata.yaml";
-
     private final TransformationContext context;
 
     public JujuLifecycle(TransformationContext context) {
@@ -26,8 +21,13 @@ public class JujuLifecycle extends AbstractLifecycle {
 
         // Visit EDMM model to generate charms
         JujuTransformer transformer = new JujuTransformer(context);
-        transformer.generateCharms();
+        try {
+            transformer.generateCharms();
+            logger.info("Juju Charms successfully generated");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.info("Juju Charms generation failed -- see above error(s)");
+        }
 
-        logger.info("Juju Charms successfully generated");
     }
 }

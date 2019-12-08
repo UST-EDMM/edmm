@@ -1,0 +1,9 @@
+#!/bin/bash
+
+<#list vars as var>
+export ${var.name}=${var.value}
+</#list>
+
+<#list scripts as script>
+/bin/bash ${script}
+</#list>

@@ -1,0 +1,9 @@
+name: ${name}
+summary: ${name}
+description: |
+  Automatically generated charm for software stack named ${name}
+maintainer: unknown
+series: [${series}]
+# Provides and requires to be filled according to bundle willing to build
+provides: {}
+requires: {}
