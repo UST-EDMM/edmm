@@ -13,14 +13,18 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+
+import static io.github.edmm.plugins.juju.JujuLifecycle.CHARM_FOLDER_PREAMBLE;
 
 public class JujuTransformer {
 
     private static final Logger logger = LoggerFactory.getLogger(JujuTransformer.class);
 
-    private static String DEFAULT_ENV_VAR_CONNECTION = "_HOSTNAME";
-    private static String DEFAULT_TARGET_LOCATION = "localhost";
+    private static final String DEFAULT_ENV_VAR_CONNECTION = "_HOSTNAME";
+    private static final String DEFAULT_TARGET_LOCATION = "localhost";
 
     private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(JujuPlugin.class, "/plugins/juju");
@@ -119,5 +123,6 @@ public class JujuTransformer {
                 System.out.println("    - " + op.getArtifacts());
             }
         }
+
     }
 }
