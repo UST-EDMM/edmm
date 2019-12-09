@@ -4,6 +4,6 @@
 export ${var.name}=${var.value}
 </#list>
 
-<#list scripts as script>
-/bin/bash ${script}
+<#list commands as command>
+${command}
 </#list>

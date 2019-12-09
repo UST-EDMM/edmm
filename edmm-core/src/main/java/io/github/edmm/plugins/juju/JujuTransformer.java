@@ -232,23 +232,24 @@ public class JujuTransformer {
             vars.add(EnvironmentVariable.builder().name(varName).value(variables.get(varName)).build());
         // Listing scripts to be executed
         // (following standard lifecycle - install, configure, start)
-        List<String> scripts = new ArrayList<String>();
+        List<String> commands = new ArrayList<String>();
         List<Operation> ops = operations.get("create");
         ops.addAll(operations.get("configure"));
         ops.addAll(operations.get("start"));
         for(Operation o : ops) {
             for (Artifact a : o.getArtifacts()) {
+                // TODO add support for other artifacts than scripts
                 String scriptPath = a.getValue();
                 // Adapting path to the fact that artifacts are forced to reside in charm folder
                 scriptPath = scriptPath.replace("../","").replace("..\\","");
-                scripts.add(a.getValue());
+                commands.add("/bin/bash " + scriptPath);
             }
         }
         // Building install hook from template "install"
         Template install = cfg.getTemplate(("install"));
         Map<String, Object> installData = new HashMap<String,Object>();
         installData.put("vars",vars);
-        installData.put("scripts",scripts);
+        installData.put("commands",commands);
         context.getFileAccess().append(installFile, TemplateHelper.toString(install, installData));
     }
 
