@@ -1,0 +1,27 @@
+package io.github.edmm.plugins.salt;
+
+import io.github.edmm.core.plugin.AbstractLifecycle;
+import io.github.edmm.core.transformation.TransformationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SaltStackLifecycle extends AbstractLifecycle {
+
+    private static final Logger logger = LoggerFactory.getLogger(SaltStackLifecycle.class);
+
+    private final TransformationContext context;
+
+    public SaltStackLifecycle(TransformationContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void transform() {
+        logger.info("Begin transformation to Salt...");
+        SaltStackTransformer visitor = new SaltStackTransformer(context);
+        // Visit compute components first
+        visitor.visitComponentsTopologicalOrder();
+        visitor.populateSaltFiles();
+        logger.info("Transformation to Salt successful");
+    }
+}
