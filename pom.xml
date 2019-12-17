@@ -28,12 +28,17 @@
         <jansi.version>1.18</jansi.version>
         <jackson.versoin>2.9.9</jackson.versoin>
         <kubernetes-client.version>4.4.2</kubernetes-client.version>
+        <jersey.version>2.16</jersey.version>
+        <replacer.version>1.5.3</replacer.version>
+        <swagger.version>2.0.2</swagger.version>
+        <swagger-ui.version>3.20.8</swagger-ui.version>
     </properties>
 
     <modules>
         <module>cfn-builder</module>
         <module>edmm-core</module>
         <module>edmm-cli</module>
+        <module>edmm-rest</module>
     </modules>
 
     <dependencyManagement>
