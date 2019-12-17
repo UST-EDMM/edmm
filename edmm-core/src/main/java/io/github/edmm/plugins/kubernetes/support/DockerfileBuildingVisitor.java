@@ -71,7 +71,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
                 builder.add("./" + filename, filename);
                 builder.cmd("./" + filename);
             }
-            fileAccess.append(targetDirectory + "/Dockerfile", builder.build());
+            fileAccess.write(targetDirectory + "/Dockerfile", builder.build());
         } catch (Exception e) {
             logger.error("Failed to create Dockerfile for stack '{}'", stack.getName(), e);
             throw new TransformationException(e);

@@ -83,7 +83,23 @@ public class PluginFileAccess {
     }
 
     /**
-     * Writes a string to a file creating the file if it does not exist in the target directory
+     * Writes a string to a file. Creates the file if it does not exist in the target directory.
+     *
+     * @param relativePath The relative path inside the target directory
+     * @param data         The string to write
+     */
+    public void write(String relativePath, String data) throws IOException {
+        File file = new File(targetDirectory, relativePath);
+        try {
+            FileUtils.writeStringToFile(file, data + Consts.NL, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            logger.error("Failed to write data to file '{}'", file);
+            throw e;
+        }
+    }
+
+    /**
+     * Appends a string to a file. Creates the file if it does not exist in the target directory.
      *
      * @param relativePath The relative path inside the target directory
      * @param data         The string to append
@@ -93,7 +109,7 @@ public class PluginFileAccess {
         try {
             FileUtils.writeStringToFile(file, data + Consts.NL, StandardCharsets.UTF_8, true);
         } catch (IOException e) {
-            logger.error("Failed to write data to file '{}'", file);
+            logger.error("Failed to append data to file '{}'", file);
             throw e;
         }
     }

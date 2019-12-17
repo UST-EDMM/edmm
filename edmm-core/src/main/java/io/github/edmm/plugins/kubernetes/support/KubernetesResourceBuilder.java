@@ -43,7 +43,7 @@ public class KubernetesResourceBuilder {
         try {
             String targetDirectory = stack.getName();
             for (KubernetesResource resource : resources) {
-                fileAccess.append(targetDirectory + "/" + resource.getName() + ".yaml", resource.toYaml());
+                fileAccess.write(targetDirectory + "/" + resource.getName() + ".yaml", resource.toYaml());
             }
         } catch (Exception e) {
             logger.error("Failed to create Kubernetes resource files for stack '{}'", stack.getName(), e);
