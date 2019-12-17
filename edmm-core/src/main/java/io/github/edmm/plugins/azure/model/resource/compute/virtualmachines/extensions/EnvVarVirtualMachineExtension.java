@@ -22,7 +22,7 @@ public class EnvVarVirtualMachineExtension extends VirtualMachineExtension {
     private Map<String, String> environmentVariables = new HashMap<>();
 
     public EnvVarVirtualMachineExtension(VirtualMachine vm) {
-        super(vm, vm.getName().replaceFirst("vm_", ""),"env");
+        super(vm, vm.getName().replaceFirst("vm_", ""), "env");
         setScriptPath(String.format("./%s/env.sh", vm.getName()));
     }
 

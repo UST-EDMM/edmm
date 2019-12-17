@@ -7,6 +7,7 @@ import java.util.Set;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DependencyGraph;
@@ -14,6 +15,8 @@ import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
+import io.github.edmm.model.visitor.VisitorHelper;
+import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.kubernetes.support.DockerfileBuildingVisitor;
 import io.github.edmm.plugins.kubernetes.support.ImageMappingVisitor;
 import io.github.edmm.plugins.kubernetes.support.KubernetesResourceBuilder;
@@ -25,15 +28,21 @@ public class KubernetesLifecycle extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesLifecycle.class);
 
-    protected final TransformationContext context;
     protected final Graph<RootComponent, RootRelation> graph;
 
     protected List<Container> containers = new ArrayList<>();
     protected DependencyGraph dependencyGraph;
 
     public KubernetesLifecycle(TransformationContext context) {
-        this.context = context;
+        super(context);
         this.graph = context.getTopologyGraph();
+    }
+
+    @Override
+    public CheckModelResult checkModel() {
+        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        return visitor.getResult();
     }
 
     @Override

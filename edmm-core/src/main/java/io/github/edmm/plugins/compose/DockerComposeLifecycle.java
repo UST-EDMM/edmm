@@ -1,8 +1,11 @@
 package io.github.edmm.plugins.compose;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.docker.Container;
+import io.github.edmm.model.visitor.VisitorHelper;
+import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.compose.support.DockerComposeBuilder;
 import io.github.edmm.plugins.kubernetes.KubernetesLifecycle;
 import org.slf4j.Logger;
@@ -14,6 +17,13 @@ public class DockerComposeLifecycle extends KubernetesLifecycle {
 
     public DockerComposeLifecycle(TransformationContext context) {
         super(context);
+    }
+
+    @Override
+    public CheckModelResult checkModel() {
+        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        return visitor.getResult();
     }
 
     @Override

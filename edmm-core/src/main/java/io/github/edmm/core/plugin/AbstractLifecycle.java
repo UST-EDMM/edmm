@@ -6,19 +6,23 @@ import java.util.List;
 
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.plugin.support.LifecyclePhaseAccess;
+import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 
 public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePhaseAccess {
 
+    protected final TransformationContext context;
+
     private final List<LifecyclePhase> phases;
 
-    public AbstractLifecycle() {
+    public AbstractLifecycle(TransformationContext context) {
+        this.context = context;
         this.phases = populatePhases();
     }
 
     @Override
     public CheckModelResult checkModel() {
-        return new CheckModelResult(CheckModelResult.State.OK);
+        return new CheckModelResult(context.getModel().getComponents());
     }
 
     @Override

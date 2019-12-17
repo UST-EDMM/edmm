@@ -43,6 +43,7 @@ public abstract class Resource {
     public String getFullName() {
         return String.format("%s/%s", type.getTypeName(), name);
     }
+
     @JsonIgnore
     public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = new HashMap<>();

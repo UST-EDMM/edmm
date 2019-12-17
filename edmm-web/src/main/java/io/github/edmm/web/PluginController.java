@@ -32,7 +32,7 @@ public class PluginController {
         this.pluginService = pluginService;
     }
 
-    @Operation(summary = "Checks if a plugin supports the used components of an EDMM model.")
+    @Operation(summary = "Checks if a plugin supports the used components in an EDMM model.")
     @PostMapping(value = "/check-model-support",
             consumes = MediaType.TEXT_PLAIN_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,12 +50,8 @@ public class PluginController {
                     .id(plugin.getPlatform().getId())
                     .name(plugin.getPlatform().getName())
                     .unsupportedComponents(unsupportedComponents);
-            if (unsupportedComponents.isEmpty()) {
-                psr.supports(1.0);
-            } else {
-                double s = unsupportedComponents.size() / (double) model.getComponents().size();
-                psr.supports(s);
-            }
+            double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
+            psr.supports(s);
             response.add(psr.build());
         }
         return ResponseEntity.ok(response);

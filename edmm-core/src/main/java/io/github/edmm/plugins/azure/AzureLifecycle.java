@@ -8,10 +8,12 @@ import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.JsonHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
+import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.CustomScriptSettings;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.EnvVarVirtualMachineExtension;
@@ -20,14 +22,21 @@ import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.exten
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AzureLifeCycle extends AbstractLifecycle {
+public class AzureLifecycle extends AbstractLifecycle {
+
+    private static final Logger logger = LoggerFactory.getLogger(AzureLifecycle.class);
 
     public static final String FILE_NAME = "deploy.json";
-    private static final Logger logger = LoggerFactory.getLogger(AzureLifeCycle.class);
-    private final TransformationContext context;
 
-    public AzureLifeCycle(TransformationContext context) {
-        this.context = context;
+    public AzureLifecycle(TransformationContext context) {
+        super(context);
+    }
+
+    @Override
+    public CheckModelResult checkModel() {
+        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        return visitor.getResult();
     }
 
     private void populateAzureTemplateFile(ResourceManagerTemplate resultTemplate) {

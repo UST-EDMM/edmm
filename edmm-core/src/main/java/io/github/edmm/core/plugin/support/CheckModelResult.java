@@ -1,24 +1,27 @@
 package io.github.edmm.core.plugin.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import io.github.edmm.model.component.RootComponent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class CheckModelResult {
 
     private State state = State.PENDING;
-
-    private final List<RootComponent> unsupportedComponents = new ArrayList<>();
+    private List<RootComponent> unsupportedComponents = new ArrayList<>();
 
     public CheckModelResult(State state) {
         this.state = state;
+    }
+
+    public CheckModelResult(Collection<RootComponent> unsupportedComponents) {
+        this.state = State.UNSUPPORTED_COMPONENTS;
+        this.unsupportedComponents = new ArrayList<>(unsupportedComponents);
     }
 
     public void addUnsupportedComponent(RootComponent component) {

@@ -3,10 +3,12 @@ package io.github.edmm.plugins.cfn;
 import java.io.IOException;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
+import io.github.edmm.plugins.ComputeSupportVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,14 +16,19 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudFormationLifecycle.class);
 
-    private final TransformationContext context;
-
     private final CloudFormationModule module;
 
     public CloudFormationLifecycle(TransformationContext context) {
-        this.context = context;
+        super(context);
         this.module = new CloudFormationModule("eu-west-1");
         this.module.setKeyPair(true);
+    }
+
+    @Override
+    public CheckModelResult checkModel() {
+        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
+        VisitorHelper.visit(context.getModel().getComponents(), visitor);
+        return visitor.getResult();
     }
 
     @Override
