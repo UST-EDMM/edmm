@@ -5,27 +5,25 @@ import java.util.concurrent.Callable;
 
 import io.github.edmm.core.plugin.Plugin;
 import io.github.edmm.core.transformation.Platform;
-import io.github.edmm.core.transformation.Transformation;
 import io.github.edmm.core.transformation.TransformationContext;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.github.edmm.core.transformation.TransformationContext.State.DONE;
+import static io.github.edmm.core.transformation.TransformationContext.State.ERROR;
+import static io.github.edmm.core.transformation.TransformationContext.State.TRANSFORMING;
 
 public final class ExecutionTask implements Callable<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutionTask.class);
 
     private final Plugin plugin;
-    private final Transformation transformation;
-    private final File sourceDirectory;
-    private final File targetDirectory;
+    private final TransformationContext context;
 
-    public ExecutionTask(@NonNull Plugin plugin, @NonNull Transformation transformation,
-                         @NonNull File sourceDirectory, @NonNull File targetDirectory) {
+    public ExecutionTask(@NonNull Plugin plugin, @NonNull TransformationContext context) {
         this.plugin = plugin;
-        this.transformation = transformation;
-        this.sourceDirectory = sourceDirectory;
-        this.targetDirectory = targetDirectory;
+        this.context = context;
     }
 
     @Override
@@ -33,26 +31,27 @@ public final class ExecutionTask implements Callable<Void> {
         boolean failed = false;
         Platform platform = plugin.getPlatform();
         logger.info("Starting transformation for {}", platform.getName());
-        transformation.setState(Transformation.State.TRANSFORMING);
+        context.setState(TRANSFORMING);
+        File targetDirectory = context.getTargetDirectory();
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
             logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
-            transformation.setState(Transformation.State.ERROR);
+            context.setState(ERROR);
             return null;
         }
         if (!targetDirectory.isDirectory() || !targetDirectory.canWrite()) {
             logger.error("Given value is not a directory or not writable: {}", targetDirectory.getAbsolutePath());
-            transformation.setState(Transformation.State.ERROR);
+            context.setState(ERROR);
             return null;
         }
         try {
-            plugin.execute(new TransformationContext(transformation, sourceDirectory, targetDirectory));
-            transformation.setState(Transformation.State.DONE);
+            plugin.execute(context);
+            context.setState(DONE);
         } catch (Exception e) {
             logger.info("Transformation to {} failed", platform.getName());
             logger.error("Something went wrong while transforming", e);
             failed = true;
         }
-        transformation.setState(failed ? Transformation.State.ERROR : Transformation.State.DONE);
+        context.setState(failed ? ERROR : DONE);
         return null;
     }
 }

@@ -1,15 +1,16 @@
-package io.github.edmm.cli;
+package io.github.edmm.core.plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TransformationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ public class PluginService {
     private static final Logger logger = LoggerFactory.getLogger(PluginService.class);
 
     private final List<Plugin> plugins;
-    private final Set<Platform> platforms = new HashSet<>();
 
     @Autowired
     public PluginService(List<Plugin> plugins) {
@@ -34,9 +34,7 @@ public class PluginService {
             }
             pluginMap.put(plugin.getPlatform().getId(), plugin);
         }
-        for (Plugin plugin : plugins) {
-            platforms.add(plugin.getPlatform());
-        }
+
         logger.debug("Loaded {} plugins", plugins.size());
     }
 
@@ -45,11 +43,9 @@ public class PluginService {
     }
 
     public Set<Platform> getSupportedPlatforms() {
-        return new HashSet<>(platforms);
-    }
-
-    public boolean isSupported(Platform platform) {
-        return platforms.contains(platform);
+        return plugins.stream()
+                .map(Plugin::getPlatform)
+                .collect(Collectors.toSet());
     }
 
     public Optional<Plugin> findByPlatform(Platform platform) {
@@ -62,5 +58,9 @@ public class PluginService {
             }
         }
         return Optional.empty();
+    }
+
+    public CheckModelResult checkModel(TransformationContext context, Plugin plugin) {
+        return plugin.getLifecycle(context).checkModel();
     }
 }

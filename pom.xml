@@ -28,6 +28,7 @@
         <jansi.version>1.18</jansi.version>
         <kubernetes-client.version>4.4.2</kubernetes-client.version>
         <springdoc-openapi-ui.version>1.2.18</springdoc-openapi-ui.version>
+        <retrofit.version>2.7.0</retrofit.version>
     </properties>
 
     <modules>
@@ -93,6 +94,16 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc-openapi-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit2</groupId>
+                <artifactId>retrofit</artifactId>
+                <version>${retrofit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit2</groupId>
+                <artifactId>converter-jackson</artifactId>
+                <version>${retrofit.version}</version>
             </dependency>
             <!-- AWS Java SDK BOM -->
             <dependency>

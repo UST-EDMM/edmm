@@ -22,7 +22,6 @@ public abstract class PluginTest {
 
     protected void executeLifecycle(Plugin plugin, TransformationContext context) {
         AbstractLifecycle lifecycle = plugin.getLifecycle(context);
-        lifecycle.checkEnvironment();
         lifecycle.checkModel();
         lifecycle.prepare();
         lifecycle.transform();

@@ -1,17 +1,19 @@
-package io.github.edmm.web.model;
+package io.github.edmm.web;
 
 import java.util.List;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
-public class PluginSupportResult {
+public final class PluginSupportResult {
 
     @NotBlank
     private String id;
@@ -19,6 +21,8 @@ public class PluginSupportResult {
     @NotBlank
     private String name;
 
+    @Min(0)
+    @Max(1)
     @PositiveOrZero
     private Double supports;
 

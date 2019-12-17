@@ -78,6 +78,6 @@ public class LifecyclePhase<L extends PluginLifecycle> {
         EXECUTING,
         DONE,
         SKIPPED,
-        FAILED
+        FAILED,
     }
 }
