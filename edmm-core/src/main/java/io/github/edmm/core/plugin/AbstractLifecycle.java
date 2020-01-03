@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.plugin.support.LifecyclePhaseAccess;
+import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 
 public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePhaseAccess {
 
+    protected final TransformationContext context;
+
     private final List<LifecyclePhase> phases;
 
-    public AbstractLifecycle() {
+    public AbstractLifecycle(TransformationContext context) {
+        this.context = context;
         this.phases = populatePhases();
     }
 
     @Override
-    public boolean checkEnvironment() {
-        return true;
-    }
-
-    @Override
-    public boolean checkModel() {
-        return true;
+    public CheckModelResult checkModel() {
+        return new CheckModelResult(context.getModel().getComponents());
     }
 
     @Override
@@ -37,13 +37,9 @@ public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePha
 
     private List<LifecyclePhase> populatePhases() {
         List<LifecyclePhase> phases = new ArrayList<>();
-        phases.add(new LifecyclePhase<>("check_environment", this, (e) -> {
-            if (!e.checkEnvironment()) {
-                throw new TransformationException("Transformation failed, because the environment check has failed");
-            }
-        }));
         phases.add(new LifecyclePhase<>("check_model", this, (e) -> {
-            if (!e.checkModel()) {
+            CheckModelResult.State state = e.checkModel().getState();
+            if (CheckModelResult.State.UNSUPPORTED_COMPONENTS.equals(state)) {
                 throw new TransformationException("Transformation failed, because the model check has failed");
             }
         }));

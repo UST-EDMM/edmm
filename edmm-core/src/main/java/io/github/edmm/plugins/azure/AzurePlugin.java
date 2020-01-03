@@ -4,7 +4,7 @@ import io.github.edmm.core.plugin.Plugin;
 import io.github.edmm.core.transformation.Platform;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class AzurePlugin extends Plugin<AzureLifeCycle> {
+public class AzurePlugin extends Plugin<AzureLifecycle> {
 
     public static final Platform AZURE = Platform.builder().id("azure").name("Azure").build();
 
@@ -13,7 +13,7 @@ public class AzurePlugin extends Plugin<AzureLifeCycle> {
     }
 
     @Override
-    public AzureLifeCycle getLifecycle(TransformationContext context) {
-        return new AzureLifeCycle(context);
+    public AzureLifecycle getLifecycle(TransformationContext context) {
+        return new AzureLifecycle(context);
     }
 }

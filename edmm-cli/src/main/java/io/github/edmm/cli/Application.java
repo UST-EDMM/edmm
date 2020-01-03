@@ -1,6 +1,5 @@
 package io.github.edmm.cli;
 
-import io.github.edmm.cli.command.TransformCommand;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -24,7 +23,7 @@ import static picocli.CommandLine.usage;
                 TransformCommand.class
         }
 )
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "io.github.edmm")
 @ImportResource( {"classpath*:pluginContext.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 

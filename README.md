@@ -178,3 +178,9 @@ We use Maven as our build tool:
 ```shell
 ./mvnw clean package
 ```
+
+Build Docker images:
+
+```shell
+docker build -t edmm-web ./edmm-web
+```

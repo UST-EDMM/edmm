@@ -1,14 +1,14 @@
-package io.github.edmm.cli.command;
+package io.github.edmm.cli;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import io.github.edmm.cli.PluginService;
-import io.github.edmm.cli.TransformationService;
+import io.github.edmm.core.plugin.PluginService;
 import io.github.edmm.core.transformation.Platform;
-import io.github.edmm.core.transformation.Transformation;
+import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.core.transformation.TransformationService;
 import io.github.edmm.model.DeploymentModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,8 +60,8 @@ public class TransformCommand implements Callable<Integer> {
                 .filter(p -> p.getId().equals(target))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
-        Transformation transformation = transformationService.createTransformation(model, platform);
-        transformationService.startTransformation(transformation, sourceDirectory, targetDirectory);
+        TransformationContext context = new TransformationContext(model, platform, sourceDirectory, targetDirectory);
+        transformationService.startTransformation(context);
         return 42;
     }
 

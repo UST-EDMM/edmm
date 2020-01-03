@@ -15,12 +15,16 @@ public class NoopPlugin extends Plugin<NoopPlugin.NoopLifecycle> {
 
     @Override
     public NoopLifecycle getLifecycle(TransformationContext context) {
-        return new NoopLifecycle();
+        return new NoopLifecycle(context);
     }
 
     public static class NoopLifecycle extends AbstractLifecycle {
 
         private static final Logger logger = LoggerFactory.getLogger(NoopLifecycle.class);
+
+        NoopLifecycle(TransformationContext context) {
+            super(context);
+        }
 
         @Override
         public void transform() {
