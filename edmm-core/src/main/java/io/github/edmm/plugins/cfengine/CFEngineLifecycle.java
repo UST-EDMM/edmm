@@ -29,7 +29,7 @@ public class CFEngineLifecycle extends AbstractLifecycle {
         CFEngineTransformer visitor = new CFEngineTransformer(context);
         // Visit compute components first
         visitor.visitComponentsTopologicalOrder();
-        //visitor.populateCFEngineFiles();
+        visitor.populateCFEngineFiles();
         logger.info("Transformation to CFEngine successful");
     }
 }
