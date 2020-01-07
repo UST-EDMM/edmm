@@ -13,4 +13,5 @@
     <bean id="terraformPlugin" class="io.github.edmm.plugins.terraform.TerraformPlugin"/>
     <bean id="jujuPlugin" class="io.github.edmm.plugins.juju.JujuPlugin"/>
     <bean id="saltStackPlugin" class="io.github.edmm.plugins.salt.SaltStackPlugin"/>
+    <bean id="cfenginePlugin" class="io.github.edmm.plugins.cfengine.CFEnginePlugin"/>
 </beans>
