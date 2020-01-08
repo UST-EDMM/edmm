@@ -16,7 +16,7 @@ import java.util.Map;
 public class CFPolicy {
     private static final Logger logger = LoggerFactory.getLogger(CFPolicy.class);
     public final Map<String, String> modVars;
-    public final Map<String, List<String>> envVars;
+    public final Map<String, Map<String, String>> envVars;
     public final Map<String, String> classes;
     public final Map<String, List<String>> methods;
 
