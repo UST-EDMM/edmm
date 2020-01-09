@@ -98,31 +98,39 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(Compute component) {
         addCompute(component);
-        add(component);
+        add(component, component);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(Tomcat component) {
-        add(component);
+        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
+                .orElseThrow(TransformationException::new);
+        add(component, compute);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(MysqlDatabase component) {
-        add(component);
+        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
+                .orElseThrow(TransformationException::new);
+        add(component, compute);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(MysqlDbms component) {
-        add(component);
+        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
+                .orElseThrow(TransformationException::new);
+        add(component, compute);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(WebApplication component) {
-        add(component);
+        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
+                .orElseThrow(TransformationException::new);
+        add(component, compute);
         component.setTransformed(true);
     }
 
@@ -188,9 +196,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
      *
      * @param component Component to be processed
      */
-    public void add(RootComponent component) {
-        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+    public void add(RootComponent component, Compute compute) {
         runningOrder.get(compute.getNormalizedName()).add(component);
         handleArtifacts(component, compute);
         handleProperties(component, compute);
