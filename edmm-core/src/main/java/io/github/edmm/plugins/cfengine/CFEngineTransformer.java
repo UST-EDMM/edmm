@@ -262,8 +262,8 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
                 String[] file = getFileParsed(operation.getArtifacts().get(0).getValue());
                 String cfengineFilePath = component.getNormalizedName() + '_' + file[1];
                 List<String> methodList = this.policy.getMethods().get(compute.getNormalizedName());
-                methodList.add("execute_script($(deployment_path)/" + cfengineFilePath + "\",\n" +
-                        "\t\t\t\t\"" + file[1] + " done.\", $(" + compute.getNormalizedName() + "_env))");
+                methodList.add("execute_script($(deployment_path), \"" + cfengineFilePath + "\",\n" +
+                        "\t\t\t\t\"" + cfengineFilePath + "\", $(" + compute.getNormalizedName() + "_env))");
 
                 String localFilePath = DEPLOYMENT_PATH + '/' + compute.getNormalizedName()
                         + '/' + component.getNormalizedName() + '_' + file[1];
