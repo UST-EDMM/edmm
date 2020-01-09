@@ -54,6 +54,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
                 .classes(new LinkedHashMap<>())
                 .methods(new LinkedHashMap<>())
                 .build();
+        // Template initialization
         this.policy.getModVars().putIfAbsent("deployment_path", DEPLOYMENT_PATH);
         this.policy.getModVars().putIfAbsent("deployment_masterfiles", DEPLOYMENT_MASTERFILES);
         this.runningOrder = new HashMap<>();
@@ -79,6 +80,9 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         VisitorHelper.visit(context.getModel().getRelations(), this);
     }
 
+    /**
+     * Populate policy file
+     */
     public void populateCFEngineFiles() {
         try {
             Template baseTemplate = cfg.getTemplate("policy.cf");
@@ -94,39 +98,31 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(Compute component) {
         addCompute(component);
-        add(component, component);
+        add(component);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(Tomcat component) {
-        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
-        add(component, compute);
+        add(component);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(MysqlDatabase component) {
-        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
-        add(component, compute);
+        add(component);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(MysqlDbms component) {
-        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
-        add(component, compute);
+        add(component);
         component.setTransformed(true);
     }
 
     @Override
     public void visit(WebApplication component) {
-        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
-        add(component, compute);
+        add(component);
         component.setTransformed(true);
     }
 
@@ -142,10 +138,12 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         }
     }
 
+    /**
+     * Add env vars to the target host to enable the connection
+     */
     public void handleConnectRelation(RootComponent targetComponent, Compute sourceCompute, Compute targetCompute) {
         String name = targetComponent.getNormalizedName().toUpperCase() + "_HOSTNAME";
         Map<String, String> sourceVars = policy.getEnvVars().get(sourceCompute.getNormalizedName() + "_env");
-        Map<String, String> targetVars = policy.getEnvVars().get(targetCompute.getNormalizedName() + "_env");
         sourceVars.putIfAbsent(name, "$(" + targetCompute.getNormalizedName() + "_ip)");
         if (sourceCompute != targetCompute) {
             // Add all the variables of targetComponent + those of the underlying nodes
@@ -167,6 +165,11 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         }
     }
 
+    /**
+     * Create all the variables, classes and methods needed to add a host to the policy
+     *
+     * @param compute Component to be processed
+     */
     public void addCompute(Compute compute) {
         this.policy.getModVars().putIfAbsent(compute.getNormalizedName() + "_ip", "10.0.0." + (last_ip++));
         this.policy.getEnvVars().putIfAbsent(compute.getNormalizedName() + "_env", new LinkedHashMap<>());
@@ -179,13 +182,26 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         runningOrder.putIfAbsent(compute.getNormalizedName(), new ArrayList<>());
     }
 
-    public void add(RootComponent component, Compute compute) {
+    /**
+     * Add the component to the policy and execute routines to copy artifacts, import properties and copy operation
+     * scripts
+     *
+     * @param component Component to be processed
+     */
+    public void add(RootComponent component) {
+        Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
+                .orElseThrow(TransformationException::new);
         runningOrder.get(compute.getNormalizedName()).add(component);
         handleArtifacts(component, compute);
         handleProperties(component, compute);
         handleOperations(component, compute);
     }
 
+    /**
+     * For each artifact copy the files to CFEngine directory
+     * @param component Component to be processed
+     * @param compute   Compute node of component
+     */
     private void handleArtifacts(RootComponent component, Compute compute) {
         component.getArtifacts().forEach(artifact -> {
             String[] file = getFileParsed(artifact.getValue());
@@ -198,6 +214,11 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         });
     }
 
+    /**
+     * Sanitize filepath
+     * @param filePath path
+     * @return [filePath, fileName]
+     */
     private String[] getFileParsed(String filePath) {
         String file = filePath;
         if (file.startsWith("./")) {
@@ -207,6 +228,9 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         return new String[]{file, name};
     }
 
+    /**
+     * For each operation creates the command to run the scripts
+     */
     private void handleOperations(RootComponent component, Compute compute) {
         List<Operation> operations = new ArrayList<>();
         // Create
@@ -221,6 +245,11 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         operations.forEach(operation -> createCommand(operation, component, compute));
     }
 
+    /**
+     * Extract the script from the operation and create a command to execute it
+     * @param operation operation
+     * @param component component for this operation
+     */
     private void createCommand(Operation operation, RootComponent component, Compute compute) {
         try {
             if (operation.getArtifacts().size() > 0) {
@@ -239,6 +268,10 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         }
     }
 
+    /**
+     * For each property adds the env variable to policy
+     * @param component EDMM component
+     */
     private void handleProperties(RootComponent component, Compute compute) {
         String[] blacklist = {"key_name", "public_key"};
         component.getProperties().entrySet().stream()
