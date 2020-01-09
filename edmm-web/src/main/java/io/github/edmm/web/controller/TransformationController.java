@@ -54,7 +54,7 @@ public class TransformationController {
                     .findFirst().orElseThrow(IllegalStateException::new);
             TransformationContext context = new TransformationContext(deploymentModel, platform, sourceDirectory.toFile(), targetDirectory.toFile());
             transformationService.startTransformation(context);
-            return ResponseEntity.ok(TransformationResult.of(targetDirectory.toAbsolutePath().toString()));
+            return ResponseEntity.ok(TransformationResult.of(context));
         } catch (Exception e) {
             log.error("Error executing transformation", e);
             return ResponseEntity.badRequest().build();
