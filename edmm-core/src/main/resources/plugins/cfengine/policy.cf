@@ -13,7 +13,7 @@ bundle agent deployment {
     classes:
         <#list agent.classes as key, value>
         "${key}"
-            expression => expression => strcmp("$(ips)","${value}");
+            expression => strcmp("$(ips)","${value}");
         </#list>
         "exists" expression => fileexists("$(deployment_path)");
 
@@ -27,11 +27,11 @@ bundle agent deployment {
 
     reports:
         !host1.!host2::
-            "Host undefined.";
+            "Host undefined";
         !exists::
-            "Deploy done.";
+            "Deploy done";
         exists::
-            "Delete $(deploy_path) dir to deploy again.";
+            "Delete $(deployment_path) dir to deploy again";
 }
 
 body file control { inputs => { "$(sys.libdir)/stdlib.cf" }; }
@@ -54,18 +54,18 @@ bundle agent copy_files(master_path, host_path) {
         "File copied";
 }
 
-bundle agent execute_script(path, report, env) {
+bundle agent execute_script(chdir, file_path, report, env) {
 
     commands:
-        "/usr/bin/env $(env) /bin/bash $(path)"
-            contain => not_paranoid;
+        "/usr/bin/env $(env) /bin/bash $(chdir)/$(file_path)"
+            contain => not_paranoid($(chdir));
 
     reports:
         "$(report) done";
 }
 
-body contain not_paranoid {
+body contain not_paranoid(chdir) {
     umask => "22";
     exec_owner => "root";
-    chdir => "/deploy";
+    chdir => "$(chdir)";
 }
