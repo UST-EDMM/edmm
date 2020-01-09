@@ -5,8 +5,10 @@ components:
   tomcat:
     relations:
     - depends_on:
+        type: depends_on
         target: ubuntu
     - hosted_on:
+        type: hosted_on
         target: ubuntu
     type: software_component
 metadata:
