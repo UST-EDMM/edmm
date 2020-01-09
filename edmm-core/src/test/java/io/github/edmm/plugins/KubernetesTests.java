@@ -25,7 +25,7 @@ public class KubernetesTests extends PluginTest {
     @Before
     public void init() throws Exception {
         ClassPathResource sourceResource = new ClassPathResource("templates");
-        ClassPathResource templateResource = new ClassPathResource("templates/scenario_iaas_single_compute.yml");
+        ClassPathResource templateResource = new ClassPathResource("templates/scenario_paas_saas.yml");
         DeploymentModel model = DeploymentModel.of(templateResource.getFile());
         logger.info("Source directory is '{}'", sourceResource.getFile());
         logger.info("Target directory is '{}'", targetDirectory);

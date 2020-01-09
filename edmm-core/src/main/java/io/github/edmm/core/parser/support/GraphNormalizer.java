@@ -15,8 +15,8 @@ public abstract class GraphNormalizer {
         resolveExtends(graph, EntityGraph.COMPONENT_TYPES);
         resolveExtends(graph, EntityGraph.RELATION_TYPES);
         resolveComponentTypes(graph);
-        resolveRelationTypes(graph);
         normalizeRelations(graph);
+        resolveRelationTypes(graph);
         resolveRelations(graph);
         normalizeOperations(graph);
         normalizeProperties(graph);
@@ -53,9 +53,14 @@ public abstract class GraphNormalizer {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
                 for (Entity relation : relations.get().getChildren()) {
-                    GraphHelper
-                            .findMappingEntity(graph, relation.getName(), EntityGraph.RELATION_TYPES)
+//                    if (relation instanceof ScalarEntity) {
+//                        GraphHelper.findMappingEntity(graph, relation.getName(), EntityGraph.RELATION_TYPES)
+//                                .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
+//                    } else {
+                    relation.getChild(DefaultKeys.TYPE)
+                            .flatMap(type -> GraphHelper.findMappingEntity(graph, ((ScalarEntity) type).getValue(), EntityGraph.RELATION_TYPES))
                             .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
+//                    }
                 }
             }
         }
@@ -86,8 +91,10 @@ public abstract class GraphNormalizer {
                     if (relation instanceof ScalarEntity) {
                         ScalarEntity scalarEntity = (ScalarEntity) relation;
                         MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                        ScalarEntity type = new ScalarEntity(scalarEntity.getName(), normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                         ScalarEntity target = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.TARGET), graph);
                         graph.replaceEntity(scalarEntity, normalizedEntity);
+                        graph.addEntity(type);
                         graph.addEntity(target);
                     }
                 }

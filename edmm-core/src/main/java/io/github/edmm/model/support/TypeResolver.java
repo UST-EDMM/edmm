@@ -3,12 +3,19 @@ package io.github.edmm.model.support;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.edmm.model.component.Auth0;
+import io.github.edmm.model.component.AwsAurora;
+import io.github.edmm.model.component.AwsBeanstalk;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
+import io.github.edmm.model.component.Dbaas;
 import io.github.edmm.model.component.Dbms;
 import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.MysqlDbms;
+import io.github.edmm.model.component.Paas;
+import io.github.edmm.model.component.Platform;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.component.Saas;
 import io.github.edmm.model.component.SoftwareComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
@@ -37,6 +44,14 @@ public abstract class TypeResolver {
         put("tomcat", Tomcat.class);
         put("mysql_dbms", MysqlDbms.class);
         put("mysql_database", MysqlDatabase.class);
+        put("platform", Platform.class);
+        put("paas", Paas.class);
+        put("dbaas", Dbaas.class);
+        put("aws_beanstalk", AwsBeanstalk.class);
+        put("aws_aurora", AwsAurora.class);
+        put("aws_aurora", AwsAurora.class);
+        put("saas", Saas.class);
+        put("auth0", Auth0.class);
         // Relations
         put("depends_on", DependsOn.class);
         put("hosted_on", HostedOn.class);

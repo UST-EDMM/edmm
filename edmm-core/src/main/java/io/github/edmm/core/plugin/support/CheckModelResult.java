@@ -20,8 +20,12 @@ public class CheckModelResult {
     }
 
     public CheckModelResult(Collection<RootComponent> unsupportedComponents) {
-        this.state = State.UNSUPPORTED_COMPONENTS;
         this.unsupportedComponents = new ArrayList<>(unsupportedComponents);
+        if (unsupportedComponents.size() == 0) {
+            this.state = State.OK;
+        } else {
+            this.state = State.UNSUPPORTED_COMPONENTS;
+        }
     }
 
     public void addUnsupportedComponent(RootComponent component) {

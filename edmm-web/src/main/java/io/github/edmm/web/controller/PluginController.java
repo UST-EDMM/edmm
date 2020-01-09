@@ -1,4 +1,4 @@
-package io.github.edmm.web;
+package io.github.edmm.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.web.model.PluginSupportResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

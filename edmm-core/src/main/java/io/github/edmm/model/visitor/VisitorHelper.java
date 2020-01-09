@@ -3,6 +3,7 @@ package io.github.edmm.model.visitor;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import io.github.edmm.core.parser.Entity;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import lombok.NonNull;
@@ -37,7 +38,10 @@ public abstract class VisitorHelper {
                 .filter(filter)
                 .forEach(relation -> {
                     if (!relation.isTransformed()) {
-                        logger.debug("Visit '{}' object for '{}' relation", relation.getClass().getSimpleName(), relation.getName());
+                        Entity component = relation.getEntity()
+                                .getParent().orElseThrow(IllegalStateException::new)
+                                .getParent().orElseThrow(IllegalStateException::new);
+                        logger.debug("Visit '{}' object for '{}' relation of component '{}'", relation.getClass().getSimpleName(), relation.getName(), component.getName());
                         relation.accept(visitor);
                     }
                 });

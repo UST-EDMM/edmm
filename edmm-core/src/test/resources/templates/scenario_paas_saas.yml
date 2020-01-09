@@ -1,0 +1,212 @@
+---
+version: edm_1_0
+
+components:
+
+  ## Spring PetClinic Application
+
+  pet_clinic:
+    type: web_application
+    artifacts:
+      - war: ./files/app.war
+    relations:
+      - hosted_on: pet_clinic_platform
+      - connects_to_db:
+          type: connects_to
+          target: db
+      - connects_to_auth:
+          type: connects_to
+          target: auth
+  pet_clinic_platform:
+    type: aws_beanstalk
+    properties:
+      region: eu-west-1
+      archetype: java
+      min_instances: 1
+      max_instances: 1
+
+  ## Database
+
+  db:
+    type: mysql_database
+    properties:
+      schema_name: petclinic
+      user: pc
+      password: petclinic
+    artifacts:
+      - sql: ./files/app.sql
+    relations:
+      - hosted_on: dbms
+
+  dbms:
+    type: aws_aurora
+    properties:
+      region: eu-west-1
+      instance_type: small
+
+  ## Authentication
+
+  auth:
+    type: auth0
+    properties:
+      domain: example.test
+      identifier: https://api.example.test
+      scopes: user,admin
+      client_id: abc
+      client_secret: xyz123abc
+
+###############################################
+## Component Types
+###############################################
+component_types:
+
+  ## Generic Types
+
+  base:
+    extends: null
+    description: The base type
+    metadata: {}
+    operations:
+      create: ~
+      configure: ~
+      start: ~
+      stop: ~
+      delete: ~
+
+  software_component:
+    extends: base
+
+  compute:
+    extends: base
+    properties:
+      os_family:
+        type: string
+        description: Specifies the type of operating system
+        default_value: linux
+      machine_image:
+        type: string
+        description: The name of the machine image to use
+      instance_type:
+        type: string
+        description: The name of the instance type to provision
+      key_name:
+        type: string
+        description: The name of the key pair to use for authentication
+      public_key:
+        type: string
+        description: The public key of the key pair to use for authentication
+
+  web_server:
+    extends: software_component
+    properties:
+      port:
+        type: integer
+        default_value: 80
+
+  web_application:
+    extends: base
+
+  dbms:
+    extends: software_component
+    properties:
+      port:
+        type: integer
+      root_password:
+        type: string
+
+  database:
+    extends: base
+    properties:
+      schema_name:
+        type: string
+      user:
+        type: string
+      password:
+        type: string
+
+  platform:
+    extends: base
+    properties:
+      region:
+        type: string
+
+  paas:
+    extends: platform
+    properties:
+      archetype:
+        type: string
+      min_instances:
+        type: integer
+      max_instances:
+        type: integer
+
+  dbaas:
+    extends: platform
+    properties:
+      instance_type:
+        type: string
+
+  saas:
+    extends: platform
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+
+  ## Technology-specific Types
+
+  tomcat:
+    extends: web_server
+    properties:
+      port:
+        type: integer
+        default_value: 8080
+
+  mysql_dbms:
+    extends: dbms
+    properties:
+      port:
+        type: integer
+        default_value: 3306
+
+  mysql_database:
+    extends: database
+
+  aws_beanstalk:
+    extends: paas
+
+  aws_aurora:
+    extends: dbaas
+
+  auth0:
+    extends: saas
+    properties:
+      domain:
+        type: string
+      identifier:
+        type: string
+      scopes:
+        type: string
+
+###############################################
+## Relation Types
+###############################################
+relation_types:
+
+  depends_on:
+    extends: null
+    properties: {}
+    operations:
+      pre_configure_source: ~
+      pre_configure_target: ~
+      post_configure_source: ~
+      post_configure_target: ~
+      target_changed: ~
+      target_removed: ~
+
+  hosted_on:
+    extends: depends_on
+
+  connects_to:
+    extends: depends_on

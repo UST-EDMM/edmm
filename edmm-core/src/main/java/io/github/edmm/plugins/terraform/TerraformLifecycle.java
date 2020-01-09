@@ -4,6 +4,7 @@ import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.terraform.aws.TerraformAwsVisitor;
@@ -22,7 +23,7 @@ public class TerraformLifecycle extends AbstractLifecycle {
 
     @Override
     public CheckModelResult checkModel() {
-        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
+        TerraformSupportVisitor visitor = new TerraformSupportVisitor(context);
         VisitorHelper.visit(context.getModel().getComponents(), visitor);
         return visitor.getResult();
     }

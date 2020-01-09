@@ -8,6 +8,7 @@ variable "region" {
   default = "eu-west-1"
 }
 
+<#if instances?size != 0>
 variable "key_name" {
   default = "id_rsa"
 }
@@ -25,7 +26,6 @@ resource "aws_key_pair" "auth" {
   public_key = file(var.public_key_path)
 }
 
-<#if instances?size != 0>
 resource "aws_vpc" "default" {
   cidr_block = "10.0.0.0/16"
   enable_dns_support = true

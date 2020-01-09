@@ -3,11 +3,13 @@ package io.github.edmm.model.support;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
@@ -71,7 +73,8 @@ public abstract class TypeWrapper {
 
     @SuppressWarnings("unchecked")
     public static RootRelation wrapRelation(MappingEntity relationEntity, MappingEntity componentEntity) {
-        Class clazz = TypeResolver.resolve(relationEntity.getName());
+        ScalarEntity type = (ScalarEntity) relationEntity.getChild(DefaultKeys.TYPE).orElseThrow(IllegalArgumentException::new);
+        Class clazz = TypeResolver.resolve(type.getValue());
         try {
             return (RootRelation) ConstructorUtils.invokeConstructor(clazz, relationEntity, componentEntity);
         } catch (Exception e) {

@@ -4,11 +4,14 @@ import java.io.File;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.github.edmm.core.plugin.support.CheckModelResult.State.OK;
 
 public abstract class PluginTest {
 
@@ -22,10 +25,16 @@ public abstract class PluginTest {
 
     protected void executeLifecycle(Plugin plugin, TransformationContext context) {
         AbstractLifecycle lifecycle = plugin.getLifecycle(context);
-        lifecycle.checkModel();
-        lifecycle.prepare();
-        lifecycle.transform();
-        lifecycle.cleanup();
+        CheckModelResult result = lifecycle.checkModel();
+        logger.info("checkModel(): state={}, unsupportedComponents={}",
+                result.getState(), result.getUnsupportedComponents());
+        if (OK.equals(result.getState())) {
+            lifecycle.prepare();
+            lifecycle.transform();
+            lifecycle.cleanup();
+        } else {
+            logger.warn("Skip execution due to unsupported components...");
+        }
     }
 
     @After

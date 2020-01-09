@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform.model.aws;
+package io.github.edmm.plugins.terraform.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

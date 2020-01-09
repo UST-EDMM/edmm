@@ -31,7 +31,7 @@ import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.plugins.terraform.TerraformVisitor;
 import io.github.edmm.plugins.terraform.model.FileProvisioner;
 import io.github.edmm.plugins.terraform.model.RemoteExecProvisioner;
-import io.github.edmm.plugins.terraform.model.aws.Ec2;
+import io.github.edmm.plugins.terraform.model.Ec2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,6 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     @Override
     public void populateTerraformFile() {
         PluginFileAccess fileAccess = context.getFileAccess();
-        BashScript envScript = new BashScript(fileAccess, "env.sh");
         Map<String, Object> data = new HashMap<>();
         data.put("instances", computeInstances);
         try {
@@ -82,6 +81,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 }
             }
             // Write env.sh script entries
+            BashScript envScript = new BashScript(fileAccess, "env.sh");
             ec2.getEnvVars().forEach((name, value) -> envScript.append("export " + name + "=" + value));
         }
     }

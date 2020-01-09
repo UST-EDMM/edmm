@@ -22,10 +22,10 @@ import lombok.Getter;
 
 public class ComputeSupportVisitor implements ComponentVisitor {
 
-    private final TransformationContext context;
+    protected final TransformationContext context;
 
     @Getter
-    private Set<RootComponent> supportedComponents = new HashSet<>();
+    protected Set<RootComponent> supportedComponents = new HashSet<>();
 
     public ComputeSupportVisitor(TransformationContext context) {
         this.context = context;

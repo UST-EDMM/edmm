@@ -1,4 +1,4 @@
-package io.github.edmm.web;
+package io.github.edmm.web.model;
 
 import java.util.List;
 
