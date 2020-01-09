@@ -1,4 +1,4 @@
-bundle agent deploy {
+bundle agent deployment {
     vars:<#list agent.modVars as key, value>
         "${key}" string => "${value}";</#list>
 
