@@ -49,7 +49,6 @@ public abstract class TypeResolver {
         put("dbaas", Dbaas.class);
         put("aws_beanstalk", AwsBeanstalk.class);
         put("aws_aurora", AwsAurora.class);
-        put("aws_aurora", AwsAurora.class);
         put("saas", Saas.class);
         put("auth0", Auth0.class);
         // Relations
