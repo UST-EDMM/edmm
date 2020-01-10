@@ -17,6 +17,7 @@ components:
       - connects_to_auth:
           type: connects_to
           target: auth
+
   pet_clinic_platform:
     type: aws_beanstalk
     properties:
