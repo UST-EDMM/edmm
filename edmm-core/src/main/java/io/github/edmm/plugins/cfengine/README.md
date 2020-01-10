@@ -45,4 +45,4 @@ The CFEngine plugin assumes that there is already a running virtual compute reso
   
 Your policy has now been added to the policy server, and will be run every five minutes.
 
-The policy is structured in such a way that if the deployment directory is present it does nothing, so if you want to run the scripts again you have to delete it
+The policy is structured in such a way that if the deployment directory is present it does nothing, so if you want to run the scripts again you have to delete it.
