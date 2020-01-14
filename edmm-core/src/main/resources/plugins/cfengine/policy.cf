@@ -1,0 +1,71 @@
+bundle agent deployment {
+    vars:<#list agent.modVars as key, value>
+        "${key}" string => "${value}";</#list>
+
+    ################################ DO NOT MODIFY ################################
+
+        <#list agent.envVars as key, value>
+        "${key}" string => "<#list value as key2, value2>
+            ${key2}=${value2}</#list>";
+        </#list>
+        "ips" slist => { @(sys.ip_addresses)};
+
+    classes:
+        <#list agent.classes as key, value>
+        "${key}"
+            expression => strcmp("$(ips)","${value}");
+        </#list>
+        "exists" expression => fileexists("$(deployment_path)");
+
+    methods:
+        <#list agent.methods as key, value>
+        ${key}.!exists::
+            <#list value as element>
+            "any" usebundle => ${element};
+            </#list>
+        </#list>
+
+    reports:
+        !host1.!host2::
+            "Host undefined";
+        !exists::
+            "Deploy done";
+        exists::
+            "Delete $(deployment_path) dir to deploy again";
+}
+
+body file control { inputs => { "$(sys.libdir)/stdlib.cf" }; }
+
+bundle agent copy_files(master_path, host_path) {
+
+    vars:
+        "remote_server" string => "$(sys.policy_hub)";
+
+    files:
+        "$(host_path)"
+            comment => "Pull down latest files",
+            perms => m("455"),
+            copy_from => remote_cp("$(master_path)","$(remote_server)"),
+            depth_search => recurse("inf"),
+            action => immediate,
+            create  => "true";
+
+    reports:
+        "File copied";
+}
+
+bundle agent execute_script(chdir, file_path, report, env) {
+
+    commands:
+        "/usr/bin/env $(env) /bin/bash $(chdir)/$(file_path)"
+            contain => not_paranoid($(chdir));
+
+    reports:
+        "$(report) done";
+}
+
+body contain not_paranoid(chdir) {
+    umask => "22";
+    exec_owner => "root";
+    chdir => "$(chdir)";
+}
