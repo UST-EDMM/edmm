@@ -182,5 +182,5 @@ We use Maven as our build tool:
 Build Docker images:
 
 ```shell
-docker build -t edmm-web ./edmm-web
+docker build -t edmm-web -f .\edmm-web\Dockerfile .
 ```

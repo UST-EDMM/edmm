@@ -1,0 +1,21 @@
+version: '3'
+services:
+
+  winery:
+    image: opentosca/winery:latest
+    environment:
+      WINERY_HOSTNAME: ${PUBLIC_HOSTNAME}
+      WORKFLOWMODELER_HOSTNAME: ${PUBLIC_HOSTNAME}
+      TOPOLOGYMODELER_HOSTNAME: ${PUBLIC_HOSTNAME}
+      CONTAINER_HOSTNAME: ${PUBLIC_HOSTNAME}
+      EDMM_TRANSFORMATION_HOSTNAME: ${PUBLIC_HOSTNAME}
+      WINERY_REPOSITORY_URL: 'https://github.com/UST-EDMM/modeling-repository'
+    ports:
+      - '8080:8080'
+    networks:
+      - edmm_modeling
+
+
+networks:
+  opentosca:
+    driver: edmm_modeling
