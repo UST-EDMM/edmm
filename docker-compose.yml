@@ -19,7 +19,7 @@ services:
   transformation-framework:
     image: ustedmm/transformation-framework
     ports:
-      - '5000:5000"
+      - '5000:5000'
     networks:
       - edmm_modeling
 
