@@ -184,15 +184,3 @@ Build Docker images locally:
 ```shell
 docker build -t edmm-web -f .\edmm-web\Dockerfile .
 ```
-
-## Run the project and the modeling tool
-
-We use [Winery](https://github.com/eclipse/winery) to create EDMM-based models graphically.
-
-You can start the modeling tool and the transformation framework as a docker service:
-
-```shell
-docker-compose up -d
-```
-
-Afterwards, Winery is running on <localhost:8080> and is preconfigured to support EDMM modeling.
