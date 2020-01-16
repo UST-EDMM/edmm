@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   winery:
     image: opentosca/winery:latest
     environment:
@@ -14,15 +13,13 @@ services:
     ports:
       - '8080:8080'
     networks:
-      - edmm_modeling
-
+      - edmm
   transformation-framework:
     image: ustedmm/transformation-framework
     ports:
       - '5000:5000'
     networks:
-      - edmm_modeling
-
+      - edmm
 networks:
   opentosca:
-    driver: edmm_modeling
+    driver: edmm
