@@ -1,4 +1,5 @@
 # CFEngine Plugin
+
 The CFEngine plugin creates one policy that runs on each host.
 
 The topology graph is first reverted and sorted topologically to determine the deployment order.

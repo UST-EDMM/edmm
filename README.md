@@ -29,7 +29,7 @@ After the EDMM model has been downloaded it can be fed into the EDMM Transformat
 For example, to convert the supported [scenario](#supported-scenario) into Kubernetes resource files one can run the `edmm` CLI tool as follows:
 
 ```shell
-edmm transform kubernetes ./edmm_model.yml
+edmm transform kubernetes ./edmm-model.yml
 ```
 
 The generated Kubernetes resource files are located relative to the `edmm_model.yml` file inside a `kubernetes` directory.
@@ -51,14 +51,6 @@ The transformation can be started by using the `transform` command of the `edmm`
 You have to specify the `target` technology (e.g., one of "ansible", "azure", "chef", "compose", "heat", "kubernetes", "terraform") and the `input` EDMM YAML model file.
 The generated technology-specific deployment models will be stored relative to the YAML input file.
 
-## Supported Scenario
-
-In this demonstration, all listed plugins focus on application deployments that are based on virtual computing resources and the software that needs to be deployed on them including their configuration and orchestration.
-The following figure shows the application stacks that is used in our test cases.
-Further, this [example](edmm-core/src/test/resources/templates/scenario_iaas.yml) shows basically the resulting EDMM model.
-
-![Supported Scenario](docs/iaas-scenario.jpg)
-
 ## Plugins
 
 Each plugin implements its own transformation logic by providing a respective `Plugin` implementation.
@@ -75,101 +67,17 @@ Currently we support the following list of plugins:
 * [Puppet](edmm-core/src/main/java/io/github/edmm/plugins/puppet)
 * [Cloudify](edmm-core/src/main/java/io/github/edmm/plugins/cloudify)
 * [AWS CloudFormation](edmm-core/src/main/java/io/github/edmm/plugins/cfn)
+* [Salt](edmm-core/src/main/java/io/github/edmm/plugins/salt)
+* [Juju](edmm-core/src/main/java/io/github/edmm/plugins/juju)
+* [CFEngine](edmm-core/src/main/java/io/github/edmm/plugins/cfengine)
 
 The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
 
-## Built-in Component Types
+## Built-in Types
 
-The following built-in types can be used in an EDMM-based model.
-Simply copy and past the following code block to your model file.
+The framework provides built-in types that can be used to model in EDMM.
+Simply copy and paste the [types](docs/types.yml) to your model file.
 An example showing the usage of these types is available [here](edmm-core/src/test/resources/templates/scenario_iaas.yml).
-
-```yaml
-component_types:
-
-  ## Generic Types
-
-  base:
-    extends: null
-    description: The base type
-    metadata: {}
-    operations:
-      create: ~
-      configure: ~
-      start: ~
-      stop: ~
-      delete: ~
-
-  software_component:
-    extends: base
-
-  compute:
-    extends: base
-    properties:
-      os_family:
-        type: string
-        description: Specifies the type of operating system
-        default_value: linux
-      machine_image:
-        type: string
-        description: The name of the machine image to use
-      instance_type:
-        type: string
-        description: The name of the instance type to provision
-      key_name:
-        type: string
-        description: The name of the key pair to use for authentication
-      public_key:
-        type: string
-        description: The public key of the key pair to use for authentication
-
-  web_server:
-    extends: software_component
-    properties:
-      port:
-        type: integer
-        default_value: 80
-
-  web_application:
-    extends: base
-
-  dbms:
-    extends: software_component
-    properties:
-      port:
-        type: integer
-      root_password:
-        type: string
-
-  database:
-    extends: base
-    properties:
-      schema_name:
-        type: string
-      user:
-        type: string
-      password:
-        type: string
-
-  ## Technology-specific Types
-
-  tomcat:
-    extends: web_server
-    properties:
-      port:
-        type: integer
-        default_value: 8080
-
-  mysql_dbms:
-    extends: dbms
-    properties:
-      port:
-        type: integer
-        default_value: 3306
-
-  mysql_database:
-    extends: database
-```
 
 ## Build the project
 
@@ -179,8 +87,9 @@ We use Maven as our build tool:
 ./mvnw clean package
 ```
 
-Build Docker images locally:
+Build the `edmm-web` Docker image:
 
 ```shell
 docker build -t edmm-web -f .\edmm-web\Dockerfile .
+docker run -it -p 5000:5000 edmm-web
 ```
