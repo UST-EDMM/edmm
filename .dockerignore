@@ -1,0 +1,7 @@
+*
+!cfn-builder/src/**/*
+!edmm-cli/src/**/*
+!edmm-cli/edmm*
+!edmm-core/src/**/*
+!edmm-web/src/**/*
+!**/*.xml
