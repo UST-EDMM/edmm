@@ -7,7 +7,7 @@ import java.util.Base64;
 import javax.validation.Valid;
 
 import io.github.edmm.core.plugin.PluginService;
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationService;
 import io.github.edmm.model.DeploymentModel;
@@ -49,10 +49,10 @@ public class TransformationController {
             DeploymentModel deploymentModel = DeploymentModel.of(input);
             Path sourceDirectory = Files.createTempDirectory(Consts.EMPTY);
             Path targetDirectory = Files.createTempDirectory(model.getTarget() + "-");
-            Platform platform = pluginService.getSupportedPlatforms().stream()
+            TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
                     .filter(p -> p.getId().equals(model.getTarget()))
                     .findFirst().orElseThrow(IllegalStateException::new);
-            TransformationContext context = new TransformationContext(deploymentModel, platform, sourceDirectory.toFile(), targetDirectory.toFile());
+            TransformationContext context = new TransformationContext(deploymentModel, targetTechnology, sourceDirectory.toFile(), targetDirectory.toFile());
             transformationService.startTransformation(context);
             return ResponseEntity.ok(TransformationResult.of(context));
         } catch (Exception e) {

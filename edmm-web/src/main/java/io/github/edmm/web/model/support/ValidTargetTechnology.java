@@ -13,10 +13,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = PlatformValidator.class)
-public @interface Platform {
+@Constraint(validatedBy = TargetTechnologyValidator.class)
+public @interface ValidTargetTechnology {
 
-    String message() default "must be a valid transformation target";
+    String message() default "must be a valid target technology";
 
     Class<?>[] groups() default {};
 

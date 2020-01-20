@@ -26,10 +26,10 @@ public class TransformationService {
     }
 
     public void startTransformation(TransformationContext context) {
-        Platform targetPlatform = context.getTargetPlatform();
-        Optional<Plugin> plugin = pluginService.findByPlatform(targetPlatform);
+        TargetTechnology targetTechnology = context.getTargetTechnology();
+        Optional<Plugin> plugin = pluginService.findByTargetTechnology(targetTechnology);
         if (!plugin.isPresent()) {
-            logger.error("Plugin for given platform '{}' could not be found", targetPlatform.getId());
+            logger.error("Plugin for given technology '{}' could not be found", targetTechnology.getId());
             return;
         }
         if (context.getState() == TransformationContext.State.READY) {

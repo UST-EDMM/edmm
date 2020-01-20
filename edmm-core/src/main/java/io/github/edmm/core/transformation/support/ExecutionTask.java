@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -29,8 +29,8 @@ public final class ExecutionTask implements Callable<Void> {
     @Override
     public Void call() {
         boolean failed = false;
-        Platform platform = plugin.getPlatform();
-        logger.info("Starting transformation for {}", platform.getName());
+        TargetTechnology targetTechnology = plugin.getTargetTechnology();
+        logger.info("Starting transformation for {}", targetTechnology.getName());
         context.setState(TRANSFORMING);
         File targetDirectory = context.getTargetDirectory();
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
@@ -47,7 +47,7 @@ public final class ExecutionTask implements Callable<Void> {
             plugin.execute(context);
             context.setState(DONE);
         } catch (Exception e) {
-            logger.info("Transformation to {} failed", platform.getName());
+            logger.info("Transformation to {} failed", targetTechnology.getName());
             logger.error("Something went wrong while transforming", e);
             failed = true;
         }

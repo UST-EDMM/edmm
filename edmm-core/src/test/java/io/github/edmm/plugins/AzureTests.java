@@ -3,7 +3,7 @@ package io.github.edmm.plugins;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.azure.AzurePlugin;
@@ -30,7 +30,7 @@ public class AzureTests extends PluginTest {
         DeploymentModel model = DeploymentModel.of(templateResource.getFile());
         logger.info("Source directory is '{}'", sourceResource.getFile());
         logger.info("Target directory is '{}'", targetDirectory);
-        context = new TransformationContext(model, Platform.NOOP, sourceResource.getFile(), targetDirectory);
+        context = new TransformationContext(model, TargetTechnology.NOOP, sourceResource.getFile(), targetDirectory);
     }
 
     @Test

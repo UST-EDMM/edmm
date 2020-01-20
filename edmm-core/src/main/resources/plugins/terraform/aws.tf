@@ -42,6 +42,7 @@ resource "aws_internet_gateway" "default" {
   vpc_id = aws_vpc.default.id
 }
 
+<#if instances??>
 <#list instances as k, ec2>
 resource "aws_security_group" "${ec2.name}_security_group" {
   name = "${ec2.name}_security_group"
@@ -110,4 +111,66 @@ resource "aws_instance" "${ec2.name}" {
 
 </#list>
 <#else>
+</#if>
+</#if>
+
+<#if dbInstances??>
+<#if dbInstances?size != 0>
+resource "aws_db_parameter_group" "default" {
+  family = "mysql5.7"
+  parameter {
+    name  = "character_set_server"
+    value = "utf8"
+  }
+  parameter {
+    name  = "character_set_client"
+    value = "utf8"
+  }
+}
+
+<#list dbInstances as k, db>
+resource "aws_db_instance" "${db.name}" {
+  name                 = "${db.name}"
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine               = "${db.engine}"
+  engine_version       = "${db.engineVersion}"
+  instance_class       = "${db.instanceClass}"
+  username             = "${db.username}"
+  password             = "${db.password}"
+  parameter_group_name = "default.mysql5.7"
+}
+
+</#list>
+</#if>
+</#if>
+
+<#if beanstalkComponents??>
+<#if beanstalkComponents?size != 0>
+<#list beanstalkComponents as k, bean>
+resource "aws_s3_bucket" "bucket_${bean.name}" {
+  bucket = "edmm_application_bucket_${bean.name}"
+}
+
+resource "aws_s3_bucket_object" "bucket_object_${bean.name}" {
+  bucket = aws_s3_bucket.bucket_${bean.name}.id
+  key    = "${bean.name}/${bean.filename}"
+  source = "${bean.filepath}${bean.filename}"
+}
+
+resource "aws_elastic_beanstalk_application" "app_${bean.name}" {
+  name        = "${bean.name}"
+  description = "Application created by Terraform"
+}
+
+resource "aws_elastic_beanstalk_application_version" "app_${bean.name}_version" {
+  name        = "${bean.name}_v1.0.0"
+  application = "${bean.name}"
+  description = "Application version created by Terraform"
+  bucket      = aws_s3_bucket.bucket_${bean.name}.id
+  key         = aws_s3_bucket_object.bucket_object_${bean.name}.id
+}
+
+</#list>
+</#if>
 </#if>

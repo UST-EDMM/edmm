@@ -42,14 +42,14 @@ public class PluginController {
         List<Plugin> plugins = pluginService.getPlugins();
         List<PluginSupportResult> response = new ArrayList<>();
         for (Plugin plugin : plugins) {
-            TransformationContext context = new TransformationContext(model, plugin.getPlatform());
+            TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
             CheckModelResult checkModelResult = pluginService.checkModel(context, plugin);
             List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
                     .map(RootComponent::getName)
                     .collect(Collectors.toList());
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
-                    .id(plugin.getPlatform().getId())
-                    .name(plugin.getPlatform().getName())
+                    .id(plugin.getTargetTechnology().getId())
+                    .name(plugin.getTargetTechnology().getName())
                     .unsupportedComponents(unsupportedComponents);
             double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
             psr.supports(s);

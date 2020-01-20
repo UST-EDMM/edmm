@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.support.CheckModelResult;
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +28,11 @@ public class PluginService {
         this.plugins = plugins;
         Map<String, Plugin> pluginMap = new HashMap<>();
         for (Plugin plugin : plugins) {
-            if (pluginMap.get(plugin.getPlatform().getId()) != null) {
-                logger.error("Found duplicate plugin identifier '{}'", plugin.getPlatform().getId());
-                throw new IllegalArgumentException("The platform id '" + plugin.getPlatform().getId() + "' is not unique");
+            if (pluginMap.get(plugin.getTargetTechnology().getId()) != null) {
+                logger.error("Found duplicate plugin identifier '{}'", plugin.getTargetTechnology().getId());
+                throw new IllegalArgumentException("The id '" + plugin.getTargetTechnology().getId() + "' is not unique");
             }
-            pluginMap.put(plugin.getPlatform().getId(), plugin);
+            pluginMap.put(plugin.getTargetTechnology().getId(), plugin);
         }
 
         logger.debug("Loaded {} plugins", plugins.size());
@@ -42,18 +42,18 @@ public class PluginService {
         return new ArrayList<>(plugins);
     }
 
-    public Set<Platform> getSupportedPlatforms() {
+    public Set<TargetTechnology> getSupportedTargetTechnologies() {
         return plugins.stream()
-                .map(Plugin::getPlatform)
+                .map(Plugin::getTargetTechnology)
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Plugin> findByPlatform(Platform platform) {
-        if (platform == null) {
+    public Optional<Plugin> findByTargetTechnology(TargetTechnology targetTechnology) {
+        if (targetTechnology == null) {
             return Optional.empty();
         }
         for (Plugin plugin : plugins) {
-            if (plugin.getPlatform().getId().equals(platform.getId())) {
+            if (plugin.getTargetTechnology().getId().equals(targetTechnology.getId())) {
                 return Optional.of(plugin);
             }
         }

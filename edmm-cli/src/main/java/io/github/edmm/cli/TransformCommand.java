@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.PluginService;
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationService;
 import io.github.edmm.model.DeploymentModel;
@@ -35,7 +35,7 @@ public class TransformCommand implements Callable<Integer> {
     @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation target")
     public void setTarget(String target) {
         List<String> availableTargets = pluginService.getPlugins().stream()
-                .map(p -> p.getPlatform().getId()).collect(Collectors.toList());
+                .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
         if (!availableTargets.contains(target)) {
             String message = String.format("Specified target technology not supported. Valid values are: %s", availableTargets);
             throw new CommandLine.ParameterException(spec.commandLine(), message);
@@ -56,11 +56,11 @@ public class TransformCommand implements Callable<Integer> {
         File sourceDirectory = input.getParentFile();
         File targetDirectory = new File(sourceDirectory, target);
         DeploymentModel model = DeploymentModel.of(input);
-        Platform platform = pluginService.getSupportedPlatforms().stream()
+        TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
                 .filter(p -> p.getId().equals(target))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
-        TransformationContext context = new TransformationContext(model, platform, sourceDirectory, targetDirectory);
+        TransformationContext context = new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
         transformationService.startTransformation(context);
         return 42;
     }

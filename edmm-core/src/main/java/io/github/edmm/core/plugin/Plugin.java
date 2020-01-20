@@ -2,7 +2,7 @@ package io.github.edmm.core.plugin;
 
 import java.util.List;
 
-import io.github.edmm.core.transformation.Platform;
+import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,13 +14,13 @@ public abstract class Plugin<L extends AbstractLifecycle> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Platform platform;
+    private final TargetTechnology targetTechnology;
 
-    public Plugin(@NonNull Platform platform) {
-        this.platform = platform;
-        logger.debug("Initializing plugin '{}'", platform.getName());
+    public Plugin(@NonNull TargetTechnology targetTechnology) {
+        this.targetTechnology = targetTechnology;
+        logger.debug("Initializing plugin '{}'", targetTechnology.getName());
         this.init();
-        logger.debug("Initialized plugin '{}'", platform.getName());
+        logger.debug("Initialized plugin '{}'", targetTechnology.getName());
     }
 
     protected void init() {

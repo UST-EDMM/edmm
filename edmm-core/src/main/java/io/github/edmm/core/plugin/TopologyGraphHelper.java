@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.Dbaas;
+import io.github.edmm.model.component.Paas;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
@@ -78,6 +80,24 @@ public abstract class TopologyGraphHelper {
                 .stream()
                 .filter(clazz::isInstance)
                 .collect(Collectors.toList());
+    }
+
+    public static Optional<RootComponent> resolveHostingComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        Set<RootComponent> targetComponents = getTargetComponents(graph, component, HostedOn.class);
+        Optional<RootComponent> optionalComponent = targetComponents.stream().findFirst();
+        if (optionalComponent.isPresent()) {
+            RootComponent hostingComponent = optionalComponent.get();
+            if (hostingComponent instanceof Compute
+                    || hostingComponent instanceof Dbaas
+                    || hostingComponent instanceof Paas) {
+                return Optional.of(hostingComponent);
+            } else {
+                return resolveHostingComponent(graph, hostingComponent);
+            }
+        } else {
+            // Leaf reached
+            return Optional.empty();
+        }
     }
 
     public static Optional<Compute> resolveHostingComputeComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {

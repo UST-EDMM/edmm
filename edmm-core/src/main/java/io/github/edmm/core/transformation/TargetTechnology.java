@@ -8,14 +8,14 @@ import lombok.NonNull;
 
 @Getter
 @Builder
-public final class Platform {
+public final class TargetTechnology {
 
-    public static final Platform NOOP = Platform.builder().id("noop").name("noop").build();
+    public static final TargetTechnology NOOP = TargetTechnology.builder().id("noop").name("noop").build();
 
     private final String id;
     private final String name;
 
-    public Platform(@NonNull String id, @NonNull String name) {
+    public TargetTechnology(@NonNull String id, @NonNull String name) {
         this.id = id;
         this.name = name;
     }
@@ -24,8 +24,8 @@ public final class Platform {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Platform platform = (Platform) object;
-        return Objects.equals(id, platform.id);
+        TargetTechnology targetTechnology = (TargetTechnology) object;
+        return Objects.equals(id, targetTechnology.id);
     }
 
     @Override

@@ -6,7 +6,7 @@ import io.github.edmm.model.visitor.ComponentVisitor;
 import lombok.ToString;
 
 @ToString
-public class Auth0 extends Platform {
+public class Auth0 extends Saas {
 
     public static final Attribute<String> DOMAIN = new Attribute<>("domain", String.class);
     public static final Attribute<String> IDENTIFIER = new Attribute<>("identifier", String.class);

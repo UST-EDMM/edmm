@@ -16,21 +16,21 @@ import org.springframework.lang.Nullable;
 public final class TransformationContext {
 
     private final DeploymentModel model;
-    private final Platform targetPlatform;
+    private final TargetTechnology targetTechnology;
     private final File sourceDirectory;
     private final File targetDirectory;
 
     @Setter
     private State state = State.READY;
 
-    public TransformationContext(DeploymentModel model, Platform targetPlatform) {
-        this(model, targetPlatform, null, null);
+    public TransformationContext(DeploymentModel model, TargetTechnology targetTechnology) {
+        this(model, targetTechnology, null, null);
     }
 
-    public TransformationContext(@NonNull DeploymentModel model, @NonNull Platform targetPlatform,
+    public TransformationContext(@NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology,
                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
         this.model = model;
-        this.targetPlatform = targetPlatform;
+        this.targetTechnology = targetTechnology;
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
     }
