@@ -1,5 +1,6 @@
 package io.github.edmm.web.controller;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -47,13 +48,10 @@ public class TransformationController {
             byte[] decodedBytes = Base64.getDecoder().decode(model.getInput());
             String input = new String(decodedBytes);
             DeploymentModel deploymentModel = DeploymentModel.of(input);
-            Path sourceDirectory = Files.createTempDirectory(Consts.EMPTY);
-            Path targetDirectory = Files.createTempDirectory(model.getTarget() + "-");
-            TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
-                    .filter(p -> p.getId().equals(model.getTarget()))
-                    .findFirst().orElseThrow(IllegalStateException::new);
-            TransformationContext context = new TransformationContext(deploymentModel, targetTechnology, sourceDirectory.toFile(), targetDirectory.toFile());
-            transformationService.startTransformation(context);
+            File sourceDirectory = Files.createTempDirectory(Consts.EMPTY).toFile();
+            File targetDirectory = Files.createTempDirectory(model.getTarget() + "-").toFile();
+
+            TransformationContext context = transformationService.transform(deploymentModel, model.getTarget(), sourceDirectory, targetDirectory);
             return ResponseEntity.ok(TransformationResult.of(context));
         } catch (Exception e) {
             log.error("Error executing transformation", e);
