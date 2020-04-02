@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public final class TransformationModel {
+public final class TransformationRequest {
 
     @NotEmpty
     @ValidTargetTechnology

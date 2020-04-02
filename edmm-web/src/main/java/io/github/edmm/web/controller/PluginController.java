@@ -1,15 +1,9 @@
 package io.github.edmm.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import io.github.edmm.core.plugin.Plugin;
 import io.github.edmm.core.plugin.PluginService;
-import io.github.edmm.core.plugin.support.CheckModelResult;
-import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
-import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.PluginSupportResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,14 +28,12 @@ public class PluginController {
     }
 
     @Operation(summary = "Checks if a plugin supports the used components in an EDMM model.")
-    @PostMapping(value = "/check-model-support",
-            consumes = MediaType.TEXT_PLAIN_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+        value = "/check-model-support",
+        consumes = MediaType.TEXT_PLAIN_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PluginSupportResult>> checkModelSupport(@RequestBody String yaml) {
         DeploymentModel model = DeploymentModel.of(yaml);
-
-        List<PluginSupportResult> response = this.pluginService.checkModelSupport(model);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(this.pluginService.checkModelSupport(model));
     }
 }

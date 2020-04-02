@@ -23,7 +23,7 @@ public class TargetTechnologyValidator implements ConstraintValidator<ValidTarge
     @Override
     public boolean isValid(String target, ConstraintValidatorContext context) {
         List<String> availableTargets = pluginService.getPlugins().stream()
-                .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
+            .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
         return availableTargets.contains(target);
     }
 }
