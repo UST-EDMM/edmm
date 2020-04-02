@@ -21,19 +21,19 @@ import static com.scaleset.cfbuilder.core.Ref.ref;
 public abstract class CloudFormationUtils {
 
     private static final String[] USER_DATA_PARAMS = {
-            "#!/bin/bash -xe\n",
-            "mkdir -p /tmp/aws-cfn-bootstrap-latest\n",
-            "curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C /tmp/aws-cfn-bootstrap-latest --strip-components 1\n",
-            "apt-get update\n",
-            "DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq\n",
-            "apt-get -y install python-setuptools\n",
-            "easy_install /tmp/aws-cfn-bootstrap-latest\n",
-            "cp /tmp/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup\n",
-            "chmod 755 /etc/init.d/cfn-hup\n",
-            "update-rc.d cfn-hup defaults\n",
-            "# Install files and packages from metadata\n",
-            "/usr/local/bin/cfn-init -v ",
-            "         --stack "
+        "#!/bin/bash -xe\n",
+        "mkdir -p /tmp/aws-cfn-bootstrap-latest\n",
+        "curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C /tmp/aws-cfn-bootstrap-latest --strip-components 1\n",
+        "apt-get update\n",
+        "DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq\n",
+        "apt-get -y install python-setuptools\n",
+        "easy_install /tmp/aws-cfn-bootstrap-latest\n",
+        "cp /tmp/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup\n",
+        "chmod 755 /etc/init.d/cfn-hup\n",
+        "update-rc.d cfn-hup defaults\n",
+        "# Install files and packages from metadata\n",
+        "/usr/local/bin/cfn-init -v ",
+        "         --stack "
     };
 
     public static String getRandomBucketName() {
@@ -50,19 +50,19 @@ public abstract class CloudFormationUtils {
 
     public static Fn getUserDataFn(Template template, String resource, String configsets) {
         Object[] userdata = {
-                template.ref("AWS::StackName"),
-                "         --resource " + resource + " ",
-                "         --configsets " + configsets + " ",
-                "         --region ",
-                template.ref("AWS::Region"),
-                "\n",
-                "/usr/local/bin/cfn-signal -e $? ",
-                "         --stack ",
-                template.ref("AWS::StackName"),
-                "         --resource " + resource + " ",
-                "         --region ",
-                template.ref("AWS::Region"),
-                "\n"
+            template.ref("AWS::StackName"),
+            "         --resource " + resource + " ",
+            "         --configsets " + configsets + " ",
+            "         --region ",
+            template.ref("AWS::Region"),
+            "\n",
+            "/usr/local/bin/cfn-signal -e $? ",
+            "         --stack ",
+            template.ref("AWS::StackName"),
+            "         --resource " + resource + " ",
+            "         --region ",
+            template.ref("AWS::Region"),
+            "\n"
         };
         List<Object> params = new ArrayList<>();
         Collections.addAll(params, USER_DATA_PARAMS);
@@ -76,7 +76,7 @@ public abstract class CloudFormationUtils {
 
     public static Policy getS3Policy(CloudFormationModule module) {
         Statement statement = new Statement().addAction("s3:GetObject").effect("Allow")
-                .addResource("arn:aws:s3:::" + module.getBucketName() + "/*");
+            .addResource("arn:aws:s3:::" + module.getBucketName() + "/*");
         PolicyDocument policyDocument = new PolicyDocument().addStatement(statement);
         return module.resource(Policy.class, "RolePolicies").policyName("S3Download").policyDocument(policyDocument);
     }

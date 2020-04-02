@@ -14,10 +14,10 @@ import picocli.CommandLine;
 
 @Component
 @CommandLine.Command(
-        name = "transform",
-        descriptionHeading = "%n",
-        description = "Starts a transformation to a target technology",
-        customSynopsis = "@|bold edmm transform|@ @|yellow <target>|@ @|yellow <input>|@"
+    name = "transform",
+    descriptionHeading = "%n",
+    description = "Starts a transformation to a target technology",
+    customSynopsis = "@|bold edmm transform|@ @|yellow <target>|@ @|yellow <input>|@"
 )
 public class TransformCommand implements Callable<Integer> {
 
@@ -33,7 +33,7 @@ public class TransformCommand implements Callable<Integer> {
     @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation target")
     public void setTarget(String target) {
         List<String> availableTargets = pluginService.getPlugins().stream()
-                .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
+            .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
         if (!availableTargets.contains(target)) {
             String message = String.format("Specified target technology not supported. Valid values are: %s", availableTargets);
             throw new CommandLine.ParameterException(spec.commandLine(), message);
@@ -54,8 +54,7 @@ public class TransformCommand implements Callable<Integer> {
         File sourceDirectory = input.getParentFile();
         File targetDirectory = new File(sourceDirectory, target);
         DeploymentModel model = DeploymentModel.of(input);
-
-        transformationService.transform(model, target, sourceDirectory,targetDirectory);
+        transformationService.transform(model, target, sourceDirectory, targetDirectory);
         return 42;
     }
 

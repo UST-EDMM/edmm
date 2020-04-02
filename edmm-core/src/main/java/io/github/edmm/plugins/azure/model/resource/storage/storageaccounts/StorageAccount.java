@@ -37,9 +37,9 @@ public class StorageAccount extends Resource {
     public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put("storageAccountName", Parameter.builder()
-                .type(ParameterTypeEnum.STRING)
-                .defaultValue("[concat(uniquestring(resourceGroup().id), 'myvmsa')]")
-                .build());
+            .type(ParameterTypeEnum.STRING)
+            .defaultValue("[concat(uniquestring(resourceGroup().id), 'myvmsa')]")
+            .build());
 
         return params;
     }

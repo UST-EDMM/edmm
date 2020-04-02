@@ -39,9 +39,9 @@ public class SaltBase {
      */
     public void addMinion(Compute component) {
         SaltMinion minion = SaltMinion.builder()
-                .name("minion_" + component.getNormalizedName())
-                .file(component.getNormalizedName())
-                .build();
+            .name("minion_" + component.getNormalizedName())
+            .file(component.getNormalizedName())
+            .build();
         minions.add(minion);
     }
 

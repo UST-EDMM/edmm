@@ -27,8 +27,8 @@ public class Artifact extends BaseElement {
 
     public String getNormalizedValue() {
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getValue().toLowerCase())
-                .replace(".", "_")
-                .replace("/", "_")
-                .replace("__", "");
+            .replace(".", "_")
+            .replace("/", "_")
+            .replace("__", "");
     }
 }

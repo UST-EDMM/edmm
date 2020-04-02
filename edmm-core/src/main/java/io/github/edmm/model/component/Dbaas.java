@@ -16,7 +16,7 @@ public class Dbaas extends Platform {
 
     public String getInstanceType() {
         return getProperty(INSTANCE_TYPE)
-                .orElseThrow(() -> new IllegalStateException("Dbaas needs to specify the instance_type property"));
+            .orElseThrow(() -> new IllegalStateException("Dbaas needs to specify the instance_type property"));
     }
 
     @Override

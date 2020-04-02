@@ -86,9 +86,9 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             }
             // Copy operations to target directory
             List<String> operations = awsInstance.getRemoteExecProvisioners().stream()
-                    .map(RemoteExecProvisioner::getScripts)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+                .map(RemoteExecProvisioner::getScripts)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
             for (String op : operations) {
                 try {
                     fileAccess.copy(op, op);
@@ -132,12 +132,12 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     @Override
     public void visit(Compute component) {
         Aws.Instance awsInstance = Aws.Instance.builder()
-                .name(component.getNormalizedName())
-                // TODO: Try to resolve image
-                .ami("ami-0bbc25e23a7640b9b")
-                // TODO: Try to resolve instance type
-                .instanceType("t2.micro")
-                .build();
+            .name(component.getNormalizedName())
+            // TODO: Try to resolve image
+            .ami("ami-0bbc25e23a7640b9b")
+            // TODO: Try to resolve instance type
+            .instanceType("t2.micro")
+            .build();
         List<String> operations = collectOperations(component);
         awsInstance.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
         awsInstance.addFileProvisioner(new FileProvisioner("./env.sh", "/opt/env.sh"));
@@ -210,11 +210,11 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             Aws.Instance awsInstance = computeInstances.get(hostingCompute);
             String[] blacklist = {"key_name", "public_key"};
             component.getProperties().values().stream()
-                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                    .forEach(p -> {
-                        String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
-                        awsInstance.addEnvVar(name, p.getValue());
-                    });
+                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                .forEach(p -> {
+                    String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
+                    awsInstance.addEnvVar(name, p.getValue());
+                });
         }
     }
 
@@ -286,7 +286,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     private List<String> collectOperations(RootComponent component) {
         List<String> operations = new ArrayList<>();
         Consumer<Operation> artifactsConsumer = op -> op.getArtifacts()
-                .forEach(artifact -> operations.add(artifact.getValue()));
+            .forEach(artifact -> operations.add(artifact.getValue()));
         component.getStandardLifecycle().getCreate().ifPresent(artifactsConsumer);
         component.getStandardLifecycle().getConfigure().ifPresent(artifactsConsumer);
         component.getStandardLifecycle().getStart().ifPresent(artifactsConsumer);

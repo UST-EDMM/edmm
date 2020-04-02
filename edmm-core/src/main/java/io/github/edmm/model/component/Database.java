@@ -20,7 +20,7 @@ public class Database extends RootComponent {
 
     public String getSchemaName() {
         return getProperty(SCHEMA_NAME)
-                .orElseThrow(() -> new IllegalStateException("Database needs to specify the schema_name property"));
+            .orElseThrow(() -> new IllegalStateException("Database needs to specify the schema_name property"));
     }
 
     public Optional<String> getUser() {

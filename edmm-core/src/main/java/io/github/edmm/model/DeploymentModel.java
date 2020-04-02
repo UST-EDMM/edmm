@@ -111,9 +111,9 @@ public final class DeploymentModel {
     public Set<Graph<RootComponent, RootRelation>> findComponentStacks() {
         EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph = getReversedTopology();
         List<RootComponent> stackSources = topology.vertexSet()
-                .stream()
-                .filter(v -> dependencyGraph.inDegreeOf(v) == 0)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(v -> dependencyGraph.inDegreeOf(v) == 0)
+            .collect(Collectors.toList());
 
         Set<Graph<RootComponent, RootRelation>> stacks = new HashSet<>();
         stackSources.forEach(source -> {

@@ -26,15 +26,15 @@ public final class DependencyGraph extends DirectedMultigraph<Container, Connect
         for (Container sourceStack : stacks) {
             sourceStack.getComponents().forEach(source -> {
                 source.getRelations().stream()
-                        .filter(r -> r instanceof ConnectsTo)
-                        .forEach(r -> {
-                            RootComponent target = graph.getEdgeTarget(r);
-                            for (Container targetStack : stacks) {
-                                if (targetStack.hasComponent(target)) {
-                                    this.addEdge(sourceStack, targetStack, (ConnectsTo) r);
-                                }
+                    .filter(r -> r instanceof ConnectsTo)
+                    .forEach(r -> {
+                        RootComponent target = graph.getEdgeTarget(r);
+                        for (Container targetStack : stacks) {
+                            if (targetStack.hasComponent(target)) {
+                                this.addEdge(sourceStack, targetStack, (ConnectsTo) r);
                             }
-                        });
+                        }
+                    });
             });
         }
     }

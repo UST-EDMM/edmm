@@ -49,11 +49,11 @@ public class PuppetTransformer {
                 try {
                     // TODO check if compute node is present in the stack
                     String stackName = stack.vertexSet()
-                            .stream()
-                            .filter(v -> v instanceof Compute)
-                            .findFirst()
-                            .get()
-                            .getNormalizedName();
+                        .stream()
+                        .filter(v -> v instanceof Compute)
+                        .findFirst()
+                        .get()
+                        .getNormalizedName();
                     logger.info("Generate a repository structure for application stack '{}'", stackName);
 
                     // Sort the reversed topology topologically to have a global order
@@ -84,8 +84,8 @@ public class PuppetTransformer {
         for (RootComponent component : stack) {
             Map<String, Property> properties = component.getProperties();
             properties.values().stream()
-                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                    .forEach(p -> envVars.add(String.format("%s=%s", component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue())));
+                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                .forEach(p -> envVars.add(String.format("%s=%s", component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue())));
         }
         return envVars;
     }
@@ -124,10 +124,10 @@ public class PuppetTransformer {
                 Path p = Paths.get(a.getValue());
 
                 Task t = Task.builder()
-                        .name(o.getNormalizedName())
-                        .envVars(envVars)
-                        .scriptFileName(p.getFileName().toString())
-                        .build();
+                    .name(o.getNormalizedName())
+                    .envVars(envVars)
+                    .scriptFileName(p.getFileName().toString())
+                    .build();
 
                 tasks.add(t);
                 taskData.put("task", t);

@@ -29,8 +29,8 @@ public abstract class GraphNormalizer {
                 ScalarEntity extendsAssignment = (ScalarEntity) entity.get();
                 if (extendsAssignment.getValue() != null) {
                     GraphHelper
-                            .findMappingEntity(graph, extendsAssignment.getValue(), types)
-                            .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.EXTENDS_TYPE));
+                        .findMappingEntity(graph, extendsAssignment.getValue(), types)
+                        .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.EXTENDS_TYPE));
                 }
             }
         }
@@ -42,8 +42,8 @@ public abstract class GraphNormalizer {
             if (entity.isPresent()) {
                 ScalarEntity typeAssignment = (ScalarEntity) entity.get();
                 GraphHelper
-                        .findMappingEntity(graph, typeAssignment.getValue(), EntityGraph.COMPONENT_TYPES)
-                        .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.INSTANCE_OF));
+                    .findMappingEntity(graph, typeAssignment.getValue(), EntityGraph.COMPONENT_TYPES)
+                    .ifPresent(value -> graph.addEdge(node, value, DefaultKeys.INSTANCE_OF));
             }
         }
     }
@@ -58,8 +58,8 @@ public abstract class GraphNormalizer {
 //                                .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
 //                    } else {
                     relation.getChild(DefaultKeys.TYPE)
-                            .flatMap(type -> GraphHelper.findMappingEntity(graph, ((ScalarEntity) type).getValue(), EntityGraph.RELATION_TYPES))
-                            .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
+                        .flatMap(type -> GraphHelper.findMappingEntity(graph, ((ScalarEntity) type).getValue(), EntityGraph.RELATION_TYPES))
+                        .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
 //                    }
                 }
             }
@@ -75,8 +75,8 @@ public abstract class GraphNormalizer {
                     if (entity.isPresent()) {
                         ScalarEntity targetAssignment = (ScalarEntity) entity.get();
                         GraphHelper
-                                .findMappingEntity(graph, targetAssignment.getValue(), EntityGraph.COMPONENTS)
-                                .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.TARGET_COMPONENT));
+                            .findMappingEntity(graph, targetAssignment.getValue(), EntityGraph.COMPONENTS)
+                            .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.TARGET_COMPONENT));
                     }
                 }
             }

@@ -25,8 +25,8 @@ public class Service {
         this.image = container.getLabel() + ":latest";
         this.targetDirectory = container.getName();
         this.ports = container.getPorts().stream()
-                .map(port -> String.valueOf(port.getValue()))
-                .collect(Collectors.toList());
+            .map(port -> String.valueOf(port.getValue()))
+            .collect(Collectors.toList());
         this.envVars = container.getEnvVars();
         this.dependencies = dependencies;
     }

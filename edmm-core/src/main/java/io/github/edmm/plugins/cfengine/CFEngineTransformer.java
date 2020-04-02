@@ -1,5 +1,16 @@
 package io.github.edmm.plugins.cfengine;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
@@ -8,7 +19,12 @@ import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;
-import io.github.edmm.model.component.*;
+import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.MysqlDatabase;
+import io.github.edmm.model.component.MysqlDbms;
+import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.component.Tomcat;
+import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
@@ -20,10 +36,6 @@ import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
@@ -49,11 +61,11 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
         this.graph = context.getTopologyGraph();
 
         this.policy = CFPolicy.builder()
-                .modVars(new LinkedHashMap<>())
-                .envVars(new LinkedHashMap<>())
-                .classes(new LinkedHashMap<>())
-                .methods(new LinkedHashMap<>())
-                .build();
+            .modVars(new LinkedHashMap<>())
+            .envVars(new LinkedHashMap<>())
+            .classes(new LinkedHashMap<>())
+            .methods(new LinkedHashMap<>())
+            .build();
         // Template initialization
         this.policy.getModVars().putIfAbsent("deployment_path", DEPLOYMENT_PATH);
         this.policy.getModVars().putIfAbsent("deployment_masterfiles", DEPLOYMENT_MASTERFILES);
@@ -66,10 +78,10 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     public void visitComponentsTopologicalOrder() {
         // Reverse the graph to find sources
         EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
-                = new EdgeReversedGraph<>(context.getModel().getTopology());
+            = new EdgeReversedGraph<>(context.getModel().getTopology());
         // Apply the topological sort
         TopologicalOrderIterator<RootComponent, RootRelation> iterator
-                = new TopologicalOrderIterator<>(dependencyGraph);
+            = new TopologicalOrderIterator<>(dependencyGraph);
         // Visit all components in topological sort
         while (iterator.hasNext()) {
             RootComponent component = iterator.next();
@@ -105,7 +117,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(Tomcat component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         add(component, compute);
         component.setTransformed(true);
     }
@@ -113,7 +125,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(MysqlDatabase component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         add(component, compute);
         component.setTransformed(true);
     }
@@ -121,7 +133,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(MysqlDbms component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         add(component, compute);
         component.setTransformed(true);
     }
@@ -129,7 +141,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(WebApplication component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         add(component, compute);
         component.setTransformed(true);
     }
@@ -163,11 +175,11 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
                 if (found && component != targetCompute) {
                     String[] blacklist = {"key_name", "public_key"};
                     component.getProperties().entrySet().stream()
-                            .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
-                            .forEach(entry -> {
-                                String nameComponent = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
-                                sourceVars.putIfAbsent(nameComponent, entry.getValue().getValue());
-                            });
+                        .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
+                        .forEach(entry -> {
+                            String nameComponent = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
+                            sourceVars.putIfAbsent(nameComponent, entry.getValue().getValue());
+                        });
                 }
             }
         }
@@ -205,6 +217,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
     /**
      * For each artifact copy the files to CFEngine directory
+     *
      * @param component Component to be processed
      * @param compute   Compute node of component
      */
@@ -213,7 +226,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
             String[] file = getFileParsed(artifact.getValue());
             try {
                 fileAccess.copy(file[0], DEPLOYMENT_PATH
-                        + '/' + compute.getNormalizedName() + '/' + file[1]);
+                    + '/' + compute.getNormalizedName() + '/' + file[1]);
             } catch (IOException e) {
                 logger.error("Failed to write CFEngine file: {}", e.getMessage(), e);
             }
@@ -222,6 +235,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
     /**
      * Sanitize filepath
+     *
      * @param filePath path
      * @return [filePath, fileName]
      */
@@ -231,7 +245,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
             file = file.substring(2);
         }
         String name = new File(file).getName();
-        return new String[]{file, name};
+        return new String[] {file, name};
     }
 
     /**
@@ -253,6 +267,7 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
     /**
      * Extract the script from the operation and create a command to execute it
+     *
      * @param operation operation
      * @param component component for this operation
      */
@@ -263,10 +278,10 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
                 String cfengineFilePath = component.getNormalizedName() + '_' + file[1];
                 List<String> methodList = this.policy.getMethods().get(compute.getNormalizedName());
                 methodList.add("execute_script($(deployment_path), \"" + cfengineFilePath + "\",\n" +
-                        "\t\t\t\t\"" + cfengineFilePath + "\", $(" + compute.getNormalizedName() + "_env))");
+                    "\t\t\t\t\"" + cfengineFilePath + "\", $(" + compute.getNormalizedName() + "_env))");
 
                 String localFilePath = DEPLOYMENT_PATH + '/' + compute.getNormalizedName()
-                        + '/' + component.getNormalizedName() + '_' + file[1];
+                    + '/' + component.getNormalizedName() + '_' + file[1];
                 fileAccess.copy(file[0], localFilePath);
             }
         } catch (IOException e) {
@@ -276,16 +291,17 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
     /**
      * For each property adds the env variable to policy
+     *
      * @param component EDMM component
      */
     private void handleProperties(RootComponent component, Compute compute) {
         String[] blacklist = {"key_name", "public_key"};
         component.getProperties().entrySet().stream()
-                .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
-                .forEach(entry -> {
-                    String name = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
-                    policy.getEnvVars().get(compute.getNormalizedName() + "_env")
-                            .putIfAbsent(name, entry.getValue().getValue());
-                });
+            .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
+            .forEach(entry -> {
+                String name = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
+                policy.getEnvVars().get(compute.getNormalizedName() + "_env")
+                    .putIfAbsent(name, entry.getValue().getValue());
+            });
     }
 }

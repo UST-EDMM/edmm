@@ -48,10 +48,10 @@ public class AnsibleTransformer implements ComponentVisitor {
 
             // Reverse the graph to find sources
             EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
-                    = new EdgeReversedGraph<>(context.getModel().getTopology());
+                = new EdgeReversedGraph<>(context.getModel().getTopology());
             // Apply the topological sort
             TopologicalOrderIterator<RootComponent, RootRelation> iterator
-                    = new TopologicalOrderIterator<>(dependencyGraph);
+                = new TopologicalOrderIterator<>(dependencyGraph);
 
             Map<String, Object> templateData = new HashMap<>();
             List<AnsiblePlay> plays = new ArrayList<>();
@@ -75,11 +75,11 @@ public class AnsibleTransformer implements ComponentVisitor {
                 }
 
                 AnsiblePlay play = AnsiblePlay.builder()
-                        .name(component.getName())
-                        .hosts(hosts)
-                        .vars(properties)
-                        .tasks(tasks)
-                        .build();
+                    .name(component.getName())
+                    .hosts(hosts)
+                    .vars(properties)
+                    .tasks(tasks)
+                    .build();
 
                 plays.add(play);
             }
@@ -96,8 +96,8 @@ public class AnsibleTransformer implements ComponentVisitor {
         for (RootComponent component : stack) {
             Map<String, Property> properties = component.getProperties();
             properties.values().stream()
-                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                    .forEach(p -> envVars.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
+                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                .forEach(p -> envVars.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
         }
     }
 
@@ -106,9 +106,9 @@ public class AnsibleTransformer implements ComponentVisitor {
             if (!operation.getArtifacts().isEmpty()) {
                 String file = operation.getArtifacts().get(0).getValue();
                 AnsibleTask task = AnsibleTask.builder()
-                        .name(operation.getNormalizedName())
-                        .script(file)
-                        .build();
+                    .name(operation.getNormalizedName())
+                    .script(file)
+                    .build();
                 targetQueue.add(task);
                 // Copy artifact files to target directory
                 PluginFileAccess fileAccess = context.getFileAccess();

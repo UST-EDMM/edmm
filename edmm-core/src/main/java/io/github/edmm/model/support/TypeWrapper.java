@@ -3,7 +3,6 @@ package io.github.edmm.model.support;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
@@ -20,7 +19,7 @@ public abstract class TypeWrapper {
     public static Map<String, RootComponent> wrapComponents(EntityGraph graph) {
         Map<String, RootComponent> components = new HashMap<>();
         Iterator<Entity> it = graph.getEntity(EntityGraph.COMPONENTS)
-                .orElseThrow(IllegalStateException::new).getChildren().iterator();
+            .orElseThrow(IllegalStateException::new).getChildren().iterator();
         while (it.hasNext()) {
             MappingEntity entity = (MappingEntity) it.next();
             String type = entity.getValue(RootComponent.TYPE);

@@ -60,15 +60,15 @@ public class AzureLifecycle extends AbstractLifecycle {
 
     private void copyOperationsToTargetDirectory(ResourceManagerTemplate resultTemplate) {
         List<String> toCopy = resultTemplate.getResources()
-                .stream()
-                .filter(resource -> resource instanceof VirtualMachineExtension && !(resource instanceof EnvVarVirtualMachineExtension)).map(resource -> {
-                    VirtualMachineExtension extension = (VirtualMachineExtension) resource;
-                    VirtualMachineExtensionProperties properties = (VirtualMachineExtensionProperties) extension.getProperties();
-                    CustomScriptSettings settings = properties.getSettings();
-                    return settings.getFileUrls();
-                })
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(resource -> resource instanceof VirtualMachineExtension && !(resource instanceof EnvVarVirtualMachineExtension)).map(resource -> {
+                VirtualMachineExtension extension = (VirtualMachineExtension) resource;
+                VirtualMachineExtensionProperties properties = (VirtualMachineExtensionProperties) extension.getProperties();
+                CustomScriptSettings settings = properties.getSettings();
+                return settings.getFileUrls();
+            })
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
         toCopy.forEach(toCopyArtifact -> {
             try {
                 context.getFileAccess().copy(toCopyArtifact, toCopyArtifact);
@@ -80,17 +80,17 @@ public class AzureLifecycle extends AbstractLifecycle {
 
     private void createEnvironmentVariableScripts(ResourceManagerTemplate resultTemplate) {
         resultTemplate.getResources()
-                .stream()
-                .filter(resource -> resource instanceof EnvVarVirtualMachineExtension)
-                .forEach(resource -> {
-                    EnvVarVirtualMachineExtension extension = (EnvVarVirtualMachineExtension) resource;
-                    extension.getScriptPath().ifPresent(path -> {
-                        BashScript envScript = new BashScript(context.getFileAccess(), path);
-                        extension.getEnvironmentVariables().forEach((key, value) -> {
-                            envScript.append("export " + key + "=" + value);
-                        });
+            .stream()
+            .filter(resource -> resource instanceof EnvVarVirtualMachineExtension)
+            .forEach(resource -> {
+                EnvVarVirtualMachineExtension extension = (EnvVarVirtualMachineExtension) resource;
+                extension.getScriptPath().ifPresent(path -> {
+                    BashScript envScript = new BashScript(context.getFileAccess(), path);
+                    extension.getEnvironmentVariables().forEach((key, value) -> {
+                        envScript.append("export " + key + "=" + value);
                     });
                 });
+            });
     }
 
     @Override

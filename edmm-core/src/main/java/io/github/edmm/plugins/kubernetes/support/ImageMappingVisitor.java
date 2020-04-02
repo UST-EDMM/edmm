@@ -18,14 +18,14 @@ public class ImageMappingVisitor implements ComponentVisitor {
     private boolean hasCreateScript(RootComponent component) {
         final boolean[] hasScript = {false};
         component.getStandardLifecycle().getCreate()
-                .ifPresent(op -> hasScript[0] = op.getArtifacts().size() > 0);
+            .ifPresent(op -> hasScript[0] = op.getArtifacts().size() > 0);
         return hasScript[0];
     }
 
     private boolean hasConfigureScript(RootComponent component) {
         final boolean[] hasScript = {false};
         component.getStandardLifecycle().getConfigure()
-                .ifPresent(op -> hasScript[0] = op.getArtifacts().size() > 0);
+            .ifPresent(op -> hasScript[0] = op.getArtifacts().size() > 0);
         return hasScript[0];
     }
 

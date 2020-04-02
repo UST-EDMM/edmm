@@ -22,7 +22,7 @@ public class IpGenerator {
 
     IpGenerator(String lower, String upper) throws IllegalArgumentException {
         if (stringToIp(lower) >= stringToIp(upper) ||
-                stringToIp(lower) < this.lowerBound || stringToIp(upper) > this.upperBound) {
+            stringToIp(lower) < this.lowerBound || stringToIp(upper) > this.upperBound) {
             throw new IllegalArgumentException();
         }
         this.lowerBound = stringToIp(lower);
@@ -56,7 +56,7 @@ public class IpGenerator {
         usedIPs.add(index++);
         if (index == upperBound) index = lowerBound;
         return String.format("%d.%d.%d.%d", (index >> 24 & 0xff), (index >> 16 & 0xff),
-                (index >> 8 & 0xff), (index & 0xff));
+            (index >> 8 & 0xff), (index & 0xff));
     }
 }
 

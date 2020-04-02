@@ -33,8 +33,8 @@ public class ComputeSupportVisitor implements ComponentVisitor {
 
     public CheckModelResult getResult() {
         List<RootComponent> unsupportedComponents = context.getModel().getComponents().stream()
-                .filter(c -> !supportedComponents.contains(c))
-                .collect(Collectors.toList());
+            .filter(c -> !supportedComponents.contains(c))
+            .collect(Collectors.toList());
         return new CheckModelResult(unsupportedComponents);
     }
 

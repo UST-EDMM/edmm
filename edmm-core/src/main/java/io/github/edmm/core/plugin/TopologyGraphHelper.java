@@ -69,17 +69,17 @@ public abstract class TopologyGraphHelper {
     @SuppressWarnings("unchecked")
     public static <V, E, T> List<T> getVertices(Graph<V, E> graph, Class<T> clazz) {
         return (List<T>) graph.vertexSet()
-                .stream()
-                .filter(clazz::isInstance)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(clazz::isInstance)
+            .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
     public static <V, E, T> List<T> getEdges(Graph<V, E> graph, Class<T> clazz) {
         return (List<T>) graph.edgeSet()
-                .stream()
-                .filter(clazz::isInstance)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(clazz::isInstance)
+            .collect(Collectors.toList());
     }
 
     public static Optional<RootComponent> resolveHostingComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {
@@ -88,8 +88,8 @@ public abstract class TopologyGraphHelper {
         if (optionalComponent.isPresent()) {
             RootComponent hostingComponent = optionalComponent.get();
             if (hostingComponent instanceof Compute
-                    || hostingComponent instanceof Dbaas
-                    || hostingComponent instanceof Paas) {
+                || hostingComponent instanceof Dbaas
+                || hostingComponent instanceof Paas) {
                 return Optional.of(hostingComponent);
             } else {
                 return resolveHostingComponent(graph, hostingComponent);

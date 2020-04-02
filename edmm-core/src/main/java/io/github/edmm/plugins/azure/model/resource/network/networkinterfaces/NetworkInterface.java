@@ -29,29 +29,29 @@ public class NetworkInterface extends Resource {
         final PublicIpAddress publicIpAddress = new PublicIpAddress(String.format("%s_publicIpAddress", this.getName()));
 
         setProperties(NetworkInterfaceProperties
+            .builder()
+            .networkSecurityGroup(securityGroup)
+            .ipConfiguration(IpConfiguration
                 .builder()
-                .networkSecurityGroup(securityGroup)
-                .ipConfiguration(IpConfiguration
+                .name(String.format("%s_ipConfiguration", this.getName()))
+                .properties(IpConfigurationProperties
+                    .builder()
+                    .privateIpAllocationMethod("Dynamic")
+                    .publicIpAddress(publicIpAddress)
+                    .subnet(SubnetReference
                         .builder()
-                        .name(String.format("%s_ipConfiguration", this.getName()))
-                        .properties(IpConfigurationProperties
-                                .builder()
-                                .privateIpAllocationMethod("Dynamic")
-                                .publicIpAddress(publicIpAddress)
-                                .subnet(SubnetReference
-                                        .builder()
-                                        .id("[variables('subnet_id')]")
-                                        .build())
-                                .build())
+                        .id("[variables('subnet_id')]")
                         .build())
-                // this ensures internal communications between vms in the same virtual network to succeed using host names
-                .dnsSettings(DnsSettings
-                        .builder()
-                        // the magical server name that "switches to azure provided DNS resolution"
-                        // see https://docs.microsoft.com/en-us/azure/templates/microsoft.network/2019-04-01/networkinterfaces#networkinterfacednssettings-object
-                        .dnsServers(Collections.singletonList("AzureProvidedDNS"))
-                        .build())
-                .build());
+                    .build())
+                .build())
+            // this ensures internal communications between vms in the same virtual network to succeed using host names
+            .dnsSettings(DnsSettings
+                .builder()
+                // the magical server name that "switches to azure provided DNS resolution"
+                // see https://docs.microsoft.com/en-us/azure/templates/microsoft.network/2019-04-01/networkinterfaces#networkinterfacednssettings-object
+                .dnsServers(Collections.singletonList("AzureProvidedDNS"))
+                .build())
+            .build());
     }
 
     @JsonIgnore

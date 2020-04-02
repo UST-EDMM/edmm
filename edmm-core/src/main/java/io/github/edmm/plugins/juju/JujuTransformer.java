@@ -37,13 +37,13 @@ public class JujuTransformer {
     public static final String HOOKS_FOLDER = "hooks";
     public static final String HOOK_INSTALL = "install";
     private static final List<String> HOOK_PLACEHOLDERS = Arrays.asList(
-            "config-changed",
-            "leader-elected",
-            "leader-settings-changed",
-            "start",
-            "stop",
-            "upgrade-charm",
-            "update-status"
+        "config-changed",
+        "leader-elected",
+        "leader-settings-changed",
+        "start",
+        "stop",
+        "upgrade-charm",
+        "update-status"
     );
     public static final String LAYER_FILENAME = "layer.yaml";
     public static final String METADATA_FILENAME = "metadata.yaml";
@@ -60,11 +60,11 @@ public class JujuTransformer {
         for (Graph<RootComponent, RootRelation> stack : context.getModel().findComponentStacks()) {
             // Setting charm name to the name of the base compute node of "stack"
             String charmName = stack.vertexSet()
-                    .stream()
-                    .filter(v -> v instanceof Compute)
-                    .findFirst()
-                    .get()
-                    .getNormalizedName();
+                .stream()
+                .filter(v -> v instanceof Compute)
+                .findFirst()
+                .get()
+                .getNormalizedName();
             logger.info("*** Charming application stack '{}' ***", charmName);
 
             // Retrieving environment variables, artifacts and operations allowing to provision the nodes in "stack"
@@ -87,7 +87,7 @@ public class JujuTransformer {
                     for (RootRelation relation : node.getRelations())
                         if (relation instanceof ConnectsTo)
                             envVars.put(relation.getTarget().concat(DEFAULT_ENV_VAR_CONNECTION).toUpperCase(),
-                                    DEFAULT_TARGET_LOCATION);
+                                DEFAULT_TARGET_LOCATION);
                     // Retrieving management operations for "node"
                     logger.info("Retrieving artifacts associated with component '{}'", node.getName());
                     node.getArtifacts().stream().forEach(artifacts::add);
@@ -227,9 +227,9 @@ public class JujuTransformer {
      * - the "hooksFolder".
      */
     private void generateInstallHook(
-            Map<String, String> variables,
-            Map<String, List<Operation>> operations,
-            String hooksFolder) throws IOException {
+        Map<String, String> variables,
+        Map<String, List<Operation>> operations,
+        String hooksFolder) throws IOException {
         // Setting path to target file
         String installFile = Paths.get(hooksFolder, HOOK_INSTALL).normalize().toString();
         // Listing environment variables to be exported

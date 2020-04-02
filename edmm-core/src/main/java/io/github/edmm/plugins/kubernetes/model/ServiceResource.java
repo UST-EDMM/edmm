@@ -29,16 +29,16 @@ public final class ServiceResource implements KubernetesResource {
     public void build() {
         List<ServicePort> ports = stack.getPorts().stream().map(PortMapping::toServicePort).collect(Collectors.toList());
         service = new ServiceBuilder()
-                .withNewMetadata()
-                .withName(stack.getServiceName())
-                .addToLabels("app", stack.getServiceName())
-                .endMetadata()
-                .withNewSpec()
-                .addAllToPorts(ports)
-                .addToSelector("app", stack.getLabel())
-                .withType("NodePort")
-                .endSpec()
-                .build();
+            .withNewMetadata()
+            .withName(stack.getServiceName())
+            .addToLabels("app", stack.getServiceName())
+            .endMetadata()
+            .withNewSpec()
+            .addAllToPorts(ports)
+            .addToSelector("app", stack.getLabel())
+            .withType("NodePort")
+            .endSpec()
+            .build();
     }
 
     @Override

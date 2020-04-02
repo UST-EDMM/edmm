@@ -20,7 +20,7 @@ public class Paas extends Platform {
 
     public String getArchetype() {
         return getProperty(ARCHETYPE)
-                .orElseThrow(() -> new IllegalStateException("Paas needs to specify the archetype property"));
+            .orElseThrow(() -> new IllegalStateException("Paas needs to specify the archetype property"));
     }
 
     public Optional<Integer> getMinInstances() {

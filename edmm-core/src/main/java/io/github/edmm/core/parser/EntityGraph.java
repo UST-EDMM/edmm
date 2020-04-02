@@ -51,8 +51,8 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
 
     public Optional<Entity> getEntity(EntityId id) {
         return this.vertexSet().stream()
-                .filter(entity -> id.equals(entity.getId()))
-                .findFirst();
+            .filter(entity -> id.equals(entity.getId()))
+            .findFirst();
     }
 
     public Optional<Entity> getEntity(List<String> path) {
@@ -82,9 +82,9 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     public void replaceEntity(Entity source, Entity target) {
         // Collect incoming and outgoing edges of the source
         Set<Pair<Entity, String>> predecessors = incomingEdgesOf(source).stream()
-                .map(c -> Pair.of(c.getSource(), c.getName())).collect(Collectors.toSet());
+            .map(c -> Pair.of(c.getSource(), c.getName())).collect(Collectors.toSet());
         Set<Pair<Entity, String>> successors = outgoingEdgesOf(source).stream()
-                .map(c -> Pair.of(c.getTarget(), c.getName())).collect(Collectors.toSet());
+            .map(c -> Pair.of(c.getTarget(), c.getName())).collect(Collectors.toSet());
         removeVertex(source);
         addVertex(target);
         // Redirect existing edges to target entity
@@ -206,7 +206,7 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
             if (o == null || getClass() != o.getClass()) return false;
             Edge edge = (Edge) o;
             return Objects.equals(source, edge.source) &&
-                    Objects.equals(target, edge.target);
+                Objects.equals(target, edge.target);
         }
 
         @Override

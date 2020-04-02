@@ -17,11 +17,11 @@ public class SecurityRule extends Resource {
         super.setDefaults();
         setApiVersion("2019-04-01");
         setProperties(SecurityRuleProperties.builder()
-                .access(SecurityRuleAccessEnum.Allow)
-                .destinationAddressPrefix("*")
-                .direction(SecurityRuleDirectionEnum.Inbound)
-                .protocol(SecurityRuleProtocolEnum.TCP)
-                .sourcePortRange("*")
-                .build());
+            .access(SecurityRuleAccessEnum.Allow)
+            .destinationAddressPrefix("*")
+            .direction(SecurityRuleDirectionEnum.Inbound)
+            .protocol(SecurityRuleProtocolEnum.TCP)
+            .sourcePortRange("*")
+            .build());
     }
 }

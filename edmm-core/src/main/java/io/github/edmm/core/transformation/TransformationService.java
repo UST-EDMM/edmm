@@ -45,9 +45,9 @@ public class TransformationService {
 
     public TransformationContext transform(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
         TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
-                                                         .filter(p -> p.getId().equals(target))
-                                                         .findFirst()
-                                                         .orElseThrow(IllegalStateException::new);
+            .filter(p -> p.getId().equals(target))
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
         TransformationContext context = new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
         this.startTransformation(context);
 

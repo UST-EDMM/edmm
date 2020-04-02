@@ -123,14 +123,14 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
                 instance.addPropertyAssignment(HEAT_USER_DATA_FORMAT, new PropertyValue(HEAT_SOFTWARE_CONFIG));
                 // Create software deployment resource
                 Resource deployment = Resource.builder()
-                        .name(getDeploymentName(component, operation))
-                        .type(HEAT_SOFTWARE_DEPLOYMENT_TYPE)
-                        .build();
+                    .name(getDeploymentName(component, operation))
+                    .type(HEAT_SOFTWARE_DEPLOYMENT_TYPE)
+                    .build();
                 // Create respective config resource
                 Resource config = Resource.builder()
-                        .name(getConfigName(component, operation))
-                        .type(HEAT_SOFTWARE_CONFIG_TYPE)
-                        .build();
+                    .name(getConfigName(component, operation))
+                    .type(HEAT_SOFTWARE_CONFIG_TYPE)
+                    .build();
                 deployment.addDependsOn(instance.getName(), config.getName());
                 // Set order of operations
                 if (i > 0) {
@@ -153,13 +153,13 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
                     }
                     RootComponent targetComponent = connection.getRight();
                     TopologyGraphHelper.resolveHostingComputeComponent(graph, targetComponent)
-                            .ifPresent(targetCompute -> {
-                                List<Object> attrs = Lists.newArrayList(targetCompute.getNormalizedName(), "networks", "private", "0");
-                                List<RootComponent> targetStack = Lists.newArrayList(targetComponent);
-                                TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), targetStack, targetComponent);
-                                prepareProperties(inputValues, targetStack);
-                                inputValues.put(targetComponent.getNormalizedName() + "_hostname", new PropertyGetAttr(attrs));
-                            });
+                        .ifPresent(targetCompute -> {
+                            List<Object> attrs = Lists.newArrayList(targetCompute.getNormalizedName(), "networks", "private", "0");
+                            List<RootComponent> targetStack = Lists.newArrayList(targetComponent);
+                            TopologyGraphHelper.resolveChildComponents(context.getTopologyGraph(), targetStack, targetComponent);
+                            prepareProperties(inputValues, targetStack);
+                            inputValues.put(targetComponent.getNormalizedName() + "_hostname", new PropertyGetAttr(attrs));
+                        });
                 }
                 deployment.addPropertyAssignment(HEAT_INPUT_VALUES, new PropertyObject(inputValues));
                 // Set artifact and copy file
@@ -195,48 +195,48 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
         // https://docs.openstack.org/heat/pike/template_guide/basic_resources.html
 
         Resource port = Resource.builder()
-                .name(compute.getNormalizedName() + "_port")
-                .type(HEAT_PORT_TYPE)
-                .build();
+            .name(compute.getNormalizedName() + "_port")
+            .type(HEAT_PORT_TYPE)
+            .build();
         port.addPropertyAssignment(HEAT_NETWORK, new PropertyGetParam(HEAT_NETWORK));
         List<Object> securityGroups = Lists.newArrayList(new PropertyGetParam(HEAT_SECURITY_GROUP));
         port.addPropertyAssignment(HEAT_SECURITY_GROUPS, new PropertyObject(securityGroups));
         template.addResource(port);
 
         Resource instance = Resource.builder()
-                .name(compute.getNormalizedName())
-                .type(HEAT_COMPUTE_TYPE)
-                .build();
+            .name(compute.getNormalizedName())
+            .type(HEAT_COMPUTE_TYPE)
+            .build();
         instance.addDependsOn(port.getName());
         template.addParameter(Parameter.builder().name(HEAT_KEY_NAME).type("string").build());
         template.addParameter(Parameter.builder().name(HEAT_IMAGE).type("string").build());
         template.addParameter(Parameter.builder().name(HEAT_FLAVOR).type("string").build());
         template.addParameter(Parameter.builder()
-                .name(HEAT_NETWORK).type("string").defaultValue("default").build());
+            .name(HEAT_NETWORK).type("string").defaultValue("default").build());
         template.addParameter(Parameter.builder()
-                .name(HEAT_SECURITY_GROUP).type("string").defaultValue("default").build());
+            .name(HEAT_SECURITY_GROUP).type("string").defaultValue("default").build());
         instance.addPropertyAssignment(HEAT_KEY_NAME, new PropertyGetParam(HEAT_KEY_NAME));
         instance.addPropertyAssignment(HEAT_IMAGE, new PropertyGetParam(HEAT_IMAGE));
         instance.addPropertyAssignment(HEAT_FLAVOR, new PropertyGetParam(HEAT_FLAVOR));
         List<ImmutablePair<String, PropertyAssignment>> networks = Lists.newArrayList(
-                new ImmutablePair<>(HEAT_PORT, new PropertyGetResource(port.getName()))
+            new ImmutablePair<>(HEAT_PORT, new PropertyGetResource(port.getName()))
         );
         instance.addPropertyAssignment(HEAT_NETWORKS, new PropertyObject(networks));
         template.addResource(instance);
 
         Resource floatingIp = Resource.builder()
-                .name(compute.getNormalizedName() + "_floating_ip")
-                .type(HEAT_FLOATING_IP_TYPE)
-                .build();
+            .name(compute.getNormalizedName() + "_floating_ip")
+            .type(HEAT_FLOATING_IP_TYPE)
+            .build();
         floatingIp.addDependsOn(port.getName());
         floatingIp.addPropertyAssignment(HEAT_FLOATING_NETWORK, new PropertyGetParam(HEAT_NETWORK));
         floatingIp.addPropertyAssignment(HEAT_PORT_ID, new PropertyGetResource(port.getName()));
         template.addResource(floatingIp);
 
         Resource floatingIpAssoc = Resource.builder()
-                .name(compute.getNormalizedName() + "_floating_ip_association")
-                .type(HEAT_FLOATING_IP_ASSOC_TYPE)
-                .build();
+            .name(compute.getNormalizedName() + "_floating_ip_association")
+            .type(HEAT_FLOATING_IP_ASSOC_TYPE)
+            .build();
         floatingIpAssoc.addDependsOn(floatingIp.getName(), port.getName());
         floatingIpAssoc.addPropertyAssignment(HEAT_FLOATINGIP_ID, new PropertyGetResource(floatingIp.getName()));
         floatingIpAssoc.addPropertyAssignment(HEAT_PORT_ID, new PropertyGetResource(port.getName()));
@@ -302,8 +302,8 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
         for (RootComponent component : stack) {
             Map<String, Property> properties = component.getProperties();
             properties.values().stream()
-                    .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                    .forEach(p -> inputs.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
+                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+                .forEach(p -> inputs.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
         }
     }
 
@@ -313,8 +313,8 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
         component.getStandardLifecycle().getConfigure().ifPresent(operations::add);
         component.getStandardLifecycle().getStart().ifPresent(operations::add);
         return operations
-                .stream()
-                .filter(Operation::hasArtifacts)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(Operation::hasArtifacts)
+            .collect(Collectors.toList());
     }
 }

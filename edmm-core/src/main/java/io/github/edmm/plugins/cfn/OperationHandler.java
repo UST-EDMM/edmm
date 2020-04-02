@@ -59,9 +59,9 @@ public class OperationHandler {
             CFNCommand cfnCommand = prepareCommand(file, name);
             CFNFile cfnFile = prepareFile(file);
             module.getOperations(compute)
-                    .getOrAddConfig(CONFIG_SETS, config)
-                    .putFile(cfnFile)
-                    .putCommand(cfnCommand);
+                .getOrAddConfig(CONFIG_SETS, config)
+                .putFile(cfnFile)
+                .putCommand(cfnCommand);
         }
     }
 
@@ -76,9 +76,9 @@ public class OperationHandler {
     private CFNFile prepareFile(String file) {
         String source = String.format("http://%s.s3.amazonaws.com/%s", module.getBucketName(), file);
         return new CFNFile("/opt/" + file)
-                .setSource(source)
-                .setMode(MODE_777) // TODO
-                .setOwner(OWNER_GROUP_ROOT) // TODO
-                .setGroup(OWNER_GROUP_ROOT);
+            .setSource(source)
+            .setMode(MODE_777) // TODO
+            .setOwner(OWNER_GROUP_ROOT) // TODO
+            .setGroup(OWNER_GROUP_ROOT);
     }
 }

@@ -18,17 +18,17 @@ public class Auth0 extends Saas {
 
     public String getDomain() {
         return getProperty(DOMAIN)
-                .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the domain property"));
+            .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the domain property"));
     }
 
     public String getIdentifier() {
         return getProperty(IDENTIFIER)
-                .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the identifier property"));
+            .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the identifier property"));
     }
 
     public String getScopes() {
         return getProperty(SCOPES)
-                .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the scopes property"));
+            .orElseThrow(() -> new IllegalStateException("Auth0 needs to specify the scopes property"));
     }
 
     @Override

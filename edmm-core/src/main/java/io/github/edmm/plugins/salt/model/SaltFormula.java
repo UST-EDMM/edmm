@@ -76,8 +76,8 @@ public class SaltFormula {
         // Extract all the variables and save them in the file
         environmentVars.putAll(otherVars);
         environmentVars.entrySet().stream()
-                .sorted(Comparator.comparingInt(p -> p.getValue().insertIndex))
-                .forEach((entry) -> saveEnvVar(entry.getKey(), entry.getValue().getValue()));
+            .sorted(Comparator.comparingInt(p -> p.getValue().insertIndex))
+            .forEach((entry) -> saveEnvVar(entry.getKey(), entry.getValue().getValue()));
     }
 
     /**
@@ -129,13 +129,13 @@ public class SaltFormula {
         vars.put("cwd", DEST_DIR);
         vars.put("runas", "root");
         return SaltState.builder()
-                .id(id)
-                .state("cmd")
-                .fun("run")
-                .vars(vars)
-                .require(requireLast)
-                .requireState(requireLast ? states.get(states.size() - 1) : null)
-                .build();
+            .id(id)
+            .state("cmd")
+            .fun("run")
+            .vars(vars)
+            .require(requireLast)
+            .requireState(requireLast ? states.get(states.size() - 1) : null)
+            .build();
     }
 
     /**
@@ -203,12 +203,12 @@ public class SaltFormula {
         vars.put("user", "root");
         vars.put("file_mode", "455");
         SaltState state = SaltState.builder()
-                .id("copy_files")
-                .state("file")
-                .fun("recurse")
-                .vars(vars)
-                .require(false)
-                .build();
+            .id("copy_files")
+            .state("file")
+            .fun("recurse")
+            .vars(vars)
+            .require(false)
+            .build();
         states.add(state);
     }
 
@@ -220,15 +220,15 @@ public class SaltFormula {
     private void handleProperties(RootComponent component) {
         String[] blacklist = {"key_name", "public_key"};
         component.getProperties().entrySet().stream()
-                .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
-                .forEach(entry -> {
-                    String name = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
-                    ComponentEnvVar var = ComponentEnvVar.builder()
-                            .name(name)
-                            .value(entry.getValue().getValue())
-                            .insertIndex(componentMapIndex).build();
-                    environmentVars.put(name, var);
-                });
+            .filter(entry -> !Arrays.asList(blacklist).contains(entry.getKey()))
+            .forEach(entry -> {
+                String name = component.getNormalizedName().toUpperCase() + '_' + entry.getKey().toUpperCase();
+                ComponentEnvVar var = ComponentEnvVar.builder()
+                    .name(name)
+                    .value(entry.getValue().getValue())
+                    .insertIndex(componentMapIndex).build();
+                environmentVars.put(name, var);
+            });
     }
 
     /**
@@ -237,7 +237,7 @@ public class SaltFormula {
     private void configureEnvVars() {
         envScript = new BashScript(fileAccess, BASE_DIR_SALT + '/' + name + '/' + name + '_' + ENV_FILE);
         states.add(buildCmdRunState(name + '_' + ENV_FILE,
-                "configure_environment", true));
+            "configure_environment", true));
     }
 
     /**
@@ -248,9 +248,9 @@ public class SaltFormula {
      */
     public void addEnvVar(String name, String value) {
         ComponentEnvVar var = ComponentEnvVar.builder()
-                .name(name)
-                .value(value)
-                .insertIndex(componentMapIndex++).build();
+            .name(name)
+            .value(value)
+            .insertIndex(componentMapIndex++).build();
         this.otherVars.putIfAbsent(name, var);
     }
 
@@ -274,14 +274,14 @@ public class SaltFormula {
         Integer index = from.componentIndex.get(fromComponent);
         if (index == null) return;
         from.environmentVars.entrySet().stream()
-                .filter(entry -> entry.getValue().insertIndex <= index && entry.getValue().insertIndex != 0)
-                .sorted(Comparator.comparingInt(p -> p.getValue().insertIndex))
-                .forEach(entry -> {
-                    ComponentEnvVar var = ComponentEnvVar.builder()
-                            .name(entry.getKey())
-                            .value(entry.getValue().value)
-                            .insertIndex(componentMapIndex++).build();
-                    this.otherVars.putIfAbsent(entry.getKey(), var);
-                });
+            .filter(entry -> entry.getValue().insertIndex <= index && entry.getValue().insertIndex != 0)
+            .sorted(Comparator.comparingInt(p -> p.getValue().insertIndex))
+            .forEach(entry -> {
+                ComponentEnvVar var = ComponentEnvVar.builder()
+                    .name(entry.getKey())
+                    .value(entry.getValue().value)
+                    .insertIndex(componentMapIndex++).build();
+                this.otherVars.putIfAbsent(entry.getKey(), var);
+            });
     }
 }

@@ -30,10 +30,10 @@ public class EnvVarVirtualMachineExtension extends VirtualMachineExtension {
         Map<String, Property> propertyMap = component.getProperties();
 
         propertyMap.values().stream()
-                .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                .forEach(p -> {
-                    String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
-                    environmentVariables.put(name, p.getValue());
-                });
+            .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
+            .forEach(p -> {
+                String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
+                environmentVariables.put(name, p.getValue());
+            });
     }
 }

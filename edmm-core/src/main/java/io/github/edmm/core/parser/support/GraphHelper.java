@@ -55,7 +55,7 @@ public abstract class GraphHelper {
     public static Optional<Entity> findMappingEntity(EntityGraph graph, String entityName, EntityId entryPoint) {
         for (Entity node : graph.getChildren(entryPoint)) {
             if (node instanceof MappingEntity
-                    && entityName.equals(node.getName())) {
+                && entityName.equals(node.getName())) {
                 return Optional.of(node);
             }
         }

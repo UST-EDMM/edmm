@@ -19,8 +19,8 @@ public class Subnet extends Resource {
     protected void setDefaults() {
         super.setDefaults();
         setProperties(SubnetProperties.builder()
-                .addressPrefix(("[parameters('subnet_addressPrefix')]"))
-                .build());
+            .addressPrefix(("[parameters('subnet_addressPrefix')]"))
+            .build());
     }
 
     @Override

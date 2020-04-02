@@ -48,9 +48,9 @@ public abstract class Resource {
     public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = new HashMap<>();
         params.put("location", Parameter.builder()
-                .type(ParameterTypeEnum.STRING)
-                .defaultValue("[resourceGroup().location]")
-                .build());
+            .type(ParameterTypeEnum.STRING)
+            .defaultValue("[resourceGroup().location]")
+            .build());
 
         return params;
     }

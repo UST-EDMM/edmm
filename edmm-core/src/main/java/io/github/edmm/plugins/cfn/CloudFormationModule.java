@@ -152,9 +152,9 @@ public class CloudFormationModule extends Module {
     public void build() {
         if (keyPair) {
             strParam(KEY_NAME)
-                    .type(KEY_NAME_TYPE)
-                    .description(KEY_NAME_DESCRIPTION)
-                    .constraintDescription(KEY_NAME_CONSTRAINT_DESCRIPTION);
+                .type(KEY_NAME_TYPE)
+                .description(KEY_NAME_DESCRIPTION)
+                .constraintDescription(KEY_NAME_CONSTRAINT_DESCRIPTION);
         }
         portMapping.forEach((name, ports) -> {
             SecurityGroup securityGroup = (SecurityGroup) getResource(name + SECURITY_GROUP);

@@ -33,7 +33,7 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
         // Resolve the chain of types
         EntityGraph graph = entity.getGraph();
         MappingEntity typeRef = GraphHelper.findTypeEntity(graph, entity).
-                orElseThrow(() -> new IllegalStateException("A component must be an instance of an existing type"));
+            orElseThrow(() -> new IllegalStateException("A component must be an instance of an existing type"));
         List<MappingEntity> typeChain = GraphHelper.resolveInheritanceChain(graph, typeRef);
         typeChain.forEach(this::updateEntityChain);
     }

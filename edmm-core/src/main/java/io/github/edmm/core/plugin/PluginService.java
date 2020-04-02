@@ -47,8 +47,8 @@ public class PluginService {
 
     public Set<TargetTechnology> getSupportedTargetTechnologies() {
         return plugins.stream()
-                .map(Plugin::getTargetTechnology)
-                .collect(Collectors.toSet());
+            .map(Plugin::getTargetTechnology)
+            .collect(Collectors.toSet());
     }
 
     public Optional<Plugin> findByTargetTechnology(TargetTechnology targetTechnology) {
@@ -67,23 +67,23 @@ public class PluginService {
         return plugin.getLifecycle(context).checkModel();
     }
 
-    public List<PluginSupportResult> checkModelSupport(DeploymentModel model){
+    public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
         for (Plugin plugin : this.plugins) {
             TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
             CheckModelResult checkModelResult = this.checkModel(context, plugin);
             List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
-                    .map(RootComponent::getName)
-                    .collect(Collectors.toList());
+                .map(RootComponent::getName)
+                .collect(Collectors.toList());
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
-                    .id(plugin.getTargetTechnology().getId())
-                    .name(plugin.getTargetTechnology().getName())
-                    .unsupportedComponents(unsupportedComponents);
+                .id(plugin.getTargetTechnology().getId())
+                .name(plugin.getTargetTechnology().getName())
+                .unsupportedComponents(unsupportedComponents);
             double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
             psr.supports(s);
             response.add(psr.build());
         }
 
-        return  response;
+        return response;
     }
 }

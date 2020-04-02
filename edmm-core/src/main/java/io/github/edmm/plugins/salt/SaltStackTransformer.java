@@ -58,10 +58,10 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     public void visitComponentsTopologicalOrder() {
         // Reverse the graph to find sources
         EdgeReversedGraph<RootComponent, RootRelation> dependencyGraph
-                = new EdgeReversedGraph<>(context.getModel().getTopology());
+            = new EdgeReversedGraph<>(context.getModel().getTopology());
         // Apply the topological sort
         TopologicalOrderIterator<RootComponent, RootRelation> iterator
-                = new TopologicalOrderIterator<>(dependencyGraph);
+            = new TopologicalOrderIterator<>(dependencyGraph);
         // Visit all components in topological sort
         while (iterator.hasNext()) {
             RootComponent component = iterator.next();
@@ -98,7 +98,7 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(Tomcat component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         formulas.get(compute.getNormalizedName()).add(component);
         component.setTransformed(true);
     }
@@ -106,7 +106,7 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(MysqlDatabase component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         formulas.get(compute.getNormalizedName()).add(component);
         component.setTransformed(true);
     }
@@ -114,7 +114,7 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(MysqlDbms component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         formulas.get(compute.getNormalizedName()).add(component);
         component.setTransformed(true);
     }
@@ -122,7 +122,7 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(WebApplication component) {
         Compute compute = TopologyGraphHelper.resolveHostingComputeComponent(graph, component)
-                .orElseThrow(TransformationException::new);
+            .orElseThrow(TransformationException::new);
         formulas.get(compute.getNormalizedName()).add(component);
         component.setTransformed(true);
     }

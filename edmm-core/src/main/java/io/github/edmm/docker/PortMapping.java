@@ -14,16 +14,16 @@ public final class PortMapping {
 
     public ServicePort toServicePort() {
         return new ServicePortBuilder()
-                .withName(getName())
-                .withPort(value)
-                .build();
+            .withName(getName())
+            .withPort(value)
+            .build();
     }
 
     public ContainerPort toContainerPort() {
         return new ContainerPortBuilder()
-                .withName(getName())
-                .withContainerPort(value)
-                .build();
+            .withName(getName())
+            .withContainerPort(value)
+            .build();
     }
 
     public String getName() {

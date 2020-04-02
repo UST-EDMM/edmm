@@ -112,8 +112,8 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
             sourceEnvVarExt.getEnvironmentVariables().putAll(targetEnvVarExt.getEnvironmentVariables());
             // add the target host name to the source environment variables.
             this.getInternalHostname(targetCompute).ifPresent(hostname -> sourceEnvVarExt.getEnvironmentVariables().put(
-                    String.format("%s_HOSTNAME", target.getNormalizedName()).toUpperCase(),
-                    hostname
+                String.format("%s_HOSTNAME", target.getNormalizedName()).toUpperCase(),
+                hostname
             ));
         }
     }
@@ -205,7 +205,7 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
     private void addArtifact(List<Pair<String, String>> existingArtifacts, String operationBaseName, Operation operation) {
         // only consider the first artifact in an operation
         operation.getArtifacts().stream().findFirst().ifPresent(artifact ->
-                existingArtifacts.add(ImmutablePair.of(operationBaseName, artifact.getValue())));
+            existingArtifacts.add(ImmutablePair.of(operationBaseName, artifact.getValue())));
     }
 
     private Optional<VirtualMachine> getHostingVirtualMachine(RootComponent component) {
@@ -225,10 +225,10 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
         if (hostingCompute != null) {
             final String vmName = "vm_" + hostingCompute.getNormalizedName();
             return this.resultTemplate.getResources()
-                    .stream()
-                    .filter(resource -> resource.getName().equals(vmName) && resource instanceof VirtualMachine)
-                    .map(resource -> (VirtualMachine) resource)
-                    .findFirst();
+                .stream()
+                .filter(resource -> resource.getName().equals(vmName) && resource instanceof VirtualMachine)
+                .map(resource -> (VirtualMachine) resource)
+                .findFirst();
         } else {
             throw new IllegalArgumentException(String.format("This component is not a Compute node nor is it hosted by a Compute node: %s", component.getNormalizedName()));
         }
@@ -236,13 +236,13 @@ public class AzureVisitor implements ComponentVisitor, RelationVisitor {
 
     private List<VirtualMachineExtension> getExistingExtensions(VirtualMachine virtualMachine) {
         return this.resultTemplate
-                .getResources()
-                .stream()
-                .filter(resource -> resource instanceof VirtualMachineExtension &&
-                        resource.getDependsOn().contains(virtualMachine.getFullName())
-                )
-                .map(resource -> (VirtualMachineExtension) resource)
-                .collect(Collectors.toList());
+            .getResources()
+            .stream()
+            .filter(resource -> resource instanceof VirtualMachineExtension &&
+                resource.getDependsOn().contains(virtualMachine.getFullName())
+            )
+            .map(resource -> (VirtualMachineExtension) resource)
+            .collect(Collectors.toList());
     }
 
     private Optional<String> getInternalHostname(VirtualMachine vm) {

@@ -12,16 +12,16 @@ import picocli.CommandLine;
 import static picocli.CommandLine.usage;
 
 @CommandLine.Command(
-        name = "edmm",
-        header = "@|bold,green Essential Deployment Metamodel Command Line Interface%n|@",
-        customSynopsis = "@|bold edmm|@ [@|yellow <command>|@] [@|yellow <subcommand>|@]",
-        footer = {
-                "%nSee 'edmm help [@|yellow <command>|@]' for detailed help information"
-        },
-        subcommands = {
-                CommandLine.HelpCommand.class,
-                TransformCommand.class
-        }
+    name = "edmm",
+    header = "@|bold,green Essential Deployment Metamodel Command Line Interface%n|@",
+    customSynopsis = "@|bold edmm|@ [@|yellow <command>|@] [@|yellow <subcommand>|@]",
+    footer = {
+        "%nSee 'edmm help [@|yellow <command>|@]' for detailed help information"
+    },
+    subcommands = {
+        CommandLine.HelpCommand.class,
+        TransformCommand.class
+    }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
 @ImportResource( {"classpath*:pluginContext.xml"})

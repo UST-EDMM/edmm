@@ -26,10 +26,10 @@ public class VirtualMachineExtension extends Resource {
 
     public void setScriptPath(String scriptPath) {
         ((VirtualMachineExtensionProperties) getProperties()).setSettings(CustomScriptSettings
-                .builder()
-                .fileUrls(Collections.singletonList(scriptPath))
-                .commandToExecute(String.format("'sh %s'", scriptPath))
-                .build());
+            .builder()
+            .fileUrls(Collections.singletonList(scriptPath))
+            .commandToExecute(String.format("'sh %s'", scriptPath))
+            .build());
     }
 
     @Override
@@ -37,12 +37,12 @@ public class VirtualMachineExtension extends Resource {
         super.setDefaults();
         setApiVersion("2019-03-01");
         setProperties(VirtualMachineExtensionProperties
-                .builder()
-                .autoUpgradeMinorVersion(true)
-                .publisher("Microsoft.Azure.Extensions")
-                .type("CustomScript")
-                .typeHandlerVersion("2.0")
-                // setting the settings happens when examining the corresponding operation
-                .build());
+            .builder()
+            .autoUpgradeMinorVersion(true)
+            .publisher("Microsoft.Azure.Extensions")
+            .type("CustomScript")
+            .typeHandlerVersion("2.0")
+            // setting the settings happens when examining the corresponding operation
+            .build());
     }
 }

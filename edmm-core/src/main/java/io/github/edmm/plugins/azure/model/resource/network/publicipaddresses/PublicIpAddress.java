@@ -24,9 +24,9 @@ public class PublicIpAddress extends Resource {
         Map<String, String> dnsSettings = new HashMap<>();
         dnsSettings.put("domainNameLabel", "[parameters('DnsName')]");
         this.setProperties(PublicIpAddressProperties.builder()
-                .publicIpAllocationMethod("Dynamic")
-                .dnsSettings(dnsSettings)
-                .build()
+            .publicIpAllocationMethod("Dynamic")
+            .dnsSettings(dnsSettings)
+            .build()
         );
     }
 

@@ -27,18 +27,18 @@ public class VirtualMachine extends Resource {
             ((VirtualMachineProperties) this.getProperties()).getOsProfile().setAdminPassword(passwordOrSsh);
         } else {
             final LinuxConfiguration linuxConfiguration = LinuxConfiguration
+                .builder()
+                .disablePasswordAuthentication(true)
+                .ssh(SshConfiguratoin
                     .builder()
-                    .disablePasswordAuthentication(true)
-                    .ssh(SshConfiguratoin
-                            .builder()
-                            .publicKeys(Collections.singletonList(PublicKey
-                                    .builder()
-                                    .keyData(passwordOrSsh)
-                                    .path(String.format("[concat('/home/', parameters('%s_adminUserName'), '/.ssh/authorized_keys')]", this.getName()))
-                                    .build()))
-                            .build()
-                    )
-                    .build();
+                    .publicKeys(Collections.singletonList(PublicKey
+                        .builder()
+                        .keyData(passwordOrSsh)
+                        .path(String.format("[concat('/home/', parameters('%s_adminUserName'), '/.ssh/authorized_keys')]", this.getName()))
+                        .build()))
+                    .build()
+                )
+                .build();
 
             ((VirtualMachineProperties) this.getProperties()).getOsProfile().setLinuxConfiguration(linuxConfiguration);
         }
@@ -49,10 +49,10 @@ public class VirtualMachine extends Resource {
         final SecurityRule newRule = new SecurityRule(String.format("sr_%s", targetNodeName));
         ((SecurityRuleProperties) newRule.getProperties()).setTargetPortRange(port);
         NetworkSecurityGroup sg = ((VirtualMachineProperties) this.getProperties())
-                .getNetworkProfile()
-                .getNetworkInterfaces()
-                .get(0)
-                .getNetworkSecurityGroup();
+            .getNetworkProfile()
+            .getNetworkInterfaces()
+            .get(0)
+            .getNetworkSecurityGroup();
         sg.getSecurityRules().add(newRule);
     }
 
@@ -67,60 +67,60 @@ public class VirtualMachine extends Resource {
         setDependsOn(dependencies);
 
         final HardwareProfile hardwareProfile = HardwareProfile
-                .builder()
-                .vmSize("Standard_A0")
-                .build();
+            .builder()
+            .vmSize("Standard_A0")
+            .build();
 
         final OsProfile osProfile = OsProfile
-                .builder()
-                .computerName(String.format("[parameters('%s_computerName')]", this.getName()))
-                .adminUsername(String.format("[parameters('%s_adminUserName')]", this.getName()))
-                .build();
+            .builder()
+            .computerName(String.format("[parameters('%s_computerName')]", this.getName()))
+            .adminUsername(String.format("[parameters('%s_adminUserName')]", this.getName()))
+            .build();
 
         final StorageProfile storageProfile = StorageProfile
+            .builder()
+            .imageReference(ImageReference
                 .builder()
-                .imageReference(ImageReference
-                        .builder()
-                        .publisher("Canonical")
-                        .offer("UbuntuServer")
-                        .sku("14.04.5-LTS")
-                        .build())
-                .osDisk(OsDisk
-                        .builder()
-                        .caching(CachingEnum.ReadWrite)
-                        .createOptions(CreateOptionsEnum.FromImage)
-                        .name(String.format("%s_OSDisk", this.getName()))
-                        .build())
-                .build();
+                .publisher("Canonical")
+                .offer("UbuntuServer")
+                .sku("14.04.5-LTS")
+                .build())
+            .osDisk(OsDisk
+                .builder()
+                .caching(CachingEnum.ReadWrite)
+                .createOptions(CreateOptionsEnum.FromImage)
+                .name(String.format("%s_OSDisk", this.getName()))
+                .build())
+            .build();
         final NetworkInterface networkInterface = new NetworkInterface(String.format("%s_networkInterface", this.getName()), this.getName());
 
         final NetworkProfile networkProfile = NetworkProfile
-                .builder()
-                .networkInterfaces(Collections.singletonList(networkInterface))
-                .build();
+            .builder()
+            .networkInterfaces(Collections.singletonList(networkInterface))
+            .build();
 
         setProperties(VirtualMachineProperties
-                .builder()
-                .hardwareProfile(hardwareProfile)
-                .networkProfile(networkProfile)
-                .osProfile(osProfile)
-                .storageProfile(storageProfile)
-                .build());
+            .builder()
+            .hardwareProfile(hardwareProfile)
+            .networkProfile(networkProfile)
+            .osProfile(osProfile)
+            .storageProfile(storageProfile)
+            .build());
     }
 
     @Override
     public Map<String, Parameter> getRequiredParameters() {
         Map<String, Parameter> params = super.getRequiredParameters();
         params.put(this.getName() + "_computerName",
-                Parameter.builder()
-                        .type(ParameterTypeEnum.STRING)
-                        .defaultValue(this.getName() + "_Computer")
-                        .build());
+            Parameter.builder()
+                .type(ParameterTypeEnum.STRING)
+                .defaultValue(this.getName() + "_Computer")
+                .build());
         params.put(this.getName() + "_adminUserName",
-                Parameter.builder()
-                        .type(ParameterTypeEnum.STRING)
-                        .defaultValue(this.getName() + "_Admin")
-                        .build());
+            Parameter.builder()
+                .type(ParameterTypeEnum.STRING)
+                .defaultValue(this.getName() + "_Admin")
+                .build());
 
         for (NetworkInterface nic : ((VirtualMachineProperties) this.getProperties()).getNetworkProfile().getNetworkInterfaces()) {
             Map<String, Parameter> networkInterfaceParams = nic.getRequiredParameters();
