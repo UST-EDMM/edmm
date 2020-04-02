@@ -10,7 +10,7 @@ import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
-import io.github.edmm.web.model.PluginSupportResult;
+import io.github.edmm.model.PluginSupportResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -39,22 +39,9 @@ public class PluginController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PluginSupportResult>> checkModelSupport(@RequestBody String yaml) {
         DeploymentModel model = DeploymentModel.of(yaml);
-        List<Plugin> plugins = pluginService.getPlugins();
-        List<PluginSupportResult> response = new ArrayList<>();
-        for (Plugin plugin : plugins) {
-            TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
-            CheckModelResult checkModelResult = pluginService.checkModel(context, plugin);
-            List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
-                    .map(RootComponent::getName)
-                    .collect(Collectors.toList());
-            PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
-                    .id(plugin.getTargetTechnology().getId())
-                    .name(plugin.getTargetTechnology().getName())
-                    .unsupportedComponents(unsupportedComponents);
-            double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
-            psr.supports(s);
-            response.add(psr.build());
-        }
+
+        List<PluginSupportResult> response = this.pluginService.checkModelSupport(model);
+
         return ResponseEntity.ok(response);
     }
 }

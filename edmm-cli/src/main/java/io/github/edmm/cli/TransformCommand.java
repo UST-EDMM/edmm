@@ -6,8 +6,6 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.PluginService;
-import io.github.edmm.core.transformation.TargetTechnology;
-import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationService;
 import io.github.edmm.model.DeploymentModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +54,8 @@ public class TransformCommand implements Callable<Integer> {
         File sourceDirectory = input.getParentFile();
         File targetDirectory = new File(sourceDirectory, target);
         DeploymentModel model = DeploymentModel.of(input);
-        TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
-                .filter(p -> p.getId().equals(target))
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
-        TransformationContext context = new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
-        transformationService.startTransformation(context);
+
+        transformationService.transform(model, target, sourceDirectory,targetDirectory);
         return 42;
     }
 

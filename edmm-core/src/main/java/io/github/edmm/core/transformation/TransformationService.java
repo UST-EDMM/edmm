@@ -1,5 +1,6 @@
 package io.github.edmm.core.transformation;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -7,6 +8,7 @@ import java.util.concurrent.Executors;
 import io.github.edmm.core.plugin.Plugin;
 import io.github.edmm.core.plugin.PluginService;
 import io.github.edmm.core.transformation.support.ExecutionTask;
+import io.github.edmm.model.DeploymentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +41,16 @@ public class TransformationService {
                 logger.error("Error executing transformation task", e);
             }
         }
+    }
+
+    public TransformationContext transform(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
+        TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
+                                                         .filter(p -> p.getId().equals(target))
+                                                         .findFirst()
+                                                         .orElseThrow(IllegalStateException::new);
+        TransformationContext context = new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
+        this.startTransformation(context);
+
+        return context;
     }
 }
