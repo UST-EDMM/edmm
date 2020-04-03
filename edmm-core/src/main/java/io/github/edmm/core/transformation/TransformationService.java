@@ -29,7 +29,7 @@ public class TransformationService {
 
     public void startTransformation(TransformationContext context) {
         TargetTechnology targetTechnology = context.getTargetTechnology();
-        Optional<Plugin> plugin = pluginService.findByTargetTechnology(targetTechnology);
+        Optional<Plugin<?>> plugin = pluginService.findByTargetTechnology(targetTechnology);
         if (!plugin.isPresent()) {
             logger.error("Plugin for given technology '{}' could not be found", targetTechnology.getId());
             return;
@@ -43,14 +43,11 @@ public class TransformationService {
         }
     }
 
-    public TransformationContext transform(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
+    public TransformationContext createContext(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
         TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
             .filter(p -> p.getId().equals(target))
             .findFirst()
             .orElseThrow(IllegalStateException::new);
-        TransformationContext context = new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
-        this.startTransformation(context);
-
-        return context;
+        return new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
     }
 }

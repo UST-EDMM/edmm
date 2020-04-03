@@ -24,24 +24,23 @@ public class PluginService {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginService.class);
 
-    private final List<Plugin> plugins;
+    private final List<Plugin<?>> plugins;
 
     @Autowired
-    public PluginService(List<Plugin> plugins) {
+    public PluginService(List<Plugin<?>> plugins) {
         this.plugins = plugins;
-        Map<String, Plugin> pluginMap = new HashMap<>();
-        for (Plugin plugin : plugins) {
+        Map<String, Plugin<?>> pluginMap = new HashMap<>();
+        for (Plugin<?> plugin : plugins) {
             if (pluginMap.get(plugin.getTargetTechnology().getId()) != null) {
                 logger.error("Found duplicate plugin identifier '{}'", plugin.getTargetTechnology().getId());
                 throw new IllegalArgumentException("The id '" + plugin.getTargetTechnology().getId() + "' is not unique");
             }
             pluginMap.put(plugin.getTargetTechnology().getId(), plugin);
         }
-
         logger.debug("Loaded {} plugins", plugins.size());
     }
 
-    public List<Plugin> getPlugins() {
+    public List<Plugin<?>> getPlugins() {
         return new ArrayList<>(plugins);
     }
 
@@ -51,11 +50,11 @@ public class PluginService {
             .collect(Collectors.toSet());
     }
 
-    public Optional<Plugin> findByTargetTechnology(TargetTechnology targetTechnology) {
+    public Optional<Plugin<?>> findByTargetTechnology(TargetTechnology targetTechnology) {
         if (targetTechnology == null) {
             return Optional.empty();
         }
-        for (Plugin plugin : plugins) {
+        for (Plugin<?> plugin : plugins) {
             if (plugin.getTargetTechnology().getId().equals(targetTechnology.getId())) {
                 return Optional.of(plugin);
             }
@@ -63,13 +62,13 @@ public class PluginService {
         return Optional.empty();
     }
 
-    public CheckModelResult checkModel(TransformationContext context, Plugin plugin) {
+    public CheckModelResult checkModel(TransformationContext context, Plugin<?> plugin) {
         return plugin.getLifecycle(context).checkModel();
     }
 
     public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
-        for (Plugin plugin : this.plugins) {
+        for (Plugin<?> plugin : this.plugins) {
             TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
             CheckModelResult checkModelResult = this.checkModel(context, plugin);
             List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()

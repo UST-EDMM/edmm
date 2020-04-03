@@ -1,6 +1,9 @@
 package io.github.edmm.web.model;
 
-import java.nio.file.Path;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 import io.github.edmm.core.transformation.TransformationContext;
 import lombok.Builder;
@@ -9,16 +12,22 @@ import lombok.NonNull;
 
 @Getter
 @Builder
-public final class TransformationResult {
+public class TransformationResult {
 
     private String id;
+    private String target;
+    private String time;
     private String state;
-    private String path;
 
-    public static TransformationResult of(@NonNull String id, @NonNull TransformationContext context, @NonNull Path path) {
-        return TransformationResult.builder().id(id)
+    public static TransformationResult of(@NonNull TransformationContext context) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+            .withLocale(Locale.GERMANY).withZone(ZoneId.systemDefault());
+
+        return TransformationResult.builder()
+            .id(context.getId())
+            .target(context.getTargetTechnology().getId())
+            .time(formatter.format(context.getTimestamp().toInstant()))
             .state(context.getState().toString().toLowerCase())
-            .path(path.toAbsolutePath().toString())
             .build();
     }
 }

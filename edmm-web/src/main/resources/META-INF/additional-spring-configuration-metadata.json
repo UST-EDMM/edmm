@@ -1,0 +1,9 @@
+{
+    "properties": [
+        {
+            "name": "repository.path",
+            "type": "java.lang.String",
+            "description": "Path to the model repository."
+        }
+    ]
+}

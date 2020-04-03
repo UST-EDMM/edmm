@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.PluginService;
+import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationService;
 import io.github.edmm.model.DeploymentModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,8 @@ public class TransformCommand implements Callable<Integer> {
         File sourceDirectory = input.getParentFile();
         File targetDirectory = new File(sourceDirectory, target);
         DeploymentModel model = DeploymentModel.of(input);
-        transformationService.transform(model, target, sourceDirectory, targetDirectory);
+        TransformationContext context = transformationService.createContext(model, target, sourceDirectory, targetDirectory);
+        transformationService.startTransformation(context);
         return 42;
     }
 

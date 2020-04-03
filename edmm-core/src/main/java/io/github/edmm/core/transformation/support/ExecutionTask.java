@@ -18,10 +18,10 @@ public final class ExecutionTask implements Callable<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutionTask.class);
 
-    private final Plugin plugin;
+    private final Plugin<?> plugin;
     private final TransformationContext context;
 
-    public ExecutionTask(@NonNull Plugin plugin, @NonNull TransformationContext context) {
+    public ExecutionTask(@NonNull Plugin<?> plugin, @NonNull TransformationContext context) {
         this.plugin = plugin;
         this.context = context;
     }
