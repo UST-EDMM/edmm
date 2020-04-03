@@ -68,7 +68,7 @@ public class TransformationController {
             .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Lists a tasks matching the given id.")
+    @Operation(summary = "Lists a task that matches the given id.")
     @GetMapping(value = "/tasks/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TransformationResult getTask(@PathVariable String id) {
         Optional<TransformationContext> task = transformationHandler.getTask(id);
@@ -78,7 +78,7 @@ public class TransformationController {
         return TransformationResult.of(task.get());
     }
 
-    @Operation(summary = "Downloads the compressed result of the transformation.")
+    @Operation(summary = "Downloads the compressed result of a transformation.")
     @GetMapping(value = "/tasks/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> downloadFile(@PathVariable String id) {
         TransformationContext context = transformationHandler.getTask(id).orElse(null);

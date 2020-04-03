@@ -32,7 +32,10 @@ public class PluginController {
         value = "/check-model-support",
         consumes = MediaType.TEXT_PLAIN_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PluginSupportResult>> checkModelSupport(@RequestBody String yaml) {
+    public ResponseEntity<List<PluginSupportResult>> checkModelSupport(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The plain EDMM YAML input")
+        @RequestBody String yaml
+    ) {
         DeploymentModel model = DeploymentModel.of(yaml);
         return ResponseEntity.ok(this.pluginService.checkModelSupport(model));
     }
