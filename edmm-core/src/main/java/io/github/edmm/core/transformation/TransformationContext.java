@@ -17,12 +17,14 @@ import org.springframework.lang.Nullable;
 @Getter
 public final class TransformationContext {
 
-    private final String id;
     private final DeploymentModel model;
     private final TargetTechnology targetTechnology;
     private final File sourceDirectory;
     private final File targetDirectory;
     private final Timestamp timestamp;
+
+    @Setter
+    private String id;
 
     @Setter
     private State state = State.READY;
