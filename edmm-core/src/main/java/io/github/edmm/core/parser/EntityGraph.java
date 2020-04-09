@@ -38,7 +38,9 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     public static final EntityId RELATION_TYPES = ROOT.extend("relation_types");
 
     public EntityGraph() {
-        super((source, target) -> new Edge(target.getName(), source, target));
+        // the edge supplier isn't needed if we use always the function
+        // addEdge(V sourceVertex, V targetVertex, E e) of the AbstractBaseClass
+        super(null,null,false);
         addVertex(new MappingEntity(ROOT, this));
     }
 
@@ -66,7 +68,7 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
         Entity parent = entity.getParent().get();
         boolean added = addVertex(entity);
         if (added) {
-            addEdge(parent, entity);
+            addEdge(parent, entity, new Edge(entity.getName(), parent, entity));
         }
     }
 

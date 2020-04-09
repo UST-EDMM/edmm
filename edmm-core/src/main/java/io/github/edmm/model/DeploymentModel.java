@@ -22,7 +22,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.ToString;
 import org.jgrapht.Graph;
-import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.slf4j.Logger;
