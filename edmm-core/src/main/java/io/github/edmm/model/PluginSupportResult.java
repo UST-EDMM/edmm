@@ -13,7 +13,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public final class PluginSupportResult {
+public class PluginSupportResult {
 
     @NotBlank
     private String id;
