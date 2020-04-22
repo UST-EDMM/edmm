@@ -17,10 +17,10 @@ import io.kubernetes.client.models.V1PodList;
 
 public class ApiInteractorImpl implements ApiInteractor {
 
-    AppsV1Api appsApi;
-    CoreV1Api coreApi;
-    String inputDeploymentName;
-    V1Deployment deployment;
+    private final AppsV1Api appsApi;
+    private final CoreV1Api coreApi;
+    private final String inputDeploymentName;
+    private V1Deployment deployment;
 
     public ApiInteractorImpl(AppsV1Api appsApi, CoreV1Api coreApi, String inputDeploymentName) {
         this.appsApi = appsApi;

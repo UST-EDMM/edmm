@@ -24,7 +24,7 @@ public class Util {
      * @param allResourceContent map with content/info of resource
      * @return list of converted EDiMM instance properties
      */
-    public static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
+    private static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
         Map<String, Object> resourceMap = allResourceContent.get(resource.getResourceName());
         // get property map of resource
@@ -111,7 +111,7 @@ public class Util {
      * @param resourceInput   resource we try to retrieve relations for
      * @return list of converted EDiMM relation instances
      */
-    public static List<RelationInstance> getRelationInstances(List<? extends Resource> resources, Map<String, Map<String, Object>> resourceContent, Resource resourceInput) {
+    private static List<RelationInstance> getRelationInstances(List<? extends Resource> resources, Map<String, Map<String, Object>> resourceContent, Resource resourceInput) {
         List<String> dependsOnList = (List<String>) resourceContent.get(resourceInput.getResourceName()).get(HeatConstants.DEPENDS_ON);
         List<RelationInstance> relationInstances = new ArrayList<>();
 
@@ -135,7 +135,7 @@ public class Util {
      * @param resourceContent content of openstack heat resource, i.e. properties
      * @return EDiMM metadata object with all metadata for resource
      */
-    public static Metadata getMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
+    private static Metadata getMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         Map<String, Object> resourceMap = resourceContent.get(resource.getResourceName());
         // get property map of current resource

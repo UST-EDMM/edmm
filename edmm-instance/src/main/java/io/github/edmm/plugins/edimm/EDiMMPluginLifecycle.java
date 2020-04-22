@@ -44,7 +44,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     public void transformToTOSCA() {
         logger.info("Start transforming to TOSCA");
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance transformedServiceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
+        ServiceTemplateInstance transformedServiceTemplateInstance = TOSCATransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
         logger.info("Transformed EDiMM to OpenTOSCA " + transformedServiceTemplateInstance.toString());
         logger.info("Finished transforming to OpenTOSCA...");
     }

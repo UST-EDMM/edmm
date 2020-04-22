@@ -28,7 +28,7 @@ public class InstanceLifecyclePhase<L extends InstancePluginLifecycle> {
         this.function = function;
     }
 
-    public void setState(State state) {
+    private void setState(State state) {
         if (this.state == state) return;
         logger.debug(String.format("%-20s  %-10s ==> %s", "Phase '" + this.name + "':", this.state, state));
         this.state = state;

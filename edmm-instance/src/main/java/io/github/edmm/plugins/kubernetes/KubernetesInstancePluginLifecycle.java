@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePluginLifecycle.class);
 
-    private DeploymentInstance deploymentInstance = new DeploymentInstance();
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
@@ -83,7 +83,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
         logger.info("Start transforming EDiMM to TOSCA...");
 
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
+        ServiceTemplateInstance serviceTemplateInstance = TOSCATransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
 
         logger.info("Finished transforming EDiMM to TOSCA...");
     }

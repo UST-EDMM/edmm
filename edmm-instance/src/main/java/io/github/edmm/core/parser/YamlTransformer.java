@@ -53,7 +53,7 @@ public class YamlTransformer {
             // write data to yaml file
             yaml.dump(yamlContent, writer);
             File file = new File(fileOutputLocation);
-            file.setReadOnly();
+
             return fileOutputLocation;
         } catch (IOException e) {
             throw new InstanceTransformationException("Failed to create YAML file due to: " + e.getMessage());

@@ -38,49 +38,31 @@ public class YamlSupport {
      */
     static boolean isPrioritized(Property p1, Property p2) {
         // id should be on top
-        if ((isPropertyID(p1) && !isPropertyID(p2))
+        return (isPropertyID(p1) && !isPropertyID(p2))
             || (isPropertyKey(p1) && !isPropertyKey(p2))
             || (isPropertyName(p1) && (!isPropertyName(p2) && !isPropertyID(p2)))
             || (isPropertyType(p1)) && (!isPropertyType(p2) && !isPropertyID(p2) && !isPropertyName(p2))
-            || (isPropertyState(p1) && (!isPropertyState(p2) && isPropertyType(p2) && !isPropertyID(p2) && isPropertyName(p2)))) {
-            return true;
-        }
-        return false;
+            || (isPropertyState(p1) && (!isPropertyState(p2) && isPropertyType(p2) && !isPropertyID(p2) && isPropertyName(p2)));
     }
 
     private static boolean isPropertyID(Property property) {
-        if (property.getName().contains(YamlConstants.ID)) {
-            return true;
-        }
-        return false;
+        return property.getName().contains(YamlConstants.ID);
     }
 
     private static boolean isPropertyName(Property property) {
-        if (property.getName().contains(YamlConstants.NAME)) {
-            return true;
-        }
-        return false;
+        return property.getName().contains(YamlConstants.NAME);
     }
 
     private static boolean isPropertyKey(Property property) {
-        if (property.getName().contains(YamlConstants.KEY)) {
-            return true;
-        }
-        return false;
+        return property.getName().contains(YamlConstants.KEY);
     }
 
     private static boolean isPropertyType(Property property) {
-        if (property.getName().contains(YamlConstants.TYPE)) {
-            return true;
-        }
-        return false;
+        return property.getName().contains(YamlConstants.TYPE);
     }
 
     private static boolean isPropertyState(Property property) {
-        if (property.getName().contains(YamlConstants.STATE)) {
-            return true;
-        }
-        return false;
+        return property.getName().contains(YamlConstants.STATE);
     }
 
     /**
@@ -94,9 +76,9 @@ public class YamlSupport {
 
         ((List<Map<String, String>>) yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
             InstanceProperty instanceProperty = new InstanceProperty(
-                map.get(YamlConstants.KEY) != null ? map.get(YamlConstants.KEY) : null,
-                map.get(YamlConstants.TYPE) != null ? map.get(YamlConstants.TYPE) : null,
-                map.get(YamlConstants.INSTANCE_VALUE) != null ? map.get(YamlConstants.INSTANCE_VALUE) : null);
+                map.get(YamlConstants.KEY),
+                map.get(YamlConstants.TYPE),
+                map.get(YamlConstants.INSTANCE_VALUE));
             instanceProperties.add(instanceProperty);
         });
 
@@ -136,7 +118,7 @@ public class YamlSupport {
      * @param yamlContent map of content of input YAML
      * @return list of relation instances of a component instance
      */
-    public static List<RelationInstance> getRelationInstances(Map<String, Object> yamlContent) {
+    private static List<RelationInstance> getRelationInstances(Map<String, Object> yamlContent) {
         List<RelationInstance> relationInstances = new ArrayList<>();
 
         ((List<Map<String, Object>>) yamlContent.get(YamlConstants.RELATION_INSTANCES)).forEach(map -> {

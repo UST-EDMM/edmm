@@ -11,9 +11,9 @@ import org.openstack4j.model.heat.Stack;
 
 public class ApiInteractorImpl implements ApiInteractor {
 
-    private OSClient.OSClientV3 osClient;
-    private String stackName;
-    private String stackId;
+    private final OSClient.OSClientV3 osClient;
+    private final String stackName;
+    private final String stackId;
 
     public ApiInteractorImpl(OSClient.OSClientV3 osClient, String stackName, String stackId) {
         this.osClient = osClient;

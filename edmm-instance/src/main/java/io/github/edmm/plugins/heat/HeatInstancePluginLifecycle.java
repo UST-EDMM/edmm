@@ -38,7 +38,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     private Map<String, Object> template;
     private OSClientV3 osClient;
     private List<? extends Resource> resources;
-    private DeploymentInstance deploymentInstance = new DeploymentInstance();
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private static final Logger logger = LoggerFactory.getLogger(HeatInstancePluginLifecycle.class);
 
     HeatInstancePluginLifecycle(InstanceTransformationContext context) {

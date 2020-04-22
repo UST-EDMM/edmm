@@ -23,7 +23,7 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
         logger.debug("Initialized plugin '{}'", sourceTechnology.getName());
     }
 
-    protected void init() {
+    void init() {
         // noop
     }
 
@@ -52,6 +52,6 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
         return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 
-    public abstract L getLifecycle(InstanceTransformationContext context);
+    protected abstract L getLifecycle(InstanceTransformationContext context);
 
 }

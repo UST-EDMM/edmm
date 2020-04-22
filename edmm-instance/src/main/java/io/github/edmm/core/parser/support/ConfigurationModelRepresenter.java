@@ -1,7 +1,6 @@
 package io.github.edmm.core.parser.support;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,7 +17,7 @@ import org.yaml.snakeyaml.representer.Representer;
 
 public class ConfigurationModelRepresenter extends Representer {
 
-    public ConfigurationModelRepresenter() {
+    private ConfigurationModelRepresenter() {
         super();
     }
 
@@ -43,11 +42,11 @@ public class ConfigurationModelRepresenter extends Representer {
         }
     }
 
-    protected Set<Property> getProperties(Class<? extends Object> type) {
+    protected Set<Property> getProperties(Class<?> type) {
         Set<Property> properties = getPropertyUtils().getProperties(type);
 
         List<Property> propertyList = new ArrayList<>(properties);
-        Collections.sort(propertyList, new BeanPropertyComparator());
+        propertyList.sort(new BeanPropertyComparator());
 
         return new LinkedHashSet<>(propertyList);
     }
@@ -56,6 +55,8 @@ public class ConfigurationModelRepresenter extends Representer {
         public int compare(Property p1, Property p2) {
             if (YamlSupport.isPrioritized(p1, p2)) {
                 return -1;
+            } else if (p1.equals(p2)) {
+                return 0;
             } else {
                 return 1;
             }

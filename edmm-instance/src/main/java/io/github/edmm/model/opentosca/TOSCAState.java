@@ -20,7 +20,7 @@ public class TOSCAState {
         ERROR(RelationshipTemplateInstanceState.ERROR),
         MIGRATED(RelationshipTemplateInstanceState.MIGRATED);
 
-        public RelationshipTemplateInstanceState relationshipTemplateInstanceState;
+        final RelationshipTemplateInstanceState relationshipTemplateInstanceState;
 
         NodeTemplateInstanceState(RelationshipTemplateInstanceState relationshipTemplateInstanceState) {
             this.relationshipTemplateInstanceState = relationshipTemplateInstanceState;

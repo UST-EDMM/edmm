@@ -14,7 +14,7 @@ public abstract class AbstractLifecycleInstancePlugin implements InstancePluginL
 
     private final List<InstanceLifecyclePhase> phases;
 
-    public AbstractLifecycleInstancePlugin(InstanceTransformationContext context) {
+    protected AbstractLifecycleInstancePlugin(InstanceTransformationContext context) {
         this.context = context;
         this.phases = populatePhases();
     }
