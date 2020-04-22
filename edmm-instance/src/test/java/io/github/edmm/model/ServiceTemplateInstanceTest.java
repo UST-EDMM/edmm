@@ -1,4 +1,4 @@
 package io.github.edmm.model;
 
-class ServiceTemplateInstanceTest {
+public class ServiceTemplateInstanceTest {
 }

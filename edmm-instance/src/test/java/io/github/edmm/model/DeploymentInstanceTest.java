@@ -1,4 +1,4 @@
 package io.github.edmm.model;
 
-class DeploymentInstanceTest {
+public class DeploymentInstanceTest {
 }
