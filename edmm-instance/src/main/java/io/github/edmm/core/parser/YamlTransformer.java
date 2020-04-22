@@ -22,33 +22,41 @@ public class YamlTransformer {
      * @param location:           path to store result yaml as passed by the user
      * @return location where yaml was saved
      */
-    public String createYAMLforEDiMM(DeploymentInstance deploymentInstance, String location) {
-        Map<String, Object> data = new LinkedHashMap<>();
-        // add all information of our deployment instance to data map
-        data.put(YamlConstants.NAME, deploymentInstance.getName());
-        data.put(YamlConstants.VERSION, deploymentInstance.getVersion());
-        data.put(YamlConstants.STATE, String.valueOf(deploymentInstance.getState()));
-        data.put(YamlConstants.ID, deploymentInstance.getId());
-        data.put(YamlConstants.CREATED_AT, deploymentInstance.getCreatedAt());
-        data.put(YamlConstants.DESCRIPTION, deploymentInstance.getDescription());
-        data.put(YamlConstants.METADATA, deploymentInstance.getMetadata());
-        data.put(YamlConstants.INSTANCE_PROPERTIES, deploymentInstance.getInstanceProperties());
-        data.put(YamlConstants.COMPONENT_INSTANCES, deploymentInstance.getComponentInstances());
-
+    public String createYamlforEDiMM(DeploymentInstance deploymentInstance, String location) {
         // create output location path + name of file
         String fileOutputLocation = location + deploymentInstance.getName() + YamlConstants.EDIMM
             + Instant.now().getEpochSecond() + YamlConstants.YAML_FILE_SUFFIX;
+
+        return writeYaml(prepareContentForYaml(deploymentInstance), fileOutputLocation);
+    }
+
+    private Map<String, Object> prepareContentForYaml(DeploymentInstance deploymentInstance) {
+        Map<String, Object> yamlContent = new LinkedHashMap<>();
+        // add all information of our deployment instance to data map
+        yamlContent.put(YamlConstants.NAME, deploymentInstance.getName());
+        yamlContent.put(YamlConstants.VERSION, deploymentInstance.getVersion());
+        yamlContent.put(YamlConstants.STATE, String.valueOf(deploymentInstance.getState()));
+        yamlContent.put(YamlConstants.ID, deploymentInstance.getId());
+        yamlContent.put(YamlConstants.CREATED_AT, deploymentInstance.getCreatedAt());
+        yamlContent.put(YamlConstants.DESCRIPTION, deploymentInstance.getDescription());
+        yamlContent.put(YamlConstants.METADATA, deploymentInstance.getMetadata());
+        yamlContent.put(YamlConstants.INSTANCE_PROPERTIES, deploymentInstance.getInstanceProperties());
+        yamlContent.put(YamlConstants.COMPONENT_INSTANCES, deploymentInstance.getComponentInstances());
+
+        return yamlContent;
+    }
+
+    private String writeYaml(Map<String, Object> yamlContent, String fileOutputLocation) {
         try {
             Yaml yaml = new Yaml(ConfigurationModelRepresenter.getRepresenter(), YamlSupport.getYamlOptions());
             FileWriter writer = new FileWriter(fileOutputLocation);
             // write data to yaml file
-            yaml.dump(data, writer);
+            yaml.dump(yamlContent, writer);
             File file = new File(fileOutputLocation);
             file.setReadOnly();
+            return fileOutputLocation;
         } catch (IOException e) {
             throw new InstanceTransformationException("Failed to create YAML file due to: " + e.getMessage());
         }
-
-        return fileOutputLocation;
     }
 }

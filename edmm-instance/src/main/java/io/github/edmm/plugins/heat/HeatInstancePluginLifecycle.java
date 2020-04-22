@@ -106,7 +106,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         logger.info("Start creating YAML of EDiMM...");
 
         YamlTransformer yamlTransformer = new YamlTransformer();
-        String fileLocation = yamlTransformer.createYAMLforEDiMM(this.deploymentInstance, context.getPath());
+        String fileLocation = yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
 
         logger.info("Finished creating YAML of EDiMM, saved to {}", fileLocation);
     }

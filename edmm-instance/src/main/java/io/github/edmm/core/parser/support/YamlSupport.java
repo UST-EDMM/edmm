@@ -38,18 +38,48 @@ public class YamlSupport {
      */
     static boolean isPrioritized(Property p1, Property p2) {
         // id should be on top
-        if ((p1.getName().contains(YamlConstants.ID) && !p2.getName().contains(YamlConstants.ID))
-            // name property should appear after id but before anything else
-            || (p1.getName().contains(YamlConstants.NAME) && (!p2.getName().contains(YamlConstants.NAME) && !p2.getName().contains(YamlConstants.ID)))
-            // key should appear on top in properties
-            || (p1.getName().contains(YamlConstants.KEY) && !p2.getName().contains(YamlConstants.KEY))
-            // type should appear after id and name
-            || (p1.getName().contains(YamlConstants.TYPE) && (!p2.getName().contains(YamlConstants.TYPE) && !p2.getName().contains(YamlConstants.ID) && !p2.getName().contains(YamlConstants.NAME)))
-            // state should appear after type, id, and name
-            || (p1.getName().contains(YamlConstants.STATE) && (!p2.getName().contains(YamlConstants.STATE) && !p2.getName().contains(YamlConstants.TYPE) && !p2.getName().contains(YamlConstants.ID) && !p2.getName().contains(YamlConstants.NAME)))) {
+        if ((isPropertyID(p1) && !isPropertyID(p2))
+            || (isPropertyKey(p1) && !isPropertyKey(p2))
+            || (isPropertyName(p1) && (!isPropertyName(p2) && !isPropertyID(p2)))
+            || (isPropertyType(p1)) && (!isPropertyType(p2) && !isPropertyID(p2) && !isPropertyName(p2))
+            || (isPropertyState(p1) && (!isPropertyState(p2) && isPropertyType(p2) && !isPropertyID(p2) && isPropertyName(p2)))) {
             return true;
         }
-        // default no prioritization
+        return false;
+    }
+
+    private static boolean isPropertyID(Property property) {
+        if (property.getName().contains(YamlConstants.ID)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isPropertyName(Property property) {
+        if (property.getName().contains(YamlConstants.NAME)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isPropertyKey(Property property) {
+        if (property.getName().contains(YamlConstants.KEY)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isPropertyType(Property property) {
+        if (property.getName().contains(YamlConstants.TYPE)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isPropertyState(Property property) {
+        if (property.getName().contains(YamlConstants.STATE)) {
+            return true;
+        }
         return false;
     }
 

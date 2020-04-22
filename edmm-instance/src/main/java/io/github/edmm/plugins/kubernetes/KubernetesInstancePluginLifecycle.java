@@ -84,7 +84,6 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
 
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
-        logger.info("Derived following service template instance {}", serviceTemplateInstance.toString());
 
         logger.info("Finished transforming EDiMM to TOSCA...");
     }
@@ -94,10 +93,9 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
         logger.info("Start creating YAML for EDiMM...");
 
         YamlTransformer yamlTransformer = new YamlTransformer();
-        String outputPath = yamlTransformer.createYAMLforEDiMM(this.deploymentInstance, context.getPath());
-        logger.info("Saved YAML to {}", outputPath);
+        String fileLocation = yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
 
-        logger.info("Finished creating YAML for EDiMM...");
+        logger.info("Finished creating YAML of EDiMM, saved to {}", fileLocation);
     }
 
     @Override

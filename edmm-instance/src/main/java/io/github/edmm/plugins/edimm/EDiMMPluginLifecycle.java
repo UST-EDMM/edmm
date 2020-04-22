@@ -53,7 +53,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     public void createYAML() {
         logger.info("Start creating YAML of EDiMM...");
         YamlTransformer yamlTransformer = new YamlTransformer();
-        String fileLocation = yamlTransformer.createYAMLforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
+        String fileLocation = yamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
         logger.info("Finished creating YAML of EDiMM, saved to {}", fileLocation);
     }
 
