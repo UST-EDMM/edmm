@@ -32,7 +32,7 @@ public class YamlSupport {
             || (isPropertyKey(p1) && !isPropertyKey(p2))
             || (isPropertyName(p1) && (!isPropertyName(p2) && !isPropertyID(p2)))
             || (isPropertyType(p1)) && (!isPropertyType(p2) && !isPropertyID(p2) && !isPropertyName(p2))
-            || (isPropertyState(p1) && (!isPropertyState(p2) && isPropertyType(p2) && !isPropertyID(p2) && isPropertyName(p2)));
+            || (isPropertyState(p1) && (!isPropertyState(p2) && !isPropertyType(p2) && !isPropertyID(p2) && !isPropertyName(p2)));
     }
 
     private static boolean isPropertyID(Property property) {

@@ -14,7 +14,9 @@ import io.github.edmm.plugins.heat.api.ApiInteractorImpl;
 import io.github.edmm.plugins.heat.api.AuthenticatorImpl;
 import io.github.edmm.plugins.heat.model.StackStatus;
 import io.github.edmm.plugins.heat.util.HeatConstants;
-import io.github.edmm.plugins.heat.util.Util;
+import io.github.edmm.plugins.heat.util.HeatMetadataHandler;
+import io.github.edmm.plugins.heat.util.HeatPropertiesHandler;
+import io.github.edmm.plugins.heat.util.HeatResourceHandler;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
@@ -24,15 +26,14 @@ import org.slf4j.LoggerFactory;
 
 public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
-    // TODO: replace with config management once ready
-    private static final String userName = "---";
-    private static final String password = "---";
-    private static final String projectId = "---";
-    private static final String domainName = "---";
-    private static final String authenticationEndpoint = "---";
+    private static final String userName = "-";
+    private static final String password = "-";
+    private static final String projectId = "-";
+    private static final String domainName = "-";
+    private static final String authenticationEndpoint = "-";
 
-    private static final String stackName = "---";
-    private static final String stackId = "---";
+    private static final String stackName = "-";
+    private static final String stackId = "-";
 
     private Stack stack;
     private Map<String, Object> template;
@@ -82,11 +83,11 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         this.deploymentInstance.setName(this.stack.getName());
         this.deploymentInstance.setState(StackStatus.StackStatusForDeploymentInstance.valueOf(this.stack.getStatus()).toEDIMMDeploymentInstanceState());
         this.deploymentInstance.setVersion(String.valueOf(this.template.get(HeatConstants.VERSION)));
-        this.deploymentInstance.setInstanceProperties(Util.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
-        this.deploymentInstance.setMetadata(Util.getMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
+        this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
+        this.deploymentInstance.setMetadata(HeatMetadataHandler.getMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
         this.resources.forEach(resource -> {
             Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) this.template.get(HeatConstants.RESOURCES);
-            this.deploymentInstance.addToComponentInstances(Util.getComponentInstance(this.resources, resource, resourceContent));
+            this.deploymentInstance.addToComponentInstances(HeatResourceHandler.getComponentInstance(this.resources, resource, resourceContent));
         });
 
         logger.info("Finished transforming to EDiMM...");
