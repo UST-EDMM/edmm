@@ -84,7 +84,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         this.deploymentInstance.setState(StackStatus.StackStatusForDeploymentInstance.valueOf(this.stack.getStatus()).toEDIMMDeploymentInstanceState());
         this.deploymentInstance.setVersion(String.valueOf(this.template.get(HeatConstants.VERSION)));
         this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
-        this.deploymentInstance.setMetadata(HeatMetadataHandler.getMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
+        this.deploymentInstance.setMetadata(HeatMetadataHandler.getDeploymentMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
         this.resources.forEach(resource -> {
             Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) this.template.get(HeatConstants.RESOURCES);
             this.deploymentInstance.addToComponentInstances(HeatResourceHandler.getComponentInstance(this.resources, resource, resourceContent));
