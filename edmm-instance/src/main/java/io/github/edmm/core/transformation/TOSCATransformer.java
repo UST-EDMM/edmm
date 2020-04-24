@@ -18,7 +18,7 @@ public class TOSCATransformer {
     ServiceTemplateInstance serviceTemplateInstance;
     List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
 
-    public ServiceTemplateInstance transformEDiMMToOpenTOSCA(DeploymentInstance deploymentInstance) {
+    public ServiceTemplateInstance transformEDiMMToServiceTemplateInstance(DeploymentInstance deploymentInstance) {
         this.deploymentInstance = deploymentInstance;
         this.serviceTemplateInstance = ServiceTemplateInstance.ofDeploymentInstance(this.deploymentInstance);
         createNodeTemplateInstances();

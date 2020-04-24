@@ -82,7 +82,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     public void transformToTOSCA() {
         logger.info("Start transforming EDiMM to TOSCA...");
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
         logger.info("Derived Service Template Instance {}", serviceTemplateInstance.toString());
         logger.info("Finished transforming EDiMM to TOSCA...");
     }
