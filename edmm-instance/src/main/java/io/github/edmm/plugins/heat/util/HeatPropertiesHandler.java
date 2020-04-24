@@ -9,6 +9,7 @@ import io.github.edmm.model.edimm.InstanceProperty;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class HeatPropertiesHandler {
+
     public static List<InstanceProperty> getDeploymentInstanceProperties(Map<String, String> parameterMap, List<Map<String, Object>> outputList) {
         List<InstanceProperty> deploymentInstanceProperties = new ArrayList<>();
         // iterate over key-value-pairs of properties

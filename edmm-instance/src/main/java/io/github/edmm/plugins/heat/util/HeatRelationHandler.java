@@ -10,6 +10,7 @@ import org.openstack4j.model.heat.Resource;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class HeatRelationHandler {
+
     protected static List<RelationInstance> getRelationInstances(List<? extends Resource> resources, Map<String, Map<String, Object>> resourceContent, Resource resourceInput) {
         List<String> dependsOnList = (List<String>) resourceContent.get(resourceInput.getResourceName()).get(HeatConstants.DEPENDS_ON);
         List<RelationInstance> relationInstances = new ArrayList<>();

@@ -10,6 +10,7 @@ import io.github.edmm.plugins.heat.model.StackStatus;
 import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
+
     protected static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
         Map<String, Object> resourceMap = allResourceContent.get(resource.getResourceName());
@@ -61,7 +62,7 @@ public class HeatResourceHandler {
         componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
-        componentInstance.setMetadata(HeatMetadataHandler.getMetadata(resource, resourceContent));
+        componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
 
         return componentInstance;
     }
