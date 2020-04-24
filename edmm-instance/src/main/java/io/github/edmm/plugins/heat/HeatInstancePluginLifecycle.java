@@ -96,7 +96,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     public void transformToTOSCA() {
         logger.info("Start transforming to OpenTOSCA...");
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
         logger.info("Derived Service Template Instance {}", serviceTemplateInstance.toString());
         logger.info("Finished transforming to OpenTOSCA...");
     }
