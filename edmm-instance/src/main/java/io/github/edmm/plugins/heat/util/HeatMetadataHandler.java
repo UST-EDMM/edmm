@@ -15,32 +15,13 @@ import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 public class HeatMetadataHandler {
 
     protected static Metadata getComponentMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
-        Map<String, Object> resultMap = new LinkedHashMap<>();
-        Map<String, Object> resourceMap = resourceContent.get(resource.getResourceName());
-        // get property map of current resource
-        Map<String, Object> propertiesMap = (Map<String, Object>) resourceMap.get(HeatConstants.PROPERTIES);
+        Map<String, Object> propertiesMap = getPropertiesMap(getResourceMap(resourceContent, resource.getResourceName()));
+        List<String> tagList = getTagList(propertiesMap);
+        Map<String, Object> metadataMap = getMetadataMap(propertiesMap);
 
-        // get tags of property map
-        List<String> tagList = (List<String>) propertiesMap.get(HeatConstants.TAGS);
-        // get metadata of property map
-        Map<String, Object> metadataMap = (Map<String, Object>) propertiesMap.get(HeatConstants.METADATA);
-
-        // add metadata and tags to result map
-        emptyIfNull(metadataMap).forEach(resultMap::put);
-        if (tagList != null && !tagList.isEmpty()) {
-            resultMap.put(HeatConstants.TAGS, tagList);
-        }
-        if (resultMap.isEmpty()) {
-            return null;
-        }
-        return Metadata.of(resultMap);
-    }
-
-    public static Metadata getDeploymentMetadata(List<String> tagList, Long timeoutTime, String updatedTime) {
         Map<String, Object> resultMap = Stream.of(
             handleTagList(tagList).entrySet(),
-            handleTimeout(timeoutTime).entrySet(),
-            handleUpdatedTime(updatedTime).entrySet()
+            handleMetadataMap(metadataMap).entrySet()
         ).flatMap(Set::stream)
             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -53,6 +34,39 @@ public class HeatMetadataHandler {
             tagMap.put(HeatConstants.TAGS, tagList);
         }
         return tagMap;
+    }
+
+    private static Map<String, Object> handleMetadataMap(Map<String, Object> metadataMap) {
+        Map<String, Object> metadataResult = new LinkedHashMap<>();
+        emptyIfNull(metadataMap).forEach(metadataResult::put);
+        return metadataResult;
+    }
+
+    private static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
+        return resourceContent.get(resourceName);
+    }
+
+    private static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
+        return (Map<String, Object>) resourceContentMap.get(HeatConstants.PROPERTIES);
+    }
+
+    private static List<String> getTagList(Map<String, Object> propertiesMap) {
+        return (List<String>) propertiesMap.get(HeatConstants.TAGS);
+    }
+
+    private static Map<String, Object> getMetadataMap(Map<String, Object> propertiesMap) {
+        return (Map<String, Object>) propertiesMap.get(HeatConstants.METADATA);
+    }
+
+    public static Metadata getDeploymentMetadata(List<String> tagList, Long timeoutTime, String updatedTime) {
+        Map<String, Object> resultMap = Stream.of(
+            handleTagList(tagList).entrySet(),
+            handleTimeout(timeoutTime).entrySet(),
+            handleUpdatedTime(updatedTime).entrySet()
+        ).flatMap(Set::stream)
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return resultMap.isEmpty() ? null : Metadata.of(resultMap);
     }
 
     private static Map<String, Object> handleTimeout(Long timeoutTime) {
