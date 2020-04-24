@@ -17,14 +17,17 @@ import org.yaml.snakeyaml.representer.Representer;
 
 public class ConfigurationModelRepresenter extends Representer {
 
-    private ConfigurationModelRepresenter() {
+    public ConfigurationModelRepresenter() {
         super();
     }
 
-    public static ConfigurationModelRepresenter getRepresenter() {
-        ConfigurationModelRepresenter representer = new ConfigurationModelRepresenter();
+    public static ConfigurationModelRepresenter getConfiguredRepresenter() {
+        return getRepresenterWithClassTags();
+    }
 
-        // EDiMM custom class representation
+    private static ConfigurationModelRepresenter getRepresenterWithClassTags() {
+        ConfigurationModelRepresenter representer = new ConfigurationModelRepresenter();
+        // add custom classes to representer for suitable visual representation in YAML file
         representer.addClassTag(InstanceProperty.class, Tag.MAP);
         representer.addClassTag(ComponentInstance.class, Tag.MAP);
         representer.addClassTag(RelationInstance.class, Tag.MAP);
@@ -53,7 +56,7 @@ public class ConfigurationModelRepresenter extends Representer {
 
     class BeanPropertyComparator implements Comparator<Property> {
         public int compare(Property p1, Property p2) {
-            if (YamlSupport.isPrioritized(p1, p2)) {
+            if (YamlSupport.isFirstPropertyPrioritized(p1, p2)) {
                 return -1;
             } else if (p1.equals(p2)) {
                 return 0;

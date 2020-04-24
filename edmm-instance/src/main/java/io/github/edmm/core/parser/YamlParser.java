@@ -41,8 +41,8 @@ public class YamlParser {
         deploymentInstance.setCreatedAt(data.get(YamlConstants.CREATED_AT) != null ? String.valueOf(data.get(YamlConstants.CREATED_AT)) : null);
         deploymentInstance.setDescription(data.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(data.get(YamlConstants.DESCRIPTION)) : null);
         deploymentInstance.setMetadata(data.get(YamlConstants.METADATA) != null ? Metadata.of(emptyIfNull((Map<String, Object>) data.get(YamlConstants.METADATA))) : null);
-        deploymentInstance.setInstanceProperties(data.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstanceProperties(data) : null);
-        deploymentInstance.setComponentInstances(data.get(YamlConstants.COMPONENT_INSTANCES) != null ? YamlSupport.getComponentInstances(data) : null);
+        deploymentInstance.setInstanceProperties(data.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(data) : null);
+        deploymentInstance.setComponentInstances(data.get(YamlConstants.COMPONENT_INSTANCES) != null ? YamlSupport.getComponentInstancesFromYamlContent(data) : null);
 
         return deploymentInstance;
     }

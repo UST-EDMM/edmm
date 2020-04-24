@@ -43,9 +43,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     @Override
     public void transformToTOSCA() {
         logger.info("Start transforming to TOSCA");
-        TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance transformedServiceTemplateInstance = TOSCATransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
-        logger.info("Transformed EDiMM to OpenTOSCA " + transformedServiceTemplateInstance.toString());
         logger.info("Finished transforming to OpenTOSCA...");
     }
 
@@ -53,8 +51,8 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     public void createYAML() {
         logger.info("Start creating YAML of EDiMM...");
         YamlTransformer yamlTransformer = new YamlTransformer();
-        String fileLocation = yamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
-        logger.info("Finished creating YAML of EDiMM, saved to {}", fileLocation);
+        yamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
+        logger.info("Finished creating YAML of EDiMM, saved to {}", yamlTransformer.getFileOutputLocation());
     }
 
     @Override

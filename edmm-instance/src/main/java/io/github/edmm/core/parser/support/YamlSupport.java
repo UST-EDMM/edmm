@@ -16,27 +16,21 @@ import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 public class YamlSupport {
 
-    /**
-     * Get DumperOptions for dumping YAMl file.
-     *
-     * @return the options for snakeyaml
-     */
-    public static DumperOptions getYamlOptions() {
-        DumperOptions options = new DumperOptions();
-        // options for a proper layout of yaml file
-        options.setIndent(2);
-        options.setPrettyFlow(true);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        return options;
+    DumperOptions dumperOptions = new DumperOptions();
+
+    public DumperOptions getYamlOptions() {
+        this.setDumperOptions();
+        return this.dumperOptions;
     }
 
-    /**
-     * Helper method to compare object properties to order output of Java Objects in YAML file.
-     *
-     * @param p1 first property to compare
-     * @param p2 second property to compare
-     */
-    static boolean isPrioritized(Property p1, Property p2) {
+    private void setDumperOptions() {
+        // options for a proper layout of yaml file
+        this.dumperOptions.setIndent(2);
+        this.dumperOptions.setPrettyFlow(true);
+        this.dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+    }
+
+    static boolean isFirstPropertyPrioritized(Property p1, Property p2) {
         // id should be on top
         return (isPropertyID(p1) && !isPropertyID(p2))
             || (isPropertyKey(p1) && !isPropertyKey(p2))
@@ -65,13 +59,7 @@ public class YamlSupport {
         return property.getName().contains(YamlConstants.STATE);
     }
 
-    /**
-     * Get instance properties for a deployment instance from YAML file.
-     *
-     * @param yamlContent map of content of input YAML
-     * @return list of instance properties
-     */
-    public static List<InstanceProperty> getInstanceProperties(Map<String, Object> yamlContent) {
+    public static List<InstanceProperty> getInstancePropertiesFromYamlContent(Map<String, Object> yamlContent) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
 
         ((List<Map<String, String>>) yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
@@ -85,13 +73,7 @@ public class YamlSupport {
         return instanceProperties;
     }
 
-    /**
-     * Get component instances for a deployment instance from YAML file.
-     *
-     * @param yamlContent map of content of input YAML
-     * @return list of component instances
-     */
-    public static List<ComponentInstance> getComponentInstances(Map<String, Object> yamlContent) {
+    public static List<ComponentInstance> getComponentInstancesFromYamlContent(Map<String, Object> yamlContent) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
 
         ((List<Map<String, Object>>) yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(map -> {
@@ -101,10 +83,10 @@ public class YamlSupport {
             componentInstance.setState(map.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForComponentInstance.valueOf(String.valueOf(map.get(YamlConstants.STATE))) : null);
             componentInstance.setId(map.get(YamlConstants.ID) != null ? String.valueOf(map.get(YamlConstants.ID)) : null);
             componentInstance.setCreatedAt(map.get(YamlConstants.CREATED_AT) != null ? String.valueOf(map.get(YamlConstants.CREATED_AT)) : null);
-            componentInstance.setInstanceProperties(map.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstanceProperties(map) : null);
+            componentInstance.setInstanceProperties(map.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(map) : null);
             componentInstance.setDescription(map.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(map.get(YamlConstants.DESCRIPTION)) : null);
             componentInstance.setMetadata(map.get(YamlConstants.METADATA) != null ? Metadata.of(emptyIfNull((Map<String, Object>) map.get(YamlConstants.METADATA))) : null);
-            componentInstance.setRelationInstances(map.get(YamlConstants.RELATION_INSTANCES) != null ? YamlSupport.getRelationInstances(map) : null);
+            componentInstance.setRelationInstances(map.get(YamlConstants.RELATION_INSTANCES) != null ? YamlSupport.getRelationInstancesFromYamlContent(map) : null);
 
             componentInstances.add(componentInstance);
         });
@@ -112,13 +94,7 @@ public class YamlSupport {
         return componentInstances;
     }
 
-    /**
-     * Get relation instances of a component instance from YAML file.
-     *
-     * @param yamlContent map of content of input YAML
-     * @return list of relation instances of a component instance
-     */
-    private static List<RelationInstance> getRelationInstances(Map<String, Object> yamlContent) {
+    private static List<RelationInstance> getRelationInstancesFromYamlContent(Map<String, Object> yamlContent) {
         List<RelationInstance> relationInstances = new ArrayList<>();
 
         ((List<Map<String, Object>>) yamlContent.get(YamlConstants.RELATION_INSTANCES)).forEach(map -> {
@@ -127,7 +103,7 @@ public class YamlSupport {
             relationInstance.setTargetInstanceId(map.get(YamlConstants.RELATION_TARGET_INSTANCE_ID) != null ? String.valueOf(map.get(YamlConstants.RELATION_TARGET_INSTANCE_ID)) : null);
             relationInstance.setType(map.get(YamlConstants.TYPE) != null ? String.valueOf(map.get(YamlConstants.TYPE)) : null);
             relationInstance.setDescription(map.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(map.get(YamlConstants.DESCRIPTION)) : null);
-            relationInstance.setInstanceProperties(map.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstanceProperties(emptyIfNull((Map<String, Object>) map.get(YamlConstants.INSTANCE_PROPERTIES))) : null);
+            relationInstance.setInstanceProperties(map.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(emptyIfNull((Map<String, Object>) map.get(YamlConstants.INSTANCE_PROPERTIES))) : null);
             relationInstance.setMetadata(map.get(YamlConstants.METADATA) != null ? Metadata.of(emptyIfNull((Map<String, Object>) map.get(YamlConstants.METADATA))) : null);
 
             relationInstances.add(relationInstance);
