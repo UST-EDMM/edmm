@@ -21,7 +21,7 @@ public class RelationInstance extends BasicInstance {
     private String targetInstanceId;
     private List<Operation> operations;
 
-    public RelationInstance of(Map<String, Object> yamlContent) {
+    public static RelationInstance ofYamlContent(Map<String, Object> yamlContent) {
         RelationInstance relationInstance = new RelationInstance();
 
         relationInstance.setId(yamlContent.get(YamlConstants.ID) != null ? String.valueOf(yamlContent.get(YamlConstants.ID)) : null);

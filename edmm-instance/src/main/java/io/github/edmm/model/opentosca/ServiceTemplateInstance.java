@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import io.github.edmm.model.edimm.DeploymentInstance;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,4 +19,16 @@ public class ServiceTemplateInstance {
     String csarId;
     TOSCAState.ServiceTemplateInstanceState state;
     List<NodeTemplateInstance> nodeTemplateInstances;
+
+    public static ServiceTemplateInstance ofDeploymentInstance(DeploymentInstance deploymentInstance) {
+        ServiceTemplateInstance serviceTemplateInstance = new ServiceTemplateInstance();
+
+        serviceTemplateInstance.setServiceTemplateInstanceId(deploymentInstance.getId());
+        serviceTemplateInstance.setCreatedAt(deploymentInstance.getCreatedAt());
+        serviceTemplateInstance.setCsarId(deploymentInstance.getName());
+        serviceTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL_NAMESPACE, deploymentInstance.getName()));
+        serviceTemplateInstance.setState(deploymentInstance.getState().toTOSCAServiceTemplateInstanceState());
+
+        return serviceTemplateInstance;
+    }
 }

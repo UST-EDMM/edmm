@@ -73,7 +73,7 @@ public class YamlSupport {
         List<ComponentInstance> componentInstances = new ArrayList<>();
 
         ((List<Map<String, Object>>) yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(componentYamlContent -> {
-            ComponentInstance componentInstance = new ComponentInstance().ofYamlContent(componentYamlContent);
+            ComponentInstance componentInstance = ComponentInstance.ofYamlContent(componentYamlContent);
             componentInstances.add(componentInstance);
         });
 
@@ -84,7 +84,7 @@ public class YamlSupport {
         List<RelationInstance> relationInstances = new ArrayList<>();
 
         ((List<Map<String, Object>>) yamlContent.get(YamlConstants.RELATION_INSTANCES)).forEach(relationYamlContent -> {
-            RelationInstance relationInstance = new RelationInstance().of(relationYamlContent);
+            RelationInstance relationInstance = RelationInstance.ofYamlContent(relationYamlContent);
             relationInstances.add(relationInstance);
         });
         return relationInstances;

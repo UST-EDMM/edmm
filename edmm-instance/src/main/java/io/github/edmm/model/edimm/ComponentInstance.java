@@ -26,7 +26,7 @@ public class ComponentInstance extends BasicInstance {
     private List<Artifact> artifacts;
     private List<RelationInstance> relationInstances;
 
-    public ComponentInstance ofYamlContent(Map<String, Object> yamlContent) {
+    public static ComponentInstance ofYamlContent(Map<String, Object> yamlContent) {
         ComponentInstance componentInstance = new ComponentInstance();
         componentInstance.setName(yamlContent.get(YamlConstants.NAME) != null ? String.valueOf(yamlContent.get(YamlConstants.NAME)) : null);
         componentInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? String.valueOf(yamlContent.get(YamlConstants.TYPE)) : null);

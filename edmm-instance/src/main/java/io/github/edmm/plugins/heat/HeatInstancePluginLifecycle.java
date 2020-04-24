@@ -95,19 +95,17 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     @Override
     public void transformToTOSCA() {
         logger.info("Start transforming to OpenTOSCA...");
-
-        ServiceTemplateInstance transformedServiceTemplateInstance = TOSCATransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
-
+        TOSCATransformer toscaTransformer = new TOSCATransformer();
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToOpenTOSCA(this.deploymentInstance);
+        logger.info("Derived Service Template Instance {}", serviceTemplateInstance.toString());
         logger.info("Finished transforming to OpenTOSCA...");
     }
 
     @Override
     public void createYAML() {
         logger.info("Start creating YAML of EDiMM...");
-
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-
         logger.info("Finished creating YAML of EDiMM, saved to {}", yamlTransformer.getFileOutputLocation());
     }
 
