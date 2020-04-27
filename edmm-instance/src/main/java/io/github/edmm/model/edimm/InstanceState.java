@@ -18,11 +18,6 @@ public class InstanceState {
             this.serviceTemplateInstanceState = toscaState;
         }
 
-        /**
-         * Convert enum value of EDiMM instance state to OpenTOSCA instance state enum value.
-         *
-         * @return value of OpenTOSCA state enum
-         */
         public TOSCAState.ServiceTemplateInstanceState toTOSCAServiceTemplateInstanceState() {
             return serviceTemplateInstanceState;
         }
@@ -44,11 +39,6 @@ public class InstanceState {
             this.nodeTemplateInstanceState = toscaState;
         }
 
-        /**
-         * Convert enum value of EDiMM instance state to OpenTOSCA instance state enum value.
-         *
-         * @return value of OpenTOSCA state enum
-         */
         public TOSCAState.NodeTemplateInstanceState toTOSCANodeTemplateInstanceState() {
             return nodeTemplateInstanceState;
         }

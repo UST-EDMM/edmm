@@ -46,15 +46,15 @@ public class TOSCATransformer {
     }
 
     private void addRelationshipToNodeTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance, ComponentInstance componentInstance) {
-        this.checkForOutgoingNodeTemplateInstance(relationshipTemplateInstance, componentInstance);
-        this.checkForIngoingNodeTemplateInstance(relationshipTemplateInstance, relationInstance);
+        this.addToNodeTemplateInstanceAsOutgoing(relationshipTemplateInstance, componentInstance);
+        this.addToNodeTemplateInstanceaAsIngoing(relationshipTemplateInstance, relationInstance);
     }
 
-    private void checkForOutgoingNodeTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance, ComponentInstance componentInstance) {
+    private void addToNodeTemplateInstanceAsOutgoing(RelationshipTemplateInstance relationshipTemplateInstance, ComponentInstance componentInstance) {
         this.nodeTemplateInstances.stream().filter(x -> x.getNodeTemplateInstanceId().equals(componentInstance.getId())).findFirst().get().addToOutgoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 
-    private void checkForIngoingNodeTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance) {
+    private void addToNodeTemplateInstanceaAsIngoing(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance) {
         this.nodeTemplateInstances.stream().filter(x -> x.getNodeTemplateInstanceId().equals(relationInstance.getTargetInstanceId())).findFirst().get().addToIngoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 }

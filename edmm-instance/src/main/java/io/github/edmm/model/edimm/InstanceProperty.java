@@ -19,12 +19,6 @@ public class InstanceProperty extends BasicInstance {
         this.instanceValue = instanceValue;
     }
 
-    /**
-     * Convert InstanceProperty of EDiMM to OpenTOSCA Property.
-     *
-     * @param instanceProperty: property to be converted
-     * @return converted OpenTOSCA property
-     */
     public static TOSCAProperty convertToTOSCAProperty(InstanceProperty instanceProperty) {
         TOSCAProperty toscaProperty = new TOSCAProperty();
 

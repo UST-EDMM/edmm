@@ -24,11 +24,6 @@ public class StackStatus {
             this.deploymentInstanceState = deploymentInstanceState;
         }
 
-        /**
-         * Convert OpenStack HEAT state enum value to EDiMM instance state enum value.
-         *
-         * @return converted EDiMM state enum value
-         */
         public InstanceState.InstanceStateForDeploymentInstance toEDIMMDeploymentInstanceState() {
             return deploymentInstanceState;
         }
@@ -55,11 +50,6 @@ public class StackStatus {
             this.componentInstanceState = componentInstanceState;
         }
 
-        /**
-         * Convert OpenStack HEAT state enum value to EDiMM instance state enum value.
-         *
-         * @return converted EDiMM state enum value
-         */
         public InstanceState.InstanceStateForComponentInstance toEDIMMComponentInstanceState() {
             return componentInstanceState;
         }

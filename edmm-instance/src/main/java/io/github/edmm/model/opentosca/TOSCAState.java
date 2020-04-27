@@ -32,6 +32,12 @@ public class TOSCAState {
     }
 
     public enum RelationshipTemplateInstanceState {
-        INITIAL, CREATING, CREATED, DELETING, DELETED, ERROR, MIGRATED
+        INITIAL,
+        CREATING,
+        CREATED,
+        DELETING,
+        DELETED,
+        ERROR,
+        MIGRATED
     }
 }

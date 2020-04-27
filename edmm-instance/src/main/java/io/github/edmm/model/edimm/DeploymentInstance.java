@@ -18,18 +18,10 @@ public class DeploymentInstance extends BasicInstance{
     private List<ComponentInstance> componentInstances;
     private String deploymentModelLocation;
 
-    /**
-     * Create list of component instances for a deployment instance.
-     */
     private void createComponentInstances() {
         this.componentInstances = new ArrayList<>();
     }
 
-    /**
-     * Add to existing list of component instances.
-     *
-     * @param componentInstance component instance to add
-     */
     public void addToComponentInstances(ComponentInstance componentInstance) {
         if (this.componentInstances == null) {
             this.createComponentInstances();
