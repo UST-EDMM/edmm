@@ -16,7 +16,7 @@ public class KubernetesPodsHandler {
             componentInstance.setId(pod.getMetadata().getUid());
             componentInstance.setCreatedAt(String.valueOf(pod.getMetadata().getCreationTimestamp()));
             componentInstance.setState(KubernetesStateHandler.getComponentInstanceState(pod.getStatus()));
-            componentInstance.setMetadata(KubernetesMetadataHandler.getMetadata(pod.getMetadata()));
+            componentInstance.setMetadata(new KubernetesMetadataHandler(pod.getMetadata()).getMetadata());
             componentInstance.setInstanceProperties(KubernetesPropertiesHandler.getComponentInstanceProperties(pod.getStatus()));
 
             componentInstances.add(componentInstance);
