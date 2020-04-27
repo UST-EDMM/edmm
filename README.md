@@ -1,24 +1,22 @@
-# EDMM Transformation Framework
+# EDMM Transformation and Deployment Framework
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.org/UST-EDMM/transformation-framework.svg?branch=master)](https://travis-ci.org/UST-EDMM/transformation-framework)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d46d2287b3084689be0247e1aed91bc9)](https://www.codacy.com/app/miwurster/transformation-framework?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UST-EDMM/transformation-framework&amp;utm_campaign=Badge_Grade)
-[![JitPack](https://jitpack.io/v/UST-EDMM/transformation-framework.svg)](https://jitpack.io/#UST-EDMM/transformation-framework)
+[![Build Status](https://travis-ci.org/UST-EDMM/transformation-framework.svg?branch=master)](https://travis-ci.org/UST-EDMM/edmm)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d46d2287b3084689be0247e1aed91bc9)](https://www.codacy.com/app/miwurster/edmm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UST-EDMM/transformation-framework&amp;utm_campaign=Badge_Grade)
+[![JitPack](https://jitpack.io/v/UST-EDMM/transformation-framework.svg)](https://jitpack.io/#UST-EDMM/edmm)
 
-> Transformation framework for the Essential Deployment Metamodel.
-
-EDMM provides a declarative model that describes the components to be deployed, their configurations, required artifacts, and relations among them.
+EDMM provides a declarative model describing the components to be deployed, their configurations, required artifacts, and relations among them.
 The resulting EDMM model is independent of any specific deployment technology and can be exported from an EDMM-enabled modeling tool or created directly using a text editor according to the respective YAML specification.
-This model can be fed into the EDMM Transformation Framework, which provides a command-line interface (CLI) that can either be used directly by the user or integrated into any automation workflow.
+This model can be fed into the EDMM Transformation and Deployment Framework, which provides a command-line interface (CLI) that can either be used directly by the user or integrated into any automation workflow.
 The CLI can be used to select the desired target deployment technology into which the EDMM model is to be transformed.
 The output is an executable technology-specific deployment model that can be executed with the selected technology.
 The following figure shows an high-level overview of the EDMM Transformation Framework.
 
+
+
+## Transformation 
+
 ![Demonstration Overview](docs/overview.png)
-
-## [Video](https://youtu.be/MGWBFomOGYU)
-
-[![Demonstration Video](docs/video.png)](https://youtu.be/MGWBFomOGYU)
 
 [Link to the video: https://youtu.be/MGWBFomOGYU](https://youtu.be/MGWBFomOGYU)
 
@@ -36,6 +34,8 @@ The generated Kubernetes resource files are located relative to the `edmm_model.
 For the supported scenario, the tool will create two separate Kubernetes stacks, each consisting of a Service resource, a Deployment resource wired with the service, and a generated `Dockerfile` containing the layers expressed by the EDMM model.
 By building the Docker images (`docker build -t <name> .`) one can apply the Kubernetes resources to a cluster (`kubectl apply -f <files>`).
 
+
+
 ## Usage
 
 The final distribution package can be downloaded form the [releases](https://github.com/UST-EDMM/transformation-framework/releases) page.
@@ -43,13 +43,15 @@ Extract the files to a location on your filesystem and add it to your path varia
 Afterwards you can invoke the `edmm` command from a command prompt.
 
 The transformation framework supports YAML files as input, according to the published [YAML specification](https://github.com/UST-EDMM/spec-yaml).
-Specified components and their respective component types must be supplied in a single file at the moment.
+Specified components, and their respective component types, must be supplied in a single file at the moment.
 However, we introduce a couple of built-in component types that can be used to model an application deployment.
 An [example](edmm-core/src/test/resources/templates/scenario_iaas.yml) shows the usage of the built-in types to model an application deployment based on virtual compute resources, e.g., virtual machines having some software components installed.
 
 The transformation can be started by using the `transform` command of the `edmm` tool: `edmm transform <target> <input>`.
 You have to specify the `target` technology (e.g., one of "ansible", "azure", "chef", "compose", "heat", "kubernetes", "terraform") and the `input` EDMM YAML model file.
 The generated technology-specific deployment models will be stored relative to the YAML input file.
+
+
 
 ## Plugins
 
@@ -72,6 +74,8 @@ Currently we support the following list of plugins:
 * [CFEngine](edmm-core/src/main/java/io/github/edmm/plugins/cfengine)
 
 The corresponding plugin README.md contains detailed information of the transformation rules each plugin employs.
+
+
 
 ## Built-in Types
 
