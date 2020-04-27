@@ -60,10 +60,6 @@ public class ApiInteractorImpl implements ApiInteractor {
             e.printStackTrace();
         }
 
-        if (podsOfDeployment.isEmpty()) {
-            throw new InstanceTransformationException("No pods found for deployment.");
-        }
-
         return podsOfDeployment;
     }
 

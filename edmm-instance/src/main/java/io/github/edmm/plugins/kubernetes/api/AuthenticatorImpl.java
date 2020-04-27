@@ -34,10 +34,8 @@ public class AuthenticatorImpl implements Authenticator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // set the global default api-client to the in-cluster one from above
         Configuration.setDefaultApiClient(this.client);
 
-        // the CoreV1Api loads default api-client from global configuration.
         this.appsApi = new AppsV1Api(Configuration.getDefaultApiClient());
         this.coreV1Api = new CoreV1Api(Configuration.getDefaultApiClient());
     }

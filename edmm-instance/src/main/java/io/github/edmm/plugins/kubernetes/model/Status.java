@@ -14,11 +14,6 @@ public class Status {
             this.deploymentInstanceState = deploymentInstanceState;
         }
 
-        /**
-         * Convert Kubernetes deployment state to EDiMM deployment instance state.
-         *
-         * @return EDiMM deployment instance state value
-         */
         public InstanceState.InstanceStateForDeploymentInstance toEDiMMDeploymentInstanceState() {
             return this.deploymentInstanceState;
         }

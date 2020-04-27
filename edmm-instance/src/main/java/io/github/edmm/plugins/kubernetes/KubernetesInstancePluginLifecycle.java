@@ -11,7 +11,10 @@ import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.util.KubernetesConstants;
-import io.github.edmm.plugins.kubernetes.util.Util;
+import io.github.edmm.plugins.kubernetes.util.KubernetesMetadataHandler;
+import io.github.edmm.plugins.kubernetes.util.KubernetesPodsHandler;
+import io.github.edmm.plugins.kubernetes.util.KubernetesPropertiesHandler;
+import io.github.edmm.plugins.kubernetes.util.KubernetesStateHandler;
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Deployment;
@@ -69,11 +72,11 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
         this.deploymentInstance.setName(this.kubernetesDeploymentInstance.getMetadata().getName());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata().getCreationTimestamp()));
         this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata().getAnnotations().get(KubernetesConstants.VERSION));
-        this.deploymentInstance.setMetadata(Util.getMetadata(this.kubernetesDeploymentInstance.getMetadata()));
+        this.deploymentInstance.setMetadata(KubernetesMetadataHandler.getMetadata(this.kubernetesDeploymentInstance.getMetadata()));
         this.deploymentInstance.setId(this.kubernetesDeploymentInstance.getMetadata().getUid());
-        this.deploymentInstance.setState(Util.getDeploymentInstanceState(this.kubernetesDeploymentInstance.getStatus()));
-        this.deploymentInstance.setComponentInstances(Util.getComponentInstances(this.podsOfDeploymentInstance));
-        this.deploymentInstance.setInstanceProperties(Util.getDeploymentInstanceProperties(this.kubernetesDeploymentInstance.getStatus()));
+        this.deploymentInstance.setState(KubernetesStateHandler.getDeploymentInstanceState(this.kubernetesDeploymentInstance.getStatus()));
+        this.deploymentInstance.setComponentInstances(KubernetesPodsHandler.getComponentInstances(this.podsOfDeploymentInstance));
+        this.deploymentInstance.setInstanceProperties(KubernetesPropertiesHandler.getDeploymentInstanceProperties(this.kubernetesDeploymentInstance.getStatus()));
 
         logger.info("Finished transforming to EDiMM...");
     }
@@ -81,9 +84,11 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     @Override
     public void transformToTOSCA() {
         logger.info("Start transforming EDiMM to TOSCA...");
+
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
         logger.info("Derived Service Template Instance {}", serviceTemplateInstance.toString());
+
         logger.info("Finished transforming EDiMM to TOSCA...");
     }
 

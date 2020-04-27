@@ -1,0 +1,26 @@
+package io.github.edmm.plugins.kubernetes.util;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.github.edmm.model.edimm.ComponentInstance;
+import io.kubernetes.client.models.V1Pod;
+
+public class KubernetesPodsHandler {
+    public static List<ComponentInstance> getComponentInstances(List<V1Pod> podList) {
+        List<ComponentInstance> componentInstances = new ArrayList<>();
+        podList.forEach(pod -> {
+            ComponentInstance componentInstance = new ComponentInstance();
+            componentInstance.setName(pod.getMetadata().getName());
+            componentInstance.setType(pod.getMetadata().getLabels().get(KubernetesConstants.APP));
+            componentInstance.setId(pod.getMetadata().getUid());
+            componentInstance.setCreatedAt(String.valueOf(pod.getMetadata().getCreationTimestamp()));
+            componentInstance.setState(KubernetesStateHandler.getComponentInstanceState(pod.getStatus()));
+            componentInstance.setMetadata(KubernetesMetadataHandler.getMetadata(pod.getMetadata()));
+            componentInstance.setInstanceProperties(KubernetesPropertiesHandler.getComponentInstanceProperties(pod.getStatus()));
+
+            componentInstances.add(componentInstance);
+        });
+        return componentInstances;
+    }
+}

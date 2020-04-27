@@ -1,38 +1,13 @@
 package io.github.edmm.plugins.kubernetes.util;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import io.github.edmm.model.Metadata;
-import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
-import io.github.edmm.model.edimm.InstanceState;
-import io.github.edmm.plugins.kubernetes.model.Status;
 import io.kubernetes.client.models.V1DeploymentStatus;
-import io.kubernetes.client.models.V1ObjectMeta;
-import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.models.V1PodStatus;
 
-public class Util {
-
-    public static List<ComponentInstance> getComponentInstances(List<V1Pod> podList) {
-        List<ComponentInstance> componentInstances = new ArrayList<>();
-        podList.forEach(pod -> {
-            ComponentInstance componentInstance = new ComponentInstance();
-            componentInstance.setName(pod.getMetadata().getName());
-            componentInstance.setType(pod.getMetadata().getLabels().get(KubernetesConstants.APP));
-            componentInstance.setId(pod.getMetadata().getUid());
-            componentInstance.setCreatedAt(String.valueOf(pod.getMetadata().getCreationTimestamp()));
-            componentInstance.setState(getComponentInstanceState(pod.getStatus()));
-            componentInstance.setMetadata(getMetadata(pod.getMetadata()));
-            componentInstance.setInstanceProperties(getComponentInstanceProperties(pod.getStatus()));
-
-            componentInstances.add(componentInstance);
-        });
-        return componentInstances;
-    }
+public class KubernetesPropertiesHandler {
 
     public static List<InstanceProperty> getDeploymentInstanceProperties(V1DeploymentStatus deploymentStatus) {
         List<InstanceProperty> properties = new ArrayList<>();
@@ -62,7 +37,7 @@ public class Util {
         return properties;
     }
 
-    private static List<InstanceProperty> getComponentInstanceProperties(V1PodStatus podStatus) {
+    static List<InstanceProperty> getComponentInstanceProperties(V1PodStatus podStatus) {
         List<InstanceProperty> properties = new ArrayList<>();
 
         if (podStatus.getContainerStatuses() != null) {
@@ -118,84 +93,5 @@ public class Util {
         }
 
         return properties;
-    }
-
-    /**
-     * Get metadata from Kubernetes deployment and convert to EDiMM metadata object.
-     *
-     * @param kubernetesMetadata kubernetes deployment metadata
-     * @return EDiMM metadata object containing all metadata
-     */
-    public static Metadata getMetadata(V1ObjectMeta kubernetesMetadata) {
-        Map<String, Object> metadataMap = new LinkedHashMap<>();
-        if (kubernetesMetadata.getAnnotations() != null) {
-            kubernetesMetadata.getAnnotations().forEach((key, value) -> {
-                if (!key.equals(KubernetesConstants.LAST_APPLIED_CONFIG)) {
-                    metadataMap.put(key, value);
-                }
-            });
-        }
-        if (kubernetesMetadata.getClusterName() != null) {
-            metadataMap.put(KubernetesConstants.CLUSTER_NAME, kubernetesMetadata.getClusterName());
-        }
-        if (kubernetesMetadata.getDeletionGracePeriodSeconds() != null) {
-            metadataMap.put(KubernetesConstants.DELETION_GRACE_PERIOD_SECONDS, kubernetesMetadata.getDeletionGracePeriodSeconds());
-        }
-        if (kubernetesMetadata.getDeletionTimestamp() != null) {
-            metadataMap.put(KubernetesConstants.DELETION_TIMESTAMP, kubernetesMetadata.getDeletionTimestamp());
-        }
-        if (kubernetesMetadata.getFinalizers() != null) {
-            metadataMap.put(KubernetesConstants.FINALIZERS, kubernetesMetadata.getFinalizers());
-        }
-        if (kubernetesMetadata.getGenerateName() != null) {
-            metadataMap.put(KubernetesConstants.GENERATE_NAME, kubernetesMetadata.getGenerateName());
-        }
-        if (kubernetesMetadata.getGeneration() != null) {
-            metadataMap.put(KubernetesConstants.GENERATION, kubernetesMetadata.getGeneration());
-        }
-        if (kubernetesMetadata.getInitializers() != null) {
-            metadataMap.put(KubernetesConstants.INITIALIZERS, kubernetesMetadata.getInitializers());
-        }
-        if (kubernetesMetadata.getLabels() != null) {
-            kubernetesMetadata.getLabels().forEach(metadataMap::put);
-        }
-        if (kubernetesMetadata.getNamespace() != null) {
-            metadataMap.put(KubernetesConstants.NAMESPACE, kubernetesMetadata.getNamespace());
-        }
-        if (kubernetesMetadata.getResourceVersion() != null) {
-            metadataMap.put(KubernetesConstants.RESOURCE_VERSION, kubernetesMetadata.getResourceVersion());
-        }
-
-        return Metadata.of(metadataMap);
-    }
-
-    /**
-     * Derive EDiMM instance state from Kubernetes deployment status.
-     *
-     * @param status kubernetes deployment status object
-     * @return converted EDiMM deployment instance state value
-     */
-    public static InstanceState.InstanceStateForDeploymentInstance getDeploymentInstanceState(V1DeploymentStatus status) {
-
-        if (Boolean.valueOf(status.getConditions().get(KubernetesConstants.LATEST_STATUS).getStatus())) {
-            return Status.KubernetesDeploymentStatus.valueOf(String.valueOf(status.getConditions().get(0).getType())).toEDiMMDeploymentInstanceState();
-        } else {
-            return InstanceState.InstanceStateForDeploymentInstance.ERROR;
-        }
-    }
-
-    /**
-     * Derive EDiMM component instance state from Kubernetes Pod status.
-     *
-     * @param status kubernetes pod status object
-     * @return converted EDiMM component instance state value
-     */
-    private static InstanceState.InstanceStateForComponentInstance getComponentInstanceState(V1PodStatus status) {
-
-        if (Boolean.valueOf(status.getConditions().get(KubernetesConstants.LATEST_STATUS).getStatus())) {
-            return Status.KubernetesPodStatus.valueOf(String.valueOf(status.getConditions().get(KubernetesConstants.LATEST_STATUS).getType())).toEDiMMComponentInstanceState();
-        } else {
-            return InstanceState.InstanceStateForComponentInstance.ERROR;
-        }
     }
 }
