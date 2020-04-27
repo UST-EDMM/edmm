@@ -31,6 +31,15 @@ public class HeatResourceHandler {
         return componentInstance;
     }
 
+    public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template) {
+        List<ComponentInstance> componentInstances = new ArrayList<>();
+        resources.forEach(resource -> {
+            Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) template.get(HeatConstants.RESOURCES);
+            componentInstances.add(HeatResourceHandler.getComponentInstance(resources, resource, resourceContent));
+        });
+        return componentInstances;
+    }
+
     private static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
         Map<String, Object> resourceMap = HeatMetadataHandler.getResourceMap(allResourceContent, resource.getResourceName());
         Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(resourceMap);
