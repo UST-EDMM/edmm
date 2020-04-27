@@ -21,8 +21,6 @@ import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
 import org.openstack4j.model.heat.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
@@ -85,12 +83,14 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
     }
 
     @Override
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override
