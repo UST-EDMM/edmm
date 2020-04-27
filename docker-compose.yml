@@ -1,8 +1,0 @@
-version: '3'
-services:
-  transformation-framework:
-    build:
-      context: .
-    image: ustedmm/transformation-framework:latest
-    ports:
-      - '5000:5000'
