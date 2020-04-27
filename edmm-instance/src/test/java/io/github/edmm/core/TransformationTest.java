@@ -23,8 +23,10 @@ class TransformationTest {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(deploymentInstance, "test-");
         File file = new File(yamlTransformer.getFileOutputLocation());
+
         String expectedString = FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
         String actualString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
         assertNotNull(deploymentInstance);
         assertTrue(file.exists());
         assertTrue(file.length() > 0);
