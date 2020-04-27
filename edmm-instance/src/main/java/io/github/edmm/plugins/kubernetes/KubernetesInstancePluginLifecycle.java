@@ -76,7 +76,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
         this.deploymentInstance.setId(this.kubernetesDeploymentInstance.getMetadata().getUid());
         this.deploymentInstance.setState(KubernetesStateHandler.getDeploymentInstanceState(this.kubernetesDeploymentInstance.getStatus()));
         this.deploymentInstance.setComponentInstances(KubernetesPodsHandler.getComponentInstances(this.podsOfDeploymentInstance));
-        this.deploymentInstance.setInstanceProperties(KubernetesPropertiesHandler.getDeploymentInstanceProperties(this.kubernetesDeploymentInstance.getStatus()));
+        this.deploymentInstance.setInstanceProperties(new KubernetesPropertiesHandler(this.kubernetesDeploymentInstance.getStatus()).getDeploymentInstanceProperties());
 
         logger.info("Finished transforming to EDiMM...");
     }
