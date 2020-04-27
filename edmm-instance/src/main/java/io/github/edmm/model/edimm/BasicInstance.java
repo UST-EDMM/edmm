@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-abstract public class BasicInstance {
+public abstract class BasicInstance {
     private String id;
     private List<InstanceProperty> instanceProperties;
     private String description;
