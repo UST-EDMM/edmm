@@ -31,7 +31,7 @@ public class KubernetesStateHandler {
         return status.getConditions().get(KubernetesConstants.LATEST_STATUS);
     }
 
-    protected static InstanceState.InstanceStateForComponentInstance getComponentInstanceState(V1PodStatus status) {
+    static InstanceState.InstanceStateForComponentInstance getComponentInstanceState(V1PodStatus status) {
 
         if (isKubernetesPodStatusSetToTrue(status)) {
             return Status.KubernetesPodStatus.valueOf(
