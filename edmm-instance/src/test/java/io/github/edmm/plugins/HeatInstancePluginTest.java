@@ -1,4 +1,4 @@
 package io.github.edmm.plugins;
 
-class HeatInstancePluginTest {
+public class HeatInstancePluginTest {
 }

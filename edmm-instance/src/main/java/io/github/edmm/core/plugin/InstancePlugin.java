@@ -52,5 +52,5 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
         return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 
-    protected abstract L getLifecycle(InstanceTransformationContext context);
+    public abstract L getLifecycle(InstanceTransformationContext context);
 }
