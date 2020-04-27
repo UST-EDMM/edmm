@@ -24,7 +24,6 @@ public class HeatRelationHandler {
             relationInstances.add(relationInstance);
             relationCount++;
         });
-        // only return list if not empty, else return null
         return (relationInstances.size() > 0) ? relationInstances : null;
     }
 

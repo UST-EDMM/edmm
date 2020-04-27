@@ -40,7 +40,6 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     private OSClientV3 osClient;
     private List<? extends Resource> resources;
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
-    private static final Logger logger = LoggerFactory.getLogger(HeatInstancePluginLifecycle.class);
 
     HeatInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);
@@ -48,8 +47,6 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
 
     @Override
     public void prepare() {
-        logger.info("Start preparing...");
-
         AuthenticatorImpl authenticator = new AuthenticatorImpl(authenticationEndpoint, userName, password, domainName, projectId);
         try {
             authenticator.authenticate();
@@ -57,26 +54,18 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         } catch (AuthenticationException e) {
             throw new InstanceTransformationException("Failed to authenticate with OpenStack HEAT API", e.getCause());
         }
-
-        logger.info("Finished preparing...");
     }
 
     @Override
     public void getModels() {
-        logger.info("Start retrieving models...");
-
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.osClient, stackName, stackId);
         this.stack = apiInteractor.getDeployment();
         this.template = apiInteractor.getModel();
         this.resources = apiInteractor.getComponents();
-
-        logger.info("Finished retrieving models...");
     }
 
     @Override
     public void transformToEDIMM() {
-        logger.info("Start transforming to EDiMM...");
-
         this.deploymentInstance.setId(this.stack.getId());
         this.deploymentInstance.setCreatedAt(this.stack.getCreationTime());
         this.deploymentInstance.setDescription(this.stack.getDescription());
@@ -85,33 +74,26 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         this.deploymentInstance.setVersion(String.valueOf(this.template.get(HeatConstants.VERSION)));
         this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
         this.deploymentInstance.setMetadata(HeatMetadataHandler.getDeploymentMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
+        // TODO move this
         this.resources.forEach(resource -> {
             Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) this.template.get(HeatConstants.RESOURCES);
             this.deploymentInstance.addToComponentInstances(HeatResourceHandler.getComponentInstance(this.resources, resource, resourceContent));
         });
-
-        logger.info("Finished transforming to EDiMM...");
     }
 
     @Override
     public void transformToTOSCA() {
-        logger.info("Start transforming to OpenTOSCA...");
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
-        logger.info("Derived Service Template Instance {}", serviceTemplateInstance.toString());
-        logger.info("Finished transforming to OpenTOSCA...");
     }
 
     @Override
     public void createYAML() {
-        logger.info("Start creating YAML of EDiMM...");
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        logger.info("Finished creating YAML of EDiMM, saved to {}", yamlTransformer.getFileOutputLocation());
     }
 
     @Override
     public void cleanup() {
-        logger.info("Skipping cleanup...");
     }
 }
