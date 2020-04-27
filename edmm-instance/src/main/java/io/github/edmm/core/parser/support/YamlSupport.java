@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.introspector.Property;
 
 public class YamlSupport {
 
-    DumperOptions dumperOptions = new DumperOptions();
+    private final DumperOptions dumperOptions = new DumperOptions();
 
     public DumperOptions getYamlOptions() {
         this.setDumperOptions();

@@ -9,9 +9,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class InstanceProperty extends BasicInstance {
-    String key;
-    String type;
-    Object instanceValue;
+    private String key;
+    private String type;
+    private Object instanceValue;
 
     public InstanceProperty(String key, String type, Object instanceValue) {
         this.key = key;

@@ -7,8 +7,8 @@ import io.github.edmm.model.edimm.InstanceProperty;
 import io.kubernetes.client.models.V1DeploymentStatus;
 
 public class KubernetesDeploymentPropertiesHandler {
-    List<InstanceProperty> instanceProperties = new ArrayList<>();
-    V1DeploymentStatus deploymentStatus;
+    private final List<InstanceProperty> instanceProperties = new ArrayList<>();
+    private final V1DeploymentStatus deploymentStatus;
 
     public KubernetesDeploymentPropertiesHandler(V1DeploymentStatus deploymentStatus) {
         this.deploymentStatus = deploymentStatus;

@@ -18,8 +18,8 @@ public class YamlConstants {
     public static final String TYPE = "type";
 
     // Constants for keys of input yaml content
-    public static final String KEY = "key";
-    public static final String INSTANCE_VALUE = "instanceValue";
+    static final String KEY = "key";
+    static final String INSTANCE_VALUE = "instanceValue";
     public static final String RELATION_INSTANCES = "relationInstances";
     public static final String RELATION_TARGET_INSTANCE_ID = "targetInstanceId";
 }

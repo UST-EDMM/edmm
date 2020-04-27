@@ -19,7 +19,7 @@ public class YamlTransformer {
     private Yaml yaml;
     private DeploymentInstance deploymentInstance;
     private String fileOutputLocation;
-    private Map<String, Object> yamlContent = new LinkedHashMap<>();
+    private final Map<String, Object> yamlContent = new LinkedHashMap<>();
 
     public void createYamlforEDiMM(DeploymentInstance deploymentInstance, String location) {
         this.deploymentInstance = deploymentInstance;

@@ -17,12 +17,6 @@ import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 public class YamlParser {
 
-    /**
-     * Parse an EDiMM YAML file and transform to DOM representation of EDiMM.
-     *
-     * @param fileInput path to input YAML
-     * @return parsed deployment instance
-     */
     public DeploymentInstance parseYamlAndTransformToDeploymentInstance(String fileInput) {
         Yaml yaml = new Yaml();
         InputStream input = null;

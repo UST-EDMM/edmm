@@ -7,8 +7,8 @@ import io.github.edmm.model.Metadata;
 import io.kubernetes.client.models.V1ObjectMeta;
 
 public class KubernetesMetadataHandler {
-    Map<String, Object> metadataMap = new LinkedHashMap<>();
-    V1ObjectMeta kubernetesMetadata;
+    private final Map<String, Object> metadataMap = new LinkedHashMap<>();
+    private final V1ObjectMeta kubernetesMetadata;
 
     public KubernetesMetadataHandler(V1ObjectMeta kubernetesMetadata) {
         this.kubernetesMetadata = kubernetesMetadata;

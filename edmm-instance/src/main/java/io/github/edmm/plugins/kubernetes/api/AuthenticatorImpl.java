@@ -15,8 +15,8 @@ import lombok.Getter;
 @Getter
 public class AuthenticatorImpl implements Authenticator {
 
-    private String kubeConfigPath;
-    private String inputDeploymentName;
+    private final String kubeConfigPath;
+    private final String inputDeploymentName;
 
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;

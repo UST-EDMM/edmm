@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ParsingTest {
+class ParsingTest {
 
     @Test
-    public void testDeploymentInstance() throws Exception {
+    void testDeploymentInstance() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
@@ -24,7 +24,7 @@ public class ParsingTest {
     }
 
     @Test
-    public void testInstanceProperties() throws Exception {
+    void testInstanceProperties() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
@@ -34,7 +34,7 @@ public class ParsingTest {
     }
 
     @Test
-    public void testComponentInstances() throws Exception {
+    void testComponentInstances() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
@@ -46,7 +46,7 @@ public class ParsingTest {
     }
 
     @Test
-    public void testMetadata() throws Exception {
+    void testMetadata() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());

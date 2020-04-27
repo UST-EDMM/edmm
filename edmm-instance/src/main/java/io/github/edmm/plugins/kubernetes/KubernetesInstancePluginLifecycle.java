@@ -70,12 +70,15 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
+
     }
 
     @Override
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

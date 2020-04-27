@@ -17,7 +17,7 @@ import org.yaml.snakeyaml.representer.Representer;
 
 public class ConfigurationModelRepresenter extends Representer {
 
-    public ConfigurationModelRepresenter() {
+    private ConfigurationModelRepresenter() {
         super();
     }
 

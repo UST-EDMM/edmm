@@ -14,16 +14,15 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class TOSCATransformer {
 
-    DeploymentInstance deploymentInstance;
-    ServiceTemplateInstance serviceTemplateInstance;
-    List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
+    private DeploymentInstance deploymentInstance;
+    private final List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
 
     public ServiceTemplateInstance transformEDiMMToServiceTemplateInstance(DeploymentInstance deploymentInstance) {
         this.deploymentInstance = deploymentInstance;
-        this.serviceTemplateInstance = ServiceTemplateInstance.ofDeploymentInstance(this.deploymentInstance);
+        ServiceTemplateInstance serviceTemplateInstance = ServiceTemplateInstance.ofDeploymentInstance(this.deploymentInstance);
         createNodeTemplateInstances();
         createRelationshipTemplateInstances();
-        this.serviceTemplateInstance.setNodeTemplateInstances(this.nodeTemplateInstances);
+        serviceTemplateInstance.setNodeTemplateInstances(this.nodeTemplateInstances);
         return serviceTemplateInstance;
     }
 
@@ -47,14 +46,14 @@ public class TOSCATransformer {
 
     private void addRelationshipToNodeTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance, ComponentInstance componentInstance) {
         this.addToNodeTemplateInstanceAsOutgoing(relationshipTemplateInstance, componentInstance);
-        this.addToNodeTemplateInstanceaAsIngoing(relationshipTemplateInstance, relationInstance);
+        this.addToNodeTemplateInstanceAsIngoing(relationshipTemplateInstance, relationInstance);
     }
 
     private void addToNodeTemplateInstanceAsOutgoing(RelationshipTemplateInstance relationshipTemplateInstance, ComponentInstance componentInstance) {
         this.nodeTemplateInstances.stream().filter(x -> x.getNodeTemplateInstanceId().equals(componentInstance.getId())).findFirst().get().addToOutgoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 
-    private void addToNodeTemplateInstanceaAsIngoing(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance) {
+    private void addToNodeTemplateInstanceAsIngoing(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance) {
         this.nodeTemplateInstances.stream().filter(x -> x.getNodeTemplateInstanceId().equals(relationInstance.getTargetInstanceId())).findFirst().get().addToIngoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 }

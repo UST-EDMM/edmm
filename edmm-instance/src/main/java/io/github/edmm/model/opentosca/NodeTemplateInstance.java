@@ -25,8 +25,8 @@ public class NodeTemplateInstance {
     TOSCAState.NodeTemplateInstanceState state;
     QName serviceTemplateId;
     List<TOSCAProperty> instanceProperties;
-    List<RelationshipTemplateInstance> outgoingRelationshipTemplateInstances;
-    List<RelationshipTemplateInstance> ingoingRelationshipTemplateInstances;
+    private List<RelationshipTemplateInstance> outgoingRelationshipTemplateInstances;
+    private List<RelationshipTemplateInstance> ingoingRelationshipTemplateInstances;
 
     private void createOutgoingRelationshipTemplateInstances() {
         this.outgoingRelationshipTemplateInstances = new ArrayList<>();

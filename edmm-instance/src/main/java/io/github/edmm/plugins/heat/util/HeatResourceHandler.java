@@ -1,9 +1,10 @@
 package io.github.edmm.plugins.heat.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
@@ -15,13 +16,26 @@ public class HeatResourceHandler {
     private static final int firstEntryIndex = 0;
     private static final String propertyKeyDelimiter = "::";
 
-    protected static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
+    public static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
+        ComponentInstance componentInstance = new ComponentInstance();
+
+        componentInstance.setType(resource.getType());
+        componentInstance.setId(resource.getPhysicalResourceId());
+        componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
+        componentInstance.setName(resource.getResourceName());
+        componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
+        componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
+        componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
+        componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
+
+        return componentInstance;
+    }
+
+    private static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
         Map<String, Object> resourceMap = HeatMetadataHandler.getResourceMap(allResourceContent, resource.getResourceName());
         Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(resourceMap);
 
-        List<InstanceProperty> instanceProperties = handleResourceInstanceProperties(propertiesMap);
-
-        return instanceProperties;
+        return handleResourceInstanceProperties(propertiesMap);
     }
 
     private static List<InstanceProperty> handleResourceInstanceProperties(Map<String, Object> propertiesMap) {
@@ -31,14 +45,14 @@ public class HeatResourceHandler {
             if (isNoResourceInstanceProperty(key)) {
                 return;
             }
-            handleResourceInstanceProperty(key, value).stream().forEach(instanceProperty -> instanceProperties.add(instanceProperty));
+            instanceProperties.addAll(Objects.requireNonNull(handleResourceInstanceProperty(key, value)));
         });
         return instanceProperties;
     }
 
     private static List<InstanceProperty> handleResourceInstanceProperty(String key, Object value) {
         if (value instanceof String) {
-            return Arrays.asList(handleStringProperty(key, String.valueOf(value)));
+            return Collections.singletonList(handleStringProperty(key, String.valueOf(value)));
         } else if (value instanceof List) {
             return handleListProperty(key, (List) value);
         }
@@ -64,20 +78,5 @@ public class HeatResourceHandler {
 
     private static boolean isNoResourceInstanceProperty(String key) {
         return key.equals(HeatConstants.METADATA) || key.equals(HeatConstants.TAGS);
-    }
-
-    public static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
-        ComponentInstance componentInstance = new ComponentInstance();
-
-        componentInstance.setType(resource.getType());
-        componentInstance.setId(resource.getPhysicalResourceId());
-        componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
-        componentInstance.setName(resource.getResourceName());
-        componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
-        componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
-        componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
-        componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
-
-        return componentInstance;
     }
 }

@@ -9,8 +9,8 @@ import io.kubernetes.client.models.V1PodStatus;
 
 class KubernetesPodPropertiesHandler {
 
-    private List<InstanceProperty> instanceProperties = new ArrayList<>();
-    private V1PodStatus podStatus;
+    private final List<InstanceProperty> instanceProperties = new ArrayList<>();
+    private final V1PodStatus podStatus;
 
     KubernetesPodPropertiesHandler(V1PodStatus podStatus) {
         this.podStatus = podStatus;

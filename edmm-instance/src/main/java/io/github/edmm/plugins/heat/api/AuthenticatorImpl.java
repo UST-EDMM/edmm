@@ -10,11 +10,11 @@ import org.openstack4j.openstack.OSFactory;
 public class AuthenticatorImpl implements Authenticator {
 
     private OSClient.OSClientV3 heatClient;
-    private String endpoint;
-    private String userName;
-    private String password;
-    private String domainName;
-    private String projectId;
+    private final String endpoint;
+    private final String userName;
+    private final String password;
+    private final String domainName;
+    private final String projectId;
 
     public AuthenticatorImpl(String endpoint, String userName, String password, String domainName, String projectId) {
         this.endpoint = endpoint;

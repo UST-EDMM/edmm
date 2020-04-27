@@ -14,7 +14,7 @@ import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 public class HeatMetadataHandler {
 
-    protected static Metadata getComponentMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
+    static Metadata getComponentMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
         Map<String, Object> propertiesMap = getPropertiesMap(getResourceMap(resourceContent, resource.getResourceName()));
         List<String> tagList = getTagList(propertiesMap);
         Map<String, Object> metadataMap = getMetadataMap(propertiesMap);
@@ -42,11 +42,11 @@ public class HeatMetadataHandler {
         return metadataResult;
     }
 
-    protected static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
+    static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
         return resourceContent.get(resourceName);
     }
 
-    protected static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
+    static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
         return (Map<String, Object>) resourceContentMap.get(HeatConstants.PROPERTIES);
     }
 

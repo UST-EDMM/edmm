@@ -1,13 +1,13 @@
 package io.github.edmm.core.plugin;
 
-import io.github.edmm.core.transformation.SourceTechnology;
+import java.util.List;
+
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+import io.github.edmm.core.transformation.SourceTechnology;
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @Getter
 public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> {
@@ -23,7 +23,7 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
         logger.debug("Initialized plugin '{}'", sourceTechnology.getName());
     }
 
-    void init() {
+    private void init() {
         // noop
     }
 
@@ -53,5 +53,4 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
     }
 
     protected abstract L getLifecycle(InstanceTransformationContext context);
-
 }
