@@ -1,4 +1,4 @@
-package io.github.edmm.core.parser.support;
+package io.github.edmm.core.yaml.support;
 
 import java.util.ArrayList;
 import java.util.List;

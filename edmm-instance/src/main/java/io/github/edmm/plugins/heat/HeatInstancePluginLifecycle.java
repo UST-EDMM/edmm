@@ -3,7 +3,7 @@ package io.github.edmm.plugins.heat;
 import java.util.List;
 import java.util.Map;
 
-import io.github.edmm.core.parser.YamlTransformer;
+import io.github.edmm.core.yaml.YamlTransformer;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.InstanceTransformationException;

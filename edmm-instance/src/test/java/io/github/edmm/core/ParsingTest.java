@@ -1,6 +1,6 @@
 package io.github.edmm.core;
 
-import io.github.edmm.core.parser.YamlParser;
+import io.github.edmm.core.yaml.YamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;

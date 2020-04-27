@@ -1,4 +1,4 @@
-package io.github.edmm.core.parser.support;
+package io.github.edmm.core.yaml.support;
 
 public class YamlConstants {
     // Constants for filename of output yaml

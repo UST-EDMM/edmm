@@ -2,8 +2,8 @@ package io.github.edmm.plugins.edimm;
 
 import java.io.File;
 
-import io.github.edmm.core.parser.YamlParser;
-import io.github.edmm.core.parser.YamlTransformer;
+import io.github.edmm.core.yaml.YamlParser;
+import io.github.edmm.core.yaml.YamlTransformer;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;

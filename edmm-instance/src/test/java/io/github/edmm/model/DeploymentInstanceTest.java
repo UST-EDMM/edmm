@@ -1,6 +1,6 @@
 package io.github.edmm.model;
 
-import io.github.edmm.core.parser.YamlParser;
+import io.github.edmm.core.yaml.YamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.model.opentosca.TOSCAState;

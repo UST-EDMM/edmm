@@ -3,8 +3,8 @@ package io.github.edmm.model.edimm;
 import java.util.List;
 import java.util.Map;
 
-import io.github.edmm.core.parser.support.YamlConstants;
-import io.github.edmm.core.parser.support.YamlSupport;
+import io.github.edmm.core.yaml.support.YamlConstants;
+import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.Operation;
 import lombok.Getter;

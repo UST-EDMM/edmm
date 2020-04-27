@@ -1,4 +1,4 @@
-package io.github.edmm.core.parser;
+package io.github.edmm.core.yaml;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,9 +7,9 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.github.edmm.core.parser.support.ConfigurationModelRepresenter;
-import io.github.edmm.core.parser.support.YamlConstants;
-import io.github.edmm.core.parser.support.YamlSupport;
+import io.github.edmm.core.yaml.support.ConfigurationModelRepresenter;
+import io.github.edmm.core.yaml.support.YamlConstants;
+import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import org.yaml.snakeyaml.Yaml;

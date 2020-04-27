@@ -1,4 +1,4 @@
-package io.github.edmm.core.parser;
+package io.github.edmm.core.yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
 
-import io.github.edmm.core.parser.support.YamlConstants;
-import io.github.edmm.core.parser.support.YamlSupport;
+import io.github.edmm.core.yaml.support.YamlConstants;
+import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
