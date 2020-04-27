@@ -42,11 +42,11 @@ public class HeatMetadataHandler {
         return metadataResult;
     }
 
-    private static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
+    protected static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
         return resourceContent.get(resourceName);
     }
 
-    private static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
+    protected static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
         return (Map<String, Object>) resourceContentMap.get(HeatConstants.PROPERTIES);
     }
 

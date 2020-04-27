@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.heat.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,47 +12,60 @@ import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
 
+    private static final int firstEntryIndex = 0;
+    private static final String propertyKeyDelimiter = "::";
+
     protected static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {
+        Map<String, Object> resourceMap = HeatMetadataHandler.getResourceMap(allResourceContent, resource.getResourceName());
+        Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(resourceMap);
+
+        List<InstanceProperty> instanceProperties = handleResourceInstanceProperties(propertiesMap);
+
+        return instanceProperties;
+    }
+
+    private static List<InstanceProperty> handleResourceInstanceProperties(Map<String, Object> propertiesMap) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
-        Map<String, Object> resourceMap = allResourceContent.get(resource.getResourceName());
-        // get property map of resource
-        Map<String, Object> propertiesMap = (Map<String, Object>) resourceMap.get(HeatConstants.PROPERTIES);
-        // iterate over key-value pairs of property map
+
         propertiesMap.forEach((key, value) -> {
-            // openstack sets tags and metadata in property map, but we handle them differently
-            if (key.equals(HeatConstants.METADATA) || key.equals(HeatConstants.TAGS)) {
+            if (isNoResourceInstanceProperty(key)) {
                 return;
             }
-            // value may be of type string or list, check both cases and handle accordingly
-            if (value instanceof String) {
-                InstanceProperty instanceProperty = new InstanceProperty(key, value.getClass().getSimpleName(), String.valueOf(value));
-                instanceProperties.add(instanceProperty);
-            } else if (value instanceof List) {
-                // entries of list may be of type string or map, check both cases and handle accordingly
-                if (((List) value).get(0) instanceof String) {
-                    ((List<String>) value).forEach(entry -> {
-                        InstanceProperty instanceSubProperty = new InstanceProperty(key, entry.getClass().getSimpleName(), entry);
-                        instanceProperties.add(instanceSubProperty);
-                    });
-                } else if (((List) value).get(0) instanceof Map) {
-                    ((List<Map<String, String>>) value).forEach(entry -> entry.forEach((pKey, pValue) -> {
-                        InstanceProperty instanceSubProperty = new InstanceProperty(key + "::" + pKey, pValue.getClass().getSimpleName(), pValue);
-                        instanceProperties.add(instanceSubProperty);
-                    }));
-                }
-            }
+            handleResourceInstanceProperty(key, value).stream().forEach(instanceProperty -> instanceProperties.add(instanceProperty));
         });
         return instanceProperties;
     }
 
-    /**
-     * Get component instance from list of stack resources.
-     *
-     * @param resources       all resources of a stack
-     * @param resource        resource we want to transform to EDiMM component instance
-     * @param resourceContent content of resource
-     * @return transformed component instance
-     */
+    private static List<InstanceProperty> handleResourceInstanceProperty(String key, Object value) {
+        if (value instanceof String) {
+            return Arrays.asList(handleStringProperty(key, String.valueOf(value)));
+        } else if (value instanceof List) {
+            return handleListProperty(key, (List) value);
+        }
+        return null;
+    }
+
+    private static InstanceProperty handleStringProperty(String key, String value) {
+        return new InstanceProperty(key, value.getClass().getSimpleName(), value);
+    }
+
+    private static List<InstanceProperty> handleListProperty(String key, List value) {
+        List<InstanceProperty> instanceProperties = new ArrayList<>();
+
+        if (value.get(firstEntryIndex) instanceof String) {
+            value.forEach(entry -> instanceProperties.add(handleStringProperty(key, String.valueOf(entry))));
+        } else if (value.get(firstEntryIndex) instanceof Map) {
+            ((List<Map<String, String>>) value).forEach(entry -> entry.forEach((pKey, pValue) -> {
+                instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue));
+            }));
+        }
+        return instanceProperties;
+    }
+
+    private static boolean isNoResourceInstanceProperty(String key) {
+        return key.equals(HeatConstants.METADATA) || key.equals(HeatConstants.TAGS);
+    }
+
     public static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
