@@ -19,6 +19,18 @@ public class KubernetesStateHandler {
         return InstanceState.InstanceStateForDeploymentInstance.ERROR;
     }
 
+    private static boolean isKubernetesDeploymentStatusSetToTrue(V1DeploymentStatus status) {
+        return Boolean.valueOf(getLatestDeploymentStatus(status));
+    }
+
+    private static String getLatestDeploymentStatus(V1DeploymentStatus status) {
+        return getLatestDeploymentCondition(status).getStatus();
+    }
+
+    private static V1DeploymentCondition getLatestDeploymentCondition(V1DeploymentStatus status) {
+        return status.getConditions().get(KubernetesConstants.LATEST_STATUS);
+    }
+
     protected static InstanceState.InstanceStateForComponentInstance getComponentInstanceState(V1PodStatus status) {
 
         if (isKubernetesPodStatusSetToTrue(status)) {
@@ -33,23 +45,11 @@ public class KubernetesStateHandler {
         return Boolean.valueOf(getLatestPodStatus(status));
     }
 
-    private static boolean isKubernetesDeploymentStatusSetToTrue(V1DeploymentStatus status) {
-        return Boolean.valueOf(getLatestDeploymentStatus(status));
-    }
-
     private static String getLatestPodStatus(V1PodStatus status) {
         return getLatestPodCondition(status).getStatus();
     }
 
-    private static String getLatestDeploymentStatus(V1DeploymentStatus status) {
-        return getLatestDeploymentCondition(status).getStatus();
-    }
-
     private static V1PodCondition getLatestPodCondition(V1PodStatus status) {
-        return status.getConditions().get(KubernetesConstants.LATEST_STATUS);
-    }
-
-    private static V1DeploymentCondition getLatestDeploymentCondition(V1DeploymentStatus status) {
         return status.getConditions().get(KubernetesConstants.LATEST_STATUS);
     }
 }
