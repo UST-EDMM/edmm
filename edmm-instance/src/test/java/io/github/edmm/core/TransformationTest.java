@@ -2,6 +2,7 @@ package io.github.edmm.core;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import io.github.edmm.core.parser.YamlParser;
 import io.github.edmm.core.parser.YamlTransformer;
@@ -17,16 +18,15 @@ import static org.junit.Assert.assertTrue;
 
 class TransformationTest {
 
-    String fileOutput;
+    File file;
 
     @Test
     void testCreateYamlForEDiMM() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         DeploymentInstance deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
         YamlTransformer yamlTransformer = new YamlTransformer();
-        yamlTransformer.createYamlforEDiMM(deploymentInstance, "test-");
-        this.fileOutput = yamlTransformer.getFileOutputLocation();
-        File file = new File(this.fileOutput);
+        yamlTransformer.createYamlforEDiMM(deploymentInstance, Files.createTempDirectory("kubernetes-").toFile().getAbsolutePath());
+        this.file = new File(yamlTransformer.getFileOutputLocation());
 
         String expectedString = FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
         String actualString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
@@ -39,8 +39,8 @@ class TransformationTest {
 
     @After
     public void destroy() throws Exception {
-        if (this.fileOutput != null) {
-            FileUtils.deleteDirectory(new File(this.fileOutput));
+        if (this.file != null) {
+            FileUtils.deleteDirectory(this.file);
         }
     }
 }

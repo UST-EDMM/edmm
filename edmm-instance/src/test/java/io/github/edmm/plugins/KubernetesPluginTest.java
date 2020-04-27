@@ -18,7 +18,7 @@ public class KubernetesPluginTest extends InstancePluginTest {
 
     @Before
     public void init() {
-        context = new InstanceTransformationContext(SourceTechnology.builder().id("kubernetes").name("Kubernetes").build(), "kubernetes-");
+        context = new InstanceTransformationContext(SourceTechnology.builder().id("kubernetes").name("Kubernetes").build(), this.targetDirectory + "/kubernetes-");
     }
 
     @Test
