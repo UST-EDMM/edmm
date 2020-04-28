@@ -26,7 +26,7 @@ public class HeatResourceHandler {
         return componentInstances;
     }
 
-    public static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
+    private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
         componentInstance.setType(resource.getType());
