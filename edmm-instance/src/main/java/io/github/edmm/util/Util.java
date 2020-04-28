@@ -6,10 +6,15 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Util {
-    public static Map<String, Object> safelyCastToStringObjectMap(Object objectToCast) {
-        Optional<Map> mapOptional = Optional.ofNullable(objectToCast)
+
+    private static Optional<Map> checkMapForCast(Object objectToCast) {
+        return Optional.ofNullable(objectToCast)
             .filter(Map.class::isInstance)
             .map(Map.class::cast);
+    }
+
+    public static Map<String, Object> safelyCastToStringObjectMap(Object objectToCast) {
+        Optional<Map> mapOptional = checkMapForCast(objectToCast);
 
         if (mapOptional.isPresent()) {
             return castToMapOf(String.class, Object.class, mapOptional.get());
@@ -18,9 +23,7 @@ public class Util {
     }
 
     public static Map<String, String> safelyCastToStringStringMap(Object objectToCast) {
-        Optional<Map> mapOptional = Optional.ofNullable(objectToCast)
-            .filter(Map.class::isInstance)
-            .map(Map.class::cast);
+        Optional<Map> mapOptional = checkMapForCast(objectToCast);
 
         if (mapOptional.isPresent()) {
             return castToMapOf(String.class, String.class, mapOptional.get());
@@ -56,14 +59,18 @@ public class Util {
     }
 
     public static List<String> safelyCastToStringList(Object objectToCast) {
-        Optional<List> listOptional = Optional.ofNullable(objectToCast)
-            .filter(List.class::isInstance)
-            .map(List.class::cast);
+        Optional<List> listOptional = checkListForCast(objectToCast);
 
         if (listOptional.isPresent()) {
             return castToListOf(String.class, listOptional.get());
         }
         return Collections.emptyList();
+    }
+
+    private static Optional<List> checkListForCast(Object objectToCast) {
+        return Optional.ofNullable(objectToCast)
+            .filter(List.class::isInstance)
+            .map(List.class::cast);
     }
 
     private static <K> List<K> castToListOf(Class<K> classK, List<?> list) {
