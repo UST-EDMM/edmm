@@ -16,6 +16,15 @@ public class HeatResourceHandler {
     private static final int firstEntryIndex = 0;
     private static final String propertyKeyDelimiter = "::";
 
+    public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template) {
+        List<ComponentInstance> componentInstances = new ArrayList<>();
+        resources.forEach(resource -> {
+            Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) template.get(HeatConstants.RESOURCES);
+            componentInstances.add(HeatResourceHandler.getComponentInstance(resources, resource, resourceContent));
+        });
+        return componentInstances;
+    }
+
     public static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Map<String, Object>> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
@@ -27,17 +36,10 @@ public class HeatResourceHandler {
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
+        componentInstance.setArtifacts(Collections.emptyList());
+        componentInstance.setOperations(Collections.emptyList());
 
         return componentInstance;
-    }
-
-    public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template) {
-        List<ComponentInstance> componentInstances = new ArrayList<>();
-        resources.forEach(resource -> {
-            Map<String, Map<String, Object>> resourceContent = (Map<String, Map<String, Object>>) template.get(HeatConstants.RESOURCES);
-            componentInstances.add(HeatResourceHandler.getComponentInstance(resources, resource, resourceContent));
-        });
-        return componentInstances;
     }
 
     private static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Map<String, Object>> allResourceContent) {

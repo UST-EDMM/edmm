@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.github.edmm.model.Metadata;
@@ -38,11 +39,33 @@ public class ConfigurationModelRepresenter extends Representer {
 
     @Override
     protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue, Tag customTag) {
-        if (propertyValue == null || propertyValue instanceof List && ((List) propertyValue).isEmpty()) {
+        if (propertyValue == null || isPropertyValueListEmpty(propertyValue) || isPropertyValueMapEmpty(propertyValue)) {
             return null;
         } else {
             return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);
         }
+    }
+
+    private boolean isPropertyValueListEmpty(Object propertyValue) {
+        if (isListPropertyValue(propertyValue)) {
+            return ((List) propertyValue).isEmpty();
+        }
+        return false;
+    }
+
+    private boolean isPropertyValueMapEmpty(Object propertyValue) {
+        if (isMapPropertyValue(propertyValue)) {
+            return ((Map) propertyValue).isEmpty();
+        }
+        return false;
+    }
+
+    private boolean isListPropertyValue(Object propertyValue) {
+        return propertyValue instanceof List;
+    }
+
+    private boolean isMapPropertyValue(Object propertyValue) {
+        return propertyValue instanceof Map;
     }
 
     protected Set<Property> getProperties(Class<?> type) {

@@ -37,24 +37,39 @@ public class HeatMetadataHandler {
     }
 
     private static Map<String, Object> handleMetadataMap(Map<String, Object> metadataMap) {
+        if (metadataMap == null) {
+            return Collections.emptyMap();
+        }
         Map<String, Object> metadataResult = new LinkedHashMap<>();
         metadataMap.forEach(metadataResult::put);
         return metadataResult;
     }
 
     static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
+        if (resourceContent.get(resourceName) == null) {
+            return Collections.emptyMap();
+        }
         return resourceContent.get(resourceName);
     }
 
-    static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContentMap) {
-        return (Map<String, Object>) resourceContentMap.get(HeatConstants.PROPERTIES);
+    static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContent) {
+        if (resourceContent.get(HeatConstants.PROPERTIES) == null) {
+            return Collections.emptyMap();
+        }
+        return (Map<String, Object>) resourceContent.get(HeatConstants.PROPERTIES);
     }
 
     private static List<String> getTagList(Map<String, Object> propertiesMap) {
+        if (propertiesMap == null) {
+            return Collections.emptyList();
+        }
         return (List<String>) propertiesMap.get(HeatConstants.TAGS);
     }
 
     private static Map<String, Object> getMetadataMap(Map<String, Object> propertiesMap) {
+        if (propertiesMap == null) {
+            return Collections.emptyMap();
+        }
         return (Map<String, Object>) propertiesMap.get(HeatConstants.METADATA);
     }
 
