@@ -9,6 +9,7 @@ import java.util.Objects;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.heat.model.StackStatus;
+import io.github.edmm.util.Util;
 import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
@@ -74,15 +75,13 @@ public class HeatResourceHandler {
         return new InstanceProperty(key, value.getClass().getSimpleName(), value);
     }
 
-    private static List<InstanceProperty> handleListProperty(String key, List value) {
+    private static List<InstanceProperty> handleListProperty(String key, List<?> value) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
 
         if (value.get(firstEntryIndex) instanceof String) {
             value.forEach(entry -> instanceProperties.add(handleStringProperty(key, String.valueOf(entry))));
         } else if (value.get(firstEntryIndex) instanceof Map) {
-            ((List<Map<String, String>>) value).forEach(entry -> entry.forEach((pKey, pValue) -> {
-                instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue));
-            }));
+            value.forEach(entry -> Util.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue))));
         }
         return instanceProperties;
     }

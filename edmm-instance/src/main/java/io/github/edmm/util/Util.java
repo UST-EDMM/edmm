@@ -17,6 +17,17 @@ public class Util {
         return Collections.emptyMap();
     }
 
+    public static Map<String, String> safelyCastToStringStringMap(Object objectToCast) {
+        Optional<Map> mapOptional = Optional.ofNullable(objectToCast)
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast);
+
+        if (mapOptional.isPresent()) {
+            return castToMapOf(String.class, String.class, mapOptional.get());
+        }
+        return Collections.emptyMap();
+    }
+
     private static <K, V> Map<K, V> castToMapOf(Class<K> clazzK, Class<V> clazzV, Map<?, ?> map) {
 
         for (Map.Entry<?, ?> e : map.entrySet()) {
