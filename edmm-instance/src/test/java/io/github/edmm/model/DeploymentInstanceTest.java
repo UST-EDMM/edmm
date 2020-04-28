@@ -1,10 +1,12 @@
 package io.github.edmm.model;
 
 import java.util.Collections;
+import java.util.List;
 
 import io.github.edmm.core.yaml.YamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
+import io.github.edmm.model.edimm.RelationInstance;
 import io.github.edmm.model.opentosca.TOSCAState;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -14,12 +16,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-class DeploymentInstanceTest {
+public class DeploymentInstanceTest {
 
     @Test
     public void testDeploymentInstance() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
+
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
 
         assertNotNull(deploymentInstance);
@@ -36,9 +39,10 @@ class DeploymentInstanceTest {
     }
 
     @Test
-    void testInstanceProperties() throws Exception {
+    public void testInstanceProperties() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
+
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
 
         assertEquals(3, deploymentInstance.getInstanceProperties().get(0).getInstanceValue());
@@ -48,9 +52,10 @@ class DeploymentInstanceTest {
     }
 
     @Test
-    void testComponentInstances() throws Exception {
+    public void testComponentInstances() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
+
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
 
         assertNotNull(deploymentInstance.getComponentInstances().get(0).getId());
@@ -58,8 +63,6 @@ class DeploymentInstanceTest {
         assertEquals("nginx", deploymentInstance.getComponentInstances().get(0).getType());
         assertEquals(InstanceState.InstanceStateForComponentInstance.CREATED, deploymentInstance.getComponentInstances().get(0).getState());
         assertNotNull(deploymentInstance.getComponentInstances().get(0).getCreatedAt());
-        assertNull(deploymentInstance.getComponentInstances().get(0).getArtifacts());
-        assertNull(deploymentInstance.getComponentInstances().get(0).getOperations());
         assertEquals(10, deploymentInstance.getComponentInstances().get(0).getInstanceProperties().size());
         assertEquals("docker://56be2e934c89cb5667ee0674a596d116c8987fe1f06b5f83bc107bccec1c08a3", deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(1).getInstanceValue());
         assertNotNull(deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(2).getType());
@@ -76,9 +79,25 @@ class DeploymentInstanceTest {
     }
 
     @Test
-    void testMetadata() throws Exception {
+    public void testRelationInstances() throws Exception {
+        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDiMM.yaml");
+        YamlParser yamlParser = new YamlParser();
+
+        DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
+        List<RelationInstance> relationInstances = deploymentInstance.getComponentInstances().get(1).getRelationInstances();
+        RelationInstance relationInstance = relationInstances.get(0);
+
+        assertNotNull(relationInstance);
+        assertEquals("4aeb6497-90e8-4c68-99b4-dea09d4848da", relationInstance.getTargetInstanceId());
+        assertEquals("depends_on", relationInstance.getType());
+        assertEquals("depends_on0", relationInstance.getId());
+    }
+
+    @Test
+    public void testMetadata() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
+
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
 
         assertNull(deploymentInstance.getMetadata().get("resource"));

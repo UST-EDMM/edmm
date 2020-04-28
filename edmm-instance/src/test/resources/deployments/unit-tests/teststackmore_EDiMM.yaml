@@ -1,0 +1,83 @@
+name: teststackmore
+version: '2015-10-15'
+state: UPDATED
+id: 1996a6d0-18f5-444c-a478-4f2e4393c42e
+createdAt: '2020-04-15T11:35:17Z'
+description: version 2017-09-01 created by HOT Generator at Wed, 15 Apr 2020 11:26:54
+  GMT.
+metadata:
+  updated_time: '2020-04-16T09:36:03Z'
+  timeout_time: 60
+instanceProperties:
+- key: OS::project_id
+  type: String
+  instanceValue: 03346a10c43b40419efeaa981c4047f4
+- key: OS::stack_id
+  type: String
+  instanceValue: 1996a6d0-18f5-444c-a478-4f2e4393c42e
+- key: OS::stack_name
+  type: String
+  instanceValue: teststackmore
+- key: output_value
+  type: String
+  instanceValue: 109d58f4-9489-4eb6-b1c7-fc00a171c6e4
+- key: output_key
+  type: String
+  instanceValue: server_id
+- key: description
+  type: String
+  instanceValue: Sample description
+componentInstances:
+- id: 4aeb6497-90e8-4c68-99b4-dea09d4848da
+  name: SecGroup_1
+  type: OS::Neutron::SecurityGroup
+  state: CREATED
+  createdAt: Thu Apr 16 11:36:03 CEST 2020
+  instanceProperties:
+  - key: name
+    type: String
+    instanceValue: se_group_3
+  - key: description
+    type: String
+    instanceValue: '"test description"'
+- id: 109d58f4-9489-4eb6-b1c7-fc00a171c6e4
+  name: Server_1
+  type: OS::Nova::Server
+  state: CREATED
+  createdAt: Thu Apr 16 11:36:03 CEST 2020
+  instanceProperties:
+  - key: admin_pass
+    type: String
+    instanceValue: test
+  - key: name
+    type: String
+    instanceValue: test_server
+  - key: availability_zone
+    type: String
+    instanceValue: nova
+  - key: key_name
+    type: String
+    instanceValue: OpenTOSCA
+  - key: image
+    type: String
+    instanceValue: d0b78861-023f-4845-8eb6-e89e8c3fda91
+  - key: flavor
+    type: String
+    instanceValue: m1.nano
+  - key: networks::allocate_network
+    type: String
+    instanceValue: auto
+  - key: security_groups
+    type: String
+    instanceValue: 0f2c0bad-8489-40de-b5af-51cc9904dc72
+  metadata:
+    amount of any: 3
+    autor: tobi
+    tags:
+    - thesis
+    - est
+    - tosca
+  relationInstances:
+  - id: depends_on0
+    type: depends_on
+    targetInstanceId: 4aeb6497-90e8-4c68-99b4-dea09d4848da

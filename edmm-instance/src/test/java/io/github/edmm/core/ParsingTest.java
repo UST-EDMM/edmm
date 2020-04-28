@@ -7,13 +7,15 @@ import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.Assert.assertNotNull;
 
-class ParsingTest {
+public class ParsingTest {
 
     @Test
-    void testParsingYaml() throws Exception {
+    public void testParsingYaml() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         YamlParser yamlParser = new YamlParser();
+
         DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
+
         assertNotNull(deploymentInstance);
     }
 }

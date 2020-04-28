@@ -16,18 +16,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-class TransformationTest {
+public class TransformationTest {
 
     File file;
 
     @Test
-    void testCreateYamlForEDiMM() throws Exception {
+    public void testCreateYamlForEDiMM() throws Exception {
         ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
         DeploymentInstance deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
         YamlTransformer yamlTransformer = new YamlTransformer();
+
         yamlTransformer.createYamlforEDiMM(deploymentInstance, Files.createTempDirectory("kubernetes-").toFile().getAbsolutePath());
         this.file = new File(yamlTransformer.getFileOutputLocation());
-
         String expectedString = FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
         String actualString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
