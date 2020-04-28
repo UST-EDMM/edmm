@@ -22,31 +22,51 @@ import static org.junit.Assert.assertTrue;
 
 class ServiceTemplateInstanceTest {
 
+    ClassPathResource resource;
+    YamlParser yamlParser;
+    ServiceTemplateInstance serviceTemplateInstance;
+    DeploymentInstance deploymentInstance;
+
     @Test
     public void testServiceTemplate() throws Exception {
-        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
-        YamlParser yamlParser = new YamlParser();
+        givenYamlOfNginxResource();
 
-        DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        ServiceTemplateInstance serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(deploymentInstance);
+        whenServiceTemplateInstanceCreated();
 
-        assertNotNull(serviceTemplateInstance);
-        assertEquals("2020-04-20T11:32:44.000+02:00", serviceTemplateInstance.getCreatedAt());
-        assertEquals(3, serviceTemplateInstance.getNodeTemplateInstances().size());
-        assertEquals("nginx-deployment", serviceTemplateInstance.getCsarId());
-        assertEquals(TOSCAState.ServiceTemplateInstanceState.CREATED, serviceTemplateInstance.getState());
-        assertEquals(new QName("http://www.opentosca.org/servicetemplates", "nginx-deployment"), serviceTemplateInstance.getServiceTemplateId());
-        assertEquals("92d76709-1fca-4d77-9865-c9cbf0dc7106", serviceTemplateInstance.getServiceTemplateInstanceId());
+        thenAssertServiceTemplateInstance();
+    }
+
+    private void givenYamlOfNginxResource() {
+        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
+        this.yamlParser = new YamlParser();
+    }
+
+    private void whenServiceTemplateInstanceCreated() throws Exception {
+        this.deploymentInstance = this.yamlParser.parseYamlAndTransformToDeploymentInstance(this.resource.getFile().getAbsolutePath());
+        this.serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
+    }
+
+    private void thenAssertServiceTemplateInstance() {
+        assertNotNull(this.serviceTemplateInstance);
+        assertEquals("2020-04-20T11:32:44.000+02:00", this.serviceTemplateInstance.getCreatedAt());
+        assertEquals(3, this.serviceTemplateInstance.getNodeTemplateInstances().size());
+        assertEquals("nginx-deployment", this.serviceTemplateInstance.getCsarId());
+        assertEquals(TOSCAState.ServiceTemplateInstanceState.CREATED, this.serviceTemplateInstance.getState());
+        assertEquals(new QName("http://www.opentosca.org/servicetemplates", "nginx-deployment"), this.serviceTemplateInstance.getServiceTemplateId());
+        assertEquals("92d76709-1fca-4d77-9865-c9cbf0dc7106", this.serviceTemplateInstance.getServiceTemplateInstanceId());
     }
 
     @Test
     public void testNodeTemplateInstances() throws Exception {
-        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
-        YamlParser yamlParser = new YamlParser();
+        givenYamlOfNginxResource();
 
-        DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        ServiceTemplateInstance serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        List<NodeTemplateInstance> nodeTemplateInstances = serviceTemplateInstance.getNodeTemplateInstances();
+        whenServiceTemplateInstanceCreated();
+
+        thenAssertNodeTemplateInstances();
+    }
+
+    private void thenAssertNodeTemplateInstances() {
+        List<NodeTemplateInstance> nodeTemplateInstances = this.serviceTemplateInstance.getNodeTemplateInstances();
 
         assertNotNull(nodeTemplateInstances);
         assertFalse(nodeTemplateInstances.isEmpty());
@@ -60,12 +80,20 @@ class ServiceTemplateInstanceTest {
 
     @Test
     public void testRelationshipTemplateInstances() throws Exception {
-        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDiMM.yaml");
-        YamlParser yamlParser = new YamlParser();
+        givenYamlOfTestStackResource();
 
-        DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        ServiceTemplateInstance serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        List<NodeTemplateInstance> nodeTemplateInstances = serviceTemplateInstance.getNodeTemplateInstances();
+        whenServiceTemplateInstanceCreated();
+
+        thenAssertRelationshipTemplateInstances();
+    }
+
+    private void givenYamlOfTestStackResource() {
+        this.resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDiMM.yaml");
+        this.yamlParser = new YamlParser();
+    }
+
+    private void thenAssertRelationshipTemplateInstances() {
+        List<NodeTemplateInstance> nodeTemplateInstances = this.serviceTemplateInstance.getNodeTemplateInstances();
         List<RelationshipTemplateInstance> relationshipTemplateInstances = nodeTemplateInstances.get(1).getOutgoingRelationshipTemplateInstances();
         RelationshipTemplateInstance relationshipTemplateInstance = relationshipTemplateInstances.get(0);
 
@@ -80,12 +108,15 @@ class ServiceTemplateInstanceTest {
 
     @Test
     public void testTOSCAProperties() throws Exception {
-        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDiMM.yaml");
-        YamlParser yamlParser = new YamlParser();
+        givenYamlOfTestStackResource();
 
-        DeploymentInstance deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        ServiceTemplateInstance serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        List<NodeTemplateInstance> nodeTemplateInstances = serviceTemplateInstance.getNodeTemplateInstances();
+        whenServiceTemplateInstanceCreated();
+
+        thenAssertTOSCAProperties();
+    }
+
+    private void thenAssertTOSCAProperties() {
+        List<NodeTemplateInstance> nodeTemplateInstances = this.serviceTemplateInstance.getNodeTemplateInstances();
         List<TOSCAProperty> toscaProperties = nodeTemplateInstances.get(1).getInstanceProperties();
 
         assertNotNull(toscaProperties);

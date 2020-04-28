@@ -18,22 +18,38 @@ import static org.junit.Assert.assertTrue;
 
 public class TransformationTest {
 
-    File file;
+    private File file;
+    private ClassPathResource resource;
+    private DeploymentInstance deploymentInstance;
+    private YamlTransformer yamlTransformer;
 
     @Test
     public void testCreateYamlForEDiMM() throws Exception {
-        ClassPathResource resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
-        DeploymentInstance deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        YamlTransformer yamlTransformer = new YamlTransformer();
+        givenYamlOfNginxResource();
 
+        whenTransformationIsDone();
+
+        thenAssertTransformationFile();
+    }
+
+    private void givenYamlOfNginxResource() throws Exception {
+        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
+        this.deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
+        this.yamlTransformer = new YamlTransformer();
+    }
+
+    private void whenTransformationIsDone() throws Exception {
         yamlTransformer.createYamlforEDiMM(deploymentInstance, Files.createTempDirectory("kubernetes-").toFile().getAbsolutePath());
         this.file = new File(yamlTransformer.getFileOutputLocation());
-        String expectedString = FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
-        String actualString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+    }
 
-        assertNotNull(deploymentInstance);
-        assertTrue(file.exists());
-        assertTrue(file.length() > 0);
+    private void thenAssertTransformationFile() throws Exception {
+        String expectedString = FileUtils.readFileToString(this.resource.getFile(), StandardCharsets.UTF_8);
+        String actualString = FileUtils.readFileToString(this.file, StandardCharsets.UTF_8);
+
+        assertNotNull(this.deploymentInstance);
+        assertTrue(this.file.exists());
+        assertTrue(this.file.length() > 0);
         assertEquals(expectedString, actualString);
     }
 
