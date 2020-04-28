@@ -7,6 +7,7 @@ import java.util.Map;
 
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.RelationInstance;
+import io.github.edmm.util.Util;
 import org.openstack4j.model.heat.Resource;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
@@ -14,7 +15,7 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 class HeatRelationHandler {
 
     static List<RelationInstance> getRelationInstances(List<? extends Resource> resources, Map<String, Map<String, Object>> resourceContent, Resource resourceInput) {
-        List<String> dependsOnList = (List<String>) resourceContent.get(resourceInput.getResourceName()).get(HeatConstants.DEPENDS_ON);
+        List<String> dependsOnList = Util.safelyCastToStringList(resourceContent.get(resourceInput.getResourceName()).get(HeatConstants.DEPENDS_ON));
         List<RelationInstance> relationInstances = new ArrayList<>();
 
         emptyIfNull(dependsOnList).forEach(dependsOnResource -> {

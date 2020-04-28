@@ -12,6 +12,7 @@ import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
+import io.github.edmm.util.Util;
 import org.yaml.snakeyaml.Yaml;
 
 public class YamlParser {
@@ -33,7 +34,7 @@ public class YamlParser {
         deploymentInstance.setId(data.get(YamlConstants.ID) != null ? String.valueOf(data.get(YamlConstants.ID)) : null);
         deploymentInstance.setCreatedAt(data.get(YamlConstants.CREATED_AT) != null ? String.valueOf(data.get(YamlConstants.CREATED_AT)) : null);
         deploymentInstance.setDescription(data.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(data.get(YamlConstants.DESCRIPTION)) : null);
-        deploymentInstance.setMetadata(data.get(YamlConstants.METADATA) != null ? Metadata.of((Map<String, Object>) data.get(YamlConstants.METADATA)) : Metadata.of(Collections.emptyMap()));
+        deploymentInstance.setMetadata(data.get(YamlConstants.METADATA) != null ? Metadata.of(Util.safelyCastToStringObjectMap(data.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
         deploymentInstance.setInstanceProperties(data.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(data) : Collections.emptyList());
         deploymentInstance.setComponentInstances(data.get(YamlConstants.COMPONENT_INSTANCES) != null ? YamlSupport.getComponentInstancesFromYamlContent(data) : Collections.emptyList());
 

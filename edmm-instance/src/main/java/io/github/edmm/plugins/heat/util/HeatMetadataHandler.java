@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import io.github.edmm.model.Metadata;
+import io.github.edmm.util.Util;
 import org.openstack4j.model.heat.Resource;
 
 import static java.util.stream.Collectors.toMap;
@@ -56,21 +57,21 @@ public class HeatMetadataHandler {
         if (resourceContent.get(HeatConstants.PROPERTIES) == null) {
             return Collections.emptyMap();
         }
-        return (Map<String, Object>) resourceContent.get(HeatConstants.PROPERTIES);
+        return Util.safelyCastToStringObjectMap(resourceContent.get(HeatConstants.PROPERTIES));
     }
 
     private static List<String> getTagList(Map<String, Object> propertiesMap) {
         if (propertiesMap == null) {
             return Collections.emptyList();
         }
-        return (List<String>) propertiesMap.get(HeatConstants.TAGS);
+        return Util.safelyCastToStringList(propertiesMap.get(HeatConstants.TAGS));
     }
 
     private static Map<String, Object> getMetadataMap(Map<String, Object> propertiesMap) {
         if (propertiesMap == null) {
             return Collections.emptyMap();
         }
-        return (Map<String, Object>) propertiesMap.get(HeatConstants.METADATA);
+        return Util.safelyCastToStringObjectMap(propertiesMap.get(HeatConstants.METADATA));
     }
 
     public static Metadata getDeploymentMetadata(List<String> tagList, Long timeoutTime, String updatedTime) {

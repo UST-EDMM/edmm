@@ -42,8 +42,9 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
     @Override
     public void run(String... args) {
         // parse
-        //exitCode = new CommandLine(this, factory).execute("parse", "edimm", "/users/tobi/downloads/teststackmore_EDiMM_1587368798.yaml");
+        exitCode = new CommandLine(this, factory).execute("parse", "edimm", "/users/tobi/downloads/teststackmore_EDiMM_1587368798.yaml");
         // transform
+        exitCode = new CommandLine(this, factory).execute("transform", "kubernetes", "/users/tobi/downloads/");
         exitCode = new CommandLine(this, factory).execute("transform", "heat", "/users/tobi/downloads/");
     }
 
