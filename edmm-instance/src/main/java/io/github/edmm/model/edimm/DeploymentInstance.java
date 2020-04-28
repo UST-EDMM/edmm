@@ -10,13 +10,12 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-public class DeploymentInstance extends BasicInstance{
+public class DeploymentInstance extends BasicInstance {
     private String name;
     private String createdAt;
     private String version;
     private InstanceState.InstanceStateForDeploymentInstance state;
     private List<ComponentInstance> componentInstances;
-    private String deploymentModelLocation;
 
     private void createComponentInstances() {
         this.componentInstances = new ArrayList<>();

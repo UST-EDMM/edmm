@@ -32,7 +32,6 @@ public class DeploymentInstanceTest {
         assertEquals("92d76709-1fca-4d77-9865-c9cbf0dc7106", deploymentInstance.getId());
         assertEquals("2020-04-20T11:32:44.000+02:00", deploymentInstance.getCreatedAt());
         assertNull(deploymentInstance.getDescription());
-        assertNull(deploymentInstance.getDeploymentModelLocation());
         assertEquals(5, deploymentInstance.getMetadata().size());
         assertEquals(5, deploymentInstance.getInstanceProperties().size());
         assertEquals(3, deploymentInstance.getComponentInstances().size());
