@@ -38,7 +38,7 @@ public class ConfigurationModelRepresenter extends Representer {
 
     @Override
     protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue, Tag customTag) {
-        if (propertyValue == null) {
+        if (propertyValue == null || propertyValue instanceof List && ((List) propertyValue).isEmpty()) {
             return null;
         } else {
             return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);

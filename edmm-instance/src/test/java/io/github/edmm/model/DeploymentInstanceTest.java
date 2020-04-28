@@ -1,5 +1,7 @@
 package io.github.edmm.model;
 
+import java.util.Collections;
+
 import io.github.edmm.core.yaml.YamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
@@ -65,7 +67,7 @@ class DeploymentInstanceTest {
         assertEquals("containerStatus::nginx::restartCount", deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(4).getKey());
         assertEquals(deploymentInstance.getComponentInstances().get(1).getState().toTOSCANodeTemplateInstanceState(), TOSCAState.NodeTemplateInstanceState.CREATED);
         assertTrue(deploymentInstance.getComponentInstances().get(0).getType().contains("nginx"));
-        assertNull(deploymentInstance.getComponentInstances().get(0).getRelationInstances());
+        assertEquals(Collections.emptyList(), deploymentInstance.getComponentInstances().get(0).getRelationInstances());
         assertEquals("containerStatus::nginx::image", deploymentInstance.getComponentInstances().get(2).getInstanceProperties().get(2).getKey());
         assertTrue(deploymentInstance.getComponentInstances().get(0).getMetadata().containsKey("app"));
         assertTrue(deploymentInstance.getComponentInstances().get(0).getMetadata().containsValue("default"));

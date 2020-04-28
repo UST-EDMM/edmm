@@ -65,7 +65,7 @@ public class HeatResourceHandler {
         } else if (value instanceof List) {
             return handleListProperty(key, (List) value);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private static InstanceProperty handleStringProperty(String key, String value) {

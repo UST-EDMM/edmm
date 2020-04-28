@@ -12,8 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
 @Setter
 @Getter
 @ToString
@@ -40,14 +38,18 @@ public class NodeTemplateInstance {
         if (this.outgoingRelationshipTemplateInstances == null) {
             this.createOutgoingRelationshipTemplateInstances();
         }
-        this.outgoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
+        if (relationshipTemplateInstance != null) {
+            this.outgoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
+        }
     }
 
     public void addToIngoingRelationshipTemplateInstances(RelationshipTemplateInstance relationshipTemplateInstance) {
         if (this.ingoingRelationshipTemplateInstances == null) {
             this.createIngoingRelationshipTemplateInstances();
         }
-        this.ingoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
+        if (relationshipTemplateInstance != null) {
+            this.ingoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
+        }
     }
 
     public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
@@ -59,7 +61,7 @@ public class NodeTemplateInstance {
         nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
         nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL_NAMESPACE, deploymentInstanceName));
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
-        nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
+        nodeTemplateInstance.setInstanceProperties(componentInstance.getInstanceProperties()
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
 
         return nodeTemplateInstance;

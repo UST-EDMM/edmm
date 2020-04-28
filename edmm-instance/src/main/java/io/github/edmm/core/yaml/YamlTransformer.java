@@ -40,7 +40,6 @@ public class YamlTransformer {
     }
 
     private void prepareContentForYaml() {
-        // add all information of our deployment instance to data map
         this.yamlContent.put(YamlConstants.NAME, this.deploymentInstance.getName());
         this.yamlContent.put(YamlConstants.VERSION, this.deploymentInstance.getVersion());
         this.yamlContent.put(YamlConstants.STATE, String.valueOf(this.deploymentInstance.getState()));

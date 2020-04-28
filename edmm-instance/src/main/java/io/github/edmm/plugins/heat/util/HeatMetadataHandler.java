@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.heat.util;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,6 @@ import io.github.edmm.model.Metadata;
 import org.openstack4j.model.heat.Resource;
 
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
 public class HeatMetadataHandler {
 
@@ -25,7 +25,7 @@ public class HeatMetadataHandler {
         ).flatMap(Set::stream)
             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return resultMap.isEmpty() ? null : Metadata.of(resultMap);
+        return resultMap.isEmpty() ? Metadata.of(Collections.emptyMap()) : Metadata.of(resultMap);
     }
 
     private static Map<String, Object> handleTagList(List<String> tagList) {
@@ -38,7 +38,7 @@ public class HeatMetadataHandler {
 
     private static Map<String, Object> handleMetadataMap(Map<String, Object> metadataMap) {
         Map<String, Object> metadataResult = new LinkedHashMap<>();
-        emptyIfNull(metadataMap).forEach(metadataResult::put);
+        metadataMap.forEach(metadataResult::put);
         return metadataResult;
     }
 
@@ -66,7 +66,7 @@ public class HeatMetadataHandler {
         ).flatMap(Set::stream)
             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return resultMap.isEmpty() ? null : Metadata.of(resultMap);
+        return resultMap.isEmpty() ? Metadata.of(Collections.emptyMap()) : Metadata.of(resultMap);
     }
 
     private static Map<String, Object> handleTimeout(Long timeoutTime) {

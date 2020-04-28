@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.heat.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,6 @@ class HeatRelationHandler {
             relationInstances.add(relationInstance);
             relationCount++;
         });
-        return (relationInstances.size() > 0) ? relationInstances : null;
+        return (relationInstances.size() > 0) ? relationInstances : Collections.emptyList();
     }
 }
