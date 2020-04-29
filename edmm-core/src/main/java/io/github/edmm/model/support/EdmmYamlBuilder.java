@@ -15,8 +15,8 @@ import org.yaml.snakeyaml.Yaml;
 public class EdmmYamlBuilder {
     private final Map<String, Object> mainMap;
     private final Map<String, Object> componentsMap;
-    Map<String, Object> componentsTypeMap;
-    Map<String, Object> relationsTypeMap;
+    private Map<String, Object> componentsTypeMap;
+    private Map<String, Object> relationsTypeMap;
 
     // this variables are used to record the component that is being modelled
     // once another component will be added, they will be used to add the component to the componentsMap
