@@ -3,6 +3,7 @@ package io.github.edmm.model.component;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
+
 import lombok.ToString;
 
 @ToString

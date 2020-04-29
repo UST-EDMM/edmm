@@ -6,12 +6,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Metadata;
+
+import com.google.common.collect.Lists;
 import lombok.ToString;
 
 @ToString

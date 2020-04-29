@@ -4,10 +4,10 @@ import java.io.PrintWriter;
 
 public class AddEntry extends DockerfileEntry {
 
+    protected String command;
+
     private final String src;
     private final String dest;
-
-    protected String command;
 
     public AddEntry(String src, String dest) {
         this.src = src;

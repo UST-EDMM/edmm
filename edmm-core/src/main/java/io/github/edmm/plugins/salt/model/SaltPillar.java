@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import freemarker.template.Configuration;
 import io.github.edmm.core.plugin.PluginFileAccess;
+
+import freemarker.template.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

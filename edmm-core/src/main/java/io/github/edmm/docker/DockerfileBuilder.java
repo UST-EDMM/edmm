@@ -20,8 +20,8 @@ import io.github.edmm.docker.support.WorkdirEntry;
 public final class DockerfileBuilder {
 
     private boolean compress = false;
-    private List<AddEntry> addEntries = new ArrayList<>();
-    private List<EnvEntry> envEntries = new ArrayList<>();
+    private final List<AddEntry> addEntries = new ArrayList<>();
+    private final List<EnvEntry> envEntries = new ArrayList<>();
     private int workdirIndex = -1;
 
     private final List<DockerfileEntry> entries = new ArrayList<>();

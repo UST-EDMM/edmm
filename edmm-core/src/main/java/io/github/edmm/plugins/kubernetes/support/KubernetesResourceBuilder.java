@@ -14,6 +14,7 @@ import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.plugins.kubernetes.model.DeploymentResource;
 import io.github.edmm.plugins.kubernetes.model.KubernetesResource;
 import io.github.edmm.plugins.kubernetes.model.ServiceResource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class ScalarEntity extends Entity {
 
-    private String value;
+    private final String value;
 
     public ScalarEntity(String value, EntityId id, EntityGraph graph) {
         super(id, graph);

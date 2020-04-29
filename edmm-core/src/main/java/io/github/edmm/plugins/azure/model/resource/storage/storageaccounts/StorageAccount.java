@@ -7,6 +7,7 @@ import io.github.edmm.plugins.azure.model.ParameterTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.Properties;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

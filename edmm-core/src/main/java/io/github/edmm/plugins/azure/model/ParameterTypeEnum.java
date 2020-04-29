@@ -11,7 +11,7 @@ public enum ParameterTypeEnum {
     SECURE_OBJECT("secureObject"),
     ARRAY("array");
 
-    private String typeName;
+    private final String typeName;
 
     ParameterTypeEnum(String name) {
         this.typeName = name;

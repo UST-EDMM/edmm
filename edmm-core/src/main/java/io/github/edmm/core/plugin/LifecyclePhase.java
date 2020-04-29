@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import io.github.edmm.core.plugin.support.ExecutionFunction;
 import io.github.edmm.core.plugin.support.LifecyclePhaseAccess;
 import io.github.edmm.core.transformation.TransformationContext;
+
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class LifecyclePhase<L extends PluginLifecycle> {
     private final ExecutionFunction<L> function;
 
     private State state = State.PENDING;
-    private Predicate<TransformationContext> predicate = (c) -> true;
+    private final Predicate<TransformationContext> predicate = (c) -> true;
 
     public LifecyclePhase(@NonNull String name, @NonNull LifecyclePhaseAccess phaseAccess, @NonNull ExecutionFunction<L> function) {
         this.name = name;

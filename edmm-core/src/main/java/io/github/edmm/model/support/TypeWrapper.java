@@ -12,6 +12,7 @@ import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
+
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 public abstract class TypeWrapper {

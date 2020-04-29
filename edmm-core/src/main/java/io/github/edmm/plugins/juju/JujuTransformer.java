@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.Artifact;
@@ -21,21 +19,27 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.juju.model.EnvironmentVariable;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JujuTransformer {
 
-    private static final Logger logger = LoggerFactory.getLogger(JujuTransformer.class);
-
     public static final String CHARM_FOLDER_PREAMBLE = "layer-";
     public static final String CHARM_SERIES = "xenial";
+    public static final String HOOKS_FOLDER = "hooks";
+    public static final String HOOK_INSTALL = "install";
+    public static final String LAYER_FILENAME = "layer.yaml";
+    public static final String METADATA_FILENAME = "metadata.yaml";
+
+    private static final Logger logger = LoggerFactory.getLogger(JujuTransformer.class);
+
     private static final String DEFAULT_ENV_VAR_CONNECTION = "_HOSTNAME";
     private static final String DEFAULT_STARTING_LAYER = "basic";
     private static final String DEFAULT_TARGET_LOCATION = "localhost";
-    public static final String HOOKS_FOLDER = "hooks";
-    public static final String HOOK_INSTALL = "install";
     private static final List<String> HOOK_PLACEHOLDERS = Arrays.asList(
         "config-changed",
         "leader-elected",
@@ -45,8 +49,6 @@ public class JujuTransformer {
         "upgrade-charm",
         "update-status"
     );
-    public static final String LAYER_FILENAME = "layer.yaml";
-    public static final String METADATA_FILENAME = "metadata.yaml";
 
     private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(JujuPlugin.class, "/plugins/juju");

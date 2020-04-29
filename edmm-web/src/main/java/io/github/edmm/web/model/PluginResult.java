@@ -3,6 +3,7 @@ package io.github.edmm.web.model;
 import javax.validation.constraints.NotBlank;
 
 import io.github.edmm.core.plugin.Plugin;
+
 import lombok.Builder;
 import lombok.Data;
 

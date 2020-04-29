@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import io.github.edmm.core.transformation.TransformationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ public class BashScript {
 
     private static final Logger logger = LoggerFactory.getLogger(BashScript.class);
 
-    private PluginFileAccess fileAccess;
+    private final PluginFileAccess fileAccess;
     private String scriptPath;
 
     public BashScript(PluginFileAccess fileAccess, String scriptPath) {

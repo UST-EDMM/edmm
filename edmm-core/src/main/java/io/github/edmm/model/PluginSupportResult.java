@@ -16,16 +16,16 @@ import lombok.Getter;
 public class PluginSupportResult {
 
     @NotBlank
-    private String id;
+    private final String id;
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @Min(0)
     @Max(1)
     @PositiveOrZero
-    private Double supports;
+    private final Double supports;
 
     @NotNull
-    private List<String> unsupportedComponents;
+    private final List<String> unsupportedComponents;
 }

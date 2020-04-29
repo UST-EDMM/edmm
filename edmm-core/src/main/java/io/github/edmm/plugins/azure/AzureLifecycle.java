@@ -19,14 +19,15 @@ import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.exten
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.EnvVarVirtualMachineExtension;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtension;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.VirtualMachineExtensionProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AzureLifecycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(AzureLifecycle.class);
-
     public static final String FILE_NAME = "deploy.json";
+
+    private static final Logger logger = LoggerFactory.getLogger(AzureLifecycle.class);
 
     public AzureLifecycle(TransformationContext context) {
         super(context);

@@ -2,6 +2,7 @@ package io.github.edmm.model;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.DescribableElement;
+
 import lombok.ToString;
 
 @ToString

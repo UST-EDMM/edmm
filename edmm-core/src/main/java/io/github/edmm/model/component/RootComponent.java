@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
@@ -18,6 +17,8 @@ import io.github.edmm.model.support.ModelEntity;
 import io.github.edmm.model.support.TypeWrapper;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.VisitableComponent;
+
+import com.google.common.collect.Lists;
 import lombok.ToString;
 
 @ToString

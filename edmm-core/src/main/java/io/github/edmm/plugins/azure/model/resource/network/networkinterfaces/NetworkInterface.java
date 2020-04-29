@@ -3,13 +3,14 @@ package io.github.edmm.plugins.azure.model.resource.network.networkinterfaces;
 import java.util.Collections;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.Parameter;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
 import io.github.edmm.plugins.azure.model.resource.network.publicipaddresses.PublicIpAddress;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NetworkInterface extends Resource {
