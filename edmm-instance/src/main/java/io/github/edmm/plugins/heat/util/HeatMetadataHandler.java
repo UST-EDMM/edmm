@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class HeatMetadataHandler {
 
-    static Metadata getComponentMetadata(Resource resource, Map<String, Map<String, Object>> resourceContent) {
+    static Metadata getComponentMetadata(Resource resource, Map<String, Object> resourceContent) {
         Map<String, Object> propertiesMap = getPropertiesMap(getResourceMap(resourceContent, resource.getResourceName()));
         List<String> tagList = getTagList(propertiesMap);
         Map<String, Object> metadataMap = getMetadataMap(propertiesMap);
@@ -46,11 +46,11 @@ public class HeatMetadataHandler {
         return metadataResult;
     }
 
-    static Map<String, Object> getResourceMap(Map<String, Map<String, Object>> resourceContent, String resourceName) {
+    static Map<String, Object> getResourceMap(Map<String,Object> resourceContent, String resourceName) {
         if (resourceContent.get(resourceName) == null) {
             return Collections.emptyMap();
         }
-        return resourceContent.get(resourceName);
+        return Util.safelyCastToStringObjectMap(resourceContent.get(resourceName));
     }
 
     static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContent) {
