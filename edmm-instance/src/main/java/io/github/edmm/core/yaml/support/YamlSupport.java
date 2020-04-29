@@ -7,7 +7,7 @@ import java.util.Map;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.RelationInstance;
-import io.github.edmm.util.Util;
+import io.github.edmm.util.CastUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 
@@ -59,8 +59,8 @@ public class YamlSupport {
     public static List<InstanceProperty> getInstancePropertiesFromYamlContent(Map<String, Object> yamlContent) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
 
-        Util.safelyCastToObjectList(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
-            Map<String, Object> stringObjectMap = Util.safelyCastToStringObjectMap(map);
+        CastUtil.safelyCastToObjectList(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
+            Map<String, Object> stringObjectMap = CastUtil.safelyCastToStringObjectMap(map);
             InstanceProperty instanceProperty = new InstanceProperty(
                 String.valueOf(stringObjectMap.get(YamlConstants.KEY)),
                 String.valueOf(stringObjectMap.get(YamlConstants.TYPE)),
@@ -74,8 +74,8 @@ public class YamlSupport {
     public static List<ComponentInstance> getComponentInstancesFromYamlContent(Map<String, Object> yamlContent) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
 
-        Util.safelyCastToObjectList(yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(componentYamlContent -> {
-            ComponentInstance componentInstance = ComponentInstance.ofYamlContent(Util.safelyCastToStringObjectMap(componentYamlContent));
+        CastUtil.safelyCastToObjectList(yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(componentYamlContent -> {
+            ComponentInstance componentInstance = ComponentInstance.ofYamlContent(CastUtil.safelyCastToStringObjectMap(componentYamlContent));
             componentInstances.add(componentInstance);
         });
 
@@ -85,8 +85,8 @@ public class YamlSupport {
     public static List<RelationInstance> getRelationInstancesFromYamlContent(Map<String, Object> yamlContent) {
         List<RelationInstance> relationInstances = new ArrayList<>();
 
-        ((List<Map<String, Object>>) yamlContent.get(YamlConstants.RELATION_INSTANCES)).forEach(relationYamlContent -> {
-            RelationInstance relationInstance = RelationInstance.ofYamlContent(relationYamlContent);
+        CastUtil.safelyCastToObjectList(yamlContent.get(YamlConstants.RELATION_INSTANCES)).forEach(relationYamlContent -> {
+            RelationInstance relationInstance = RelationInstance.ofYamlContent(CastUtil.safelyCastToStringObjectMap(relationYamlContent));
             relationInstances.add(relationInstance);
         });
         return relationInstances;

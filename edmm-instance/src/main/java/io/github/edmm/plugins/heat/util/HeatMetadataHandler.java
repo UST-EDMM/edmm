@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import io.github.edmm.model.Metadata;
-import io.github.edmm.util.Util;
+import io.github.edmm.util.CastUtil;
 import org.openstack4j.model.heat.Resource;
 
 import static java.util.stream.Collectors.toMap;
@@ -50,28 +50,28 @@ public class HeatMetadataHandler {
         if (resourceContent.get(resourceName) == null) {
             return Collections.emptyMap();
         }
-        return Util.safelyCastToStringObjectMap(resourceContent.get(resourceName));
+        return CastUtil.safelyCastToStringObjectMap(resourceContent.get(resourceName));
     }
 
     static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContent) {
         if (resourceContent.get(HeatConstants.PROPERTIES) == null) {
             return Collections.emptyMap();
         }
-        return Util.safelyCastToStringObjectMap(resourceContent.get(HeatConstants.PROPERTIES));
+        return CastUtil.safelyCastToStringObjectMap(resourceContent.get(HeatConstants.PROPERTIES));
     }
 
     private static List<String> getTagList(Map<String, Object> propertiesMap) {
         if (propertiesMap == null) {
             return Collections.emptyList();
         }
-        return Util.safelyCastToStringList(propertiesMap.get(HeatConstants.TAGS));
+        return CastUtil.safelyCastToStringList(propertiesMap.get(HeatConstants.TAGS));
     }
 
     private static Map<String, Object> getMetadataMap(Map<String, Object> propertiesMap) {
         if (propertiesMap == null) {
             return Collections.emptyMap();
         }
-        return Util.safelyCastToStringObjectMap(propertiesMap.get(HeatConstants.METADATA));
+        return CastUtil.safelyCastToStringObjectMap(propertiesMap.get(HeatConstants.METADATA));
     }
 
     public static Metadata getDeploymentMetadata(List<String> tagList, Long timeoutTime, String updatedTime) {

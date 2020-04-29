@@ -9,7 +9,7 @@ import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.Operation;
-import io.github.edmm.util.Util;
+import io.github.edmm.util.CastUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,7 +35,7 @@ public class ComponentInstance extends BasicInstance {
         componentInstance.setCreatedAt(yamlContent.get(YamlConstants.CREATED_AT) != null ? String.valueOf(yamlContent.get(YamlConstants.CREATED_AT)) : null);
         componentInstance.setInstanceProperties(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(yamlContent) : Collections.emptyList());
         componentInstance.setDescription(yamlContent.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(yamlContent.get(YamlConstants.DESCRIPTION)) : null);
-        componentInstance.setMetadata(yamlContent.get(YamlConstants.METADATA) != null ? Metadata.of(Util.safelyCastToStringObjectMap(yamlContent.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
+        componentInstance.setMetadata(yamlContent.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(yamlContent.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
         componentInstance.setRelationInstances(yamlContent.get(YamlConstants.RELATION_INSTANCES) != null ? YamlSupport.getRelationInstancesFromYamlContent(yamlContent) : Collections.emptyList());
 
         return componentInstance;

@@ -9,7 +9,7 @@ import java.util.Objects;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.heat.model.StackStatus;
-import io.github.edmm.util.Util;
+import io.github.edmm.util.CastUtil;
 import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
@@ -20,7 +20,7 @@ public class HeatResourceHandler {
     public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         resources.forEach(resource -> {
-            Map<String, Object> resourceContent = Util.safelyCastToStringObjectMap(template.get(HeatConstants.RESOURCES));
+            Map<String, Object> resourceContent = CastUtil.safelyCastToStringObjectMap(template.get(HeatConstants.RESOURCES));
             componentInstances.add(HeatResourceHandler.getComponentInstance(resources, resource, resourceContent));
         });
         return componentInstances;
@@ -81,7 +81,7 @@ public class HeatResourceHandler {
         if (value.get(firstEntryIndex) instanceof String) {
             value.forEach(entry -> instanceProperties.add(handleStringProperty(key, String.valueOf(entry))));
         } else if (value.get(firstEntryIndex) instanceof Map) {
-            value.forEach(entry -> Util.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue))));
+            value.forEach(entry -> CastUtil.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue))));
         }
         return instanceProperties;
     }
