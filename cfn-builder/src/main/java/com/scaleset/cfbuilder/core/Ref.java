@@ -9,12 +9,12 @@ public class Ref {
 
     private ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-    public static Ref ref(String logicalName) {
-        return new Ref(logicalName);
-    }
-
     public Ref(String logicalName) {
         setLogicalName(logicalName);
+    }
+
+    public static Ref ref(String logicalName) {
+        return new Ref(logicalName);
     }
 
     @JsonProperty("Ref")

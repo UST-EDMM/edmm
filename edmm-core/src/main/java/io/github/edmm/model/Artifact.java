@@ -1,9 +1,10 @@
 package io.github.edmm.model;
 
-import com.google.common.base.CaseFormat;
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.model.support.BaseElement;
+
+import com.google.common.base.CaseFormat;
 import lombok.ToString;
 
 @ToString

@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
@@ -26,6 +23,10 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.chef.model.Metadata;
 import io.github.edmm.plugins.chef.model.PolicyFile;
 import io.github.edmm.plugins.chef.model.ShellRecipe;
+
+import com.google.common.collect.Lists;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

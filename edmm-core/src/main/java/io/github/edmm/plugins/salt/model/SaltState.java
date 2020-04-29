@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.edmm.core.plugin.TemplateHelper;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import io.github.edmm.core.plugin.TemplateHelper;
 import lombok.Builder;
 import lombok.Data;
 import org.slf4j.Logger;

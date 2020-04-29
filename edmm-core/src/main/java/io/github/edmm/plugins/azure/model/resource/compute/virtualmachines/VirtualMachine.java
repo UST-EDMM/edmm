@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.Parameter;
 import io.github.edmm.plugins.azure.model.ParameterTypeEnum;
 import io.github.edmm.plugins.azure.model.resource.Resource;
@@ -14,6 +13,8 @@ import io.github.edmm.plugins.azure.model.resource.network.networkinterfaces.Net
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.NetworkSecurityGroup;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules.SecurityRule;
 import io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules.SecurityRuleProperties;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VirtualMachine extends Resource {

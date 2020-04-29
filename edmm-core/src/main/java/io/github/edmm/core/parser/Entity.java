@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.model.support.Attribute;
+
 import lombok.Getter;
 
 @Getter

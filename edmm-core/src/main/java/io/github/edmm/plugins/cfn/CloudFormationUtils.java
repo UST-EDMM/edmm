@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.edmm.utils.Consts;
+
 import com.scaleset.cfbuilder.cloudformation.Authentication;
 import com.scaleset.cfbuilder.core.Fn;
 import com.scaleset.cfbuilder.core.Template;
@@ -14,7 +16,6 @@ import com.scaleset.cfbuilder.iam.PolicyDocument;
 import com.scaleset.cfbuilder.iam.Principal;
 import com.scaleset.cfbuilder.iam.Role;
 import com.scaleset.cfbuilder.iam.Statement;
-import io.github.edmm.utils.Consts;
 
 import static com.scaleset.cfbuilder.core.Ref.ref;
 

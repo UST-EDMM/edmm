@@ -9,7 +9,7 @@ public enum SecurityRuleProtocolEnum {
     ESP("Esp"),
     ALL_PROTOCOLS("*");
 
-    private String protocolName;
+    private final String protocolName;
 
     SecurityRuleProtocolEnum(String name) {
         this.protocolName = name;

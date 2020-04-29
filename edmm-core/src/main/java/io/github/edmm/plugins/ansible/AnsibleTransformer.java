@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
@@ -23,6 +20,10 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.ansible.model.AnsiblePlay;
 import io.github.edmm.plugins.ansible.model.AnsibleTask;
+
+import com.google.common.collect.Lists;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -41,6 +40,8 @@ import io.github.edmm.plugins.heat.model.PropertyObject;
 import io.github.edmm.plugins.heat.model.PropertyValue;
 import io.github.edmm.plugins.heat.model.Resource;
 import io.github.edmm.plugins.heat.model.Template;
+
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graph;
@@ -83,8 +84,8 @@ public class HeatVisitor implements ComponentVisitor, RelationVisitor {
     private final Graph<RootComponent, RootRelation> graph;
     private final Template template;
 
-    private Map<Compute, Resource> computeResources = new HashMap<>();
-    private List<Pair<RootComponent, RootComponent>> connectionPairs = new ArrayList<>();
+    private final Map<Compute, Resource> computeResources = new HashMap<>();
+    private final List<Pair<RootComponent, RootComponent>> connectionPairs = new ArrayList<>();
 
     public HeatVisitor(TransformationContext context) {
         this.context = context;

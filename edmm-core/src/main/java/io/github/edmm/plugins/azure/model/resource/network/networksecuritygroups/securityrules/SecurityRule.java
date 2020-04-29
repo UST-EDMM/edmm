@@ -1,8 +1,9 @@
 package io.github.edmm.plugins.azure.model.resource.network.networksecuritygroups.securityrules;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.edmm.plugins.azure.model.resource.Resource;
 import io.github.edmm.plugins.azure.model.resource.ResourceTypeEnum;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecurityRule extends Resource {

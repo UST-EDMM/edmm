@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class IpGenerator {
     // Used ips
-    private LinkedList<Integer> usedIPs;
+    private final LinkedList<Integer> usedIPs;
     // Lowerbound 10.0.0.0
     private int lowerBound = 0b00001010_00000000_00000000_00000000;
     // Upperbound 10.0.0.255

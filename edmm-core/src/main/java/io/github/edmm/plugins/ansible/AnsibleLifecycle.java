@@ -5,14 +5,15 @@ import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.ComputeSupportVisitor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AnsibleLifecycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnsibleLifecycle.class);
-
     public static final String FILE_NAME = "deployment.yml";
+
+    private static final Logger logger = LoggerFactory.getLogger(AnsibleLifecycle.class);
 
     public AnsibleLifecycle(TransformationContext context) {
         super(context);

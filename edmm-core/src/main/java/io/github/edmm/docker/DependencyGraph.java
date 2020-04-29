@@ -5,6 +5,7 @@ import java.util.List;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.RootRelation;
+
 import lombok.NonNull;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedMultigraph;

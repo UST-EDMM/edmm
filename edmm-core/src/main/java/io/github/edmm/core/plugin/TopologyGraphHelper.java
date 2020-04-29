@@ -13,6 +13,7 @@ import io.github.edmm.model.component.Paas;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
+
 import org.jgrapht.Graph;
 
 public abstract class TopologyGraphHelper {

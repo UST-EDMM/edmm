@@ -16,6 +16,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
         <java.version>1.8</java.version>
         <jgrapht.version>1.3.1</jgrapht.version>
         <picocli.version>4.0.3</picocli.version>
@@ -115,5 +116,32 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.1</version>
+                    <configuration>
+                        <configLocation>${checkstyle.config.location}</configLocation>
+                        <encoding>UTF-8</encoding>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>checkstyle</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
