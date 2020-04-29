@@ -9,6 +9,7 @@ import java.util.Set;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.DependsOn;
 import io.github.edmm.model.relation.RootRelation;
+
 import org.yaml.snakeyaml.Yaml;
 
 public class EdmmYamlBuilder {
@@ -23,7 +24,7 @@ public class EdmmYamlBuilder {
     private Class<? extends RootComponent> currentComponentClass ;
     private List<Map<String, Object>> currentRelations ;
 
-    public EdmmYamlBuilder (){
+    public EdmmYamlBuilder () {
         componentsTypeMap = new HashMap<>();
         relationsTypeMap = new HashMap<>();
         componentsMap = new HashMap<>();
@@ -92,7 +93,7 @@ public class EdmmYamlBuilder {
      */
     private void populateTypeMaps() {
         Set<String> typeSet = TypeResolver.typeSet();
-        for(String type : typeSet) {
+        for (String type : typeSet) {
             Class<? extends ModelEntity> modelEntity = TypeResolver.resolve(type);
             if (RootComponent.class.isAssignableFrom(modelEntity)) {
                 // type is a component type
@@ -102,7 +103,7 @@ public class EdmmYamlBuilder {
                 extendsMap.put("extends",extendsType);
                 componentsTypeMap.put(type,extendsMap);
 
-            } else if (RootRelation.class.isAssignableFrom(modelEntity)){
+            } else if (RootRelation.class.isAssignableFrom(modelEntity)) {
                 // type is a relation type
                 Class<? extends RootRelation> rootRelation = modelEntity.asSubclass(RootRelation.class);
                 Object extendsType = (DependsOn.class == modelEntity) ? null : TypeResolver.resolve((Class<? extends ModelEntity>) rootRelation.getSuperclass());

@@ -1,15 +1,12 @@
 package io.github.edmm.plugins.rules;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.ModelEntity;
+
 import lombok.Getter;
 import org.jgrapht.Graph;
 
@@ -23,13 +20,13 @@ public abstract class Rule implements Comparable<Rule> {
     @Getter
     protected Integer priority;
 
-    public Rule(String name, String description, int priority){
+    public Rule(String name, String description, int priority) {
         this.name = name;
         this.description = description;
         this.priority = priority;
     }
 
-    public Rule(String name, String description){
+    public Rule(String name, String description) {
         this.name = name;
         this.description = description;
         this.priority = Integer.MAX_VALUE - 1;
@@ -41,8 +38,7 @@ public abstract class Rule implements Comparable<Rule> {
         return false;
     }
 
-
-    public boolean evaluate(DeploymentModel actualModel,Graph<RootComponent, RootRelation> actualSubTopology){
+    public boolean evaluate(DeploymentModel actualModel,Graph<RootComponent, RootRelation> actualSubTopology) {
         String yaml = fromTopology();
         DeploymentModel expectedModel = DeploymentModel.of(yaml);
 
@@ -96,8 +92,8 @@ public abstract class Rule implements Comparable<Rule> {
         return expectedClass == actualClass || expectedClass == actualClass.getSuperclass();
     }
 
-
     protected abstract String fromTopology();
+
     protected abstract String toTopology();
 
     @Override
