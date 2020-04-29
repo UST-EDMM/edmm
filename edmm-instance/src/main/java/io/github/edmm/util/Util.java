@@ -58,6 +58,15 @@ public class Util {
         }
     }
 
+    public static List<Object> safelyCastToObjectList(Object objectToCast) {
+        Optional<List> listOptional = checkListForCast(objectToCast);
+
+        if (listOptional.isPresent()) {
+            return castToListOf(Object.class, listOptional.get());
+        }
+        return Collections.emptyList();
+    }
+
     public static List<String> safelyCastToStringList(Object objectToCast) {
         Optional<List> listOptional = checkListForCast(objectToCast);
 

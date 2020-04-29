@@ -7,6 +7,7 @@ import java.util.Map;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.RelationInstance;
+import io.github.edmm.util.Util;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 
@@ -58,11 +59,12 @@ public class YamlSupport {
     public static List<InstanceProperty> getInstancePropertiesFromYamlContent(Map<String, Object> yamlContent) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
 
-        ((List<Map<String, String>>) yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
+        Util.safelyCastToObjectList(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES)).forEach(map -> {
+            Map<String, Object> stringObjectMap = Util.safelyCastToStringObjectMap(map);
             InstanceProperty instanceProperty = new InstanceProperty(
-                map.get(YamlConstants.KEY),
-                map.get(YamlConstants.TYPE),
-                map.get(YamlConstants.INSTANCE_VALUE));
+                String.valueOf(stringObjectMap.get(YamlConstants.KEY)),
+                String.valueOf(stringObjectMap.get(YamlConstants.TYPE)),
+                stringObjectMap.get(YamlConstants.INSTANCE_VALUE));
             instanceProperties.add(instanceProperty);
         });
 
@@ -72,8 +74,8 @@ public class YamlSupport {
     public static List<ComponentInstance> getComponentInstancesFromYamlContent(Map<String, Object> yamlContent) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
 
-        ((List<Map<String, Object>>) yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(componentYamlContent -> {
-            ComponentInstance componentInstance = ComponentInstance.ofYamlContent(componentYamlContent);
+        Util.safelyCastToObjectList(yamlContent.get(YamlConstants.COMPONENT_INSTANCES)).forEach(componentYamlContent -> {
+            ComponentInstance componentInstance = ComponentInstance.ofYamlContent(Util.safelyCastToStringObjectMap(componentYamlContent));
             componentInstances.add(componentInstance);
         });
 
