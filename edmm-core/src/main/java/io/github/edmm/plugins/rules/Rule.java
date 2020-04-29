@@ -42,12 +42,11 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
 
-    public boolean evaluate(Graph<RootComponent, RootRelation> subTopology){
+    public boolean evaluate(DeploymentModel actualModel,Graph<RootComponent, RootRelation> actualSubTopology){
         String yaml = fromTopology();
-        DeploymentModel matchingDeploymentModel = DeploymentModel.of(yaml);
+        DeploymentModel expectedModel = DeploymentModel.of(yaml);
 
-
-        return false;
+        return compare(expectedModel,actualModel,actualSubTopology);
     }
 
     private boolean compare(
@@ -63,6 +62,7 @@ public abstract class Rule implements Comparable<Rule> {
             for (RootComponent actualSource : actualSubTopology.vertexSet()) {
 
                 if (areSimilar(expectedSource,actualSource)) {
+                    // TODO this is not correct if we have more than one component
                     similarComponentsCount += 1;
 
                     for (RootRelation expectedRelation : expectedSource.getRelations()) {
@@ -75,7 +75,9 @@ public abstract class Rule implements Comparable<Rule> {
 
                                 if (expectedTarget.isPresent() && actualTarget.isPresent() &&
                                     areSimilar(expectedTarget.get(), actualTarget.get())) {
+                                    // TODO this is not correct either
                                     similarRelationsCount += 1;
+                                    break; // this might fix the error
                                 }
                             }
                         }
@@ -97,20 +99,6 @@ public abstract class Rule implements Comparable<Rule> {
 
     protected abstract String fromTopology();
     protected abstract String toTopology();
-
-    /*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Rule that = (Rule) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }*/
 
     @Override
     public String toString() {
