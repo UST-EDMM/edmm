@@ -1,7 +1,6 @@
 package io.github.edmm.model.support;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import io.github.edmm.model.component.Auth0;
 import io.github.edmm.model.component.AwsAurora;
@@ -23,6 +22,8 @@ import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.DependsOn;
 import io.github.edmm.model.relation.HostedOn;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public abstract class TypeResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(TypeResolver.class);
 
-    private static final Map<String, Class<? extends ModelEntity>> TYPE_MAPPING = new HashMap<>();
+    private static final BidiMap<String, Class<? extends ModelEntity>> TYPE_MAPPING = new DualHashBidiMap<>();
 
     static {
         // Components
@@ -65,6 +66,20 @@ public abstract class TypeResolver {
             logger.warn("Type '{}' is unknown and not supported", type);
             return RootComponent.class;
         }
+    }
+
+    public static String resolve(Class<? extends ModelEntity> clazz) {
+        String type = TYPE_MAPPING.getKey(clazz);
+        if (type != null) {
+            return type;
+        } else {
+            logger.warn("Class '{}' is unknown and not supported", clazz.getName());
+            return TYPE_MAPPING.getKey(RootComponent.class);
+        }
+    }
+
+    public static Set<String> typeSet() {
+        return TYPE_MAPPING.keySet();
     }
 
     private static void put(String name, Class<? extends ModelEntity> clazz) {
