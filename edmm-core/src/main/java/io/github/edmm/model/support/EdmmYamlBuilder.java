@@ -12,41 +12,50 @@ import io.github.edmm.model.relation.RootRelation;
 import org.yaml.snakeyaml.Yaml;
 
 public class EdmmYamlBuilder {
-    private Map<String, Object> mainMap;
-    private Map<String, Object> componentsMap;
+    private final Map<String, Object> mainMap;
+    private final Map<String, Object> componentsMap;
     Map<String, Object> componentsTypeMap;
     Map<String, Object> relationsTypeMap;
+
+    // this variables are used to record the component that is being modelled
+    // once another component will be added, they will be used to add the component to the componentsMap
+    // and will be ready again to accept the new component's information
+    private Class<? extends RootComponent> currentComponentClass ;
+    private List<Map<String, Object>> currentRelations ;
 
     public EdmmYamlBuilder (){
         componentsTypeMap = new HashMap<>();
         relationsTypeMap = new HashMap<>();
         componentsMap = new HashMap<>();
         mainMap = new HashMap<>();
+
+        currentComponentClass = null;
+        currentRelations = new ArrayList<>();
     }
 
-    public EdmmYamlBuilder component(Class<? extends RootComponent> componentClass, Class<? extends RootComponent> hostedOnClass) {
-        Map<String, Object> componentMap = new HashMap<>();
-        Map<String, Object> relationMap = new HashMap<>();
-        List<Map> relations = new ArrayList<>();
-
-        relationMap.put("hosted_on", hostedOnClass.getSimpleName());
-        relations.add(relationMap);
-        componentMap.put("type", TypeResolver.resolve(componentClass));
-        componentMap.put("relations", relations);
-        componentsMap.put(componentClass.getSimpleName(), componentMap);
-
-        //component(hostedOnClass);
-        return this;
-    }
-
+    /**
+     *  Adds a component under the 'components' section
+     */
     public EdmmYamlBuilder component(Class<? extends RootComponent> componentClass) {
-        Map<String, Object> componentMap = new HashMap<>();
-        componentMap.put("type", TypeResolver.resolve(componentClass));
-        componentsMap.put(componentClass.getSimpleName(), componentMap);
+        flushCurrentComponent();
+        currentComponentClass = componentClass;
         return this;
     }
 
-    public String buildToYamlString() {
+    /**
+     * Adds 'hosted_on' to the previously specified component
+     * @param componentClass the class hosting the component
+     */
+    public EdmmYamlBuilder hostedOn(Class<? extends RootComponent> componentClass) {
+        Map<String, Object> relationMap = new HashMap<>();
+        relationMap.put("hosted_on", componentClass.getSimpleName());
+        currentRelations.add(relationMap);
+
+        return this;
+    }
+
+    public String build() {
+        flushCurrentComponent();
         populateTypeMaps();
 
         mainMap.put("components", componentsMap);
@@ -56,8 +65,32 @@ public class EdmmYamlBuilder {
         return new Yaml().dumpAsMap(mainMap);
     }
 
+    /**
+     * It adds the currentComponent and the currentRelations to the componentsMap.
+     * This function needs to be called every time a new component is added, so that the currentComponent will be saved
+     * and there will be room for the new one.
+     * It is also called at build time, to save the last component added.
+     */
+    private void flushCurrentComponent() {
+        if (currentComponentClass != null ) {
+            Map<String, Object> componentMap = new HashMap<>();
+
+            if (! currentRelations.isEmpty())
+                componentMap.put("relations", currentRelations);
+            // here we can add also operations and properties with the same mechanism
+
+            componentMap.put("type", TypeResolver.resolve(currentComponentClass));
+            componentsMap.put(currentComponentClass.getSimpleName(), componentMap);
+        }
+        currentComponentClass = null;
+        currentRelations = new ArrayList<>();
+    }
+
+    /**
+     * This functions populates the  componentsTypeMap and the relationsTypeMap in order to create the
+     * 'component_types' and 'relation_types? sections of the yaml in an automatic way
+     */
     private void populateTypeMaps() {
-        // adding the relation_type and component_type section
         Set<String> typeSet = TypeResolver.typeSet();
         for(String type : typeSet) {
             Class<? extends ModelEntity> modelEntity = TypeResolver.resolve(type);

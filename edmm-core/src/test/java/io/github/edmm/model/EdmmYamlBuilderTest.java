@@ -12,7 +12,10 @@ public class EdmmYamlBuilderTest {
     public void testSimpleYaml(){
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
 
-        String yamlString =  yamlBuilder.component(Paas.class, Compute.class).buildToYamlString();
+        String yamlString =  yamlBuilder.component(Paas.class)
+            .hostedOn(Compute.class)
+            .component(Compute.class)
+            .build();
 
         try {
             DeploymentModel.of(yamlString);
