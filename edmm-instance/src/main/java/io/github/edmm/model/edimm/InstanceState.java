@@ -30,6 +30,7 @@ public class InstanceState {
         DELETED(TOSCAState.NodeTemplateInstanceState.DELETED),
         ERROR(TOSCAState.NodeTemplateInstanceState.ERROR),
         UPDATED(TOSCAState.NodeTemplateInstanceState.MIGRATED),
+        UPDATING(TOSCAState.NodeTemplateInstanceState.CREATING),
         STARTED(TOSCAState.NodeTemplateInstanceState.STARTED),
         STOPPED(TOSCAState.NodeTemplateInstanceState.STOPPED);
 

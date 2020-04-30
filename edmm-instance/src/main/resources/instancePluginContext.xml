@@ -4,4 +4,5 @@
     <bean id="heatPlugin" class="io.github.edmm.plugins.heat.HeatInstancePlugin"/>
     <bean id="kubernetesPlugin" class="io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin"/>
     <bean id="edimmPlugin" class="io.github.edmm.plugins.edimm.EDiMMPlugin"/>
+    <bean id="cfnPlugin" class="io.github.edmm.plugins.cfn.CfnInstancePlugin"/>
 </beans>
