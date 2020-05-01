@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.Operation;
+import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.support.ModelEntity;
 import io.github.edmm.model.visitor.RelationVisitor;
@@ -18,11 +19,11 @@ public class RootRelation extends ModelEntity implements VisitableRelation {
 
     public static Attribute<String> TARGET = new Attribute<>("target", String.class);
 
-    private final MappingEntity entity;
+    private final RootComponent sourceComponent;
 
-    public RootRelation(MappingEntity relationDefinition, MappingEntity entity) {
+    public RootRelation(MappingEntity relationDefinition, RootComponent sourceComponent) {
         super(relationDefinition);
-        this.entity = entity;
+        this.sourceComponent = sourceComponent;
     }
 
     public String getTarget() {
@@ -31,6 +32,10 @@ public class RootRelation extends ModelEntity implements VisitableRelation {
             throw new IllegalStateException("Relation needs to have a target");
         }
         return type;
+    }
+
+    public String getSource() {
+        return sourceComponent.getName();
     }
 
     public StandardLifecycle getStandardLifecycle() {

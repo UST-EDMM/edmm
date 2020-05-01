@@ -69,7 +69,7 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
         Set<Entity> children = entity.getChildren();
         for (Entity child : children) {
             MappingEntity relationEntity = (MappingEntity) child;
-            RootRelation relation = TypeWrapper.wrapRelation(relationEntity, this.entity);
+            RootRelation relation = TypeWrapper.wrapRelation(relationEntity, this);
             result.add(relation);
         }
     }
