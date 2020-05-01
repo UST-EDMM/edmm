@@ -55,6 +55,18 @@ public class EdmmYamlBuilder {
         return this;
     }
 
+    /**
+     * Adds 'depends_on' to the previously specified component
+     * @param componentClass the class hosting the component
+     */
+    public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass) {
+        Map<String, Object> relationMap = new HashMap<>();
+        relationMap.put("depends_on", componentClass.getSimpleName());
+        currentRelations.add(relationMap);
+
+        return this;
+    }
+
     public String build() {
         flushCurrentComponent();
         populateTypeMaps();
