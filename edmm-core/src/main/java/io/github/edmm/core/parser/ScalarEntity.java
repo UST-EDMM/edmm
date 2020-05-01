@@ -16,4 +16,9 @@ public class ScalarEntity extends Entity {
     public String toString() {
         return String.format("ScalarEntity (id='%s', value='%s')", getId(), getValue());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && this.value == ((ScalarEntity) o).getValue();
+    }
 }
