@@ -1,21 +1,28 @@
 package io.github.edmm.plugins.rules;
 
+import io.github.edmm.model.component.Auth0;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Paas;
+import io.github.edmm.model.component.Saas;
+import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.support.EdmmYamlBuilder;
 
-public class PaasDefaultRule extends Rule {
+public class CustomRule extends Rule {
 
-    public PaasDefaultRule() {
-        super("paas-default",
-            "always supported replacement for a PaaS node type");
+    public CustomRule() {
+        super("stub-rule",
+            "rule that breaks test");
     }
 
     @Override
     protected String fromTopology() {
         return new EdmmYamlBuilder()
-            .component(Paas.class)
+            .component(WebApplication.class)
+            .dependsOn(Saas.class)
+            .dependsOn(Auth0.class)
+            .component(Saas.class)
+            .component(Auth0.class)
             .build();
     }
 
