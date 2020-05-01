@@ -19,6 +19,6 @@ public class ScalarEntity extends Entity {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o) && this.value == ((ScalarEntity) o).getValue();
+        return super.equals(o) && this.value == ((ScalarEntity)o).value;
     }
 }

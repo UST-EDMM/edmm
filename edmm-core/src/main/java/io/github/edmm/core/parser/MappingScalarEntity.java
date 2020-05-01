@@ -13,11 +13,11 @@ public class MappingScalarEntity extends MappingEntity {
 
     @Override
     public String toString() {
-        return (String.format("MappingEntity (id='%s', value='%s')", getId(),getValue()));
+        return (String.format("MappingScalarEntity (id='%s', value='%s')", getId(),getValue()));
     }
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o) && this.value == ((MappingScalarEntity) o).value;
+        return super.equals(o) && this.value == ((MappingScalarEntity)o).value;
     }
 }
