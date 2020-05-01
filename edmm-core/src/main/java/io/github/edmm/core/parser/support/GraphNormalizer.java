@@ -6,6 +6,7 @@ import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.EntityId;
 import io.github.edmm.core.parser.MappingEntity;
+import io.github.edmm.core.parser.MappingScalarEntity;
 import io.github.edmm.core.parser.ScalarEntity;
 import io.github.edmm.core.parser.SequenceEntity;
 
@@ -90,7 +91,7 @@ public abstract class GraphNormalizer {
                 for (Entity relation : relations.get().getChildren()) {
                     if (relation instanceof ScalarEntity) {
                         ScalarEntity scalarEntity = (ScalarEntity) relation;
-                        MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                        MappingEntity normalizedEntity = new MappingScalarEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                         ScalarEntity type = new ScalarEntity(scalarEntity.getName(), normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                         ScalarEntity target = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.TARGET), graph);
                         graph.replaceEntity(scalarEntity, normalizedEntity);
@@ -120,7 +121,7 @@ public abstract class GraphNormalizer {
             for (Entity op : operations.get().getChildren()) {
                 if (op instanceof ScalarEntity) {
                     ScalarEntity scalarEntity = (ScalarEntity) op;
-                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                    MappingEntity normalizedEntity = new MappingScalarEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                     SequenceEntity artifacts = new SequenceEntity(op.getId().extend(DefaultKeys.ARTIFACTS), graph);
                     ScalarEntity artifact = new ScalarEntity(scalarEntity.getValue(), artifacts.getId().extend(DefaultKeys.CMD), graph);
                     graph.replaceEntity(scalarEntity, normalizedEntity);
@@ -143,7 +144,7 @@ public abstract class GraphNormalizer {
             for (Entity prop : properties.get().getChildren()) {
                 if (prop instanceof ScalarEntity) {
                     ScalarEntity scalarEntity = (ScalarEntity) prop;
-                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                    MappingEntity normalizedEntity = new MappingScalarEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                     ScalarEntity type = new ScalarEntity(DefaultKeys.STRING, normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                     ScalarEntity value = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.VALUE), graph);
                     graph.replaceEntity(scalarEntity, normalizedEntity);
