@@ -72,11 +72,11 @@ public abstract class TypeWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public static RootRelation wrapRelation(MappingEntity relationEntity, RootComponent sourceComponent) {
+    public static RootRelation wrapRelation(MappingEntity relationEntity, MappingEntity componentEntity) {
         ScalarEntity type = (ScalarEntity) relationEntity.getChild(DefaultKeys.TYPE).orElseThrow(IllegalArgumentException::new);
         Class clazz = TypeResolver.resolve(type.getValue());
         try {
-            return (RootRelation) ConstructorUtils.invokeConstructor(clazz, relationEntity, sourceComponent);
+            return (RootRelation) ConstructorUtils.invokeConstructor(clazz, relationEntity, componentEntity);
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Failed to wrap relation '%s'", relationEntity), e);
         }
