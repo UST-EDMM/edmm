@@ -1,8 +1,12 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.Optional;
+
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.Auth0;
+import io.github.edmm.model.component.AwsBeanstalk;
 import io.github.edmm.model.component.Paas;
+import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Saas;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.component.WebServer;
@@ -18,27 +22,20 @@ public class RulesTests {
 
         PaasDefaultRule paasDefaultRule = new PaasDefaultRule();
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-        String yaml = yamlBuilder.component(Paas.class).build();
+        String yaml = yamlBuilder.component(AwsBeanstalk.class).build();
         DeploymentModel actualModel = DeploymentModel.of(yaml);
-        Assert.assertTrue(paasDefaultRule.evaluate(actualModel, actualModel.getTopology()));
+        Optional<RootComponent> unsupportedComponent = actualModel.getComponent("AwsBeanstalk");
+
+        if (unsupportedComponent.isPresent())
+            Assert.assertTrue(paasDefaultRule.evaluate(actualModel,  unsupportedComponent.get()));
+        else
+            Assert.fail("component not present");
     }
 
     @Test
-    public void testEvaluateWebServer() {
-
-        PaasDefaultRule paasDefaultRule = new PaasDefaultRule();
+    public void testRuleAssessor1() {
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-        String yaml = yamlBuilder.component(WebServer.class).build();
-        DeploymentModel actualModel = DeploymentModel.of(yaml);
-        Assert.assertFalse(paasDefaultRule.evaluate(actualModel, actualModel.getTopology()));
-    }
-
-    @Test
-    public void testEvaluateCustomRule() {
-        // TODO this test fails as I expected
-        CustomRule customRule = new CustomRule();
-        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-        String yaml = yamlBuilder
+        yamlBuilder
             .component(WebApplication.class)
             .dependsOn(Saas.class)
             .dependsOn(Auth0.class)
@@ -46,7 +43,37 @@ public class RulesTests {
             .component(Auth0.class)
             .build();
 
-        DeploymentModel actualModel = DeploymentModel.of(yaml);
-        //Assert.assertTrue(customRule.evaluate(actualModel, actualModel.getTopology()));
+        DeploymentModel deploymentModel = DeploymentModel.of(yamlBuilder.build());
+        Optional<RootComponent> unsupportedComponent = deploymentModel.getComponent("WebApplication");
+        RuleAssessor ruleAssessor = new RuleAssessor(deploymentModel,deploymentModel);
+
+        if (unsupportedComponent.isPresent())
+            Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
+        else
+            Assert.fail("component not present");
+    }
+
+    @Test
+    public void testRuleAssessor2() {
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        yamlBuilder
+            .component(WebApplication.class)
+            .dependsOn(Saas.class)
+            .component(Saas.class);
+        DeploymentModel expectedModel = DeploymentModel.of(yamlBuilder.build());
+
+        yamlBuilder = new EdmmYamlBuilder()
+            .component(WebApplication.class)
+            .dependsOn(Auth0.class)
+            .component(Auth0.class);
+        DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
+
+        Optional<RootComponent> unsupportedComponent = actualModel.getComponent("WebApplication");
+        RuleAssessor ruleAssessor = new RuleAssessor(expectedModel,actualModel);
+
+        if (unsupportedComponent.isPresent())
+            Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
+        else
+            Assert.fail("component not present");
     }
 }
