@@ -13,18 +13,15 @@ public class PaasDefaultRule extends Rule {
     }
 
     @Override
-    protected String fromTopology() {
-        return new EdmmYamlBuilder()
-            .component(Paas.class)
-            .build();
+    protected EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder) {
+        return yamlBuilder.component(Paas.class);
     }
 
     @Override
-    protected String toTopology() {
-        return new EdmmYamlBuilder()
+    protected EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder) {
+        return yamlBuilder
             .component(WebServer.class)
             .hostedOn(Compute.class)
-            .component(Compute.class)
-            .build();
+            .component(Compute.class);
     }
 }

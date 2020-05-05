@@ -68,12 +68,18 @@ public class RulesTests {
         DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
 
         Optional<RootComponent> unsupportedComponent = actualModel.getComponent("WebApplication");
-        RuleAssessor ruleAssessor = new RuleAssessor(expectedModel,actualModel);
+        RuleAssessor ruleAssessor  = new RuleAssessor(expectedModel,actualModel);
 
         if (unsupportedComponent.isPresent())
             Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
-        else
-            Assert.fail("component not present");
+        else Assert.fail("component not present");
+
+        unsupportedComponent = expectedModel.getComponent("WebApplication");
+        ruleAssessor  = new RuleAssessor(actualModel, expectedModel);
+
+        if (unsupportedComponent.isPresent())
+            Assert.assertFalse(ruleAssessor.assess(unsupportedComponent.get()));
+        else Assert.fail("component not present");
     }
 
     @Test

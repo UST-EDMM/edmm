@@ -51,7 +51,7 @@ public class RuleAssessor {
         // If it exists then we have found a match and the rule can be applied
         boolean match = false;
         for (RootComponent current : candidates) {
-            // every time we found a match of type component -> relation -> component we delete this elements from the sets below
+            // every time we find a match of type component -> relation -> component we delete this elements from the sets below
             expectedComponents = new HashSet<>(expectedTopology.vertexSet());
             expectedRelations = new HashSet<>(expectedTopology.edgeSet());
 
@@ -127,6 +127,8 @@ public class RuleAssessor {
 
                     if (replace.test(expectedSource, actualSource) &&
                         replace.test(expectedTarget, actualTarget)) {
+                        // match source-component -> relation -> target-component found
+
                         expectedRelations.remove(expectedEdge);
                         expectedComponents.remove(expectedSource);
                         expectedComponents.remove(expectedTarget);

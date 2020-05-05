@@ -2,6 +2,7 @@ package io.github.edmm.plugins.rules;
 
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.support.EdmmYamlBuilder;
 
 import lombok.Getter;
 
@@ -26,15 +27,16 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     public boolean evaluate(DeploymentModel actualModel,RootComponent unsupportedComponent) {
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        DeploymentModel expectedModel = DeploymentModel.of(fromTopology(yamlBuilder).build());
 
-        DeploymentModel expectedModel = DeploymentModel.of(fromTopology());
         RuleAssessor ruleAssessor = new RuleAssessor(expectedModel,actualModel);
         return ruleAssessor.assess(unsupportedComponent);
     }
 
-    protected abstract String fromTopology();
+    protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
 
-    protected abstract String toTopology();
+    protected abstract EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder);
 
     @Override
     public String toString() {
