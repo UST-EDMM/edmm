@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.TemplateHelper;
-import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.TemplateHelper;
+import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Artifact;

@@ -2,7 +2,7 @@ package io.github.edmm.plugins;
 
 import java.nio.file.Files;
 
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.heat.HeatPlugin;

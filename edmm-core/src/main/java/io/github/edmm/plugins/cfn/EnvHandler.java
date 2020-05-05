@@ -2,7 +2,7 @@ package io.github.edmm.plugins.cfn;
 
 import java.util.Map;
 
-import io.github.edmm.core.plugin.BashScript;
+import io.github.edmm.core.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
 
 import com.scaleset.cfbuilder.ec2.metadata.CFNCommand;

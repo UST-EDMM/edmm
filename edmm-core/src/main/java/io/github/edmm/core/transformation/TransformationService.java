@@ -5,9 +5,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.plugin.PluginService;
-import io.github.edmm.core.transformation.support.ExecutionTask;
+import io.github.edmm.core.plugin.TransformationPlugin;
+import io.github.edmm.core.transformation.support.TransformationTask;
 import io.github.edmm.model.DeploymentModel;
 
 import org.slf4j.Logger;
@@ -28,16 +29,16 @@ public class TransformationService {
         this.pluginService = pluginService;
     }
 
-    public void startTransformation(TransformationContext context) {
+    public void start(TransformationContext context) {
         TargetTechnology targetTechnology = context.getTargetTechnology();
-        Optional<Plugin<?>> plugin = pluginService.findByTargetTechnology(targetTechnology);
+        Optional<TransformationPlugin<?>> plugin = pluginService.getTransformationPlugin(targetTechnology);
         if (!plugin.isPresent()) {
             logger.error("Plugin for given technology '{}' could not be found", targetTechnology.getId());
             return;
         }
         if (context.getState() == TransformationContext.State.READY) {
             try {
-                executor.submit(new ExecutionTask(plugin.get(), context)).get();
+                executor.submit(new TransformationTask(plugin.get(), context)).get();
             } catch (Exception e) {
                 logger.error("Error executing transformation task", e);
             }
@@ -45,7 +46,7 @@ public class TransformationService {
     }
 
     public TransformationContext createContext(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
-        TargetTechnology targetTechnology = pluginService.getSupportedTargetTechnologies().stream()
+        TargetTechnology targetTechnology = pluginService.getSupportedTransformationTargets().stream()
             .filter(p -> p.getId().equals(target))
             .findFirst()
             .orElseThrow(IllegalStateException::new);

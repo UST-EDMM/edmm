@@ -59,7 +59,7 @@ public class TransformationHandler {
             throw new IllegalStateException("Could not create transformation context", e);
         }
         try {
-            service.startTransformation(context);
+            service.start(context);
         } catch (Exception e) {
             log.error("Transformation failed: {}", e.getMessage(), e);
             context.setState(ERROR);

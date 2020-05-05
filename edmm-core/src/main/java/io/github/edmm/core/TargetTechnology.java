@@ -1,4 +1,4 @@
-package io.github.edmm.core.transformation;
+package io.github.edmm.core;
 
 import java.util.Objects;
 

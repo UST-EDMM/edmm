@@ -1,10 +1,10 @@
 package io.github.edmm.plugins.compose;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
+import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class DockerComposePlugin extends Plugin<DockerComposeLifecycle> {
+public class DockerComposePlugin extends TransformationPlugin<DockerComposeLifecycle> {
 
     public static final TargetTechnology DOCKER_COMPOSE = TargetTechnology.builder().id("compose").name("Docker Compose").build();
 

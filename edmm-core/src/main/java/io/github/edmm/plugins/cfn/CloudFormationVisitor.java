@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Operation;

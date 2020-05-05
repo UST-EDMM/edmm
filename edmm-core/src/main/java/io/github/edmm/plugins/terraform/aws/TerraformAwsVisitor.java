@@ -12,10 +12,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import io.github.edmm.core.plugin.BashScript;
+import io.github.edmm.core.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.TemplateHelper;
-import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.TemplateHelper;
+import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.Artifact;

@@ -1,6 +1,6 @@
 package io.github.edmm.plugins.cloudify;
 
-import io.github.edmm.core.plugin.TemplateHelper;
+import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;

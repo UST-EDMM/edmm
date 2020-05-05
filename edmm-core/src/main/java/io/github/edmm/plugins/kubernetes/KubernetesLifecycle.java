@@ -6,7 +6,7 @@ import java.util.Set;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.TopologyGraphHelper;
+import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.docker.Container;
@@ -30,8 +30,8 @@ public class KubernetesLifecycle extends AbstractLifecycle {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesLifecycle.class);
 
     protected final Graph<RootComponent, RootRelation> graph;
+    protected final List<Container> containers = new ArrayList<>();
 
-    protected List<Container> containers = new ArrayList<>();
     protected DependencyGraph dependencyGraph;
 
     public KubernetesLifecycle(TransformationContext context) {

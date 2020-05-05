@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.edmm.core.plugin.TemplateHelper;
+import io.github.edmm.core.TemplateHelper;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;

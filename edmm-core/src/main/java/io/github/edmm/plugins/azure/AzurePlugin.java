@@ -1,10 +1,10 @@
 package io.github.edmm.plugins.azure;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
+import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class AzurePlugin extends Plugin<AzureLifecycle> {
+public class AzurePlugin extends TransformationPlugin<AzureLifecycle> {
 
     public static final TargetTechnology AZURE = TargetTechnology.builder().id("azure").name("Azure").build();
 

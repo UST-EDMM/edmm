@@ -1,8 +1,9 @@
-package io.github.edmm.core.plugin;
+package io.github.edmm.core;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationException;
 
 import org.slf4j.Logger;

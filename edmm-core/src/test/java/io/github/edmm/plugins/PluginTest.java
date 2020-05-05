@@ -2,10 +2,13 @@ package io.github.edmm.plugins;
 
 import java.io.File;
 
+import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.plugin.ExecutionPlugin;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.slf4j.Logger;
@@ -23,11 +26,11 @@ public abstract class PluginTest {
         this.targetDirectory = targetDirectory;
     }
 
-    protected void executeLifecycle(Plugin plugin, TransformationContext context) {
+    protected void executeLifecycle(TransformationPlugin<?> plugin, TransformationContext context) {
         AbstractLifecycle lifecycle = plugin.getLifecycle(context);
         CheckModelResult result = lifecycle.checkModel();
         logger.info("checkModel(): state={}, unsupportedComponents={}",
-                result.getState(), result.getUnsupportedComponents());
+            result.getState(), result.getUnsupportedComponents());
         if (OK.equals(result.getState())) {
             lifecycle.prepare();
             lifecycle.transform();
@@ -35,6 +38,16 @@ public abstract class PluginTest {
         } else {
             logger.warn("Skip execution due to unsupported components...");
         }
+    }
+
+    protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) {
+        plugin.init();
+        try {
+            plugin.execute(context);
+        } catch (Exception e) {
+            logger.error("Error executing deployment: {}", e.getMessage(), e);
+        }
+        plugin.finalize(context);
     }
 
     @After
