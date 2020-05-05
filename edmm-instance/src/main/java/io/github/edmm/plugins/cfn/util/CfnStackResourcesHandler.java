@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
-import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.cfn.model.Status;
 
@@ -26,8 +25,8 @@ public class CfnStackResourcesHandler {
             componentInstance.setDescription(stackResource.getDescription());
             componentInstance.setType(stackResource.getResourceType());
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
+            componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());
             componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus()).toEDiMMComponentInstanceState());
-            componentInstance.setMetadata(Metadata.of(Collections.emptyMap()));
             componentInstance.setInstanceProperties(Collections.emptyList());
             this.componentInstances.add(componentInstance);
         });

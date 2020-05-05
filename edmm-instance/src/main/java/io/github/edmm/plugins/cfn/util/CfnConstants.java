@@ -13,5 +13,11 @@ class CfnConstants {
     static final String ENABLE_TERMINATION_PROTECTION = "enableTerminationProtection";
     static final String PARENT_ID = "parentId";
     static final String ROOT_ID = "rootId";
+    static final String MONITORING_TIMES_IN_MINUTES = "monitoringTimeInMinutes";
+    static final String ROLLBACK_TRIGGER = "rollbackTrigger";
+    static final String ROLLBACK_TYPE = "rollbackType";
+    static final String ARN = "ARN";
+    static final String TYPE = "type";
+    static final String DELIMITER = "::";
 
 }
