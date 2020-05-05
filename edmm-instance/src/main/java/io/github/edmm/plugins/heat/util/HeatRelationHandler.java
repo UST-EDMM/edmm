@@ -1,11 +1,11 @@
 package io.github.edmm.plugins.heat.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.RelationInstance;
 import io.github.edmm.util.CastUtil;
 
@@ -24,10 +24,14 @@ class HeatRelationHandler {
             // TODO: metadata, instance properties, description, operation
             RelationInstance relationInstance = new RelationInstance();
             relationInstance.setType(HeatConstants.DEPENDS_ON);
-            relationInstance.setTargetInstanceId(resources.stream().filter(res -> res.getResourceName().equals(dependsOnResource)).findFirst().get().getPhysicalResourceId());
+            relationInstance.setTargetInstanceId(resources.stream()
+                .filter(res -> res.getResourceName().equals(dependsOnResource))
+                .findFirst()
+                .orElseThrow(InstanceTransformationException::new)
+                .getPhysicalResourceId());
             relationInstance.setId(HeatConstants.DEPENDS_ON + String.valueOf(relationCount.getAndIncrement()));
             relationInstances.add(relationInstance);
         });
-        return (relationInstances.size() > 0) ? relationInstances : Collections.emptyList();
+        return relationInstances;
     }
 }
