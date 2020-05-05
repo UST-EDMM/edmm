@@ -1,5 +1,8 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.support.EdmmYamlBuilder;
@@ -34,9 +37,22 @@ public abstract class Rule implements Comparable<Rule> {
         return ruleAssessor.assess(unsupportedComponent);
     }
 
+    public String execute() {
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        return yamlBuilder.build();
+    }
+
     protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
 
     protected abstract EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder);
+
+    public static List<Rule> getDefalut() {
+        List<Rule> rules = new ArrayList<>();
+        rules.add(new PaasDefaultRule());
+        rules.add(new SaasDefaultRule());
+        rules.add(new DbaasDefaultRule());
+        return  rules;
+    }
 
     @Override
     public String toString() {
