@@ -38,40 +38,40 @@ public class HeatMetadataHandler {
     }
 
     private static Map<String, Object> handleMetadataMap(Map<String, Object> metadataMap) {
-        if (metadataMap == null) {
-            return Collections.emptyMap();
+        if (metadataMap != null) {
+            Map<String, Object> metadataResult = new LinkedHashMap<>();
+            metadataMap.forEach(metadataResult::put);
+            return metadataResult;
         }
-        Map<String, Object> metadataResult = new LinkedHashMap<>();
-        metadataMap.forEach(metadataResult::put);
-        return metadataResult;
+        return Collections.emptyMap();
     }
 
-    static Map<String, Object> getResourceMap(Map<String,Object> resourceContent, String resourceName) {
-        if (resourceContent.get(resourceName) == null) {
-            return Collections.emptyMap();
+    static Map<String, Object> getResourceMap(Map<String, Object> resourceContent, String resourceName) {
+        if (resourceContent.get(resourceName) != null) {
+            return CastUtil.safelyCastToStringObjectMap(resourceContent.get(resourceName));
         }
-        return CastUtil.safelyCastToStringObjectMap(resourceContent.get(resourceName));
+        return Collections.emptyMap();
     }
 
     static Map<String, Object> getPropertiesMap(Map<String, Object> resourceContent) {
-        if (resourceContent.get(HeatConstants.PROPERTIES) == null) {
-            return Collections.emptyMap();
+        if (resourceContent.get(HeatConstants.PROPERTIES) != null) {
+            return CastUtil.safelyCastToStringObjectMap(resourceContent.get(HeatConstants.PROPERTIES));
         }
-        return CastUtil.safelyCastToStringObjectMap(resourceContent.get(HeatConstants.PROPERTIES));
+        return Collections.emptyMap();
     }
 
     private static List<String> getTagList(Map<String, Object> propertiesMap) {
-        if (propertiesMap == null) {
-            return Collections.emptyList();
+        if (propertiesMap != null) {
+            return CastUtil.safelyCastToStringList(propertiesMap.get(HeatConstants.TAGS));
         }
-        return CastUtil.safelyCastToStringList(propertiesMap.get(HeatConstants.TAGS));
+        return Collections.emptyList();
     }
 
     private static Map<String, Object> getMetadataMap(Map<String, Object> propertiesMap) {
-        if (propertiesMap == null) {
-            return Collections.emptyMap();
+        if (propertiesMap != null) {
+            return CastUtil.safelyCastToStringObjectMap(propertiesMap.get(HeatConstants.METADATA));
         }
-        return CastUtil.safelyCastToStringObjectMap(propertiesMap.get(HeatConstants.METADATA));
+        return Collections.emptyMap();
     }
 
     public static Metadata getDeploymentMetadata(List<String> tagList, Long timeoutTime, String updatedTime) {
