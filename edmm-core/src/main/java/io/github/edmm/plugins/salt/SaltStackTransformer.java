@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import freemarker.template.Configuration;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
@@ -23,6 +22,8 @@ import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.salt.model.SaltBase;
 import io.github.edmm.plugins.salt.model.SaltFormula;
+
+import freemarker.template.Configuration;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -39,10 +40,10 @@ public class SaltStackTransformer implements ComponentVisitor, RelationVisitor {
     // Used to generate static ip
     private final IpGenerator ipGenerator;
     private final Graph<RootComponent, RootRelation> graph;
-    private SaltBase baseFile;
+    private final SaltBase baseFile;
     // <ComputeName, Formula>
-    private Map<String, SaltFormula> formulas = new HashMap<>();
-    private PluginFileAccess fileAccess;
+    private final Map<String, SaltFormula> formulas = new HashMap<>();
+    private final PluginFileAccess fileAccess;
 
     public SaltStackTransformer(TransformationContext context) {
         this.context = context;

@@ -2,6 +2,10 @@ package io.github.edmm.plugins.kubernetes.model;
 
 import java.util.stream.Collectors;
 
+import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.docker.Container;
+import io.github.edmm.docker.PortMapping;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -9,9 +13,6 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.internal.SerializationUtils;
-import io.github.edmm.core.transformation.TransformationException;
-import io.github.edmm.docker.Container;
-import io.github.edmm.docker.PortMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

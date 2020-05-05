@@ -1,12 +1,13 @@
 package io.github.edmm.plugins.terraform;
 
-import freemarker.template.Configuration;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.RelationVisitor;
+
+import freemarker.template.Configuration;
 import org.jgrapht.Graph;
 
 public abstract class TerraformVisitor implements ComponentVisitor, RelationVisitor {

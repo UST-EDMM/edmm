@@ -6,6 +6,7 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import io.github.edmm.core.transformation.TransformationContext;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,10 +15,10 @@ import lombok.NonNull;
 @Builder
 public class TransformationResult {
 
-    private String id;
-    private String target;
-    private String time;
-    private String state;
+    private final String id;
+    private final String target;
+    private final String time;
+    private final String state;
 
     public static TransformationResult of(@NonNull TransformationContext context) {
         DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)

@@ -10,13 +10,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.amazonaws.util.StringInputStream;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.TypeWrapper;
+
+import com.amazonaws.util.StringInputStream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -39,7 +40,7 @@ public final class DeploymentModel {
 
     private final Map<String, RootComponent> componentMap;
     private final Graph<RootComponent, RootRelation> topology = new DirectedMultigraph<>(RootRelation.class);
-    private Set<Graph<RootComponent, RootRelation>> stacks = new HashSet<>();
+    private final Set<Graph<RootComponent, RootRelation>> stacks = new HashSet<>();
 
     public DeploymentModel(String name, EntityGraph graph) {
         this.name = name;

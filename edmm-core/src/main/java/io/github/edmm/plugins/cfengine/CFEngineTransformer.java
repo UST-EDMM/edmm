@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.TemplateHelper;
 import io.github.edmm.core.plugin.TopologyGraphHelper;
@@ -31,6 +29,9 @@ import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.cfengine.model.CFPolicy;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -41,16 +42,16 @@ public class CFEngineTransformer implements ComponentVisitor, RelationVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(CFEngineTransformer.class);
 
-    private final TransformationContext context;
-    private final Configuration cfg = TemplateHelper.forClasspath(CFEnginePlugin.class, "/plugins/cfengine");
-
-    private final Graph<RootComponent, RootRelation> graph;
-    private PluginFileAccess fileAccess;
+    private static final String DEPLOYMENT_PATH = "/deployment";
+    private static final String DEPLOYMENT_NAME = "deployment.cf";
+    private static final String DEPLOYMENT_MASTERFILES = "/var/cfengine/masterfiles/deployment";
 
     public final CFPolicy policy;
-    private final String DEPLOYMENT_PATH = "/deployment";
-    private final String DEPLOYMENT_NAME = "deployment.cf";
-    private final String DEPLOYMENT_MASTERFILES = "/var/cfengine/masterfiles/deployment";
+
+    private final TransformationContext context;
+    private final Configuration cfg = TemplateHelper.forClasspath(CFEnginePlugin.class, "/plugins/cfengine");
+    private final Graph<RootComponent, RootRelation> graph;
+    private final PluginFileAccess fileAccess;
     private final Map<String, List<RootComponent>> runningOrder; //List<RootComponent> runningOrder
 
     private int last_ip = 0;

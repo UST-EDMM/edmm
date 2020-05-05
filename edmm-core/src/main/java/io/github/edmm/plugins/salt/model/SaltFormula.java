@@ -9,11 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import freemarker.template.Configuration;
 import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.RootComponent;
+
+import freemarker.template.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

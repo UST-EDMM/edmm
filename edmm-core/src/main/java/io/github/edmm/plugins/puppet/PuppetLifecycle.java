@@ -5,17 +5,18 @@ import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.visitor.VisitorHelper;
 import io.github.edmm.plugins.ComputeSupportVisitor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PuppetLifecycle extends AbstractLifecycle {
 
-    private static final Logger logger = LoggerFactory.getLogger(PuppetLifecycle.class);
-
     public static final String MODULE_FILES_FOLDER = "files";
     public static final String MODULE_MANIFESTS_FOLDER = "manifests";
     public static final String MANIFEST_MAIN = "init";
     public static final String MANIFEST_EXTENSION = ".pp";
+
+    private static final Logger logger = LoggerFactory.getLogger(PuppetLifecycle.class);
 
     public PuppetLifecycle(TransformationContext context) {
         super(context);

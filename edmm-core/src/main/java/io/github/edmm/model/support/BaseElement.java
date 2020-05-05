@@ -2,8 +2,9 @@ package io.github.edmm.model.support;
 
 import java.util.Collection;
 
-import com.google.common.base.CaseFormat;
 import io.github.edmm.core.parser.MappingEntity;
+
+import com.google.common.base.CaseFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.edmm.core.parser.support.GraphNormalizer;
+
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,7 +41,7 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     public EntityGraph() {
         // the edge supplier isn't needed if we use always the function
         // addEdge(V sourceVertex, V targetVertex, E e) of the AbstractBaseClass
-        super(null,null,false);
+        super(null, null, false);
         addVertex(new MappingEntity(ROOT, this));
     }
 

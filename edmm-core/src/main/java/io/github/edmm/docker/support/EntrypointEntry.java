@@ -4,9 +4,8 @@ import java.io.PrintWriter;
 
 public class EntrypointEntry extends DockerfileEntry {
 
-    private final String[] commands;
-
     protected String command = "ENTRYPOINT ";
+    private final String[] commands;
 
     public EntrypointEntry(String... commands) {
         this.commands = commands;

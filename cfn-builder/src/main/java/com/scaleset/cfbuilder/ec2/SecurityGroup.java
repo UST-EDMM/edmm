@@ -47,16 +47,17 @@ public interface SecurityGroup extends Resource {
     }
 
     public class PortRange {
+
         int from;
         int to;
-
-        public static PortRange range(int from, int to) {
-            return new PortRange(from, to);
-        }
 
         public PortRange(int from, int to) {
             this.from = from;
             this.to = to;
+        }
+
+        public static PortRange range(int from, int to) {
+            return new PortRange(from, to);
         }
     }
 

@@ -2,10 +2,11 @@ package io.github.edmm.plugins.cfn;
 
 import java.util.Map;
 
-import com.scaleset.cfbuilder.ec2.metadata.CFNCommand;
-import com.scaleset.cfbuilder.ec2.metadata.CFNFile;
 import io.github.edmm.core.plugin.BashScript;
 import io.github.edmm.core.plugin.PluginFileAccess;
+
+import com.scaleset.cfbuilder.ec2.metadata.CFNCommand;
+import com.scaleset.cfbuilder.ec2.metadata.CFNFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

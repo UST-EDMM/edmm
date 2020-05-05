@@ -28,6 +28,7 @@ import io.github.edmm.plugins.cloudify.CloudifyVisitor;
 import io.github.edmm.plugins.cloudify.model.azure.Script;
 import io.github.edmm.plugins.cloudify.model.azure.VirtualMachine;
 import io.github.edmm.plugins.terraform.aws.TerraformAwsVisitor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
