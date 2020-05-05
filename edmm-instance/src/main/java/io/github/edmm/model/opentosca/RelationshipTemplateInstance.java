@@ -30,7 +30,7 @@ public class RelationshipTemplateInstance {
     public static RelationshipTemplateInstance ofRelationInstance(String deploymentInstanceId, RelationInstance relationInstance, ComponentInstance componentInstance) {
         RelationshipTemplateInstance relationshipTemplateInstance = new RelationshipTemplateInstance();
         relationshipTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
-        relationshipTemplateInstance.setRelationshipType(new QName(OpenTOSCANamespaces.OPENTOSCA_REL_TYPE_NAMESPACE, relationInstance.getType()));
+        relationshipTemplateInstance.setRelationshipType(new QName(OpenTOSCANamespaces.OPENTOSCA_REL_TYPE_NAMESPACE, String.valueOf(relationInstance.getType())));
         relationshipTemplateInstance.setSourceNodeTemplateInstanceId(componentInstance.getId());
         relationshipTemplateInstance.setTargetNodeTemplateInstanceId(relationInstance.getTargetInstanceId());
         relationshipTemplateInstance.setRelationshipTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_REL_TEMPL_NAMESPACE, relationInstance.getId()));

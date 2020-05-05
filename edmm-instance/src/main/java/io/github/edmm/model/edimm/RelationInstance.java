@@ -18,7 +18,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RelationInstance extends BasicInstance {
-    private String type;
+    private RelationTypes.RelationType type;
     private String targetInstanceId;
     private List<Operation> operations;
 
@@ -27,7 +27,7 @@ public class RelationInstance extends BasicInstance {
 
         relationInstance.setId(yamlContent.get(YamlConstants.ID) != null ? String.valueOf(yamlContent.get(YamlConstants.ID)) : null);
         relationInstance.setTargetInstanceId(yamlContent.get(YamlConstants.RELATION_TARGET_INSTANCE_ID) != null ? String.valueOf(yamlContent.get(YamlConstants.RELATION_TARGET_INSTANCE_ID)) : null);
-        relationInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? String.valueOf(yamlContent.get(YamlConstants.TYPE)) : null);
+        relationInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? RelationTypes.RelationType.valueOf(String.valueOf(yamlContent.get(YamlConstants.TYPE))) : null);
         relationInstance.setDescription(yamlContent.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(yamlContent.get(YamlConstants.DESCRIPTION)) : null);
         relationInstance.setInstanceProperties(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(CastUtil.safelyCastToStringObjectMap(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES))) : Collections.emptyList());
         relationInstance.setMetadata(yamlContent.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(yamlContent.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));

@@ -78,6 +78,6 @@ componentInstances:
     - est
     - tosca
   relationInstances:
-  - id: depends_on0
-    type: depends_on
+  - id: dependsOn::0
+    type: dependsOn
     targetInstanceId: 4aeb6497-90e8-4c68-99b4-dea09d4848da

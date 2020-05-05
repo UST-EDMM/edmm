@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.RelationInstance;
+import io.github.edmm.model.edimm.RelationTypes;
 import io.github.edmm.plugins.cfn.model.Resource;
 import io.github.edmm.plugins.cfn.model.Template;
 import io.github.edmm.util.CastUtil;
@@ -57,8 +58,8 @@ class CfnStackRelationHandler {
 
     private void createRelation(String dependsOnValue, AtomicInteger relationCount) {
         RelationInstance relationInstance = new RelationInstance();
-        relationInstance.setId(CfnConstants.DEPENDS_ON + relationCount.getAndIncrement());
-        relationInstance.setType(CfnConstants.DEPENDS_ON);
+        relationInstance.setId(RelationTypes.RelationType.dependsOn + RelationTypes.relationDelimiter + String.valueOf(relationCount.getAndIncrement()));
+        relationInstance.setType(RelationTypes.RelationType.dependsOn);
         relationInstance.setTargetInstanceId(this.stackResources.stream()
             .filter(res -> res.getLogicalResourceId().equals(String.valueOf(dependsOnValue)))
             .findFirst()
