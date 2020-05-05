@@ -39,17 +39,16 @@ public class TOSCATransformer {
     }
 
     private void createRelationshipTemplateInstances() {
-        if (!isComponentInstancesExisting()) {
-            return;
+        if (isComponentInstancesExisting()) {
+            this.deploymentInstance.getComponentInstances().forEach(componentInstance -> {
+                if (componentInstance.getRelationInstances() != null && !componentInstance.getRelationInstances().isEmpty()) {
+                    componentInstance.getRelationInstances().forEach(relationInstance -> {
+                        RelationshipTemplateInstance relationshipTemplateInstance = RelationshipTemplateInstance.ofRelationInstance(this.deploymentInstance.getId(), relationInstance, componentInstance);
+                        addRelationshipToNodeTemplateInstance(relationshipTemplateInstance, relationInstance, componentInstance);
+                    });
+                }
+            });
         }
-        this.deploymentInstance.getComponentInstances().forEach(componentInstance -> {
-            if (componentInstance.getRelationInstances() != null && !componentInstance.getRelationInstances().isEmpty()) {
-                componentInstance.getRelationInstances().forEach(relationInstance -> {
-                    RelationshipTemplateInstance relationshipTemplateInstance = RelationshipTemplateInstance.ofRelationInstance(this.deploymentInstance.getId(), relationInstance, componentInstance);
-                    addRelationshipToNodeTemplateInstance(relationshipTemplateInstance, relationInstance, componentInstance);
-                });
-            }
-        });
     }
 
     private void addRelationshipToNodeTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance, ComponentInstance componentInstance) {

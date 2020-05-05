@@ -16,11 +16,11 @@ import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 class CfnStackRelationHandler {
 
-    private StackResourceDetail stackResource;
-    private List<StackResourceDetail> stackResources;
+    private final StackResourceDetail stackResource;
+    private final List<StackResourceDetail> stackResources;
     private Resource currentResource;
-    private Template template;
-    private List<RelationInstance> relationInstances = new ArrayList<>();
+    private final Template template;
+    private final List<RelationInstance> relationInstances = new ArrayList<>();
 
     CfnStackRelationHandler(StackResourceDetail stackResource, List<StackResourceDetail> stackResources, Template template) {
         this.stackResource = stackResource;

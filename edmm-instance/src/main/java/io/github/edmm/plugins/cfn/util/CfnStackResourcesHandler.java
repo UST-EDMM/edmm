@@ -10,9 +10,9 @@ import io.github.edmm.plugins.cfn.model.Template;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class CfnStackResourcesHandler {
-    private List<StackResourceDetail> stackResources;
-    private Template template;
-    private List<ComponentInstance> componentInstances = new ArrayList<>();
+    private final List<StackResourceDetail> stackResources;
+    private final Template template;
+    private final List<ComponentInstance> componentInstances = new ArrayList<>();
 
     public CfnStackResourcesHandler(List<StackResourceDetail> stackResources, Template template) {
         this.stackResources = stackResources;

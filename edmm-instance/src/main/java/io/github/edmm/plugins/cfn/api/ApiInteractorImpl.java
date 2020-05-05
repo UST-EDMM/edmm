@@ -15,8 +15,8 @@ import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class ApiInteractorImpl implements ApiInteractor {
 
-    private AmazonCloudFormation cloudFormation;
-    private String inputStackName;
+    private final AmazonCloudFormation cloudFormation;
+    private final String inputStackName;
 
     public ApiInteractorImpl(AmazonCloudFormation cloudFormation, String inputStackName) {
         this.cloudFormation = cloudFormation;

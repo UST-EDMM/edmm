@@ -17,7 +17,7 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
 
     private final SourceTechnology sourceTechnology;
 
-    public InstancePlugin(@NonNull SourceTechnology sourceTechnology) {
+    protected InstancePlugin(@NonNull SourceTechnology sourceTechnology) {
         this.sourceTechnology = sourceTechnology;
         logger.debug("Initializing plugin '{}'", sourceTechnology.getName());
         this.init();

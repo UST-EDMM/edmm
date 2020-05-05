@@ -13,7 +13,7 @@ import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 public class CfnMetadataHandler {
     private Stack stack;
     private StackResourceDetail stackResource;
-    private Map<String, Object> metadataMap = new LinkedHashMap<>();
+    private final Map<String, Object> metadataMap = new LinkedHashMap<>();
 
     public CfnMetadataHandler(Stack stack) {
         this.stack = stack;

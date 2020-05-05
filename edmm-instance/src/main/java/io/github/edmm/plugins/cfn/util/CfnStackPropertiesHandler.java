@@ -10,7 +10,7 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 
 public class CfnStackPropertiesHandler {
 
-    private List<InstanceProperty> instanceProperties = new ArrayList<>();
+    private final List<InstanceProperty> instanceProperties = new ArrayList<>();
 
     public List<InstanceProperty> getInstanceProperties(List<Parameter> parameters, List<Output> outputs) {
         this.handleParameters(parameters);

@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class BasicInstance {
+abstract class BasicInstance {
     private String id;
     private List<InstanceProperty> instanceProperties;
     private String description;

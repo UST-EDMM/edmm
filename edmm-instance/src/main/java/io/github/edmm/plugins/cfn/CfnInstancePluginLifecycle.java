@@ -22,8 +22,8 @@ import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
-    String inputStackName = "edimm-aws-cfn-test";
-    private DeploymentInstance deploymentInstance = new DeploymentInstance();
+    private final String inputStackName = "edimm-aws-cfn-test";
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private AmazonCloudFormation cloudFormation;
     private Stack stack;
     private Template template;

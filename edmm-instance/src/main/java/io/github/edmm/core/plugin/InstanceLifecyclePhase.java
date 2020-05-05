@@ -21,7 +21,7 @@ public class InstanceLifecyclePhase<L extends InstancePluginLifecycle> {
     private final ExecutionFunction<L> function;
 
     private State state = State.PENDING;
-    private Predicate<InstanceTransformationContext> predicate = (c) -> true;
+    private final Predicate<InstanceTransformationContext> predicate = (c) -> true;
 
     InstanceLifecyclePhase(@NonNull String name, @NonNull InstanceLifecyclePhaseAccess phaseAccess, @NonNull ExecutionFunction<L> function) {
         this.name = name;

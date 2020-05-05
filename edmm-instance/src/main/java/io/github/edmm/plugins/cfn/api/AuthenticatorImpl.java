@@ -12,8 +12,8 @@ import lombok.Getter;
 @Getter
 public class AuthenticatorImpl implements Authenticator {
 
-    ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
-    AmazonCloudFormation cloudFormation;
+    private final ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+    private AmazonCloudFormation cloudFormation;
 
     @Override
     public void authenticate() {

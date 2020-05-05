@@ -18,8 +18,8 @@ import org.yaml.snakeyaml.Yaml;
 
 public class YamlParser {
 
-    Map<String, Object> yamlData;
-    DeploymentInstance deploymentInstance = new DeploymentInstance();
+    private Map<String, Object> yamlData;
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     public DeploymentInstance parseYamlAndTransformToDeploymentInstance(String fileInput) {
 
