@@ -1,7 +1,7 @@
 package io.github.edmm.plugins.ansible;
 
-import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 public class AnsiblePlugin extends TransformationPlugin<AnsibleLifecycle> {

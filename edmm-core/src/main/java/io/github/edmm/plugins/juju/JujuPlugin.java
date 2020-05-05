@@ -1,7 +1,7 @@
 package io.github.edmm.plugins.juju;
 
-import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 public class JujuPlugin extends TransformationPlugin<JujuLifecycle> {

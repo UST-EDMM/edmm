@@ -1,7 +1,7 @@
 package io.github.edmm.plugins.chef;
 
-import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 public class ChefPlugin extends TransformationPlugin<ChefLifecycle> {

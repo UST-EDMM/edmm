@@ -1,7 +1,7 @@
 package io.github.edmm.plugins.terraform;
 
-import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 public class TerraformPlugin extends TransformationPlugin<TerraformLifecycle> {

@@ -1,8 +1,8 @@
 package io.github.edmm.core.plugin.noop;
 
+import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.TransformationPlugin;
-import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 
 import org.slf4j.Logger;
