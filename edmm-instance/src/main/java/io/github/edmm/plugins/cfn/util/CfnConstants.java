@@ -19,6 +19,7 @@ class CfnConstants {
     static final String ARN = "ARN";
     static final String TYPE = "type";
     static final String DELIMITER = "::";
-    static final String DEPENDS_ON = "dependsOn";
+    static final String CONFIG = "config";
+
 
 }

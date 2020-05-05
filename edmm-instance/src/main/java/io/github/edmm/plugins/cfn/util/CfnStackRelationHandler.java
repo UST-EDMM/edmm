@@ -35,9 +35,7 @@ class CfnStackRelationHandler {
 
     private List<RelationInstance> handleRelations() {
         AtomicInteger relationCount = new AtomicInteger();
-        this.currentResource.getDependsOn().forEach((dependsOnKey, dependsOnValueObject) -> {
-            handleRelationValueObject(dependsOnValueObject, relationCount);
-        });
+        this.currentResource.getDependsOn().forEach((dependsOnKey, dependsOnValueObject) -> handleRelationValueObject(dependsOnValueObject, relationCount));
         return this.relationInstances;
     }
 

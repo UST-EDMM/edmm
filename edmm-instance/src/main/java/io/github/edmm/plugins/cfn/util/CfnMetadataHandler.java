@@ -113,9 +113,7 @@ public class CfnMetadataHandler {
     private void handleNotificationARNs() {
         if (this.stack.getNotificationARNs() != null) {
             AtomicInteger notificationARNCount = new AtomicInteger();
-            this.stack.getNotificationARNs().forEach(notificationARN -> {
-                this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + String.valueOf(notificationARNCount.getAndIncrement()), notificationARN);
-            });
+            this.stack.getNotificationARNs().forEach(notificationARN -> this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + String.valueOf(notificationARNCount.getAndIncrement()), notificationARN));
         }
     }
 
@@ -162,8 +160,8 @@ public class CfnMetadataHandler {
         }
     }
 
-    public Metadata getMetadataOfComponentInstance() {
-        this.metadataMap.put("config", this.stackResource.getMetadata());
+    Metadata getMetadataOfComponentInstance() {
+        this.metadataMap.put(CfnConstants.CONFIG, this.stackResource.getMetadata());
         return Metadata.of(this.metadataMap);
     }
 }

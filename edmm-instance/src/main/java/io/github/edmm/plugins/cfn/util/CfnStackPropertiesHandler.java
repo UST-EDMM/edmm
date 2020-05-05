@@ -10,7 +10,7 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 
 public class CfnStackPropertiesHandler {
 
-    List<InstanceProperty> instanceProperties = new ArrayList<>();
+    private List<InstanceProperty> instanceProperties = new ArrayList<>();
 
     public List<InstanceProperty> getInstanceProperties(List<Parameter> parameters, List<Output> outputs) {
         this.handleParameters(parameters);
@@ -22,7 +22,7 @@ public class CfnStackPropertiesHandler {
     private void handleParameters(List<Parameter> parameters) {
         parameters.forEach(parameter -> this.instanceProperties.add(new InstanceProperty(
             parameter.getParameterKey(),
-            String.class.getSimpleName(),
+            parameter.getParameterValue().getClass().getSimpleName(),
             parameter.getParameterValue()
         )));
     }
@@ -30,7 +30,7 @@ public class CfnStackPropertiesHandler {
     private void handleOutputs(List<Output> outputs) {
         outputs.forEach(output -> this.instanceProperties.add(new InstanceProperty(
             output.getOutputKey(),
-            String.class.getSimpleName(),
+            output.getClass().getSimpleName(),
             output.getOutputValue()
         )));
     }
