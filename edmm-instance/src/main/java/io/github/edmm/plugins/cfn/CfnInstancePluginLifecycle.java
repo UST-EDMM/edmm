@@ -11,6 +11,7 @@ import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.cfn.api.ApiInteractorImpl;
 import io.github.edmm.plugins.cfn.api.AuthenticatorImpl;
 import io.github.edmm.plugins.cfn.model.Status;
+import io.github.edmm.plugins.cfn.model.Template;
 import io.github.edmm.plugins.cfn.util.CfnMetadataHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackPropertiesHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackResourcesHandler;
@@ -25,7 +26,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
     private AmazonCloudFormation cloudFormation;
     private Stack stack;
-    private String templateBody;
+    private Template template;
     private List<StackResourceDetail> stackResources;
 
     CfnInstancePluginLifecycle(InstanceTransformationContext context) {
@@ -45,20 +46,20 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
         ApiInteractorImpl interactor = new ApiInteractorImpl(this.cloudFormation, this.inputStackName);
         this.stack = interactor.getDeployment();
         this.stackResources = interactor.getComponents();
-        this.templateBody = interactor.getModel();
+        this.template = interactor.getModel();
     }
 
     @Override
     public void transformToEDIMM() {
-        // TODO: version
         this.deploymentInstance.setName(this.stack.getStackName());
         this.deploymentInstance.setId(this.stack.getStackId());
+        this.deploymentInstance.setVersion(this.template.getAWSTemplateFormatVersion());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.stack.getCreationTime()));
         this.deploymentInstance.setDescription(this.stack.getDescription());
         this.deploymentInstance.setState(Status.CfnStackStatus.valueOf(this.stack.getStackStatus()).toEDiMMDeploymentInstanceState());
         this.deploymentInstance.setInstanceProperties(new CfnStackPropertiesHandler().getInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
         this.deploymentInstance.setMetadata(new CfnMetadataHandler(this.stack).getMetadataForDeploymentInstance());
-        this.deploymentInstance.setComponentInstances(new CfnStackResourcesHandler(this.stackResources).getComponentInstances());
+        this.deploymentInstance.setComponentInstances(new CfnStackResourcesHandler(this.stackResources, this.template).getComponentInstances());
     }
 
     @Override

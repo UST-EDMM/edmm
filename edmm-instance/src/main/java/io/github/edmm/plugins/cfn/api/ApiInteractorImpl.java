@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.edmm.core.plugin.ApiInteractor;
+import io.github.edmm.plugins.cfn.model.Template;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.DescribeStackResourceRequest;
@@ -40,7 +41,7 @@ public class ApiInteractorImpl implements ApiInteractor {
     }
 
     @Override
-    public String getModel() {
-        return this.cloudFormation.getTemplate(new GetTemplateRequest().withStackName(this.inputStackName)).getTemplateBody();
+    public Template getModel() {
+        return Template.fromTemplateBodyString(this.cloudFormation.getTemplate(new GetTemplateRequest().withStackName(this.inputStackName)).getTemplateBody());
     }
 }

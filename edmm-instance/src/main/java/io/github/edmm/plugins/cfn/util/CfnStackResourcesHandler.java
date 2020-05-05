@@ -5,15 +5,18 @@ import java.util.List;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.cfn.model.Status;
+import io.github.edmm.plugins.cfn.model.Template;
 
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class CfnStackResourcesHandler {
     private List<StackResourceDetail> stackResources;
+    private Template template;
     private List<ComponentInstance> componentInstances = new ArrayList<>();
 
-    public CfnStackResourcesHandler(List<StackResourceDetail> stackResources) {
+    public CfnStackResourcesHandler(List<StackResourceDetail> stackResources, Template template) {
         this.stackResources = stackResources;
+        this.template = template;
     }
 
     public List<ComponentInstance> getComponentInstances() {
@@ -27,6 +30,7 @@ public class CfnStackResourcesHandler {
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
             componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());
             componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus()).toEDiMMComponentInstanceState());
+            componentInstance.setRelationInstances(new CfnStackRelationHandler(stackResource, this.stackResources, this.template).getRelationInstances());
             this.componentInstances.add(componentInstance);
         });
         return this.componentInstances;
