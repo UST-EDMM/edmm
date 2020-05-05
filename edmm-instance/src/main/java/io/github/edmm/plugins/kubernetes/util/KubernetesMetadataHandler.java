@@ -31,84 +31,73 @@ public class KubernetesMetadataHandler {
     }
 
     private void handleAnnotations() {
-        if (this.kubernetesMetadata.getAnnotations() == null || this.kubernetesMetadata.getAnnotations().isEmpty()) {
-            return;
+        if (this.kubernetesMetadata.getAnnotations() != null && !this.kubernetesMetadata.getAnnotations().isEmpty()) {
+            this.kubernetesMetadata.getAnnotations().forEach((key, value) -> {
+                if (isMetadata(key)) {
+                    this.metadataMap.put(key, value);
+                }
+            });
         }
-        this.kubernetesMetadata.getAnnotations().forEach((key, value) -> {
-            if (isMetadata(key)) {
-                this.metadataMap.put(key, value);
-            }
-        });
     }
 
     private void handleClusterName() {
-        if (this.kubernetesMetadata.getClusterName() == null) {
-            return;
+        if (this.kubernetesMetadata.getClusterName() != null) {
+            this.metadataMap.put(KubernetesConstants.CLUSTER_NAME, this.kubernetesMetadata.getClusterName());
         }
-        this.metadataMap.put(KubernetesConstants.CLUSTER_NAME, this.kubernetesMetadata.getClusterName());
     }
 
     private void handleDeletionPeriod() {
-        if (kubernetesMetadata.getDeletionGracePeriodSeconds() == null) {
-            return;
+        if (kubernetesMetadata.getDeletionGracePeriodSeconds() != null) {
+            this.metadataMap.put(KubernetesConstants.DELETION_GRACE_PERIOD_SECONDS, kubernetesMetadata.getDeletionGracePeriodSeconds());
         }
-        this.metadataMap.put(KubernetesConstants.DELETION_GRACE_PERIOD_SECONDS, kubernetesMetadata.getDeletionGracePeriodSeconds());
     }
 
     private void handleDeletionTimestamp() {
-        if (kubernetesMetadata.getDeletionTimestamp() == null) {
-            return;
+        if (kubernetesMetadata.getDeletionTimestamp() != null) {
+            this.metadataMap.put(KubernetesConstants.DELETION_TIMESTAMP, kubernetesMetadata.getDeletionTimestamp());
         }
-        this.metadataMap.put(KubernetesConstants.DELETION_TIMESTAMP, kubernetesMetadata.getDeletionTimestamp());
     }
 
     private void handleFinalizers() {
-        if (kubernetesMetadata.getFinalizers() == null || kubernetesMetadata.getFinalizers().isEmpty()) {
-            return;
+        if (kubernetesMetadata.getFinalizers() != null && !kubernetesMetadata.getFinalizers().isEmpty()) {
+            this.metadataMap.put(KubernetesConstants.FINALIZERS, kubernetesMetadata.getFinalizers());
         }
-        this.metadataMap.put(KubernetesConstants.FINALIZERS, kubernetesMetadata.getFinalizers());
     }
 
     private void handleGenerateName() {
-        if (kubernetesMetadata.getGenerateName() == null) {
-            return;
+        if (kubernetesMetadata.getGenerateName() != null) {
+            this.metadataMap.put(KubernetesConstants.GENERATE_NAME, kubernetesMetadata.getGenerateName());
         }
-        this.metadataMap.put(KubernetesConstants.GENERATE_NAME, kubernetesMetadata.getGenerateName());
     }
 
     private void handleGeneration() {
-        if (kubernetesMetadata.getGeneration() == null) {
-            return;
+        if (kubernetesMetadata.getGeneration() != null) {
+            this.metadataMap.put(KubernetesConstants.GENERATION, kubernetesMetadata.getGeneration());
         }
-        this.metadataMap.put(KubernetesConstants.GENERATION, kubernetesMetadata.getGeneration());
     }
 
     private void handleInitializers() {
-        if (kubernetesMetadata.getInitializers() == null) {
-            return;
+        if (kubernetesMetadata.getInitializers() != null) {
+            this.metadataMap.put(KubernetesConstants.INITIALIZERS, kubernetesMetadata.getInitializers());
         }
-        this.metadataMap.put(KubernetesConstants.INITIALIZERS, kubernetesMetadata.getInitializers());
     }
 
     private void handleLabels() {
-        if (kubernetesMetadata.getLabels() == null || kubernetesMetadata.getLabels().isEmpty()) {
-            return;
+        if (kubernetesMetadata.getLabels() != null && !kubernetesMetadata.getLabels().isEmpty()) {
+            kubernetesMetadata.getLabels().forEach(this.metadataMap::put);
         }
-        kubernetesMetadata.getLabels().forEach(this.metadataMap::put);
     }
 
     private void handleNamespace() {
-        if (kubernetesMetadata.getNamespace() == null) {
-            return;
+        if (kubernetesMetadata.getNamespace() != null) {
+            this.metadataMap.put(KubernetesConstants.NAMESPACE, kubernetesMetadata.getNamespace());
         }
-        this.metadataMap.put(KubernetesConstants.NAMESPACE, kubernetesMetadata.getNamespace());
     }
 
     private void handleResourceVersion() {
-        if (kubernetesMetadata.getResourceVersion() == null) {
-            return;
+        if (kubernetesMetadata.getResourceVersion() != null) {
+            this.metadataMap.put(KubernetesConstants.RESOURCE_VERSION, kubernetesMetadata.getResourceVersion());
         }
-        this.metadataMap.put(KubernetesConstants.RESOURCE_VERSION, kubernetesMetadata.getResourceVersion());
     }
 
     private static boolean isMetadata(String key) {
