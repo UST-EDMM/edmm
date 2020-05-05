@@ -5,7 +5,7 @@ import java.util.Optional;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.Auth0;
 import io.github.edmm.model.component.AwsBeanstalk;
-import io.github.edmm.model.component.Paas;
+import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Saas;
 import io.github.edmm.model.component.WebApplication;
@@ -13,7 +13,6 @@ import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.support.EdmmYamlBuilder;
 import org.junit.Assert;
 import org.junit.Test;
-
 
 public class RulesTests {
 
@@ -70,6 +69,27 @@ public class RulesTests {
 
         Optional<RootComponent> unsupportedComponent = actualModel.getComponent("WebApplication");
         RuleAssessor ruleAssessor = new RuleAssessor(expectedModel,actualModel);
+
+        if (unsupportedComponent.isPresent())
+            Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
+        else
+            Assert.fail("component not present");
+    }
+
+    @Test
+    public void testRuleAssessor3() {
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        yamlBuilder
+            .component(WebApplication.class)
+            .hostedOn(WebServer.class)
+            .component(WebServer.class)
+            .hostedOn(Compute.class)
+            .component(Compute.class)
+            .build();
+
+        DeploymentModel deploymentModel = DeploymentModel.of(yamlBuilder.build());
+        Optional<RootComponent> unsupportedComponent = deploymentModel.getComponent("WebServer");
+        RuleAssessor ruleAssessor = new RuleAssessor(deploymentModel,deploymentModel);
 
         if (unsupportedComponent.isPresent())
             Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
