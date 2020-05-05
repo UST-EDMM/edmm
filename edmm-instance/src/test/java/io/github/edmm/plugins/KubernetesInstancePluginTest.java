@@ -8,11 +8,11 @@ import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
 import org.junit.Before;
 import org.junit.Test;
 
-public class KubernetesPluginTest extends InstancePluginTest {
+public class KubernetesInstancePluginTest extends InstancePluginTest {
 
     private InstanceTransformationContext context;
 
-    public KubernetesPluginTest() throws Exception {
+    public KubernetesInstancePluginTest() throws Exception {
         super(Files.createTempDirectory("kubernetes-").toFile());
     }
 
