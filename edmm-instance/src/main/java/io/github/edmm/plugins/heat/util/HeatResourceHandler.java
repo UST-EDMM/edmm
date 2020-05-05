@@ -21,7 +21,7 @@ public class HeatResourceHandler {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         resources.forEach(resource -> {
             Map<String, Object> resourceContent = CastUtil.safelyCastToStringObjectMap(template.get(HeatConstants.RESOURCES));
-            componentInstances.add(HeatResourceHandler.getComponentInstance(resources, resource, resourceContent));
+            componentInstances.add(getComponentInstance(resources, resource, resourceContent));
         });
         return componentInstances;
     }
@@ -29,6 +29,7 @@ public class HeatResourceHandler {
     private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String,Object> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
+        // TODO artifacts, operations, description
         componentInstance.setType(resource.getType());
         componentInstance.setId(resource.getPhysicalResourceId());
         componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
@@ -37,8 +38,6 @@ public class HeatResourceHandler {
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
-        componentInstance.setArtifacts(Collections.emptyList());
-        componentInstance.setOperations(Collections.emptyList());
 
         return componentInstance;
     }

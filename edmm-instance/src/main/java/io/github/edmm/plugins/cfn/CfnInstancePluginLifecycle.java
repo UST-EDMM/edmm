@@ -50,6 +50,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
 
     @Override
     public void transformToEDIMM() {
+        // TODO: version
         this.deploymentInstance.setName(this.stack.getStackName());
         this.deploymentInstance.setId(this.stack.getStackId());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.stack.getCreationTime()));

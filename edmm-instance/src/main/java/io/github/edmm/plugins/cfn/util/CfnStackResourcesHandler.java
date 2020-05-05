@@ -19,6 +19,7 @@ public class CfnStackResourcesHandler {
 
     public List<ComponentInstance> getComponentInstances() {
         this.stackResources.forEach(stackResource -> {
+            // TODO: artifacts, operations, relations
             ComponentInstance componentInstance = new ComponentInstance();
             componentInstance.setName(stackResource.getLogicalResourceId());
             componentInstance.setId(stackResource.getPhysicalResourceId());

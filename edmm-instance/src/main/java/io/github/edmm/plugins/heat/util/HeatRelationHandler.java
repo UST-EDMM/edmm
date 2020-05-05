@@ -20,14 +20,11 @@ class HeatRelationHandler {
 
         emptyIfNull(dependsOnList).forEach(dependsOnResource -> {
             Integer relationCount = 0;
+            // TODO: metadata, instance properties, description, operation
             RelationInstance relationInstance = new RelationInstance();
             relationInstance.setType(HeatConstants.DEPENDS_ON);
             relationInstance.setTargetInstanceId(resources.stream().filter(res -> res.getResourceName().equals(dependsOnResource)).findFirst().get().getPhysicalResourceId());
             relationInstance.setId(HeatConstants.DEPENDS_ON + String.valueOf(relationCount));
-            relationInstance.setMetadata(Metadata.of(Collections.emptyMap()));
-            relationInstance.setInstanceProperties(Collections.emptyList());
-            relationInstance.setDescription(null);
-            relationInstance.setOperations(Collections.emptyList());
             relationInstances.add(relationInstance);
             relationCount++;
         });

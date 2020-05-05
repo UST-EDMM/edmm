@@ -56,6 +56,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
 
     @Override
     public void transformToEDIMM() {
+        // TODO description
         this.deploymentInstance.setName(this.kubernetesDeploymentInstance.getMetadata().getName());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata().getCreationTimestamp()));
         this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata().getAnnotations().get(KubernetesConstants.VERSION));

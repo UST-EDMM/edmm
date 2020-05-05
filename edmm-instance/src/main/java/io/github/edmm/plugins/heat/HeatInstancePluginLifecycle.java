@@ -64,6 +64,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
 
     @Override
     public void transformToEDIMM() {
+        // mapping complete
         this.deploymentInstance.setId(this.stack.getId());
         this.deploymentInstance.setCreatedAt(this.stack.getCreationTime());
         this.deploymentInstance.setDescription(this.stack.getDescription());
