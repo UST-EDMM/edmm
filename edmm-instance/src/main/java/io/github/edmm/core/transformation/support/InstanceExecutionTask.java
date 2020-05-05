@@ -1,15 +1,18 @@
 package io.github.edmm.core.transformation.support;
 
+import java.util.concurrent.Callable;
+
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
+
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Callable;
-
-import static io.github.edmm.core.transformation.InstanceTransformationContext.State.*;
+import static io.github.edmm.core.transformation.InstanceTransformationContext.State.DONE;
+import static io.github.edmm.core.transformation.InstanceTransformationContext.State.ERROR;
+import static io.github.edmm.core.transformation.InstanceTransformationContext.State.TRANSFORMING;
 
 public class InstanceExecutionTask implements Callable<Void> {
     private static final Logger logger = LoggerFactory.getLogger(ExecutionTask.class);

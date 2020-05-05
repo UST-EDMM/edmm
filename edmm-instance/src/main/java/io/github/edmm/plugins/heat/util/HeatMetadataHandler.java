@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import io.github.edmm.model.Metadata;
 import io.github.edmm.util.CastUtil;
+
 import org.openstack4j.model.heat.Resource;
 
 import static java.util.stream.Collectors.toMap;

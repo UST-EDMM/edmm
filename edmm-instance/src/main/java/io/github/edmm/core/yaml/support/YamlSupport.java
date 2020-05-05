@@ -8,24 +8,13 @@ import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.RelationInstance;
 import io.github.edmm.util.CastUtil;
+
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 
 public class YamlSupport {
 
     private final DumperOptions dumperOptions = new DumperOptions();
-
-    public DumperOptions getYamlOptions() {
-        this.setDumperOptions();
-        return this.dumperOptions;
-    }
-
-    private void setDumperOptions() {
-        // options for a proper layout of yaml file
-        this.dumperOptions.setIndent(2);
-        this.dumperOptions.setPrettyFlow(true);
-        this.dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    }
 
     static boolean isFirstPropertyPrioritized(Property p1, Property p2) {
         // id should be on top
@@ -90,5 +79,17 @@ public class YamlSupport {
             relationInstances.add(relationInstance);
         });
         return relationInstances;
+    }
+
+    public DumperOptions getYamlOptions() {
+        this.setDumperOptions();
+        return this.dumperOptions;
+    }
+
+    private void setDumperOptions() {
+        // options for a proper layout of yaml file
+        this.dumperOptions.setIndent(2);
+        this.dumperOptions.setPrettyFlow(true);
+        this.dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
     }
 }

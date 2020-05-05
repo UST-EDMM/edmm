@@ -3,13 +3,14 @@ package io.github.edmm.plugins.cfn.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.edmm.core.plugin.ApiInteractor;
+
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.DescribeStackResourceRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStackResourcesRequest;
 import com.amazonaws.services.cloudformation.model.GetTemplateRequest;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
-import io.github.edmm.core.plugin.ApiInteractor;
 
 public class ApiInteractorImpl implements ApiInteractor {
 

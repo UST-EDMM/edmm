@@ -12,6 +12,7 @@ import io.github.edmm.model.opentosca.RelationshipTemplateInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.model.opentosca.TOSCAProperty;
 import io.github.edmm.model.opentosca.TOSCAState;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 

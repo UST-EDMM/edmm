@@ -4,10 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.github.edmm.model.Metadata;
+
 import com.amazonaws.services.cloudformation.model.RollbackTrigger;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
-import io.github.edmm.model.Metadata;
 
 public class CfnMetadataHandler {
     private Stack stack;
@@ -20,6 +21,10 @@ public class CfnMetadataHandler {
 
     CfnMetadataHandler(StackResourceDetail stackResource) {
         this.stackResource = stackResource;
+    }
+
+    private static String generateMetadataKey(String firstKey, String secondKey, int count, String thirdKey) {
+        return firstKey + CfnConstants.DELIMITER + secondKey + String.valueOf(count) + CfnConstants.DELIMITER + CfnConstants.DELIMITER + thirdKey;
     }
 
     public Metadata getMetadataForDeploymentInstance() {
@@ -90,10 +95,6 @@ public class CfnMetadataHandler {
                 CfnConstants.ROLLBACK_CONFIGURATION, CfnConstants.ROLLBACK_TRIGGER, rollbackTriggerCount, CfnConstants.TYPE),
                 rollbackTrigger.getType());
         }
-    }
-
-    private static String generateMetadataKey(String firstKey, String secondKey, int count, String thirdKey) {
-        return firstKey + CfnConstants.DELIMITER + secondKey + String.valueOf(count) + CfnConstants.DELIMITER + CfnConstants.DELIMITER + thirdKey;
     }
 
     private void handleMonitoringTimeInMinutes() {

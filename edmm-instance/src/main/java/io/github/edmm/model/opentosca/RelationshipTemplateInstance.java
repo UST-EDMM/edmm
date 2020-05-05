@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.RelationInstance;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.heat.api;
 
 import io.github.edmm.core.plugin.Authenticator;
+
 import lombok.Getter;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.Identifier;
@@ -9,12 +10,12 @@ import org.openstack4j.openstack.OSFactory;
 @Getter
 public class AuthenticatorImpl implements Authenticator {
 
-    private OSClient.OSClientV3 heatClient;
     private final String endpoint;
     private final String userName;
     private final String password;
     private final String domainName;
     private final String projectId;
+    private OSClient.OSClientV3 heatClient;
 
     public AuthenticatorImpl(String endpoint, String userName, String password, String domainName, String projectId) {
         this.endpoint = endpoint;

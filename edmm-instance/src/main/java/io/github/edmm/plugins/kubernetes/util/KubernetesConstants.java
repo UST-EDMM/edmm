@@ -2,10 +2,10 @@ package io.github.edmm.plugins.kubernetes.util;
 
 public class KubernetesConstants {
 
-    static final String KEY_DELIMITER = "::";
-
     // metadata key constants
     public static final String VERSION = "deployment.kubernetes.io/revision";
+    public static final String APP = "app";
+    static final String KEY_DELIMITER = "::";
     static final String CLUSTER_NAME = "clusterName";
     static final String DELETION_GRACE_PERIOD_SECONDS = "deletionGracePeriodSeconds";
     static final String DELETION_TIMESTAMP = "deletionTimestamp";
@@ -14,7 +14,6 @@ public class KubernetesConstants {
     static final String GENERATION = "generation";
     static final String INITIALIZERS = "initializers";
     static final String NAMESPACE = "namespace";
-    public static final String APP = "app";
     static final String RESOURCE_VERSION = "resourceVersion";
     static final String LAST_APPLIED_CONFIG = "kubectl.kubernetes.io/last-applied-configuration";
 

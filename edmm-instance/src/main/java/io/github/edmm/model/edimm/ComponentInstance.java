@@ -10,6 +10,7 @@ import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Metadata;
 import io.github.edmm.model.Operation;
 import io.github.edmm.util.CastUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

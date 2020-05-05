@@ -7,19 +7,20 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.core.yaml.support.ConfigurationModelRepresenter;
 import io.github.edmm.core.yaml.support.YamlConstants;
 import io.github.edmm.core.yaml.support.YamlSupport;
-import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.DeploymentInstance;
+
 import org.yaml.snakeyaml.Yaml;
 
 public class YamlTransformer {
 
+    private final Map<String, Object> yamlContent = new LinkedHashMap<>();
     private Yaml yaml;
     private DeploymentInstance deploymentInstance;
     private String fileOutputLocation;
-    private final Map<String, Object> yamlContent = new LinkedHashMap<>();
 
     public void createYamlforEDiMM(DeploymentInstance deploymentInstance, String location) {
         this.deploymentInstance = deploymentInstance;

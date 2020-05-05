@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import io.github.edmm.core.plugin.InstancePluginService;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.InstanceTransformationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;

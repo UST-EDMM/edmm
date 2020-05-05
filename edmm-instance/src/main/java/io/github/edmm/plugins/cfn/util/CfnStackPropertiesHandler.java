@@ -3,9 +3,10 @@ package io.github.edmm.plugins.cfn.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.edmm.model.edimm.InstanceProperty;
+
 import com.amazonaws.services.cloudformation.model.Output;
 import com.amazonaws.services.cloudformation.model.Parameter;
-import io.github.edmm.model.edimm.InstanceProperty;
 
 public class CfnStackPropertiesHandler {
 

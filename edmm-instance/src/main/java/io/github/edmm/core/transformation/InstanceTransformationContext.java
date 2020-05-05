@@ -1,11 +1,11 @@
 package io.github.edmm.core.transformation;
 
+import java.sql.Timestamp;
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 
 @Getter
 public final class InstanceTransformationContext {

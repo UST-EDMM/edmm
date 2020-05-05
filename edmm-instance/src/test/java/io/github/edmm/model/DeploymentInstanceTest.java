@@ -9,6 +9,7 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.model.edimm.RelationInstance;
 import io.github.edmm.model.opentosca.TOSCAState;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 

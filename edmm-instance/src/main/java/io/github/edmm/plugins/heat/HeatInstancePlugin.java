@@ -1,8 +1,8 @@
 package io.github.edmm.plugins.heat;
 
 import io.github.edmm.core.plugin.InstancePlugin;
-import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+import io.github.edmm.core.transformation.SourceTechnology;
 
 public class HeatInstancePlugin extends InstancePlugin<HeatInstancePluginLifecycle> {
 

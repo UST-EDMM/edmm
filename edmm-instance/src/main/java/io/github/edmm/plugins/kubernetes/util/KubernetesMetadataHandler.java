@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.github.edmm.model.Metadata;
+
 import io.kubernetes.client.models.V1ObjectMeta;
 
 public class KubernetesMetadataHandler {
@@ -12,6 +13,10 @@ public class KubernetesMetadataHandler {
 
     public KubernetesMetadataHandler(V1ObjectMeta kubernetesMetadata) {
         this.kubernetesMetadata = kubernetesMetadata;
+    }
+
+    private static boolean isMetadata(String key) {
+        return !key.equals(KubernetesConstants.LAST_APPLIED_CONFIG);
     }
 
     public Metadata getMetadata() {
@@ -98,9 +103,5 @@ public class KubernetesMetadataHandler {
         if (kubernetesMetadata.getResourceVersion() != null) {
             this.metadataMap.put(KubernetesConstants.RESOURCE_VERSION, kubernetesMetadata.getResourceVersion());
         }
-    }
-
-    private static boolean isMetadata(String key) {
-        return !key.equals(KubernetesConstants.LAST_APPLIED_CONFIG);
     }
 }

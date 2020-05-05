@@ -8,9 +8,12 @@ import javax.xml.namespace.QName;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @Setter
 @Getter
@@ -25,6 +28,21 @@ public class NodeTemplateInstance {
     List<TOSCAProperty> instanceProperties;
     private List<RelationshipTemplateInstance> outgoingRelationshipTemplateInstances;
     private List<RelationshipTemplateInstance> ingoingRelationshipTemplateInstances;
+
+    public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
+        NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
+
+        nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
+        nodeTemplateInstance.setNodeType(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE_NAMESPACE, componentInstance.getType()));
+        nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL_NAMESPACE, componentInstance.getName()));
+        nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
+        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL_NAMESPACE, deploymentInstanceName));
+        nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
+        nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
+            .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
+
+        return nodeTemplateInstance;
+    }
 
     private void createOutgoingRelationshipTemplateInstances() {
         this.outgoingRelationshipTemplateInstances = new ArrayList<>();
@@ -50,20 +68,5 @@ public class NodeTemplateInstance {
         if (relationshipTemplateInstance != null) {
             this.ingoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
         }
-    }
-
-    public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
-        NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
-
-        nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
-        nodeTemplateInstance.setNodeType(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE_NAMESPACE, componentInstance.getType()));
-        nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL_NAMESPACE, componentInstance.getName()));
-        nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
-        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL_NAMESPACE, deploymentInstanceName));
-        nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
-        nodeTemplateInstance.setInstanceProperties(componentInstance.getInstanceProperties()
-            .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
-
-        return nodeTemplateInstance;
     }
 }

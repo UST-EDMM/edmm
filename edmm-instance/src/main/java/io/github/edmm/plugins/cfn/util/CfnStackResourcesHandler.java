@@ -1,16 +1,16 @@
 package io.github.edmm.plugins.cfn.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.cfn.model.Status;
 
+import com.amazonaws.services.cloudformation.model.StackResourceDetail;
+
 public class CfnStackResourcesHandler {
-    List<StackResourceDetail> stackResources;
-    List<ComponentInstance> componentInstances = new ArrayList<>();
+    private List<StackResourceDetail> stackResources;
+    private List<ComponentInstance> componentInstances = new ArrayList<>();
 
     public CfnStackResourcesHandler(List<StackResourceDetail> stackResources) {
         this.stackResources = stackResources;
@@ -18,7 +18,7 @@ public class CfnStackResourcesHandler {
 
     public List<ComponentInstance> getComponentInstances() {
         this.stackResources.forEach(stackResource -> {
-            // TODO: artifacts, operations, relations
+            // TODO: artifacts, operations, relations, instance props
             ComponentInstance componentInstance = new ComponentInstance();
             componentInstance.setName(stackResource.getLogicalResourceId());
             componentInstance.setId(stackResource.getPhysicalResourceId());
@@ -27,7 +27,6 @@ public class CfnStackResourcesHandler {
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
             componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());
             componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus()).toEDiMMComponentInstanceState());
-            componentInstance.setInstanceProperties(Collections.emptyList());
             this.componentInstances.add(componentInstance);
         });
         return this.componentInstances;

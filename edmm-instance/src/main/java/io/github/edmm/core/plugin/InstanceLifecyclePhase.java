@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import io.github.edmm.core.plugin.support.ExecutionFunction;
 import io.github.edmm.core.plugin.support.InstanceLifecyclePhaseAccess;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;

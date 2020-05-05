@@ -1,10 +1,10 @@
 package io.github.edmm.core.transformation;
 
+import java.util.Objects;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.Objects;
 
 @Getter
 @Builder

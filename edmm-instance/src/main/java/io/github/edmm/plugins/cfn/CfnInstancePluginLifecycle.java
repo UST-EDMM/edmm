@@ -2,9 +2,6 @@ package io.github.edmm.plugins.cfn;
 
 import java.util.List;
 
-import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.model.Stack;
-import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
@@ -18,15 +15,18 @@ import io.github.edmm.plugins.cfn.util.CfnMetadataHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackPropertiesHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackResourcesHandler;
 
+import com.amazonaws.services.cloudformation.AmazonCloudFormation;
+import com.amazonaws.services.cloudformation.model.Stack;
+import com.amazonaws.services.cloudformation.model.StackResourceDetail;
+
 public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
+    String inputStackName = "edimm-aws-cfn-test";
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
     private AmazonCloudFormation cloudFormation;
     private Stack stack;
     private String templateBody;
     private List<StackResourceDetail> stackResources;
-
-    String inputStackName = "edimm-aws-cfn-test";
 
     CfnInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);

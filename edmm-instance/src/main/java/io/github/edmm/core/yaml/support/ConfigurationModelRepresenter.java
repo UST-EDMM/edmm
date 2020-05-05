@@ -11,6 +11,7 @@ import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.RelationInstance;
+
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;

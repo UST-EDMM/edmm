@@ -2,10 +2,10 @@ package io.github.edmm.plugins.kubernetes;
 
 import java.util.List;
 
-import io.github.edmm.core.yaml.YamlTransformer;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.core.yaml.YamlTransformer;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
@@ -15,6 +15,7 @@ import io.github.edmm.plugins.kubernetes.util.KubernetesDeploymentPropertiesHand
 import io.github.edmm.plugins.kubernetes.util.KubernetesMetadataHandler;
 import io.github.edmm.plugins.kubernetes.util.KubernetesPodsHandler;
 import io.github.edmm.plugins.kubernetes.util.KubernetesStateHandler;
+
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Deployment;
@@ -23,16 +24,13 @@ import io.kubernetes.client.models.V1Pod;
 public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
-
-    private AppsV1Api appsApi;
-    private CoreV1Api coreV1Api;
-
-    private V1Deployment kubernetesDeploymentInstance;
-    private List<V1Pod> podsOfDeploymentInstance;
-
     // hardcoded for testing purposes
     private final String inputDeploymentName = "nginx-deployment";
     private final String kubeConfigPath = "/Users/tobi/.kube/config";
+    private AppsV1Api appsApi;
+    private CoreV1Api coreV1Api;
+    private V1Deployment kubernetesDeploymentInstance;
+    private List<V1Pod> podsOfDeploymentInstance;
 
     KubernetesInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);

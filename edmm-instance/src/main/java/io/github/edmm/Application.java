@@ -25,7 +25,7 @@ import static picocli.CommandLine.usage;
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource( {"classpath*:instancePluginContext.xml"})
+@ImportResource({"classpath*:instancePluginContext.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
     private static final String PICOCLI_ANSI = "picocli.ansi";
@@ -39,13 +39,21 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
         this.factory = factory;
     }
 
+    public static void main(String[] args) {
+        AnsiConsole.systemInstall();
+        System.setProperty(PICOCLI_ANSI, String.valueOf(true));
+        int exitCode = SpringApplication.exit(SpringApplication.run(Application.class, args));
+        AnsiConsole.systemUninstall();
+        System.exit(exitCode);
+    }
+
     @Override
     public void run(String... args) {
         // parse
-        // exitCode = new CommandLine(this, factory).execute("parse", "edimm", "/users/tobi/downloads/teststackmore_EDiMM_1587368798.yaml");
+        exitCode = new CommandLine(this, factory).execute("parse", "edimm", "/users/tobi/downloads/teststackmore_EDiMM_1587368798.yaml");
         // transform
-        // exitCode = new CommandLine(this, factory).execute("transform", "kubernetes", "/users/tobi/downloads/");
-        // exitCode = new CommandLine(this, factory).execute("transform", "heat", "/users/tobi/downloads/");
+        exitCode = new CommandLine(this, factory).execute("transform", "kubernetes", "/users/tobi/downloads/");
+        exitCode = new CommandLine(this, factory).execute("transform", "heat", "/users/tobi/downloads/");
         exitCode = new CommandLine(this, factory).execute("transform", "cfn", "/users/tobi/downloads/");
     }
 
@@ -57,13 +65,5 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
     @Override
     public int getExitCode() {
         return exitCode;
-    }
-
-    public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        System.setProperty(PICOCLI_ANSI, String.valueOf(true));
-        int exitCode = SpringApplication.exit(SpringApplication.run(Application.class, args));
-        AnsiConsole.systemUninstall();
-        System.exit(exitCode);
     }
 }

@@ -10,6 +10,7 @@ import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.heat.model.StackStatus;
 import io.github.edmm.util.CastUtil;
+
 import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
@@ -26,7 +27,7 @@ public class HeatResourceHandler {
         return componentInstances;
     }
 
-    private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String,Object> resourceContent) {
+    private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Object> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
         // TODO artifacts, operations, description

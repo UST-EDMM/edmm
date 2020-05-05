@@ -1,6 +1,7 @@
 package io.github.edmm.model.edimm;
 
 import io.github.edmm.model.opentosca.TOSCAProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

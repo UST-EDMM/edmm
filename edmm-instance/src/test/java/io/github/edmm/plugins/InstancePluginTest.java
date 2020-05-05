@@ -5,6 +5,7 @@ import java.io.File;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 

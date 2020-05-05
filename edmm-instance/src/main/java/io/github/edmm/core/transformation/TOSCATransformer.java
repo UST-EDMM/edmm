@@ -12,8 +12,8 @@ import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 public class TOSCATransformer {
 
-    private DeploymentInstance deploymentInstance;
     private final List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
+    private DeploymentInstance deploymentInstance;
 
     public ServiceTemplateInstance transformEDiMMToServiceTemplateInstance(DeploymentInstance deploymentInstance) {
         this.deploymentInstance = deploymentInstance;

@@ -2,6 +2,7 @@ package io.github.edmm.plugins.kubernetes.util;
 
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.plugins.kubernetes.model.Status;
+
 import io.kubernetes.client.models.V1DeploymentCondition;
 import io.kubernetes.client.models.V1DeploymentStatus;
 import io.kubernetes.client.models.V1PodCondition;

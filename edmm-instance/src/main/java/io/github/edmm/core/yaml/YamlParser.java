@@ -13,6 +13,7 @@ import io.github.edmm.model.Metadata;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.util.CastUtil;
+
 import org.yaml.snakeyaml.Yaml;
 
 public class YamlParser {

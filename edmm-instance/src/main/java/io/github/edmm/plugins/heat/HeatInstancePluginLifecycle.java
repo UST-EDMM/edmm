@@ -17,6 +17,7 @@ import io.github.edmm.plugins.heat.util.HeatConstants;
 import io.github.edmm.plugins.heat.util.HeatMetadataHandler;
 import io.github.edmm.plugins.heat.util.HeatPropertiesHandler;
 import io.github.edmm.plugins.heat.util.HeatResourceHandler;
+
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
@@ -32,12 +33,11 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
 
     private static final String stackName = "-";
     private static final String stackId = "-";
-
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private Stack stack;
     private Map<String, Object> template;
     private OSClientV3 osClient;
     private List<? extends Resource> resources;
-    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     HeatInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);

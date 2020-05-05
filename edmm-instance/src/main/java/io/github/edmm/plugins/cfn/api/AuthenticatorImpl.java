@@ -1,11 +1,12 @@
 package io.github.edmm.plugins.cfn.api;
 
+import io.github.edmm.core.plugin.Authenticator;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
-import io.github.edmm.core.plugin.Authenticator;
 import lombok.Getter;
 
 @Getter
