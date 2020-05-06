@@ -33,10 +33,10 @@ public class NodeTemplateInstance {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
 
         nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
-        nodeTemplateInstance.setNodeType(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE_NAMESPACE, componentInstance.getType()));
-        nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL_NAMESPACE, componentInstance.getName()));
+        nodeTemplateInstance.setNodeType(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, componentInstance.getType()));
+        nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL, componentInstance.getName()));
         nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
-        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL_NAMESPACE, deploymentInstanceName));
+        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL, deploymentInstanceName));
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
         nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));

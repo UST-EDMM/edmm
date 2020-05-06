@@ -99,7 +99,7 @@ class ServiceTemplateInstanceTest {
         RelationshipTemplateInstance relationshipTemplateInstance = relationshipTemplateInstances.get(0);
 
         assertNotNull(relationshipTemplateInstance);
-        assertEquals("dependsOn", relationshipTemplateInstance.getRelationshipType().getLocalPart());
+        assertEquals("DependsOn", relationshipTemplateInstance.getRelationshipType().getLocalPart());
         assertEquals("4aeb6497-90e8-4c68-99b4-dea09d4848da", relationshipTemplateInstance.getTargetNodeTemplateInstanceId());
         assertEquals(TOSCAState.RelationshipTemplateInstanceState.CREATED, relationshipTemplateInstance.getState());
         assertEquals("109d58f4-9489-4eb6-b1c7-fc00a171c6e4", relationshipTemplateInstance.getSourceNodeTemplateInstanceId());

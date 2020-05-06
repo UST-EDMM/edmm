@@ -1,4 +1,10 @@
 package io.github.edmm.model.opentosca;
 
-class TOSCABaseTypes {
+public class TOSCABaseTypes {
+    public enum TOSCARelationBaseTypes {
+        ConnectsTo,
+        DependsOn,
+        DeployedOn,
+        HostedOn
+    }
 }

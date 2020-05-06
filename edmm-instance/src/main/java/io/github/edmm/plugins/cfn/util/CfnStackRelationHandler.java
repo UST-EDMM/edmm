@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.cfn.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,37 +28,58 @@ class CfnStackRelationHandler {
     }
 
     List<RelationInstance> getRelationInstances() {
-        this.currentResource = this.template.getResources().get(this.stackResource.getLogicalResourceId());
-        return this.isRelationExisting() ? handleRelations() : Collections.emptyList();
-    }
+        this.extractCurrentResource();
+        this.checkAndHandleRelations();
 
-    private List<RelationInstance> handleRelations() {
-        AtomicInteger relationCount = new AtomicInteger();
-        this.currentResource.getDependsOn().forEach((dependsOnKey, dependsOnValueObject) -> handleRelationValueObject(dependsOnValueObject, relationCount));
         return this.relationInstances;
     }
 
-    private void handleRelationValueObject(Object dependsOnValueObject, AtomicInteger relationCount) {
-        if (dependsOnValueObject instanceof String) {
-            this.createRelation(String.valueOf(dependsOnValueObject), relationCount);
-        } else if (dependsOnValueObject instanceof List) {
-            CastUtil.safelyCastToStringList(dependsOnValueObject).forEach(dependsOnValue -> this.createRelation(String.valueOf(dependsOnValue), relationCount));
+    private void extractCurrentResource() {
+        this.currentResource = this.template.getResources().get(this.stackResource.getLogicalResourceId());
+    }
+
+    private boolean isAtLeastOneRelationExisting() {
+        return this.currentResource.getDependsOn() != null;
+    }
+
+    private void checkAndHandleRelations() {
+        if (this.isAtLeastOneRelationExisting()) {
+            this.iterateOverAllRelations();
         }
     }
 
-    private void createRelation(String dependsOnValue, AtomicInteger relationCount) {
+    private void iterateOverAllRelations() {
+        AtomicInteger relationCount = new AtomicInteger();
+        this.currentResource.getDependsOn().forEach((dependsOnKey, dependsOnValueObject) ->
+            this.handleRelation(dependsOnValueObject, relationCount));
+    }
+
+    private void handleRelation(Object dependsOnValueObject, AtomicInteger relationCount) {
+        if (dependsOnValueObject instanceof String) {
+            this.createRelationInstance(String.valueOf(dependsOnValueObject), relationCount);
+        } else if (dependsOnValueObject instanceof List) {
+            CastUtil.safelyCastToStringList(dependsOnValueObject).forEach(dependsOnValue
+                -> this.createRelationInstance(String.valueOf(dependsOnValue), relationCount));
+        }
+    }
+
+    private void createRelationInstance(String dependsOnValue, AtomicInteger relationCount) {
         RelationInstance relationInstance = new RelationInstance();
-        relationInstance.setId(RelationTypes.RelationType.dependsOn + RelationTypes.relationDelimiter + String.valueOf(relationCount.getAndIncrement()));
+        relationInstance.setId(this.generateIdOfRelation(relationCount));
         relationInstance.setType(RelationTypes.RelationType.dependsOn);
-        relationInstance.setTargetInstanceId(this.stackResources.stream()
-            .filter(res -> res.getLogicalResourceId().equals(String.valueOf(dependsOnValue)))
-            .findFirst()
-            .orElseThrow(InstanceTransformationException::new)
-            .getPhysicalResourceId());
+        relationInstance.setTargetInstanceId(this.getTargetInstanceIdOfRelation(dependsOnValue));
         this.relationInstances.add(relationInstance);
     }
 
-    private boolean isRelationExisting() {
-        return this.currentResource.getDependsOn() != null;
+    private String generateIdOfRelation(AtomicInteger relationCount) {
+        return RelationTypes.RelationType.dependsOn + RelationTypes.relationDelimiter + String.valueOf(relationCount.getAndIncrement());
+    }
+
+    private String getTargetInstanceIdOfRelation(String dependsOnValue) {
+        return this.stackResources.stream()
+            .filter(res -> res.getLogicalResourceId().equals(String.valueOf(dependsOnValue)))
+            .findFirst()
+            .orElseThrow(InstanceTransformationException::new)
+            .getPhysicalResourceId();
     }
 }
