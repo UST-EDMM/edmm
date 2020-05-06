@@ -67,7 +67,8 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
 
     private void populateRelations(List<RootRelation> result, Entity entity) {
         Set<Entity> children = entity.getChildren();
-        for (Entity child : children) {
+        for (Entity entry : children) {
+            Entity child = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
             MappingEntity relationEntity = (MappingEntity) child;
             RootRelation relation = TypeWrapper.wrapRelation(relationEntity, this.entity);
             result.add(relation);
