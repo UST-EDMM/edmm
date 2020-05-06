@@ -21,8 +21,7 @@ class HeatRelationHandler {
         List<RelationInstance> relationInstances = new ArrayList<>();
         AtomicInteger relationCount = new AtomicInteger();
         emptyIfNull(dependsOnList).forEach(dependsOnResource -> {
-
-            // TODO: metadata, instance properties, description, operation
+            // TODO: metadata, instance properties, description
             RelationInstance relationInstance = new RelationInstance();
             relationInstance.setType(RelationTypes.RelationType.dependsOn);
             relationInstance.setTargetInstanceId(resources.stream()

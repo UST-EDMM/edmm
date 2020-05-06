@@ -1,13 +1,11 @@
 package io.github.edmm.model.edimm;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import io.github.edmm.core.yaml.support.YamlConstants;
 import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Metadata;
-import io.github.edmm.model.Operation;
 import io.github.edmm.util.CastUtil;
 
 import lombok.Getter;
@@ -20,7 +18,6 @@ import lombok.ToString;
 public class RelationInstance extends BasicInstance {
     private RelationTypes.RelationType type;
     private String targetInstanceId;
-    private List<Operation> operations;
 
     public static RelationInstance ofYamlContent(Map<String, Object> yamlContent) {
         RelationInstance relationInstance = new RelationInstance();

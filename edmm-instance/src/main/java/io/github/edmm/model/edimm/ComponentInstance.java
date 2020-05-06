@@ -8,7 +8,6 @@ import io.github.edmm.core.yaml.support.YamlConstants;
 import io.github.edmm.core.yaml.support.YamlSupport;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Metadata;
-import io.github.edmm.model.Operation;
 import io.github.edmm.util.CastUtil;
 
 import lombok.Getter;
@@ -23,7 +22,6 @@ public class ComponentInstance extends BasicInstance {
     private String createdAt;
     private InstanceState.InstanceStateForComponentInstance state;
     private String type;
-    private List<Operation> operations;
     private List<Artifact> artifacts;
     private List<RelationInstance> relationInstances;
 

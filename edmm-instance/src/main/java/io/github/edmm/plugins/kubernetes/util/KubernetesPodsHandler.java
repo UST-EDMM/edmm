@@ -11,7 +11,7 @@ public class KubernetesPodsHandler {
     public static List<ComponentInstance> getComponentInstances(List<V1Pod> podList) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         podList.forEach(pod -> {
-            // TODO artifacts, operations, description, relation instance
+            // TODO artifacts, description, relation instance
             ComponentInstance componentInstance = new ComponentInstance();
             componentInstance.setName(pod.getMetadata().getName());
             componentInstance.setType(pod.getMetadata().getLabels().get(KubernetesConstants.APP));
