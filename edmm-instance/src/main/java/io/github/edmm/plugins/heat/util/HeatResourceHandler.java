@@ -30,7 +30,7 @@ public class HeatResourceHandler {
     private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Object> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
-        // TODO artifacts, description
+        // TODO artifacts
         componentInstance.setType(resource.getType());
         componentInstance.setId(resource.getPhysicalResourceId());
         componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
