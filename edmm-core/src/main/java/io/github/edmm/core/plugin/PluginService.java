@@ -31,8 +31,8 @@ public class PluginService {
     public PluginService(List<TransformationPlugin<?>> transformationPlugins, List<ExecutionPlugin> executionPlugins) {
         this.transformationPlugins = transformationPlugins;
         this.executionPlugins = executionPlugins;
-        logger.debug("Loaded {} transformation plugins", transformationPlugins.size());
-        logger.debug("Loaded {} execution plugins", executionPlugins.size());
+        logger.debug("Loaded {} transformation plugin(s)", transformationPlugins.size());
+        logger.debug("Loaded {} execution plugin(s)", executionPlugins.size());
     }
 
     public Set<TargetTechnology> getSupportedTransformationTargets() {

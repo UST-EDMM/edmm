@@ -3,6 +3,10 @@ package io.github.edmm.plugins.kubernetes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.plugin.AbstractLifecycle;
@@ -13,6 +17,7 @@ import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DependencyGraph;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.VisitorHelper;
@@ -22,8 +27,11 @@ import io.github.edmm.plugins.kubernetes.support.ImageMappingVisitor;
 import io.github.edmm.plugins.kubernetes.support.KubernetesResourceBuilder;
 
 import org.jgrapht.Graph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.STACKS_ENTRY;
 
 public class KubernetesLifecycle extends AbstractLifecycle {
 
@@ -72,6 +80,17 @@ public class KubernetesLifecycle extends AbstractLifecycle {
             resourceBuilder.populateResources();
         }
         logger.info("Transformation to Kubernetes successful");
+    }
+
+    @Override
+    public void cleanup() {
+        TopologicalOrderIterator<Container, ConnectsTo> topologicalIterator
+            = new TopologicalOrderIterator<>(dependencyGraph.getReversedGraph());
+        List<String> stackNames = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(topologicalIterator, Spliterator.ORDERED), false)
+            .map(Container::getName).collect(Collectors.toList());
+        // Save stack names for later use
+        context.putValue(STACKS_ENTRY, stackNames);
     }
 
     protected void resolveBaseImage(Container stack) {

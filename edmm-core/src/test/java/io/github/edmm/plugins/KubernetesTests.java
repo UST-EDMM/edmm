@@ -31,7 +31,7 @@ public class KubernetesTests extends PluginTest {
         DeploymentModel model = DeploymentModel.of(templateResource.getFile());
         logger.info("Source directory is '{}'", sourceResource.getFile());
         logger.info("Target directory is '{}'", targetDirectory);
-        context = new TransformationContext(model, TargetTechnology.NOOP, sourceResource.getFile(), targetDirectory);
+        context = new TransformationContext(templateResource.getFile(), KubernetesPlugin.KUBERNETES, sourceResource.getFile(), targetDirectory);
     }
 
     @Test
@@ -41,6 +41,8 @@ public class KubernetesTests extends PluginTest {
 
     @Test
     public void testDeployment() {
+        testLifecycleExecution();
+        TransformationContext context = TransformationContext.of(targetDirectory);
         executeDeployment(new KubernetesPlugin(), new ExecutionContext(context));
     }
 }

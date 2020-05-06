@@ -8,6 +8,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 
 public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> implements ExecutionPlugin {
 
+    public static final String STACKS_ENTRY = "stacks";
     public static final TargetTechnology KUBERNETES = TargetTechnology.builder().id("kubernetes").name("Kubernetes").build();
 
     public KubernetesPlugin() {

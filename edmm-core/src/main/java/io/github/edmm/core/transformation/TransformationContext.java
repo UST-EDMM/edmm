@@ -2,8 +2,11 @@ package io.github.edmm.core.transformation;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.DeploymentModel;
@@ -13,23 +16,34 @@ import io.github.edmm.model.relation.RootRelation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.Graph;
 import org.springframework.lang.Nullable;
 
 @Data
 public final class TransformationContext {
 
-    private final DeploymentModel model;
-    private final TargetTechnology targetTechnology;
-    private final File sourceDirectory;
-    private final File targetDirectory;
-    private final Timestamp timestamp;
+    public static final String CONTEXT_FILENAME = "edmm.json";
 
     private String id;
+    private File input;
+    @JsonIgnore
+    private String inputAsString;
+    private DeploymentModel model;
+    private TargetTechnology targetTechnology;
+    private File sourceDirectory;
+    private File targetDirectory;
+    private Timestamp timestamp;
     private State state = State.READY;
 
-    public TransformationContext(DeploymentModel model, TargetTechnology targetTechnology) {
-        this(model, targetTechnology, null, null);
+    private Map<String, Object> values;
+
+    public TransformationContext() {
+
+    }
+
+    public TransformationContext(@NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology) {
+        this(UUID.randomUUID().toString(), model, targetTechnology, null, null);
     }
 
     public TransformationContext(@NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology,
@@ -37,8 +51,20 @@ public final class TransformationContext {
         this(UUID.randomUUID().toString(), model, targetTechnology, sourceDirectory, targetDirectory);
     }
 
-    public TransformationContext(@NonNull String id, @NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology,
+    public TransformationContext(@NonNull File input, @NonNull TargetTechnology targetTechnology,
                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
+        this(UUID.randomUUID().toString(), null, targetTechnology, sourceDirectory, targetDirectory);
+        this.input = input;
+    }
+
+    public TransformationContext(@NonNull String inputAsString, @NonNull TargetTechnology targetTechnology,
+                                 @Nullable File sourceDirectory, @Nullable File targetDirectory) {
+        this(UUID.randomUUID().toString(), null, targetTechnology, sourceDirectory, targetDirectory);
+        this.inputAsString = inputAsString;
+    }
+
+    private TransformationContext(String id, DeploymentModel model, TargetTechnology targetTechnology,
+                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
         this.id = id;
         this.model = model;
         this.targetTechnology = targetTechnology;
@@ -47,19 +73,51 @@ public final class TransformationContext {
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
+    public static TransformationContext of(File directory) {
+        File file = new File(directory, CONTEXT_FILENAME);
+        if (!file.isFile() || !directory.canRead()) {
+            throw new IllegalStateException(String.format("Cannot read context from file '%s'", file));
+        }
+        return JsonHelper.readValue(file, TransformationContext.class);
+    }
+
     @JsonIgnore
     public DeploymentModel getModel() {
+        if (model == null) {
+            if (input == null && StringUtils.isBlank(inputAsString)) {
+                throw new IllegalStateException("Context requires either an input as file or as string");
+            }
+            if (input != null) {
+                model = DeploymentModel.of(input);
+            } else {
+                model = DeploymentModel.of(inputAsString);
+            }
+        }
         return model;
     }
 
     @JsonIgnore
     public Graph<RootComponent, RootRelation> getTopologyGraph() {
-        return model.getTopology();
+        return getModel().getTopology();
     }
 
     @JsonIgnore
     public PluginFileAccess getFileAccess() {
         return new PluginFileAccess(sourceDirectory, targetDirectory);
+    }
+
+    public void putValue(String name, Object value) {
+        if (values == null) {
+            values = new HashMap<>();
+        }
+        values.put(name, value);
+    }
+
+    public Object getValue(String name) {
+        if (values == null) {
+            return null;
+        }
+        return values.get(name);
     }
 
     public enum State {

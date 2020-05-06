@@ -12,6 +12,8 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.github.edmm.core.transformation.TransformationContext.CONTEXT_FILENAME;
+
 @Getter
 public abstract class TransformationPlugin<L extends AbstractLifecycle> {
 
@@ -52,7 +54,7 @@ public abstract class TransformationPlugin<L extends AbstractLifecycle> {
     }
 
     public void finalize(TransformationContext context) {
-        File file = new File(context.getTargetDirectory(), "edmm.json");
+        File file = new File(context.getTargetDirectory(), CONTEXT_FILENAME);
         JsonHelper.writeValue(context, file);
     }
 

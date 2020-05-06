@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.github.edmm.core.plugin.support.CheckModelResult.State.OK;
+import static io.github.edmm.core.transformation.TransformationContext.State.DONE;
+import static io.github.edmm.core.transformation.TransformationContext.State.TRANSFORMING;
 
 public abstract class PluginTest {
 
@@ -32,22 +34,28 @@ public abstract class PluginTest {
         logger.info("checkModel(): state={}, unsupportedComponents={}",
             result.getState(), result.getUnsupportedComponents());
         if (OK.equals(result.getState())) {
+            context.setState(TRANSFORMING);
             lifecycle.prepare();
             lifecycle.transform();
             lifecycle.cleanup();
+            context.setState(DONE);
         } else {
             logger.warn("Skip execution due to unsupported components...");
         }
+        plugin.finalize(context);
     }
 
     protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) {
         plugin.init();
         try {
+            context.setState(ExecutionContext.State.DEPLOYING);
             plugin.execute(context);
         } catch (Exception e) {
             logger.error("Error executing deployment: {}", e.getMessage(), e);
+            context.setState(ExecutionContext.State.ERROR);
         }
         plugin.finalize(context);
+        context.setState(ExecutionContext.State.DONE);
     }
 
     @After
