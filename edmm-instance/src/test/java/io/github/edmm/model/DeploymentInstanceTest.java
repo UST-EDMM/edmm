@@ -90,7 +90,6 @@ public class DeploymentInstanceTest {
         assertEquals(10, this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().size());
         assertEquals("docker://56be2e934c89cb5667ee0674a596d116c8987fe1f06b5f83bc107bccec1c08a3", this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(1).getInstanceValue());
         assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(2).getType());
-        assertTrue(this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(3).getType() instanceof String);
         assertEquals("containerStatus::nginx::restartCount", this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(4).getKey());
         assertEquals(this.deploymentInstance.getComponentInstances().get(1).getState().toTOSCANodeTemplateInstanceState(), TOSCAState.NodeTemplateInstanceState.CREATED);
         assertTrue(this.deploymentInstance.getComponentInstances().get(0).getType().contains("nginx"));

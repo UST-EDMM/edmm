@@ -2,6 +2,7 @@ package io.github.edmm.core.transformation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.DeploymentInstance;
@@ -57,18 +58,18 @@ public class TOSCATransformer {
     }
 
     private void addToNodeTemplateInstanceAsOutgoing(RelationshipTemplateInstance relationshipTemplateInstance, ComponentInstance componentInstance) {
-        this.nodeTemplateInstances.stream()
+        Objects.requireNonNull(this.nodeTemplateInstances.stream()
             .filter(x -> x.getNodeTemplateInstanceId().equals(componentInstance.getId()))
             .findFirst()
-            .orElse(null)
+            .orElse(null))
             .addToOutgoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 
     private void addToNodeTemplateInstanceAsIngoing(RelationshipTemplateInstance relationshipTemplateInstance, RelationInstance relationInstance) {
-        this.nodeTemplateInstances.stream()
+        Objects.requireNonNull(this.nodeTemplateInstances.stream()
             .filter(x -> x.getNodeTemplateInstanceId().equals(relationInstance.getTargetInstanceId()))
             .findFirst()
-            .orElse(null)
+            .orElse(null))
             .addToIngoingRelationshipTemplateInstances(relationshipTemplateInstance);
     }
 }
