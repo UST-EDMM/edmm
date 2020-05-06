@@ -21,9 +21,9 @@ import static org.junit.Assert.assertTrue;
 
 public class DeploymentInstanceTest {
 
-    ClassPathResource resource;
-    YamlParser yamlParser;
-    DeploymentInstance deploymentInstance;
+    private ClassPathResource resource;
+    private YamlParser yamlParser;
+    private DeploymentInstance deploymentInstance;
 
     @Test
     public void testDeploymentInstance() throws Exception {

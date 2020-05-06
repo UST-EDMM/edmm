@@ -23,10 +23,10 @@ import static org.junit.Assert.assertTrue;
 
 class ServiceTemplateInstanceTest {
 
-    ClassPathResource resource;
-    YamlParser yamlParser;
-    ServiceTemplateInstance serviceTemplateInstance;
-    DeploymentInstance deploymentInstance;
+    private ClassPathResource resource;
+    private YamlParser yamlParser;
+    private ServiceTemplateInstance serviceTemplateInstance;
+    private DeploymentInstance deploymentInstance;
 
     @Test
     public void testServiceTemplate() throws Exception {
