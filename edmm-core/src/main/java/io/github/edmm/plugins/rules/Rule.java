@@ -39,7 +39,7 @@ public abstract class Rule implements Comparable<Rule> {
 
     public String execute() {
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-        return yamlBuilder.build();
+        return toTopology(yamlBuilder).build();
     }
 
     protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
