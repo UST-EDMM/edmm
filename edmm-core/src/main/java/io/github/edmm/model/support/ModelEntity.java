@@ -9,11 +9,14 @@ import java.util.Set;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
+import io.github.edmm.core.parser.ScalarEntity;
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.core.parser.support.GraphHelper;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
 
 import lombok.ToString;
+import lombok.var;
 
 @ToString
 public abstract class ModelEntity extends DescribableElement {
@@ -48,6 +51,37 @@ public abstract class ModelEntity extends DescribableElement {
             propertiesEntity.ifPresent(value -> populateProperties(result, value));
         }
         return result;
+    }
+
+    public void addProperty(String name, String value) {
+        EntityGraph graph = entity.getGraph();
+        var props = entity.getChild(PROPERTIES);
+        MappingEntity propertyEnt;
+        if (!props.isPresent()) {
+            propertyEnt = new MappingEntity(entity.getId().extend(PROPERTIES.getName()), graph);
+            graph.addEntity(propertyEnt);
+        } else {
+            propertyEnt = (MappingEntity) props.get();
+        }
+        var id = propertyEnt.getId().extend(name);
+        MappingEntity propertyEntity = new MappingEntity(id, graph);
+        ScalarEntity typeEntity = new ScalarEntity(DefaultKeys.STRING, propertyEntity.getId().extend(DefaultKeys.TYPE), graph);
+        ScalarEntity valueEntity = new ScalarEntity(value, propertyEntity.getId().extend(DefaultKeys.VALUE), graph);
+        ScalarEntity computedEntity = new ScalarEntity("true", propertyEntity.getId().extend(DefaultKeys.COMPUTED), graph);
+        // check if entity already exists
+        if (propertyEnt.getChild(name).isPresent()) {
+            var existingValueEntity = propertyEnt.getChild(name).get().getChild(DefaultKeys.VALUE)
+                .orElseThrow(IllegalStateException::new);
+            var existingTypeEntity = propertyEnt.getChild(name).get().getChild(DefaultKeys.TYPE)
+                .orElseThrow(IllegalStateException::new);
+            graph.replaceEntity(existingValueEntity, valueEntity);
+            graph.replaceEntity(existingTypeEntity, typeEntity);
+        } else {
+            graph.addEntity(propertyEntity);
+            graph.addEntity(typeEntity);
+            graph.addEntity(valueEntity);
+        }
+        graph.addEntity(computedEntity);
     }
 
     public Optional<Property> getProperty(String name) {

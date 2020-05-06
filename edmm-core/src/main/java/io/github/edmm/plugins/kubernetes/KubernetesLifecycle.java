@@ -76,7 +76,7 @@ public class KubernetesLifecycle extends AbstractLifecycle {
         }
         for (Container stack : containers) {
             // Build Kubernetes resource files
-            KubernetesResourceBuilder resourceBuilder = new KubernetesResourceBuilder(stack, dependencyGraph, fileAccess);
+            KubernetesResourceBuilder resourceBuilder = new KubernetesResourceBuilder(stack, graph, fileAccess);
             resourceBuilder.populateResources();
         }
         logger.info("Transformation to Kubernetes successful");

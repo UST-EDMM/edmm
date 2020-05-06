@@ -2,10 +2,8 @@ package io.github.edmm.plugins;
 
 import java.nio.file.Files;
 
-import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.transformation.TransformationContext;
-import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.kubernetes.KubernetesPlugin;
 
 import org.junit.Before;
@@ -27,8 +25,7 @@ public class KubernetesTests extends PluginTest {
     @Before
     public void init() throws Exception {
         ClassPathResource sourceResource = new ClassPathResource("templates");
-        ClassPathResource templateResource = new ClassPathResource("templates/scenario_iaas.yml");
-        DeploymentModel model = DeploymentModel.of(templateResource.getFile());
+        ClassPathResource templateResource = new ClassPathResource("templates/kubernetes.yml");
         logger.info("Source directory is '{}'", sourceResource.getFile());
         logger.info("Target directory is '{}'", targetDirectory);
         context = new TransformationContext(templateResource.getFile(), KubernetesPlugin.KUBERNETES, sourceResource.getFile(), targetDirectory);
@@ -40,7 +37,7 @@ public class KubernetesTests extends PluginTest {
     }
 
     @Test
-    public void testDeployment() {
+    public void testDeploymentExecution() {
         testLifecycleExecution();
         TransformationContext context = TransformationContext.of(targetDirectory);
         executeDeployment(new KubernetesPlugin(), new ExecutionContext(context));

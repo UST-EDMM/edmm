@@ -7,6 +7,11 @@ components:
 
   pet_clinic:
     type: web_application
+    properties:
+      db_hostname: ${db.public_address}
+      db_user: ${db.user}
+      db_password: ${db.password}
+      db_schema: ${db.schema_name}
     artifacts:
       - war: ./files/app.war
     operations:
