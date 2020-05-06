@@ -52,15 +52,11 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
-//                    if (relation instanceof ScalarEntity) {
-//                        GraphHelper.findMappingEntity(graph, relation.getName(), EntityGraph.RELATION_TYPES)
-//                                .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
-//                    } else {
+                for (Entity entry : relations.get().getChildren()) {
+                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
                     relation.getChild(DefaultKeys.TYPE)
                         .flatMap(type -> GraphHelper.findMappingEntity(graph, ((ScalarEntity) type).getValue(), EntityGraph.RELATION_TYPES))
                         .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
-//                    }
                 }
             }
         }
@@ -70,7 +66,8 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
+                for (Entity entry : relations.get().getChildren()) {
+                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
                     Optional<Entity> entity = relation.getChild(DefaultKeys.TARGET);
                     if (entity.isPresent()) {
                         ScalarEntity targetAssignment = (ScalarEntity) entity.get();
@@ -87,7 +84,8 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity relation : relations.get().getChildren()) {
+                for (Entity entry : relations.get().getChildren()) {
+                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
                     if (relation instanceof ScalarEntity) {
                         ScalarEntity scalarEntity = (ScalarEntity) relation;
                         MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);

@@ -18,7 +18,12 @@ components:
     type: software_component
     relations:
       - hosted_on: ubuntu
+      - depends_on: db
       - depends_on: ubuntu
+  db:
+    type: software_component
+    relations:
+      - hosted_on: ubuntu
 
 component_types:
   base:
