@@ -19,7 +19,9 @@ public class KubernetesMetadataHandler {
         return !key.equals(KubernetesConstants.LAST_APPLIED_CONFIG);
     }
 
-    public Metadata getMetadata() {
+    public Metadata getMetadata(String apiVersion, String kind) {
+        handleApiVersion(apiVersion);
+        handleKind(kind);
         handleAnnotations();
         handleClusterName();
         handleDeletionPeriod();
@@ -33,6 +35,18 @@ public class KubernetesMetadataHandler {
         handleResourceVersion();
 
         return Metadata.of(this.metadataMap);
+    }
+
+    private void handleApiVersion(String apiVersion) {
+        if (apiVersion != null) {
+            this.metadataMap.put(KubernetesConstants.API_VERSION, apiVersion);
+        }
+    }
+
+    private void handleKind(String kind) {
+        if (kind != null) {
+            this.metadataMap.put(KubernetesConstants.KIND, kind);
+        }
     }
 
     private void handleAnnotations() {

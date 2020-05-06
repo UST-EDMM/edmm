@@ -16,6 +16,8 @@ public class KubernetesConstants {
     static final String NAMESPACE = "namespace";
     static final String RESOURCE_VERSION = "resourceVersion";
     static final String LAST_APPLIED_CONFIG = "kubectl.kubernetes.io/last-applied-configuration";
+    static final String API_VERSION = "apiVersion";
+    static final String KIND = "kind";
 
     // deployment status constants
     static final String REPLICAS = "replicas";

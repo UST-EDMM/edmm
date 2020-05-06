@@ -58,7 +58,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
         this.deploymentInstance.setName(this.kubernetesDeploymentInstance.getMetadata().getName());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata().getCreationTimestamp()));
         this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata().getAnnotations().get(KubernetesConstants.VERSION));
-        this.deploymentInstance.setMetadata(new KubernetesMetadataHandler(this.kubernetesDeploymentInstance.getMetadata()).getMetadata());
+        this.deploymentInstance.setMetadata(new KubernetesMetadataHandler(this.kubernetesDeploymentInstance.getMetadata()).getMetadata(this.kubernetesDeploymentInstance.getApiVersion(), this.kubernetesDeploymentInstance.getKind()));
         this.deploymentInstance.setId(this.kubernetesDeploymentInstance.getMetadata().getUid());
         this.deploymentInstance.setState(KubernetesStateHandler.getDeploymentInstanceState(this.kubernetesDeploymentInstance.getStatus()));
         this.deploymentInstance.setComponentInstances(KubernetesPodsHandler.getComponentInstances(this.podsOfDeploymentInstance));
