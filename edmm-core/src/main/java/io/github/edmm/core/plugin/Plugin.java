@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.plugins.rules.Rule;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -54,4 +55,8 @@ public abstract class Plugin<L extends AbstractLifecycle> {
     }
 
     public abstract L getLifecycle(TransformationContext context);
+
+    public List<Rule> getRules() {
+        return Rule.getDefault();
+    }
 }

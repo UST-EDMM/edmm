@@ -14,6 +14,8 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.PluginSupportResult;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.plugins.rules.Rule;
+import io.github.edmm.plugins.rules.RuleEngine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,18 +69,29 @@ public class PluginService {
         return plugin.getLifecycle(context).checkModel();
     }
 
+    public List<Rule.Result> applyRules(DeploymentModel model, Plugin<?> plugin, CheckModelResult checkModelResult) {
+
+        List<Rule.Result> replacementRules = new ArrayList<>();
+        for (RootComponent unsupportedComponent : checkModelResult.getUnsupportedComponents()) {
+            replacementRules.addAll( RuleEngine.fire(model, plugin.getRules(), unsupportedComponent) );
+        }
+        return  replacementRules;
+    }
+
     public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
         for (Plugin<?> plugin : this.plugins) {
             TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
             CheckModelResult checkModelResult = this.checkModel(context, plugin);
+            List<Rule.Result> replacementRules = this.applyRules(model, plugin, checkModelResult);
             List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
                 .map(RootComponent::getName)
                 .collect(Collectors.toList());
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
                 .id(plugin.getTargetTechnology().getId())
                 .name(plugin.getTargetTechnology().getName())
-                .unsupportedComponents(unsupportedComponents);
+                .unsupportedComponents(unsupportedComponents)
+                .replacementRules(replacementRules);
             double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
             psr.supports(s);
             response.add(psr.build());
