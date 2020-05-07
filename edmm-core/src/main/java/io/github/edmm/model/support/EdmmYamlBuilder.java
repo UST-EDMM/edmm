@@ -79,6 +79,14 @@ public class EdmmYamlBuilder {
     }
 
     /**
+     * it doesn't add the relation types and the component types
+     */
+    public String simpleBuild() {
+        flushCurrentComponent();
+        return new Yaml().dumpAsMap(componentsMap);
+    }
+
+    /**
      * It adds the currentComponent and the currentRelations to the componentsMap.
      * This function needs to be called every time a new component is added, so that the currentComponent will be saved
      * and there will be room for the new one.

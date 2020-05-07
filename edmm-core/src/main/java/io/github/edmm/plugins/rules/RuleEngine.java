@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.edmm.model.DeploymentModel;
@@ -10,10 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RuleEngine {
 
-    public void fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent) {
+    public static List<Rule.Result> fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent) {
+        List<Rule.Result> results = new ArrayList<>();
         if (rules.isEmpty()) {
             log.warn("No rules registered! Nothing to apply");
-            return;
+            return results;
         }
         log.debug("Rules evaluation started");
         for (Rule rule : rules) {
@@ -26,11 +28,13 @@ public class RuleEngine {
             }
             if (evaluationResult) {
                 log.debug("Rule '{}' triggered", name);
-                rule.execute();
-
+                Rule.Result result = rule.execute();
+                results.add(result);
             } else {
                 log.debug("Rule '{}' has been evaluated to false, it has not been executed", name);
             }
         }
+
+        return results;
     }
 }

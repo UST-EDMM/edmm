@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.List;
 import java.util.Optional;
 
 import io.github.edmm.model.DeploymentModel;
@@ -93,13 +94,30 @@ public class RulesTests {
             .component(Compute.class)
             .build();
 
-        DeploymentModel deploymentModel = DeploymentModel.of(yamlBuilder.build());
-        Optional<RootComponent> unsupportedComponent = deploymentModel.getComponent("WebServer");
-        RuleAssessor ruleAssessor = new RuleAssessor(deploymentModel,deploymentModel);
+        DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
+        Optional<RootComponent> unsupportedComponent = model.getComponent("WebServer");
+        RuleAssessor ruleAssessor = new RuleAssessor(model,model);
 
         if (unsupportedComponent.isPresent())
             Assert.assertTrue(ruleAssessor.assess(unsupportedComponent.get()));
         else
+            Assert.fail("component not present");
+    }
+
+    @Test
+    public void testRuleEngine(){
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder().component(Saas.class);
+        DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
+        Optional<RootComponent> unsupportedComponent = model.getComponent("Saas");
+
+        if (unsupportedComponent.isPresent()) {
+            List<Rule.Result> result = RuleEngine.fire(model, Rule.getDefault(), unsupportedComponent.get());
+            Assert.assertEquals(1,result.size());
+
+            SaasDefaultRule saasDefaultRule = new SaasDefaultRule();
+            saasDefaultRule.evaluate(model,unsupportedComponent.get());
+            Assert.assertEquals(saasDefaultRule.execute().getToTopology() , result.get(0).getToTopology());
+        } else
             Assert.fail("component not present");
     }
 }
