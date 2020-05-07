@@ -1,7 +1,6 @@
 package io.github.edmm.model.support;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.github.edmm.core.parser.Entity;
@@ -19,12 +18,11 @@ public abstract class TypeWrapper {
 
     public static Map<String, RootComponent> wrapComponents(EntityGraph graph) {
         Map<String, RootComponent> components = new HashMap<>();
-        Iterator<Entity> it = graph.getEntity(EntityGraph.COMPONENTS)
-            .orElseThrow(IllegalStateException::new).getChildren().iterator();
-        while (it.hasNext()) {
-            MappingEntity entity = (MappingEntity) it.next();
+        for (Entity value : graph.getEntity(EntityGraph.COMPONENTS)
+            .orElseThrow(IllegalStateException::new).getChildren()) {
+            MappingEntity entity = (MappingEntity) value;
             String type = entity.getValue(RootComponent.TYPE);
-            Class clazz = TypeResolver.resolve(type);
+            Class<?> clazz = TypeResolver.resolve(type);
             components.put(entity.getName(), doWrap(entity, clazz));
         }
         return components;
@@ -63,7 +61,7 @@ public abstract class TypeWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T doWrap(MappingEntity entity, Class type) {
+    private static <T> T doWrap(MappingEntity entity, Class<?> type) {
         try {
             return (T) ConstructorUtils.invokeConstructor(type, entity);
         } catch (Exception e) {
@@ -71,10 +69,9 @@ public abstract class TypeWrapper {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static RootRelation wrapRelation(MappingEntity relationEntity, MappingEntity componentEntity) {
         ScalarEntity type = (ScalarEntity) relationEntity.getChild(DefaultKeys.TYPE).orElseThrow(IllegalArgumentException::new);
-        Class clazz = TypeResolver.resolve(type.getValue());
+        Class<?> clazz = TypeResolver.resolve(type.getValue());
         try {
             return (RootRelation) ConstructorUtils.invokeConstructor(clazz, relationEntity, componentEntity);
         } catch (Exception e) {

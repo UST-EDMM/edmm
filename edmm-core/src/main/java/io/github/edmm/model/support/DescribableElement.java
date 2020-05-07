@@ -63,7 +63,11 @@ public abstract class DescribableElement extends BaseElement {
 
     protected void populateArtifacts(List<Artifact> result, Entity entity) {
         Set<Entity> children = entity.getChildren();
-        for (Entity child : children) {
+        for (Entity entry : children) {
+            Entity child = entry;
+            if (child instanceof MappingEntity) {
+                child = child.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
+            }
             ScalarEntity artifactEntity = (ScalarEntity) child;
             if (Objects.nonNull(artifactEntity.getValue())) {
                 Artifact artifact = new Artifact(artifactEntity, getEntity());
