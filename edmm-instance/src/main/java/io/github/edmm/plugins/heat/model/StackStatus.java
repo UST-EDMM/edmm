@@ -4,6 +4,7 @@ import io.github.edmm.model.edimm.InstanceState;
 
 public class StackStatus {
     public enum StackStatusForDeploymentInstance {
+        CHECK_COMPLETE(InstanceState.InstanceStateForDeploymentInstance.CREATED),
         CREATE_COMPLETE(InstanceState.InstanceStateForDeploymentInstance.CREATED),
         CREATE_FAILED(InstanceState.InstanceStateForDeploymentInstance.ERROR),
         CREATE_IN_PROGRESS(InstanceState.InstanceStateForDeploymentInstance.CREATING),
@@ -30,6 +31,7 @@ public class StackStatus {
     }
 
     public enum StackStatusForComponentInstance {
+        CHECK_COMPLETE(InstanceState.InstanceStateForComponentInstance.CREATED),
         CREATE_COMPLETE(InstanceState.InstanceStateForComponentInstance.CREATED),
         CREATE_FAILED(InstanceState.InstanceStateForComponentInstance.ERROR),
         CREATE_IN_PROGRESS(InstanceState.InstanceStateForComponentInstance.CREATING),
