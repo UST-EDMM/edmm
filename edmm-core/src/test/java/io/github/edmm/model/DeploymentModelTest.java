@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.SoftwareComponent;
+import io.github.edmm.model.relation.DependsOn;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 import org.apache.commons.io.FileUtils;
@@ -87,16 +88,15 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/relations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         SoftwareComponent tomcat = (SoftwareComponent) model.getComponent("tomcat").orElseThrow(IllegalStateException::new);
-        assertEquals(2, tomcat.getRelations().size());
-        assertEquals("hosted_on", tomcat.getRelations().get(0).getName());
-        assertEquals("depends_on", tomcat.getRelations().get(1).getName());
-        RootRelation hostedOn = tomcat.getRelations().get(0);
-        assertTrue(hostedOn instanceof HostedOn);
-        assertEquals("ubuntu", hostedOn.getTarget());
-        assertEquals(0, hostedOn.getProperties().size());
-        assertEquals(6, hostedOn.getOperations().size());
-        assertEquals(2, model.getTopology().vertexSet().size());
-        assertEquals(2, model.getTopology().edgeSet().size());
+        assertEquals(3, tomcat.getRelations().size());
+        assertEquals("hosted_on", tomcat.getRelations().get(1).getName());
+        RootRelation relation = tomcat.getRelations().get(0);
+        assertTrue(relation instanceof DependsOn);
+        assertEquals("db", relation.getTarget());
+        assertEquals(0, relation.getProperties().size());
+        assertEquals(6, relation.getOperations().size());
+        assertEquals(3, model.getTopology().vertexSet().size());
+        assertEquals(4, model.getTopology().edgeSet().size());
     }
 
     @Test
