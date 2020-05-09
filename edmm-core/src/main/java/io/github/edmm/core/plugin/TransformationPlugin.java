@@ -3,8 +3,8 @@ package io.github.edmm.core.plugin;
 import java.io.File;
 import java.util.List;
 
-import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.DeploymentTechnology;
+import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.transformation.TransformationContext;
 
 import lombok.Getter;
