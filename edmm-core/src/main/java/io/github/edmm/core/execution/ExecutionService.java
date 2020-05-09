@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.support.ExecutionTask;
 import io.github.edmm.core.plugin.ExecutionPlugin;
 import io.github.edmm.core.plugin.PluginService;
@@ -31,10 +31,10 @@ public class ExecutionService {
     }
 
     public void start(ExecutionContext context) {
-        TargetTechnology technology = context.getTransformation().getTargetTechnology();
-        Optional<ExecutionPlugin> plugin = pluginService.getExecutionPlugin(technology);
+        DeploymentTechnology dt = context.getTransformation().getDeploymentTechnology();
+        Optional<ExecutionPlugin> plugin = pluginService.getExecutionPlugin(dt);
         if (!plugin.isPresent()) {
-            logger.error("Plugin for given technology '{}' could not be found", technology.getId());
+            logger.error("Plugin for given technology '{}' could not be found", dt.getId());
             return;
         }
         if (context.getState() == READY) {

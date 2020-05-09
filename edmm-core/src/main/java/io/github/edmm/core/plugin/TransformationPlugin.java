@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import io.github.edmm.core.JsonHelper;
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 
 import lombok.Getter;
@@ -19,13 +19,13 @@ public abstract class TransformationPlugin<L extends AbstractLifecycle> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final TargetTechnology targetTechnology;
+    private final DeploymentTechnology deploymentTechnology;
 
-    public TransformationPlugin(@NonNull TargetTechnology targetTechnology) {
-        this.targetTechnology = targetTechnology;
-        logger.debug("Initializing plugin '{}'", targetTechnology.getName());
+    public TransformationPlugin(@NonNull DeploymentTechnology deploymentTechnology) {
+        this.deploymentTechnology = deploymentTechnology;
+        logger.debug("Initializing plugin '{}'", deploymentTechnology.getName());
         this.init();
-        logger.debug("Initialized plugin '{}'", targetTechnology.getName());
+        logger.debug("Initialized plugin '{}'", deploymentTechnology.getName());
     }
 
     public void init() {

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
@@ -35,15 +35,15 @@ public class PluginService {
         logger.debug("Loaded {} execution plugin(s)", executionPlugins.size());
     }
 
-    public Set<TargetTechnology> getSupportedTransformationTargets() {
+    public Set<DeploymentTechnology> getSupportedTransformationTargets() {
         return transformationPlugins.stream()
-            .map(TransformationPlugin::getTargetTechnology)
+            .map(TransformationPlugin::getDeploymentTechnology)
             .collect(Collectors.toSet());
     }
 
-    public Set<TargetTechnology> getSupportedExecutionTargets() {
+    public Set<DeploymentTechnology> getSupportedExecutionTargets() {
         return executionPlugins.stream()
-            .map(ExecutionPlugin::getTargetTechnology)
+            .map(ExecutionPlugin::getDeploymentTechnology)
             .collect(Collectors.toSet());
     }
 
@@ -55,24 +55,24 @@ public class PluginService {
         return Collections.unmodifiableList(executionPlugins);
     }
 
-    public Optional<TransformationPlugin<?>> getTransformationPlugin(TargetTechnology technology) {
-        if (technology == null) {
+    public Optional<TransformationPlugin<?>> getTransformationPlugin(DeploymentTechnology dt) {
+        if (dt == null) {
             return Optional.empty();
         }
         for (TransformationPlugin<?> plugin : transformationPlugins) {
-            if (plugin.getTargetTechnology().getId().equals(technology.getId())) {
+            if (plugin.getDeploymentTechnology().getId().equals(dt.getId())) {
                 return Optional.of(plugin);
             }
         }
         return Optional.empty();
     }
 
-    public Optional<ExecutionPlugin> getExecutionPlugin(TargetTechnology technology) {
-        if (technology == null) {
+    public Optional<ExecutionPlugin> getExecutionPlugin(DeploymentTechnology dt) {
+        if (dt == null) {
             return Optional.empty();
         }
         for (ExecutionPlugin plugin : executionPlugins) {
-            if (plugin.getTargetTechnology().getId().equals(technology.getId())) {
+            if (plugin.getDeploymentTechnology().getId().equals(dt.getId())) {
                 return Optional.of(plugin);
             }
         }
@@ -86,14 +86,14 @@ public class PluginService {
     public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
         for (TransformationPlugin<?> plugin : this.transformationPlugins) {
-            TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
+            TransformationContext context = new TransformationContext(model, plugin.getDeploymentTechnology());
             CheckModelResult checkModelResult = this.checkModel(context, plugin);
             List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
                 .map(RootComponent::getName)
                 .collect(Collectors.toList());
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
-                .id(plugin.getTargetTechnology().getId())
-                .name(plugin.getTargetTechnology().getName())
+                .id(plugin.getDeploymentTechnology().getId())
+                .name(plugin.getDeploymentTechnology().getName())
                 .unsupportedComponents(unsupportedComponents);
             double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
             psr.supports(s);

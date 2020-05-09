@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.plugin.PluginService;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.support.TransformationTask;
@@ -30,10 +30,10 @@ public class TransformationService {
     }
 
     public void start(TransformationContext context) {
-        TargetTechnology targetTechnology = context.getTargetTechnology();
-        Optional<TransformationPlugin<?>> plugin = pluginService.getTransformationPlugin(targetTechnology);
+        DeploymentTechnology dt = context.getDeploymentTechnology();
+        Optional<TransformationPlugin<?>> plugin = pluginService.getTransformationPlugin(dt);
         if (!plugin.isPresent()) {
-            logger.error("Plugin for given technology '{}' could not be found", targetTechnology.getId());
+            logger.error("Plugin for given technology '{}' could not be found", dt.getId());
             return;
         }
         if (context.getState() == TransformationContext.State.READY) {
@@ -46,10 +46,10 @@ public class TransformationService {
     }
 
     public TransformationContext createContext(DeploymentModel model, String target, File sourceDirectory, File targetDirectory) {
-        TargetTechnology targetTechnology = pluginService.getSupportedTransformationTargets().stream()
+        DeploymentTechnology deploymentTechnology = pluginService.getSupportedTransformationTargets().stream()
             .filter(p -> p.getId().equals(target))
             .findFirst()
             .orElseThrow(IllegalStateException::new);
-        return new TransformationContext(model, targetTechnology, sourceDirectory, targetDirectory);
+        return new TransformationContext(model, deploymentTechnology, sourceDirectory, targetDirectory);
     }
 }

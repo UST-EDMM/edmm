@@ -1,10 +1,13 @@
 package io.github.edmm.model.parameters;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class InputParameter {
 
     private final String key;
@@ -33,5 +36,18 @@ public class InputParameter {
 
     public Optional<String> getValue() {
         return Optional.ofNullable(value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InputParameter that = (InputParameter) o;
+        return Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
     }
 }

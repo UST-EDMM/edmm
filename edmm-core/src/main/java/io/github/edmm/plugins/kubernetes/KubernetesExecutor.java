@@ -14,7 +14,7 @@ import io.fabric8.kubernetes.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.STACKS_ENTRY;
+import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.TARGET_NAMESPACE;
 
 public class KubernetesExecutor {
 
@@ -40,7 +40,7 @@ public class KubernetesExecutor {
     @SuppressWarnings("unchecked")
     private List<String> getStacks(ExecutionContext context) {
         Map<String, Object> values = context.getTransformation().getValues();
-        return (List<String>) values.get(STACKS_ENTRY);
+        return (List<String>) values.get(TARGET_NAMESPACE);
     }
 
     private void buildDockerImages(String name, ExecutionContext context) {

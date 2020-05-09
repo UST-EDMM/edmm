@@ -1,6 +1,6 @@
 package io.github.edmm.core.plugin;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 
 public interface ExecutionPlugin {
@@ -15,5 +15,5 @@ public interface ExecutionPlugin {
         // default
     }
 
-    TargetTechnology getTargetTechnology();
+    DeploymentTechnology getDeploymentTechnology();
 }

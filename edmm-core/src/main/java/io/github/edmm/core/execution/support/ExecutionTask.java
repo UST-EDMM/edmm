@@ -3,7 +3,7 @@ package io.github.edmm.core.execution.support;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.ExecutionPlugin;
 
@@ -29,7 +29,7 @@ public final class ExecutionTask implements Callable<Void> {
 
     @Override
     public Void call() {
-        TargetTechnology technology = context.getTransformation().getTargetTechnology();
+        DeploymentTechnology technology = context.getTransformation().getDeploymentTechnology();
         logger.info("Starting deployment for {}", technology.getName());
         context.setState(DEPLOYING);
         File directory = context.getDirectory();

@@ -85,7 +85,7 @@ public class TransformationController {
         TransformationContext context = transformationHandler.getTask(id).orElse(null);
         if (context != null && DONE.equals(context.getState())) {
             try {
-                String name = context.getTargetTechnology().getId();
+                String name = context.getDeploymentTechnology().getId();
                 Path zipFile = Files.createTempFile(name + "-", ".zip");
                 Compress.zip(context.getTargetDirectory().toPath(), zipFile);
                 Resource response = asResource(zipFile);

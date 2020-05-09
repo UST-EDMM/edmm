@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.JsonHelper;
-import io.github.edmm.core.TargetTechnology;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
@@ -30,7 +30,7 @@ public final class TransformationContext {
     @JsonIgnore
     private String inputAsString;
     private DeploymentModel model;
-    private TargetTechnology targetTechnology;
+    private DeploymentTechnology deploymentTechnology;
     private File sourceDirectory;
     private File targetDirectory;
     private Timestamp timestamp;
@@ -42,32 +42,32 @@ public final class TransformationContext {
 
     }
 
-    public TransformationContext(@NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology) {
-        this(UUID.randomUUID().toString(), model, targetTechnology, null, null);
+    public TransformationContext(@NonNull DeploymentModel model, @NonNull DeploymentTechnology deploymentTechnology) {
+        this(UUID.randomUUID().toString(), model, deploymentTechnology, null, null);
     }
 
-    public TransformationContext(@NonNull DeploymentModel model, @NonNull TargetTechnology targetTechnology,
+    public TransformationContext(@NonNull DeploymentModel model, @NonNull DeploymentTechnology deploymentTechnology,
                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
-        this(UUID.randomUUID().toString(), model, targetTechnology, sourceDirectory, targetDirectory);
+        this(UUID.randomUUID().toString(), model, deploymentTechnology, sourceDirectory, targetDirectory);
     }
 
-    public TransformationContext(@NonNull File input, @NonNull TargetTechnology targetTechnology,
+    public TransformationContext(@NonNull File input, @NonNull DeploymentTechnology deploymentTechnology,
                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
-        this(UUID.randomUUID().toString(), null, targetTechnology, sourceDirectory, targetDirectory);
+        this(UUID.randomUUID().toString(), null, deploymentTechnology, sourceDirectory, targetDirectory);
         this.input = input;
     }
 
-    public TransformationContext(@NonNull String inputAsString, @NonNull TargetTechnology targetTechnology,
+    public TransformationContext(@NonNull String inputAsString, @NonNull DeploymentTechnology deploymentTechnology,
                                  @Nullable File sourceDirectory, @Nullable File targetDirectory) {
-        this(UUID.randomUUID().toString(), null, targetTechnology, sourceDirectory, targetDirectory);
+        this(UUID.randomUUID().toString(), null, deploymentTechnology, sourceDirectory, targetDirectory);
         this.inputAsString = inputAsString;
     }
 
-    private TransformationContext(String id, DeploymentModel model, TargetTechnology targetTechnology,
+    private TransformationContext(String id, DeploymentModel model, DeploymentTechnology deploymentTechnology,
                                   @Nullable File sourceDirectory, @Nullable File targetDirectory) {
         this.id = id;
         this.model = model;
-        this.targetTechnology = targetTechnology;
+        this.deploymentTechnology = deploymentTechnology;
         this.sourceDirectory = sourceDirectory;
         this.targetDirectory = targetDirectory;
         this.timestamp = new Timestamp(System.currentTimeMillis());

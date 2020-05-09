@@ -1,15 +1,32 @@
 package io.github.edmm.plugins.kubernetes;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.ExecutionPlugin;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.model.parameters.InputParameter;
+
+import com.google.common.collect.Sets;
+
+import static io.github.edmm.model.parameters.ParameterType.NAME;
 
 public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> implements ExecutionPlugin {
 
     public static final String STACKS_ENTRY = "stacks";
-    public static final TargetTechnology KUBERNETES = TargetTechnology.builder().id("kubernetes").name("Kubernetes").build();
+    public static final String TARGET_NAMESPACE = "target-namespace";
+    public static final DeploymentTechnology KUBERNETES = DeploymentTechnology.builder()
+        .id("kubernetes")
+        .name("Kubernetes")
+        .deploymentSupported(true)
+        .deploymentInput(Sets.newHashSet(
+            InputParameter.builder()
+                .key(TARGET_NAMESPACE).type(NAME).required(true)
+                .description("Kubernetes namespace for the deployment")
+                .defaultValue("default")
+                .build()
+        ))
+        .build();
 
     public KubernetesPlugin() {
         super(KUBERNETES);
@@ -22,7 +39,6 @@ public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> 
 
     @Override
     public void execute(ExecutionContext context) {
-        // TODO
-        System.out.println("foo bar baz qux doo");
+        new KubernetesExecutor(context).execute();
     }
 }

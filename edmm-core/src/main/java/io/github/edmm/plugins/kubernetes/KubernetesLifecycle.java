@@ -31,7 +31,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.STACKS_ENTRY;
+import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.TARGET_NAMESPACE;
 
 public class KubernetesLifecycle extends AbstractLifecycle {
 
@@ -90,7 +90,7 @@ public class KubernetesLifecycle extends AbstractLifecycle {
             Spliterators.spliteratorUnknownSize(topologicalIterator, Spliterator.ORDERED), false)
             .map(Container::getName).collect(Collectors.toList());
         // Save stack names for later use
-        context.putValue(STACKS_ENTRY, stackNames);
+        context.putValue(TARGET_NAMESPACE, stackNames);
     }
 
     protected void resolveBaseImage(Container stack) {

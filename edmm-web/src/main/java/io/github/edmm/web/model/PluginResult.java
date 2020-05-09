@@ -19,8 +19,8 @@ public class PluginResult {
 
     public static PluginResult of(TransformationPlugin<?> plugin) {
         return PluginResult.builder()
-            .id(plugin.getTargetTechnology().getId())
-            .name(plugin.getTargetTechnology().getName())
+            .id(plugin.getDeploymentTechnology().getId())
+            .name(plugin.getDeploymentTechnology().getName())
             .build();
     }
 }

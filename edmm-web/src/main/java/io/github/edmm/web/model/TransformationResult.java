@@ -26,7 +26,7 @@ public class TransformationResult {
 
         return TransformationResult.builder()
             .id(context.getId())
-            .target(context.getTargetTechnology().getId())
+            .target(context.getDeploymentTechnology().getId())
             .time(formatter.format(context.getTimestamp().toInstant()))
             .state(context.getState().toString().toLowerCase())
             .build();

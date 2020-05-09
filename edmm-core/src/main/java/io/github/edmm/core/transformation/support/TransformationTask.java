@@ -3,7 +3,7 @@ package io.github.edmm.core.transformation.support;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import io.github.edmm.core.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
@@ -29,8 +29,8 @@ public final class TransformationTask implements Callable<Void> {
 
     @Override
     public Void call() {
-        TargetTechnology targetTechnology = plugin.getTargetTechnology();
-        logger.info("Starting transformation for {}", targetTechnology.getName());
+        DeploymentTechnology deploymentTechnology = plugin.getDeploymentTechnology();
+        logger.info("Starting transformation for {}", deploymentTechnology.getName());
         context.setState(TRANSFORMING);
         File targetDirectory = context.getTargetDirectory();
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
@@ -48,7 +48,7 @@ public final class TransformationTask implements Callable<Void> {
             plugin.finalize(context);
             context.setState(DONE);
         } catch (Exception e) {
-            logger.info("Transformation to {} failed", targetTechnology.getName());
+            logger.info("Transformation to {} failed", deploymentTechnology.getName());
             logger.error("Something went wrong while transforming", e);
             context.setState(ERROR);
         }
