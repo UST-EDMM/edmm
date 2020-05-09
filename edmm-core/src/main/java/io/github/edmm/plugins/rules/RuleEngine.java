@@ -28,7 +28,7 @@ public class RuleEngine {
             }
             if (evaluationResult) {
                 log.debug("Rule '{}' triggered", name);
-                Rule.Result result = rule.execute();
+                Rule.Result result = rule.execute(unsupportedComponent);
                 results.add(result);
             } else {
                 log.debug("Rule '{}' has been evaluated to false, it has not been executed", name);

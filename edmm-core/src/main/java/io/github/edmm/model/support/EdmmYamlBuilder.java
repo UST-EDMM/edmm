@@ -78,12 +78,9 @@ public class EdmmYamlBuilder {
         return new Yaml().dumpAsMap(mainMap);
     }
 
-    /**
-     * it doesn't add the relation types and the component types
-     */
-    public String simpleBuild() {
+    public Map<String,Object> getComponentsMap() {
         flushCurrentComponent();
-        return new Yaml().dumpAsMap(componentsMap);
+        return this.componentsMap;
     }
 
     /**

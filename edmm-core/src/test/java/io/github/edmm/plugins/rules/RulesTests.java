@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.rules;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import io.github.edmm.model.DeploymentModel;
@@ -115,8 +116,8 @@ public class RulesTests {
             Assert.assertEquals(1,result.size());
 
             SaasDefaultRule saasDefaultRule = new SaasDefaultRule();
-            saasDefaultRule.evaluate(model,unsupportedComponent.get());
-            Assert.assertEquals(saasDefaultRule.execute().getToTopology() , result.get(0).getToTopology());
+            Map<String,Object> expected = saasDefaultRule.execute(unsupportedComponent.get()).getToTopology();
+            Assert.assertEquals( expected, result.get(0).getToTopology());
         } else
             Assert.fail("component not present");
     }

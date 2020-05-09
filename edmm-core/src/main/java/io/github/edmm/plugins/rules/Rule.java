@@ -2,6 +2,7 @@ package io.github.edmm.plugins.rules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
@@ -19,8 +20,6 @@ public abstract class Rule implements Comparable<Rule> {
     @Getter
     protected Integer priority;
 
-    private RootComponent unsupportedComponent;
-
     public Rule(String name, String description, int priority) {
         this.name = name;
         this.description = description;
@@ -32,8 +31,6 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     public boolean evaluate(DeploymentModel actualModel,RootComponent unsupportedComponent) {
-        this.unsupportedComponent = unsupportedComponent;
-
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         DeploymentModel expectedModel = DeploymentModel.of(fromTopology(yamlBuilder).build());
 
@@ -41,11 +38,13 @@ public abstract class Rule implements Comparable<Rule> {
         return ruleAssessor.assess(unsupportedComponent);
     }
 
-    public Rule.Result execute() {
+    public Rule.Result execute(RootComponent unsupportedComponent) {
         EdmmYamlBuilder yamlBuilderFrom = new EdmmYamlBuilder();
         EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
 
-        return new Rule.Result(unsupportedComponent,fromTopology(yamlBuilderFrom).simpleBuild(), toTopology(yamlBuilderTo).simpleBuild());
+        return new Rule.Result(unsupportedComponent,
+            fromTopology(yamlBuilderFrom).getComponentsMap(),
+            toTopology(yamlBuilderTo).getComponentsMap());
     }
 
     protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
@@ -73,10 +72,10 @@ public abstract class Rule implements Comparable<Rule> {
     @Getter
     public static class Result {
         private final String unsupportedComponent;
-        private final String fromTopology;
-        private final String toTopology;
+        private final Map<String,Object> fromTopology;
+        private final Map<String,Object> toTopology;
 
-        public Result(RootComponent component, String from, String to) {
+        public Result(RootComponent component, Map<String,Object> from, Map<String,Object> to) {
             unsupportedComponent = component.getName();
             fromTopology = from;
             toTopology = to;
