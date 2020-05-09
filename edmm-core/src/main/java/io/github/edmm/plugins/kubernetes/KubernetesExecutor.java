@@ -20,7 +20,7 @@ public class KubernetesExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesExecutor.class);
 
-    private final KubernetesClient client = new DefaultKubernetesClient();
+    private final KubernetesClient client = new DefaultKubernetesClient().inNamespace("default");
 
     private final ExecutionContext context;
     private final List<String> stacks;
@@ -65,9 +65,10 @@ public class KubernetesExecutor {
             throw new IllegalArgumentException("Stack not available for deployment");
         }
         try {
-            doApplyToKubernetes(new File(directory, name + "-deployment.yaml"));
-            doApplyToKubernetes(new File(directory, name + "-service.yaml"));
-            doApplyToKubernetes(new File(directory, name + "-config.yaml"));
+            String filename = name.replace("_", "-");
+            doApplyToKubernetes(new File(directory, filename + "-deployment.yaml"));
+            doApplyToKubernetes(new File(directory, filename + "-service.yaml"));
+            doApplyToKubernetes(new File(directory, filename + "-config.yaml"));
         } catch (Exception e) {
             logger.error("Error applying Kubernetes deployment: {}", e.getMessage(), e);
         }

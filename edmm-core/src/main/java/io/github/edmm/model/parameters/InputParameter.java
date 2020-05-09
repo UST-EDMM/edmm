@@ -1,8 +1,9 @@
 package io.github.edmm.model.parameters;
 
 import java.util.Objects;
-import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,20 +23,19 @@ public class InputParameter {
     }
 
     public InputParameter(String key, ParameterType type, String description, boolean required, String defaultValue) {
+        this(key, type, description, required, defaultValue, defaultValue);
+    }
+
+    @JsonCreator
+    public InputParameter(@JsonProperty("key") String key, @JsonProperty("type") ParameterType type,
+                          @JsonProperty("description") String description, @JsonProperty("required") boolean required,
+                          @JsonProperty("defaultValue") String defaultValue, @JsonProperty("value") String value) {
         this.key = key;
         this.type = type;
         this.description = description;
         this.required = required;
         this.defaultValue = defaultValue;
-        this.value = defaultValue;
-    }
-
-    public Optional<String> getDefaultValue() {
-        return Optional.ofNullable(defaultValue);
-    }
-
-    public Optional<String> getValue() {
-        return Optional.ofNullable(value);
+        this.value = value;
     }
 
     @Override

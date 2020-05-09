@@ -7,6 +7,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.plugins.kubernetes.KubernetesPlugin;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class KubernetesTests extends PluginTest {
     }
 
     @Test
+    @Ignore
     public void testDeploymentExecution() {
         testLifecycleExecution();
         TransformationContext context = TransformationContext.of(targetDirectory);

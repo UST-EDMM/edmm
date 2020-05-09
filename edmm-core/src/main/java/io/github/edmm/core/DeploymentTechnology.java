@@ -29,8 +29,9 @@ public final class DeploymentTechnology {
 
     @JsonCreator
     public DeploymentTechnology(@JsonProperty("id") @NonNull String id, @JsonProperty("name") @NonNull String name,
-                                Set<InputParameter> transformationInput, Set<InputParameter> deploymentInput,
-                                boolean deploymentSupported) {
+                                @JsonProperty("transformationInput") Set<InputParameter> transformationInput,
+                                @JsonProperty("deploymentInput") Set<InputParameter> deploymentInput,
+                                @JsonProperty("deploymentSupported") boolean deploymentSupported) {
         this.id = id;
         this.name = name;
         this.transformationInput = transformationInput;
