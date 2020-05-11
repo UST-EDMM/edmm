@@ -5,27 +5,20 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InputParameter {
+public class UserInput {
 
     private String name;
-    private ParameterType type;
-    private String defaultValue;
-    private String description;
-
-    public static InputParameter of(@NonNull String name, @NonNull ParameterType type, @NonNull String defaultValue, @NonNull String description) {
-        return new InputParameter(name, type, defaultValue, description);
-    }
+    private String value;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InputParameter that = (InputParameter) o;
+        UserInput that = (UserInput) o;
         return Objects.equals(name, that.name);
     }
 

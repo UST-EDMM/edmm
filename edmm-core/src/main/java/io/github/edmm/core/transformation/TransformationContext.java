@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import io.github.edmm.core.DeploymentTechnology;
@@ -11,16 +12,19 @@ import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.parameters.UserInput;
 import io.github.edmm.model.relation.RootRelation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.Graph;
 import org.springframework.lang.Nullable;
 
 @Data
+@NoArgsConstructor
 public final class TransformationContext {
 
     public static final String CONTEXT_FILENAME = "edmm.json";
@@ -36,11 +40,8 @@ public final class TransformationContext {
     private Timestamp timestamp;
     private State state = State.READY;
 
+    private Set<UserInput> userInputs;
     private Map<String, Object> values;
-
-    public TransformationContext() {
-
-    }
 
     public TransformationContext(@NonNull DeploymentModel model, @NonNull DeploymentTechnology deploymentTechnology) {
         this(UUID.randomUUID().toString(), model, deploymentTechnology, null, null);

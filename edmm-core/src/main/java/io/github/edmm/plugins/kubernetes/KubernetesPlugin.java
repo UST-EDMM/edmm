@@ -19,12 +19,8 @@ public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> 
         .id("kubernetes")
         .name("Kubernetes")
         .deploymentSupported(true)
-        .deploymentInput(Sets.newHashSet(
-            InputParameter.builder()
-                .key(TARGET_NAMESPACE).type(NAME).required(true)
-                .description("Kubernetes namespace for the deployment")
-                .defaultValue("default")
-                .build()
+        .executionParameters(Sets.newHashSet(
+            InputParameter.of(TARGET_NAMESPACE, NAME, "default", "Kubernetes namespace for the deployment")
         ))
         .build();
 
@@ -39,6 +35,8 @@ public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> 
 
     @Override
     public void execute(ExecutionContext context) {
+        // TODO
+        // Set<ParameterInstance> parameters = ParameterInstance.of(context.getUserInputs(), KUBERNETES.getTransformationParameters());
         new KubernetesExecutor(context).execute();
     }
 }

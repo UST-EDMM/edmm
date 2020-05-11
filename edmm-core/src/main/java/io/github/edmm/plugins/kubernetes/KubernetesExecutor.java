@@ -13,8 +13,11 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
-import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.TARGET_NAMESPACE;
+import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.STACKS_ENTRY;
 
 public class KubernetesExecutor {
 
@@ -40,7 +43,7 @@ public class KubernetesExecutor {
     @SuppressWarnings("unchecked")
     private List<String> getStacks(ExecutionContext context) {
         Map<String, Object> values = context.getTransformation().getValues();
-        return (List<String>) values.get(TARGET_NAMESPACE);
+        return (List<String>) values.get(STACKS_ENTRY);
     }
 
     private void buildDockerImages(String name, ExecutionContext context) {
@@ -49,11 +52,17 @@ public class KubernetesExecutor {
         if (!dockerfile.isFile() || !dockerfile.canRead()) {
             throw new IllegalArgumentException("Dockerfile not available for deployment");
         }
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.directory(directory);
-        pb.inheritIO();
         try {
-            pb.command("docker", "build", "-t", name + ":latest", ".").start().waitFor();
+            ProcessResult pr = new ProcessExecutor()
+                .directory(directory)
+                .command("docker", "build", "-t", name + ":latest", ".")
+                .redirectError(Slf4jStream.of(getClass()).asError())
+                .redirectOutput(Slf4jStream.of(getClass()).asDebug())
+                .readOutput(true)
+                .execute();
+            if (pr.getExitValue() > 0) {
+                throw new IllegalStateException("Error while executing 'docker' executable");
+            }
         } catch (Exception e) {
             logger.error("Error building Dockerfile: {}", e.getMessage(), e);
         }

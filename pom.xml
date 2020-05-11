@@ -30,6 +30,7 @@
         <kubernetes-client.version>4.4.2</kubernetes-client.version>
         <springdoc-openapi-ui.version>1.2.18</springdoc-openapi-ui.version>
         <retrofit.version>2.7.0</retrofit.version>
+        <zt-exec.version>1.11</zt-exec.version>
     </properties>
 
     <modules>
@@ -105,6 +106,11 @@
                 <groupId>com.squareup.retrofit2</groupId>
                 <artifactId>converter-jackson</artifactId>
                 <version>${retrofit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-exec</artifactId>
+                <version>${zt-exec.version}</version>
             </dependency>
             <!-- AWS Java SDK BOM -->
             <dependency>

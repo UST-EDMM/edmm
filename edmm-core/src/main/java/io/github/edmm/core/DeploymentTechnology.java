@@ -19,8 +19,8 @@ public final class DeploymentTechnology {
 
     private final String id;
     private final String name;
-    private final Set<InputParameter> transformationInput;
-    private final Set<InputParameter> deploymentInput;
+    private final Set<InputParameter> transformationParameters;
+    private final Set<InputParameter> executionParameters;
     private final boolean deploymentSupported;
 
     public DeploymentTechnology(String id, String name) {
@@ -29,13 +29,13 @@ public final class DeploymentTechnology {
 
     @JsonCreator
     public DeploymentTechnology(@JsonProperty("id") @NonNull String id, @JsonProperty("name") @NonNull String name,
-                                @JsonProperty("transformationInput") Set<InputParameter> transformationInput,
-                                @JsonProperty("deploymentInput") Set<InputParameter> deploymentInput,
+                                @JsonProperty("transformationInput") Set<InputParameter> transformationParameters,
+                                @JsonProperty("deploymentInput") Set<InputParameter> executionParameters,
                                 @JsonProperty("deploymentSupported") boolean deploymentSupported) {
         this.id = id;
         this.name = name;
-        this.transformationInput = transformationInput;
-        this.deploymentInput = deploymentInput;
+        this.transformationParameters = transformationParameters;
+        this.executionParameters = executionParameters;
         this.deploymentSupported = deploymentSupported;
     }
 
