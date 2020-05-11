@@ -119,7 +119,7 @@ public class RuleAssessor {
         for (RootRelation expectedEdge : expectedEdges) {
             for (RootRelation actualEdge : actualEdges) {
                 if (replace.test(expectedEdge,actualEdge)) {
-
+                    // the relation matches, now we check the source and the target of the edge
                     RootComponent expectedSource = expectedTopology.getEdgeSource(expectedEdge);
                     RootComponent expectedTarget = expectedTopology.getEdgeTarget(expectedEdge);
                     RootComponent actualSource = actualTopology.getEdgeSource(actualEdge);
@@ -127,16 +127,18 @@ public class RuleAssessor {
 
                     if (replace.test(expectedSource, actualSource) &&
                         replace.test(expectedTarget, actualTarget)) {
-                        // match source-component -> relation -> target-component found
+                        // found match: source-component -> relation -> target-component
 
                         expectedRelations.remove(expectedEdge);
                         expectedComponents.remove(expectedSource);
                         expectedComponents.remove(expectedTarget);
 
+                        // it's important to add the nodes in the same order, so that when they are removed
+                        // we do not invert sources with targets
                         expectedToVisit.add(expectedSource);
-                        expectedToVisit.add(expectedTarget);
-
                         actualToVisit.add(actualSource);
+
+                        expectedToVisit.add(expectedTarget);
                         actualToVisit.add(actualTarget);
                     }
                 }

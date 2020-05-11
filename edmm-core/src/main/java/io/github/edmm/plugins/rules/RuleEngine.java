@@ -1,7 +1,10 @@
 package io.github.edmm.plugins.rules;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
@@ -11,12 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RuleEngine {
 
-    public static List<Rule.Result> fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent) {
+    /**
+     * @param rules the plugin specific rules. The function will add the default rules and sort them all.
+     */
+    public static List<Rule.Result> fire(DeploymentModel model, @NotNull List<Rule> rules, RootComponent unsupportedComponent) {
         List<Rule.Result> results = new ArrayList<>();
-        if (rules.isEmpty()) {
-            log.warn("No rules registered! Nothing to apply");
-            return results;
-        }
+
+        // we always add the default rules
+        rules.addAll(Rule.getDefault());
+        // the rules are sorted by their priority
+        Collections.sort(rules);
+
         log.debug("Rules evaluation started");
         for (Rule rule : rules) {
             String name = rule.getName();

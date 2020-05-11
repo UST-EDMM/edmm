@@ -1,5 +1,6 @@
 package io.github.edmm.core.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.edmm.core.transformation.TargetTechnology;
@@ -56,7 +57,8 @@ public abstract class Plugin<L extends AbstractLifecycle> {
 
     public abstract L getLifecycle(TransformationContext context);
 
-    public List<Rule> getRules() {
-        return Rule.getDefault();
-    }
+    /**
+     * @return a list with the plugin specific rules
+     */
+    public List<Rule> getRules() { return new ArrayList<>(); }
 }

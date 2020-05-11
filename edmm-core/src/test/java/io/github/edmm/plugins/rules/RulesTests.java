@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,7 +113,7 @@ public class RulesTests {
         Optional<RootComponent> unsupportedComponent = model.getComponent("Saas");
 
         if (unsupportedComponent.isPresent()) {
-            List<Rule.Result> result = RuleEngine.fire(model, Rule.getDefault(), unsupportedComponent.get());
+            List<Rule.Result> result = RuleEngine.fire(model, new ArrayList<>(), unsupportedComponent.get());
             Assert.assertEquals(1,result.size());
 
             SaasDefaultRule saasDefaultRule = new SaasDefaultRule();
