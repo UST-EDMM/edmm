@@ -49,7 +49,8 @@ public class ExecutionService {
         Set<InputParameter> transformationParameters = dt.getTransformationParameters();
         ParameterInstance.of(userInputs, transformationParameters).forEach(p -> {
             if (!isValid(p)) {
-                errors.add(String.format("Parameter '%s' is not valid, must be a valid '%s' value", p.getName(), p.getType().getName()));
+                errors.add(String.format("Parameter '%s' is not valid, must be a valid %s value but is '%s'",
+                    p.getName(), p.getType().getName(), p.getValue()));
             }
         });
         if (errors.size() > 0) {

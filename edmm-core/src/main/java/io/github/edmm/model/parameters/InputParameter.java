@@ -17,7 +17,7 @@ public class InputParameter {
     private String defaultValue;
     private String description;
 
-    public static InputParameter of(@NonNull String name, @NonNull ParameterType type, @NonNull String defaultValue, @NonNull String description) {
+    public static InputParameter of(@NonNull String name, @NonNull ParameterType type, String defaultValue, String description) {
         return new InputParameter(name, type, defaultValue, description);
     }
 
