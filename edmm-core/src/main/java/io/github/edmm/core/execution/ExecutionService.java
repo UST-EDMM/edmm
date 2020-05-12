@@ -38,13 +38,16 @@ public class ExecutionService {
     }
 
     public void start(ExecutionContext context) {
+        List<String> errors = new ArrayList<>();
         DeploymentTechnology dt = context.getTransformation().getDeploymentTechnology();
+        if (!dt.isDeploymentSupported()) {
+            errors.add(String.format("Deployment with '%s' not yet supported", dt.getName()));
+        }
         Optional<ExecutionPlugin> plugin = pluginService.getExecutionPlugin(dt);
         if (!plugin.isPresent()) {
             logger.error("Plugin for given technology '{}' could not be found", dt.getId());
             return;
         }
-        List<String> errors = new ArrayList<>();
         Set<UserInput> userInputs = context.getUserInputs();
         Set<InputParameter> transformationParameters = dt.getTransformationParameters();
         ParameterInstance.of(userInputs, transformationParameters).forEach(p -> {
