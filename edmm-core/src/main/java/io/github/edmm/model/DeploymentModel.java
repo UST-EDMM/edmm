@@ -2,7 +2,6 @@ package io.github.edmm.model;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,16 +37,14 @@ public final class DeploymentModel {
 
     private final String name;
     private final EntityGraph graph;
-    private final Path directory;
 
     private final Map<String, RootComponent> componentMap;
     private final Graph<RootComponent, RootRelation> topology = new DirectedMultigraph<>(RootRelation.class);
     private final Set<Graph<RootComponent, RootRelation>> stacks = new HashSet<>();
 
-    public DeploymentModel(String name, EntityGraph graph, Path absoluteDirectoryPath) {
+    public DeploymentModel(String name, EntityGraph graph) {
         this.name = name;
         this.graph = graph;
-        this.directory = absoluteDirectoryPath;
         componentMap = TypeWrapper.wrapComponents(graph);
         initNodes();
         initEdges();
@@ -79,13 +76,13 @@ public final class DeploymentModel {
             throw new IllegalStateException(String.format("File '%s' does not exist - failed to construct internal graph", file));
         }
         EntityGraph graph = new EntityGraph(new FileInputStream(file));
-        return new DeploymentModel(file.getName(), graph, file.getParentFile().toPath());
+        return new DeploymentModel(file.getName(), graph);
     }
 
     @SneakyThrows
     public static DeploymentModel of(@NonNull String yaml) {
         EntityGraph graph = new EntityGraph(new StringInputStream(yaml));
-        return new DeploymentModel(UUID.randomUUID().toString(), graph, null);
+        return new DeploymentModel(UUID.randomUUID().toString(), graph);
     }
 
     public Set<RootComponent> getComponents() {
