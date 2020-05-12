@@ -29,13 +29,19 @@ public final class ExecutionContext {
     private Map<String, Object> values;
 
     public ExecutionContext(TransformationContext tc) {
-        this(UUID.randomUUID().toString(), tc);
+        this(UUID.randomUUID().toString(), tc, null);
     }
 
-    public ExecutionContext(String id, TransformationContext tc) {
+    public ExecutionContext(TransformationContext tc, Set<UserInput> userInputs) {
+        this(tc);
+        this.userInputs = userInputs;
+    }
+
+    public ExecutionContext(String id, TransformationContext tc, Set<UserInput> userInputs) {
         this.id = id;
         this.directory = tc.getTargetDirectory();
         this.transformation = tc;
+        this.userInputs = userInputs;
     }
 
     public PluginFileAccess getFileAccess() {

@@ -49,8 +49,7 @@ public class DeployCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        ExecutionContext context = new ExecutionContext(TransformationContext.of(directory));
-        context.setUserInputs(userInputs);
+        ExecutionContext context = new ExecutionContext(TransformationContext.of(directory), userInputs);
         executionService.start(context);
         return 42;
     }

@@ -25,14 +25,14 @@ import static io.github.edmm.core.transformation.TransformationContext.State.ERR
 @Service
 public class TransformationHandler {
 
-    private final TransformationService service;
+    private final TransformationService transformationService;
     private final Map<String, TransformationContext> store = new ConcurrentHashMap<>();
 
     @Value("${repository.path}")
     private String repositoryPath;
 
-    public TransformationHandler(TransformationService service) {
-        this.service = service;
+    public TransformationHandler(TransformationService transformationService) {
+        this.transformationService = transformationService;
     }
 
     public Collection<TransformationContext> getTasks() {
@@ -52,14 +52,14 @@ public class TransformationHandler {
             DeploymentModel deploymentModel = DeploymentModel.of(input);
             Path sourceDirectory = Paths.get(repositoryPath);
             Path targetDirectory = Files.createTempDirectory(id + "-");
-            context = service.createContext(deploymentModel, model.getTarget(), sourceDirectory.toFile(), targetDirectory.toFile());
+            context = transformationService.createContext(deploymentModel, model.getTarget(), sourceDirectory.toFile(), targetDirectory.toFile());
             context.setId(id);
             store.put(id, context);
         } catch (Exception e) {
             throw new IllegalStateException("Could not create transformation context", e);
         }
         try {
-            service.start(context);
+            transformationService.start(context);
         } catch (Exception e) {
             log.error("Transformation failed: {}", e.getMessage(), e);
             context.setState(ERROR);

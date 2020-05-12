@@ -64,9 +64,7 @@ public class TransformationController {
     @Operation(summary = "Lists all available transformation tasks.")
     @GetMapping(value = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TransformationResult> getTasks() {
-        return transformationHandler.getTasks().stream()
-            .map(TransformationResult::of)
-            .collect(Collectors.toList());
+        return transformationHandler.getTasks().stream().map(TransformationResult::of).collect(Collectors.toList());
     }
 
     @Operation(summary = "Lists a task that matches the given id.")
