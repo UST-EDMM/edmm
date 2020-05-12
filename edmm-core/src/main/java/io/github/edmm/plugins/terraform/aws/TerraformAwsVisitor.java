@@ -2,6 +2,7 @@ package io.github.edmm.plugins.terraform.aws;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,10 +38,6 @@ import io.github.edmm.plugins.terraform.model.Auth0ResourceServer;
 import io.github.edmm.plugins.terraform.model.Aws;
 import io.github.edmm.plugins.terraform.model.FileProvisioner;
 import io.github.edmm.plugins.terraform.model.RemoteExecProvisioner;
-import io.github.edmm.utils.Consts;
-
-import lombok.SneakyThrows;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,7 +260,6 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     }
 
     @Override
-    @SneakyThrows
     public void visit(WebApplication component) {
         Optional<RootComponent> optionalHostingComponent = TopologyGraphHelper.resolveHostingComponent(graph, component);
         if (optionalHostingComponent.isPresent()) {
@@ -273,8 +269,10 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 beanstalk.setName(component.getNormalizedName());
                 component.getArtifacts().stream().findFirst().ifPresent(artifact -> {
                     File file = new File(artifact.getValue());
-                    String filepath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
-                    beanstalk.setFilepath(filepath + Consts.FS);
+                    if (context.getModel().getDirectory() != null) {
+                        Path resolvedFile = context.getModel().getDirectory().resolve(file.toPath()).normalize();
+                        beanstalk.setFilepath(resolvedFile.getParent().toString());
+                    }
                     beanstalk.setFilename(file.getName());
                 });
                 component.setTransformed(true);
