@@ -2,26 +2,28 @@ package io.github.edmm.plugins.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
+import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RuleEngine {
+    @Getter
+    private final Map<String, List<Rule.Result>> results;
 
-    /**
-     * @param rules the plugin specific rules. The function will add the default rules and sort them all.
-     */
-    public static List<Rule.Result> fire(DeploymentModel model, @NotNull List<Rule> rules, RootComponent unsupportedComponent) {
-        List<Rule.Result> results = new ArrayList<>();
+    public RuleEngine() {
+        results = new HashMap<>();
+    }
 
-        // we always add the default rules
-        rules.addAll(Rule.getDefault());
+    public void fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent ) {
         // the rules are sorted by their priority
         Collections.sort(rules);
 
@@ -36,13 +38,29 @@ public class RuleEngine {
             }
             if (evaluationResult) {
                 log.debug("Rule '{}' triggered", name);
-                Rule.Result result = rule.execute(unsupportedComponent);
-                results.add(result);
+                Rule.Result result = rule.execute();
+                this.put(unsupportedComponent,result);
             } else {
                 log.debug("Rule '{}' has been evaluated to false, it has not been executed", name);
             }
         }
-
-        return results;
     }
+
+    public void fire(TransformationContext context, Plugin<?> plugin) {
+        DeploymentModel model = context.getModel();
+
+        for (RootComponent component : model.getComponents()) {
+            this.fire(model, plugin.getRules(), component);
+        }
+    }
+
+    private void put(RootComponent unsupportedComponent, Rule.Result result) {
+        List<Rule.Result> ruleResults = results.get(unsupportedComponent.getName());
+        if (ruleResults == null) {
+          ruleResults = new ArrayList<>();
+        }
+        ruleResults.add(result);
+        results.put(unsupportedComponent.getName(), ruleResults);
+    }
+
 }

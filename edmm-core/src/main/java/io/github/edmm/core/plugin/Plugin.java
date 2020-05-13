@@ -1,7 +1,8 @@
 package io.github.edmm.core.plugin;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -58,7 +59,10 @@ public abstract class Plugin<L extends AbstractLifecycle> {
     public abstract L getLifecycle(TransformationContext context);
 
     /**
-     * @return a list with the plugin specific rules
+     * @return a list with the plugin specific rules.
+     * By default the function returns the list of 'default' rules.
+     * Override this function to specify the rules to be applied.
+     * If the plugin has no rules and accepts all the components, just return an empty list.
      */
-    public List<Rule> getRules() { return new ArrayList<>(); }
+    public @NotNull List<Rule> getRules() { return Rule.getDefault(); }
 }

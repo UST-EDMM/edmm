@@ -1,19 +1,22 @@
 package io.github.edmm.plugins.rules;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.Auth0;
+import io.github.edmm.model.component.AwsAurora;
 import io.github.edmm.model.component.AwsBeanstalk;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Saas;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.support.EdmmYamlBuilder;
+import io.github.edmm.plugins.ansible.AnsiblePlugin;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -108,18 +111,52 @@ public class RulesTests {
 
     @Test
     public void testRuleEngine(){
+        RuleEngine ruleEngine = new RuleEngine();
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder().component(Saas.class);
         DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
         Optional<RootComponent> unsupportedComponent = model.getComponent("Saas");
 
         if (unsupportedComponent.isPresent()) {
-            List<Rule.Result> result = RuleEngine.fire(model, new ArrayList<>(), unsupportedComponent.get());
+            ruleEngine.fire(model, Rule.getDefault(), unsupportedComponent.get());
+            List<Rule.Result> result = ruleEngine.getResults().get(unsupportedComponent.get().getName());
             Assert.assertEquals(1,result.size());
 
             SaasDefaultRule saasDefaultRule = new SaasDefaultRule();
-            Map<String,Object> expected = saasDefaultRule.execute(unsupportedComponent.get()).getToTopology();
+            Map<String,Object> expected = saasDefaultRule.execute().getToTopology();
             Assert.assertEquals( expected, result.get(0).getToTopology());
         } else
             Assert.fail("component not present");
+    }
+
+    @Test
+    public void testRuleEngineWithAnsible(){
+        RuleEngine ruleEngine = new RuleEngine();
+        AnsiblePlugin ansible = new AnsiblePlugin();
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        // pet-clinic like topology
+        yamlBuilder.component(Auth0.class)
+                   .component(WebApplication.class)
+                   .hostedOn(AwsBeanstalk.class)
+                   .connectsTo(Auth0.class)
+                   .connectsTo(MysqlDatabase.class)
+                   .component(MysqlDatabase.class)
+                   .hostedOn(AwsAurora.class)
+                   .component(AwsAurora.class)
+                   .component(AwsBeanstalk.class);
+
+        DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
+        TransformationContext context = new TransformationContext(model, ansible.getTargetTechnology());
+
+        ruleEngine.fire(context, ansible);
+        Map<String,List<Rule.Result>> results = ruleEngine.getResults();
+
+        Assert.assertEquals(3,results.keySet().size());
+        Assert.assertNotNull(results.get("AwsAurora"));
+        Assert.assertNotNull(results.get("AwsBeanstalk"));
+        Assert.assertNotNull(results.get("Auth0"));
+
+        DbaasDefaultRule dbaasDefaultRule = new DbaasDefaultRule();
+        Assert.assertEquals(dbaasDefaultRule.execute().getToTopology(),
+            results.get("AwsAurora").get(0).getToTopology());
     }
 }

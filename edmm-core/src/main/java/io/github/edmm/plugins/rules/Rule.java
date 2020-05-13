@@ -38,12 +38,11 @@ public abstract class Rule implements Comparable<Rule> {
         return ruleAssessor.assess(unsupportedComponent);
     }
 
-    public Rule.Result execute(RootComponent unsupportedComponent) {
+    public Rule.Result execute() {
         EdmmYamlBuilder yamlBuilderFrom = new EdmmYamlBuilder();
         EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
 
-        return new Rule.Result(unsupportedComponent,
-            fromTopology(yamlBuilderFrom).getComponentsMap(),
+        return new Rule.Result(fromTopology(yamlBuilderFrom).getComponentsMap(),
             toTopology(yamlBuilderTo).getComponentsMap());
     }
 
@@ -71,12 +70,10 @@ public abstract class Rule implements Comparable<Rule> {
 
     @Getter
     public static class Result {
-        private final String unsupportedComponent;
         private final Map<String,Object> fromTopology;
         private final Map<String,Object> toTopology;
 
-        public Result(RootComponent component, Map<String,Object> from, Map<String,Object> to) {
-            unsupportedComponent = component.getName();
+        public Result(Map<String,Object> from, Map<String,Object> to) {
             fromTopology = from;
             toTopology = to;
         }
