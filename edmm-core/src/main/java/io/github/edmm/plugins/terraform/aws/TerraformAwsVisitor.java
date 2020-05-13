@@ -132,7 +132,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     public void visit(Compute component) {
         Aws.Instance awsInstance = Aws.Instance.builder()
             .name(component.getNormalizedName())
-            // TODO: Try to resolve image
+            // TODO: Try to resolve image, see https://www.terraform.io/docs/providers/aws/d/ami.html
             .ami("ami-0bbc25e23a7640b9b")
             // TODO: Try to resolve instance type
             .instanceType("t2.micro")
@@ -271,7 +271,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 component.getArtifacts().stream().findFirst().ifPresent(artifact -> {
                     File file = new File(artifact.getValue());
                     Path resolvedFile = context.getSourceDirectory().toPath().resolve(file.toPath()).normalize();
-                    beanstalk.setFilepath(resolvedFile.getParent().toString());
+                    beanstalk.setFilepath(resolvedFile.getParent().toString().replace("\\", "\\\\"));
                     beanstalk.setFilename(file.getName());
                 });
                 component.setTransformed(true);

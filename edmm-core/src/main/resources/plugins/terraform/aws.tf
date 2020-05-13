@@ -2,7 +2,13 @@
 provider "aws" {
   version = "~> 2.0"
   region = var.region
+  access_key = var.awsAccessKey
+  secret_key = var.awsSecretKey
 }
+
+variable "awsAccessKey" { }
+
+variable "awsSecretKey" { }
 
 variable "region" {
   default = "eu-west-1"
@@ -14,7 +20,7 @@ variable "key_name" {
 }
 
 variable "public_key_path" {
-  default = "id_rsa.pub"
+  default = "~/.ssh/id_rsa.pub"
 }
 
 variable "ssh_user" {
@@ -83,6 +89,7 @@ resource "aws_instance" "${ec2.name}" {
       type  = "ssh"
       user  = var.ssh_user
       agent = true
+      host = self.public_ip
     }
   }
   </#list>
@@ -98,6 +105,7 @@ resource "aws_instance" "${ec2.name}" {
       type  = "ssh"
       user  = var.ssh_user
       agent = true
+      host = self.public_ip
     }
   }
   <#else>

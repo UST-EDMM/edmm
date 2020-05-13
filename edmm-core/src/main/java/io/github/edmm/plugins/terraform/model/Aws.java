@@ -20,7 +20,9 @@ public class Aws {
         private String filename;
 
         public void setFilepath(String filepath) {
-            this.filepath = filepath != null && filepath.endsWith(Consts.FS) ? filepath : filepath + Consts.FS;
+            this.filepath = filepath != null && filepath.endsWith(Consts.FS)
+                ? filepath
+                : Consts.FS.endsWith("\\") ? filepath + Consts.FS + Consts.FS : filepath + Consts.FS;
         }
     }
 
