@@ -1,6 +1,7 @@
 package io.github.edmm.model;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -29,8 +30,5 @@ public class PluginSupportResult {
     private final Double supports;
 
     @NotNull
-    private final List<String> unsupportedComponents;
-
-    @NotNull
-    private final List<Rule.Result> replacementRules;
+    private final Map<String, List<Rule.Result>> replacementRules;
 }

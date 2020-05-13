@@ -8,12 +8,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TargetTechnology;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.PluginSupportResult;
-import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.plugins.rules.Rule;
 import io.github.edmm.plugins.rules.RuleEngine;
 
@@ -65,34 +63,20 @@ public class PluginService {
         return Optional.empty();
     }
 
-    public CheckModelResult checkModel(TransformationContext context, Plugin<?> plugin) {
-        return plugin.getLifecycle(context).checkModel();
-    }
-
-    public List<Rule.Result> applyRules(DeploymentModel model, Plugin<?> plugin, CheckModelResult checkModelResult) {
-
-        List<Rule.Result> replacementRules = new ArrayList<>();
-        for (RootComponent unsupportedComponent : checkModelResult.getUnsupportedComponents()) {
-            replacementRules.addAll( RuleEngine.fire(model, plugin.getRules(), unsupportedComponent) );
-        }
-        return  replacementRules;
-    }
-
     public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
         for (Plugin<?> plugin : this.plugins) {
             TransformationContext context = new TransformationContext(model, plugin.getTargetTechnology());
-            CheckModelResult checkModelResult = this.checkModel(context, plugin);
-            List<Rule.Result> replacementRules = this.applyRules(model, plugin, checkModelResult);
-            List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
-                .map(RootComponent::getName)
-                .collect(Collectors.toList());
+
+            RuleEngine ruleEngine = new RuleEngine();
+            ruleEngine.fire(context,plugin);
+            Map<String,List<Rule.Result>> ruleResults = ruleEngine.getResults();
+
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
                 .id(plugin.getTargetTechnology().getId())
                 .name(plugin.getTargetTechnology().getName())
-                .unsupportedComponents(unsupportedComponents)
-                .replacementRules(replacementRules);
-            double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
+                .replacementRules(ruleResults);
+            double s = 1 - (ruleResults.keySet().size() / (double) model.getComponents().size());
             psr.supports(s);
             response.add(psr.build());
         }
