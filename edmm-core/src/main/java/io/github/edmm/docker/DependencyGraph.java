@@ -9,6 +9,7 @@ import io.github.edmm.model.relation.RootRelation;
 import lombok.NonNull;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.EdgeReversedGraph;
 
 public final class DependencyGraph extends DirectedMultigraph<Container, ConnectsTo> {
 
@@ -38,5 +39,9 @@ public final class DependencyGraph extends DirectedMultigraph<Container, Connect
                     });
             });
         }
+    }
+
+    public Graph<Container, ConnectsTo> getReversedGraph() {
+        return new EdgeReversedGraph<>(this);
     }
 }

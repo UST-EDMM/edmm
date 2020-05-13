@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.edmm.core.plugin.Plugin;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
@@ -46,7 +46,7 @@ public class RuleEngine {
         }
     }
 
-    public void fire(TransformationContext context, Plugin<?> plugin) {
+    public void fire(TransformationContext context, TransformationPlugin<?> plugin) {
         DeploymentModel model = context.getModel();
 
         for (RootComponent component : model.getComponents()) {

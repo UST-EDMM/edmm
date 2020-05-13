@@ -1,7 +1,8 @@
 package io.github.edmm.plugins.kubernetes.support;
 
-import java.util.Arrays;
+import java.util.Map;
 
+import io.github.edmm.core.TransformationHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.docker.Container;
@@ -21,6 +22,7 @@ import io.github.edmm.model.visitor.ComponentVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.github.edmm.model.component.Compute.PUBLIC_ADDRESS;
 import static io.github.edmm.model.component.WebServer.PORT;
 
 public class DockerfileBuildingVisitor implements ComponentVisitor {
@@ -94,14 +96,8 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     }
 
     private void collectEnvVars(RootComponent component) {
-        String[] blacklist = {"key_name", "public_key"};
-        component.getProperties().values().stream()
-            .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-            .forEach(p -> {
-                String name = (component.getNormalizedName() + "_" + p.getNormalizedName()).toUpperCase();
-                builder.env(name, p.getValue());
-                stack.addEnvVar(name, p.getValue());
-            });
+        Map<String, String> envVars = TransformationHelper.collectEnvVars(component);
+        envVars.forEach(builder::env);
     }
 
     private void collectLifecycleOperation(RootComponent component, Operation operation, boolean isStartOperation) {
@@ -136,6 +132,9 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     @Override
     public void visit(Compute component) {
         visit((RootComponent) component);
+        component.getProperty(PUBLIC_ADDRESS.getName()).ifPresent(p -> {
+            p.setValue(stack.getPublicAddress());
+        });
     }
 
     @Override

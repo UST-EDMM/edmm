@@ -22,6 +22,7 @@ public abstract class DefaultKeys {
     public static final String TARGET_COMPONENT = "target_component";
     public static final String TYPE = "type";
     public static final String VALUE = "value";
+    public static final String COMPUTED = "computed";
     // endregion
 
     // region *** attribute value types ***

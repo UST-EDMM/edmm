@@ -96,6 +96,9 @@ component_types:
       public_key:
         type: string
         description: The public key of the key pair to use for authentication
+      public_address:
+        type: string
+        description: The public ip address of this instance
 
   web_server:
     extends: software_component

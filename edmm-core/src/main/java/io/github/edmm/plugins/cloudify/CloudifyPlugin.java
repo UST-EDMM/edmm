@@ -1,12 +1,12 @@
 package io.github.edmm.plugins.cloudify;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class CloudifyPlugin extends Plugin<CloudifyLifecycle> {
+public class CloudifyPlugin extends TransformationPlugin<CloudifyLifecycle> {
 
-    public static final TargetTechnology CLOUDIFY = TargetTechnology.builder().id("cloudify").name("Cloudify").build();
+    public static final DeploymentTechnology CLOUDIFY = DeploymentTechnology.builder().id("cloudify").name("Cloudify").build();
 
     public CloudifyPlugin() {
         super(CLOUDIFY);

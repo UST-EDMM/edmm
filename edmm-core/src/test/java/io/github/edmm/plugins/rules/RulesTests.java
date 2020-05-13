@@ -145,7 +145,7 @@ public class RulesTests {
                    .component(AwsBeanstalk.class);
 
         DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
-        TransformationContext context = new TransformationContext(model, ansible.getTargetTechnology());
+        TransformationContext context = new TransformationContext(model, ansible.getDeploymentTechnology());
 
         ruleEngine.fire(context, ansible);
         Map<String,List<Rule.Result>> results = ruleEngine.getResults();
