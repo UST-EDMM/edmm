@@ -13,7 +13,6 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.ParameterInstance;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ public abstract class PluginTest {
         }
     }
 
-    protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) {
+    protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) throws Exception {
         plugin.init();
         List<String> errors = new ArrayList<>();
         ParameterInstance.of(context.getUserInputs(), plugin.getDeploymentTechnology().getExecutionParameters()).forEach(p -> {
@@ -78,6 +77,8 @@ public abstract class PluginTest {
             } catch (Exception e) {
                 logger.error("Error executing deployment: {}", e.getMessage(), e);
                 context.setState(ExecutionContext.State.ERROR);
+                plugin.finalize(context);
+                throw e;
             }
             plugin.finalize(context);
             context.setState(ExecutionContext.State.DONE);

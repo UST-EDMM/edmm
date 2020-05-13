@@ -1,11 +1,14 @@
 package io.github.edmm.plugins;
 
 import java.nio.file.Files;
+import java.util.HashSet;
 
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
+import io.github.edmm.model.parameters.UserInput;
 import io.github.edmm.plugins.terraform.TerraformPlugin;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
