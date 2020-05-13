@@ -13,6 +13,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.ParameterInstance;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,7 @@ public abstract class PluginTest {
         }
     }
 
-    @After
+//    @After
     public void destroy() throws Exception {
         if (targetDirectory != null) {
             logger.info("Clean up working directory...");
