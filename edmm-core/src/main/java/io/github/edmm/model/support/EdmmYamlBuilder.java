@@ -57,11 +57,23 @@ public class EdmmYamlBuilder {
 
     /**
      * Adds 'depends_on' to the previously specified component
-     * @param componentClass the class hosting the component
+     * @param componentClass the target class of the relation
      */
     public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass) {
         Map<String, Object> relationMap = new HashMap<>();
         relationMap.put("depends_on", componentClass.getSimpleName());
+        currentRelations.add(relationMap);
+
+        return this;
+    }
+
+    /**
+     * Adds 'connects_to' to the previously specified component
+     * @param componentClass the target class of the relation
+     */
+    public EdmmYamlBuilder connectsTo(Class<? extends RootComponent> componentClass) {
+        Map<String, Object> relationMap = new HashMap<>();
+        relationMap.put("connects_to", componentClass.getSimpleName());
         currentRelations.add(relationMap);
 
         return this;
