@@ -21,6 +21,11 @@ public class TerraformPlugin extends TransformationPlugin<TerraformLifecycle> im
 
     @Override
     public void execute(ExecutionContext context) throws Exception {
+        new TerraformExecutor(context, TERRAFORM).execute();
+    }
 
+    @Override
+    public void destroy(ExecutionContext context) throws Exception {
+        new TerraformExecutor(context, TERRAFORM).destroy();
     }
 }

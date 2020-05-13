@@ -133,7 +133,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
         Aws.Instance awsInstance = Aws.Instance.builder()
             .name(component.getNormalizedName())
             // TODO: Try to resolve image, see https://www.terraform.io/docs/providers/aws/d/ami.html
-            .ami("ami-0bbc25e23a7640b9b")
+            .ami("ami-0701e7be9b2a77600")
             // TODO: Try to resolve instance type
             .instanceType("t2.micro")
             .build();

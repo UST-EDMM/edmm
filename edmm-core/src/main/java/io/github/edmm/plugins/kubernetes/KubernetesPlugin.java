@@ -37,6 +37,11 @@ public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> 
     public void execute(ExecutionContext context) {
         // TODO
         // Set<ParameterInstance> parameters = ParameterInstance.of(context.getUserInputs(), KUBERNETES.getTransformationParameters());
-        new KubernetesExecutor(context).execute();
+        new KubernetesExecutor(context, KUBERNETES).execute();
+    }
+
+    @Override
+    public void destroy(ExecutionContext context) throws Exception {
+        // noop
     }
 }

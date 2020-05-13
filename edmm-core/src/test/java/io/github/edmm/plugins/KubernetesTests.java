@@ -39,7 +39,7 @@ public class KubernetesTests extends PluginTest {
 
     @Test
     @Ignore
-    public void testDeploymentExecution() {
+    public void testDeploymentExecution() throws Exception {
         testLifecycleExecution();
         TransformationContext context = TransformationContext.of(targetDirectory);
         executeDeployment(new KubernetesPlugin(), new ExecutionContext(context));

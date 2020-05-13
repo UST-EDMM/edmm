@@ -40,9 +40,17 @@ public class TerraformTests extends PluginTest {
 
     @Test
     @Ignore
-    public void testDeploymentExecution() {
+    public void testDeploymentExecution() throws Exception {
         testLifecycleExecution();
         TransformationContext context = TransformationContext.of(targetDirectory);
-        executeDeployment(new TerraformPlugin(), new ExecutionContext(context));
+        ExecutionContext executionContext = new ExecutionContext(context);
+
+        HashSet<UserInput> userInputs = new HashSet<>();
+        userInputs.add(new UserInput("awsAccessKey", ""));
+        userInputs.add(new UserInput("awsSecretKey", ""));
+
+        executionContext.setUserInputs(userInputs);
+
+        executeDeployment(new TerraformPlugin(), executionContext);
     }
 }
