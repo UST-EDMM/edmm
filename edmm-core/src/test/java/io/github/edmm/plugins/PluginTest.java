@@ -3,6 +3,8 @@ package io.github.edmm.plugins;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.AbstractLifecycle;
@@ -12,6 +14,8 @@ import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.ParameterInstance;
 
+import io.github.edmm.plugins.rules.Rule;
+import io.github.edmm.plugins.rules.RuleEngine;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.slf4j.Logger;
@@ -43,10 +47,14 @@ public abstract class PluginTest {
         }
         if (context.getState() == TransformationContext.State.READY) {
             AbstractLifecycle lifecycle = plugin.getLifecycle(context);
-            CheckModelResult result = lifecycle.checkModel();
-            logger.info("checkModel(): state={}, unsupportedComponents={}",
-                result.getState(), result.getUnsupportedComponents());
-            if (OK.equals(result.getState())) {
+
+            RuleEngine ruleEngine = new RuleEngine();
+            ruleEngine.fire(context,plugin);
+            Set<String> unsupportedComponents = ruleEngine.getResults().keySet();
+
+            logger.info("RuleEngine.fire(): unsupportedComponents={}", unsupportedComponents);
+
+            if (unsupportedComponents.isEmpty()) {
                 context.setState(TransformationContext.State.TRANSFORMING);
                 lifecycle.prepare();
                 lifecycle.transform();

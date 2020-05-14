@@ -3,7 +3,6 @@ package io.github.edmm.plugins.cfn;
 import java.io.IOException;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
@@ -22,13 +21,6 @@ public class CloudFormationLifecycle extends AbstractLifecycle {
         super(context);
         this.module = new CloudFormationModule("eu-west-1");
         this.module.setKeyPair(true);
-    }
-
-    @Override
-    public CheckModelResult checkModel() {
-        CloudFormationSupportVisitor visitor = new CloudFormationSupportVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        return visitor.getResult();
     }
 
     @Override
