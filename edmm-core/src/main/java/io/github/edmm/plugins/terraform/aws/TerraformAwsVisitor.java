@@ -139,7 +139,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             .build();
         List<String> operations = collectOperations(component);
         awsInstance.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
-        awsInstance.addFileProvisioner(new FileProvisioner("./env.sh", "/opt/env.sh"));
+        awsInstance.addFileProvisioner(new FileProvisioner("./env.sh", "~/env.sh"));
         computeInstances.put(component, awsInstance);
         component.setTransformed(true);
     }
@@ -186,7 +186,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             Compute hostingCompute = optionalCompute.get();
             Aws.Instance awsInstance = computeInstances.get(hostingCompute);
             for (Artifact artifact : component.getArtifacts()) {
-                String destination = "/opt/" + component.getNormalizedName();
+                String destination = "~/" + component.getNormalizedName();
                 awsInstance.addFileProvisioner(new FileProvisioner(artifact.getValue(), destination));
             }
         }

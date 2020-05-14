@@ -98,17 +98,17 @@ resource "aws_instance" "${ec2.name}" {
   key_name = aws_key_pair.auth.id
   vpc_security_group_ids = [aws_security_group.${ec2.name}_security_group.id]
   subnet_id = aws_subnet.default.id
+  connection {
+    type  = "ssh"
+    user  = var.ssh_user
+    agent = true
+    private_key = file(var.private_key_path)
+    host = self.public_ip
+  }
   <#list ec2.fileProvisioners as provisioner>
   provisioner "file" {
     source      = "${provisioner.source}"
     destination = "${provisioner.destination}"
-    connection {
-      type  = "ssh"
-      user  = var.ssh_user
-      private_key = file(var.private_key_path)
-      agent = true
-      host = self.public_ip
-    }
   }
   </#list>
   <#list ec2.remoteExecProvisioners as provisioner>
@@ -119,13 +119,6 @@ resource "aws_instance" "${ec2.name}" {
       "${script}"<#sep>,</#sep>
       </#list>
     ]
-    connection {
-      type  = "ssh"
-      user  = var.ssh_user
-      agent = true
-      private_key = file(var.private_key_path)
-      host = self.public_ip
-    }
   }
   <#else>
   </#if>
