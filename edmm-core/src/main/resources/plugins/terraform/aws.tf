@@ -36,32 +36,32 @@ resource "aws_key_pair" "auth" {
   public_key = file(var.public_key_path)
 }
 
-resource "aws_vpc" "default" {
+resource "aws_vpc" "edmm" {
   cidr_block = "10.0.0.0/16"
   enable_dns_support = true
   enable_dns_hostnames = true
 }
 
-resource "aws_subnet" "default" {
-  vpc_id = aws_vpc.default.id
+resource "aws_subnet" "edmm" {
+  vpc_id = aws_vpc.edmm.id
   cidr_block = "10.0.1.0/24"
   map_public_ip_on_launch = true
 }
 
-resource "aws_internet_gateway" "default" {
-  vpc_id = aws_vpc.default.id
+resource "aws_internet_gateway" "edmm" {
+  vpc_id = aws_vpc.edmm.id
 }
 
 resource "aws_route_table" "public_routes" {
-  vpc_id = aws_vpc.default.id
+  vpc_id = aws_vpc.edmm.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.default.id
+    gateway_id = aws_internet_gateway.edmm.id
   }
 }
 
 resource "aws_route_table_association" "public_route_association" {
-  subnet_id = aws_subnet.default.id
+  subnet_id = aws_subnet.edmm.id
   route_table_id = aws_route_table.public_routes.id
 }
 
@@ -69,7 +69,7 @@ resource "aws_route_table_association" "public_route_association" {
 <#list instances as k, ec2>
 resource "aws_security_group" "${ec2.name}_security_group" {
   name = "${ec2.name}_security_group"
-  vpc_id = aws_vpc.default.id
+  vpc_id = aws_vpc.edmm.id
   ingress {
     from_port = 22
     to_port = 22
@@ -97,7 +97,7 @@ resource "aws_instance" "${ec2.name}" {
   instance_type = "${ec2.instanceType}"
   key_name = aws_key_pair.auth.id
   vpc_security_group_ids = [aws_security_group.${ec2.name}_security_group.id]
-  subnet_id = aws_subnet.default.id
+  subnet_id = aws_subnet.edmm.id
   connection {
     type  = "ssh"
     user  = var.ssh_user
@@ -136,7 +136,7 @@ resource "aws_instance" "${ec2.name}" {
 
 <#if dbInstances??>
 <#if dbInstances?size != 0>
-resource "aws_db_parameter_group" "default" {
+resource "aws_db_parameter_group" "edmm" {
   family = "mysql5.7"
   parameter {
     name  = "character_set_server"
@@ -158,7 +158,7 @@ resource "aws_db_instance" "${db.name}" {
   instance_class       = "${db.instanceClass}"
   username             = "${db.username}"
   password             = "${db.password}"
-  parameter_group_name = "default.mysql5.7"
+  parameter_group_name = "edmm.mysql5.7"
 }
 
 </#list>
