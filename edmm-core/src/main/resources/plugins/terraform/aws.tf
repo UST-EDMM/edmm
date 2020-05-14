@@ -23,6 +23,10 @@ variable "public_key_path" {
   default = "~/.ssh/id_rsa.pub"
 }
 
+variable "private_key_path" {
+  default = "~/.ssh/id_rsa"
+}
+
 variable "ssh_user" {
   default = "ubuntu"
 }
@@ -46,6 +50,19 @@ resource "aws_subnet" "default" {
 
 resource "aws_internet_gateway" "default" {
   vpc_id = aws_vpc.default.id
+}
+
+resource "aws_route_table" "public_routes" {
+  vpc_id = aws_vpc.default.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.default.id
+  }
+}
+
+resource "aws_route_table_association" "public_route_association" {
+  subnet_id = aws_subnet.default.id
+  route_table_id = aws_route_table.public_routes.id
 }
 
 <#if instances??>
@@ -88,6 +105,7 @@ resource "aws_instance" "${ec2.name}" {
     connection {
       type  = "ssh"
       user  = var.ssh_user
+      private_key = file(var.private_key_path)
       agent = true
       host = self.public_ip
     }
@@ -105,6 +123,7 @@ resource "aws_instance" "${ec2.name}" {
       type  = "ssh"
       user  = var.ssh_user
       agent = true
+      private_key = file(var.private_key_path)
       host = self.public_ip
     }
   }

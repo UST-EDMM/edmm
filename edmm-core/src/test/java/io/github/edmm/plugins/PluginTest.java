@@ -86,7 +86,7 @@ public abstract class PluginTest {
         }
     }
 
-//    @After
+    @After
     public void destroy() throws Exception {
         if (targetDirectory != null) {
             logger.info("Clean up working directory...");
