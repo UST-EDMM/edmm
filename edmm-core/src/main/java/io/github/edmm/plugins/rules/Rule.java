@@ -101,9 +101,9 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     public enum ReplacementReason {
-        UNSUPPORTED("unsupported"),
-        PARTLY_SUPPORTED("partlySupported"),
-        PREFERRED("preferred");
+        UNSUPPORTED("unsupported"), // the fromTopology is completely unsupported
+        PARTLY_SUPPORTED("partlySupported"), // the fromTopology is partly supported
+        PREFERRED("preferred"); // the fromTopology is supported but we suggest the toTopology as replacement
 
         private final String label;
 
