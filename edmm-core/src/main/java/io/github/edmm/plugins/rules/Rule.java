@@ -20,14 +20,18 @@ public abstract class Rule implements Comparable<Rule> {
     @Getter
     protected Integer priority;
 
-    public Rule(String name, String description, int priority) {
+    @Getter
+    protected ReplacementReason reason;
+
+    public Rule(String name, String description, int priority, ReplacementReason reason) {
         this.name = name;
         this.description = description;
         this.priority = priority;
+        this.reason = reason;
     }
 
     public Rule(String name, String description) {
-        this(name,description,Integer.MAX_VALUE - 1);
+        this(name,description,Integer.MAX_VALUE - 1, ReplacementReason.UNSUPPORTED);
     }
 
     public boolean evaluate(DeploymentModel actualModel,RootComponent unsupportedComponent) {
@@ -42,7 +46,9 @@ public abstract class Rule implements Comparable<Rule> {
         EdmmYamlBuilder yamlBuilderFrom = new EdmmYamlBuilder();
         EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
 
-        return new Rule.Result(fromTopology(yamlBuilderFrom).getComponentsMap(),
+        return new Rule.Result(
+            this.reason,
+            fromTopology(yamlBuilderFrom).getComponentsMap(),
             toTopology(yamlBuilderTo).getComponentsMap());
     }
 
@@ -68,12 +74,26 @@ public abstract class Rule implements Comparable<Rule> {
         return getPriority().compareTo(rule.getPriority());
     }
 
+    public enum ReplacementReason {
+        UNSUPPORTED("unsupported"),
+        PARTLY_SUPPORTED("partlySupported"),
+        PREFERRED("preferred");
+
+        private final String label;
+
+        ReplacementReason(String reason) {
+            this.label = reason;
+        }
+    }
+
     @Getter
     public static class Result {
+        private final String reason;
         private final Map<String,Object> fromTopology;
         private final Map<String,Object> toTopology;
 
-        public Result(Map<String,Object> from, Map<String,Object> to) {
+        public Result(ReplacementReason reason, Map<String,Object> from, Map<String,Object> to) {
+            this.reason = reason.label;
             fromTopology = from;
             toTopology = to;
         }
