@@ -22,6 +22,7 @@ public class EdmmYamlBuilder {
     // once another component will be added, they will be used to add the component to the componentsMap
     // and will be ready again to accept the new component's information
     private Class<? extends RootComponent> currentComponentClass ;
+    private String currentComponentName;
     private List<Map<String, Object>> currentRelations ;
 
     public EdmmYamlBuilder () {
@@ -35,48 +36,65 @@ public class EdmmYamlBuilder {
     }
 
     /**
-     *  Adds a component under the 'components' section
+     * Adds a component under the 'components' section
+     * @param componentName a unique name for the component to avoid duplicates
      */
-    public EdmmYamlBuilder component(Class<? extends RootComponent> componentClass) {
+    public EdmmYamlBuilder component(Class<? extends RootComponent> componentClass, String componentName) {
         flushCurrentComponent();
         currentComponentClass = componentClass;
+        currentComponentName = componentName;
+        return this;
+    }
+
+    public EdmmYamlBuilder component(Class<? extends RootComponent> componentClass) {
+        return component(componentClass, componentClass.getSimpleName());
+    }
+
+    private EdmmYamlBuilder relation(String relationType,Class<? extends RootComponent> componentClass, String componentName) {
+        Map<String, Object> relationMap = new HashMap<>();
+        relationMap.put(relationType, componentName);
+        currentRelations.add(relationMap);
+
         return this;
     }
 
     /**
      * Adds 'hosted_on' to the previously specified component
      * @param componentClass the class hosting the component
+     * @param componentName the unique name of the hosting component
      */
-    public EdmmYamlBuilder hostedOn(Class<? extends RootComponent> componentClass) {
-        Map<String, Object> relationMap = new HashMap<>();
-        relationMap.put("hosted_on", componentClass.getSimpleName());
-        currentRelations.add(relationMap);
+    public EdmmYamlBuilder hostedOn(Class<? extends RootComponent> componentClass, String componentName) {
+        return relation("hosted_on", componentClass, componentName);
+    }
 
-        return this;
+    public EdmmYamlBuilder hostedOn(Class<? extends RootComponent> componentClass) {
+        return relation("hosted_on", componentClass, componentClass.getSimpleName());
     }
 
     /**
      * Adds 'depends_on' to the previously specified component
      * @param componentClass the target class of the relation
+     * @param componentName the unique name of the target component
      */
-    public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass) {
-        Map<String, Object> relationMap = new HashMap<>();
-        relationMap.put("depends_on", componentClass.getSimpleName());
-        currentRelations.add(relationMap);
+    public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass, String componentName) {
+        return relation("depends_on", componentClass, componentName);
+    }
 
-        return this;
+    public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass) {
+        return relation("depends_on", componentClass, componentClass.getSimpleName());
     }
 
     /**
      * Adds 'connects_to' to the previously specified component
      * @param componentClass the target class of the relation
+     * @param componentName the unique name of the target component
      */
-    public EdmmYamlBuilder connectsTo(Class<? extends RootComponent> componentClass) {
-        Map<String, Object> relationMap = new HashMap<>();
-        relationMap.put("connects_to", componentClass.getSimpleName());
-        currentRelations.add(relationMap);
+    public EdmmYamlBuilder connectsTo(Class<? extends RootComponent> componentClass, String componentName) {
+        return relation("connects_to", componentClass, componentName);
+    }
 
-        return this;
+    public EdmmYamlBuilder connectsTo(Class<? extends RootComponent> componentClass) {
+        return relation("connects_to", componentClass, componentClass.getSimpleName());
     }
 
     public String build() {
@@ -110,7 +128,7 @@ public class EdmmYamlBuilder {
             // here we can add also operations and properties with the same mechanism
 
             componentMap.put("type", TypeResolver.resolve(currentComponentClass));
-            componentsMap.put(currentComponentClass.getSimpleName(), componentMap);
+            componentsMap.put(currentComponentName, componentMap);
         }
         currentComponentClass = null;
         currentRelations = new ArrayList<>();
