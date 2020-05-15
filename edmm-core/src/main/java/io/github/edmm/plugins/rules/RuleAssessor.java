@@ -16,33 +16,51 @@ import io.github.edmm.model.support.ModelEntity;
 import org.jgrapht.Graph;
 
 public class RuleAssessor {
-    private final Graph<RootComponent,RootRelation> expectedTopology;
-    private final Graph<RootComponent,RootRelation> actualTopology;
     private final BiPredicate<ModelEntity,ModelEntity> similarity;
     private final BiPredicate<ModelEntity,ModelEntity> equality;
+
+    private Graph<RootComponent,RootRelation> expectedTopology;
+    private Graph<RootComponent,RootRelation> actualTopology;
 
     private Set<RootComponent> expectedComponents;
     private Set<RootRelation> expectedRelations;
 
-    /**
-     * @param expectedModel the model derived from the topology given by the rule
-     * @param actualModel the model of the topology drawn by the user
-     */
-    public RuleAssessor (DeploymentModel expectedModel, DeploymentModel actualModel) {
-        expectedTopology = expectedModel.getTopology();
-        actualTopology = actualModel.getTopology();
-
+    public RuleAssessor () {
         similarity = new ModelEntitySimilarity();
         equality = new ModelEntityEquality();
     }
 
-    public boolean assess(RootComponent unsupportedComponent) {
+    /**
+     * @param expectedModel the model derived from the topology given by the rule.
+     * @param actualModel the model of the topology drawn by the user.
+     * @param exactAssessment True, if we want to check for exact match (see RuleAssessor.ModelEntityEquality)
+     *                        i.e Auth0 does not match exactly with Saas.
+     *                        False, if we want a more relaxed match (see RuleAssessor.ModelEntitySimilarity)
+     *                        i.e AwsBeanstalk matches with Paas.
+     *
+     * @return True, if, in the neighbourhood of the unsupportedComponent (in the actual topology), there is
+     *              a sub graph matching the expected topology.
+     */
+    public boolean assess(
+        DeploymentModel expectedModel,
+        DeploymentModel actualModel,
+        RootComponent unsupportedComponent,
+        boolean exactAssessment
+    ) {
+        expectedTopology = expectedModel.getTopology();
+        actualTopology = actualModel.getTopology();
         // Getting the nodes in the expected topology that are similar to the unsupported node.
         // Our search in the graph will start from this nodes
         List<RootComponent> candidates = new ArrayList<>();
         for (RootComponent c : expectedTopology.vertexSet()) {
-            if (similarity.test(c, unsupportedComponent)) {
-                candidates.add(c);
+            if (exactAssessment) {
+                if (equality.test(c, unsupportedComponent)) {
+                    candidates.add(c);
+                }
+            } else {
+                if (similarity.test(c, unsupportedComponent)) {
+                    candidates.add(c);
+                }
             }
         }
 
@@ -58,8 +76,11 @@ public class RuleAssessor {
             expectedComponents.remove(current);
             // we first check exact matches i.e  expected Auth0 - actual Auth0
             checkGraph(unsupportedComponent,current,equality);
-            // then we search similar matches i.e expected PaaS - actual AwsBeanstalk
-            checkGraph(unsupportedComponent,current,similarity);
+
+            if (!exactAssessment) {
+                // then we search similar matches i.e expected PaaS - actual AwsBeanstalk
+                checkGraph(unsupportedComponent,current,similarity);
+            }
 
             // once the sets are empty it means that there is a match
             if (expectedComponents.size() == 0 && expectedRelations.size() == 0) {

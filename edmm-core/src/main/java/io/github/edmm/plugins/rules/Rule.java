@@ -23,11 +23,15 @@ public abstract class Rule implements Comparable<Rule> {
     @Getter
     protected ReplacementReason reason;
 
+    private final RuleAssessor ruleAssessor;
+
     public Rule(String name, String description, int priority, ReplacementReason reason) {
         this.name = name;
         this.description = description;
         this.priority = priority;
         this.reason = reason;
+
+        ruleAssessor = new RuleAssessor();
     }
 
     public Rule(String name, String description) {
@@ -35,11 +39,24 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     public boolean evaluate(DeploymentModel actualModel,RootComponent unsupportedComponent) {
-        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-        DeploymentModel expectedModel = DeploymentModel.of(fromTopology(yamlBuilder).build());
+        DeploymentModel expectedModel = DeploymentModel.of(fromTopology(new EdmmYamlBuilder()).build());
 
-        RuleAssessor ruleAssessor = new RuleAssessor(expectedModel,actualModel);
-        return ruleAssessor.assess(unsupportedComponent);
+        boolean topologyMatches = ruleAssessor.assess(expectedModel,actualModel,unsupportedComponent,false);
+
+        List<EdmmYamlBuilder> exceptYamlBuilders = this.exceptTopologies(new ArrayList<>());
+
+        if (exceptYamlBuilders != null && topologyMatches) {
+            // if the topology matches we check for exceptions
+            for (EdmmYamlBuilder yamlBuilder: exceptYamlBuilders) {
+                 DeploymentModel exceptionModel = DeploymentModel.of(yamlBuilder.build());
+                 if ( ruleAssessor.assess(exceptionModel, actualModel, unsupportedComponent, true) ) {
+                     // if there is an exact match this rule shouldn't be evaluated because
+                     // we found a topology representing an exception
+                     return false;
+                 }
+            }
+        }
+        return topologyMatches;
     }
 
     public Rule.Result execute() {
@@ -55,6 +72,15 @@ public abstract class Rule implements Comparable<Rule> {
     protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
 
     protected abstract EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder);
+
+    /**
+     * @return a list of topologies that are exceptions w.r.t. fromTopology
+     *          i.e. the plugin supports Auth0 but not any other Saas: fromTopology function will return Saas,
+     *          while this function will return Auth0, so that this rule will match every Saas except Auth0
+     */
+    protected List<EdmmYamlBuilder> exceptTopologies(List<EdmmYamlBuilder> yamlBuilders) {
+        return null;
+    }
 
     public static List<Rule> getDefault() {
         List<Rule> rules = new ArrayList<>();

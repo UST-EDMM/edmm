@@ -6,6 +6,8 @@ import java.util.List;
 import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.plugins.cfn.rules.CfnDbaasRule;
+import io.github.edmm.plugins.cfn.rules.CfnPaasRule;
 import io.github.edmm.plugins.rules.Rule;
 import io.github.edmm.plugins.rules.SaasDefaultRule;
 
@@ -26,6 +28,8 @@ public class CloudFormationPlugin extends TransformationPlugin<CloudFormationLif
     public List<Rule> getRules() {
         List<Rule> rules = new ArrayList<>();
         rules.add(new SaasDefaultRule());
+        rules.add(new CfnPaasRule());
+        rules.add(new CfnDbaasRule());
         return rules;
     }
 }
