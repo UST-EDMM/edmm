@@ -1,12 +1,12 @@
 package io.github.edmm.plugins.salt;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class SaltStackPlugin extends Plugin<SaltStackLifecycle> {
+public class SaltStackPlugin extends TransformationPlugin<SaltStackLifecycle> {
 
-    public static final TargetTechnology SALTSTACK = TargetTechnology.builder().id("saltstack").name("Saltstack").build();
+    public static final DeploymentTechnology SALTSTACK = DeploymentTechnology.builder().id("saltstack").name("Saltstack").build();
 
     public SaltStackPlugin() {
         super(SALTSTACK);

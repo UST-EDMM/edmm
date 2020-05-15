@@ -1,12 +1,12 @@
 package io.github.edmm.plugins.cfengine;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
-public class CFEnginePlugin extends Plugin<CFEngineLifecycle> {
+public class CFEnginePlugin extends TransformationPlugin<CFEngineLifecycle> {
 
-    public static final TargetTechnology CFENGINE = TargetTechnology.builder().id("cfengine").name("CFEngine").build();
+    public static final DeploymentTechnology CFENGINE = DeploymentTechnology.builder().id("cfengine").name("CFEngine").build();
 
     public CFEnginePlugin() {
         super(CFENGINE);

@@ -1,19 +1,26 @@
-package io.github.edmm.core.plugin;
+package io.github.edmm.core;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Dbaas;
 import io.github.edmm.model.component.Paas;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 
+import com.google.common.collect.Lists;
+import lombok.var;
 import org.jgrapht.Graph;
 
 public abstract class TopologyGraphHelper {
@@ -125,5 +132,72 @@ public abstract class TopologyGraphHelper {
             children.add(child);
             resolveChildComponents(graph, children, child);
         }
+    }
+
+    public static Optional<RootComponent> resolveNextHostingComponent(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        Set<RootComponent> targetComponents = getTargetComponents(graph, component, HostedOn.class);
+        return targetComponents.stream().findFirst();
+    }
+
+    public static List<RootComponent> resolveComponentStack(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        List<RootComponent> stack = Lists.newArrayList(component);
+        Optional<RootComponent> c = TopologyGraphHelper.resolveNextHostingComponent(graph, component);
+        while (c.isPresent()) {
+            stack.add(c.get());
+            c = TopologyGraphHelper.resolveNextHostingComponent(graph, c.get());
+        }
+        Collections.reverse(stack);
+        return stack;
+    }
+
+    public static Map<String, Property> resolveComponentStackProperties(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        Map<String, Property> result = new HashMap<>();
+        var hosts = TopologyGraphHelper.resolveComponentStack(graph, component);
+        for (RootComponent host : hosts) {
+            host.getProperties().forEach(result::put);
+        }
+        return result;
+    }
+
+    public static Map<String, Property> resolvePropertyReferences(Graph<RootComponent, RootRelation> graph, RootComponent component, Map<String, Property> properties) {
+        Map<String, Property> result = new HashMap<>();
+        for (var entry : properties.entrySet()) {
+            var p = entry.getValue();
+            if (p.getValue() != null && p.getValue().contains("${")) {
+                result.put(entry.getKey(), resolveReferencedProperty(graph, component, p));
+            } else {
+                result.put(entry.getKey(), p);
+            }
+        }
+        return result;
+    }
+
+    public static Property resolveReferencedProperty(Graph<RootComponent, RootRelation> graph, RootComponent component, Property property) {
+        Set<RootComponent> targets = TopologyGraphHelper.getTargetComponents(graph, component, ConnectsTo.class);
+        String[] matches = property.getValue().replace("${", "").replace("}", "").split("\\.");
+        String componentName = matches[0];
+        String propertyName = matches[1];
+        for (var target : targets) {
+            if (target.getName().equalsIgnoreCase(componentName)) {
+                Map<String, Property> properties = resolveComponentStackProperties(graph, target);
+                if (!properties.containsKey(propertyName)) {
+                    throw new IllegalStateException(String.format("The reference '%s' is not valid", property.getValue()));
+                }
+                return properties.get(propertyName);
+            }
+        }
+        throw new IllegalStateException(String.format("The reference '%s' is not valid", property.getValue()));
+    }
+
+    public static Map<String, Property> resolveComputedProperties(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        Map<String, Property> properties = TopologyGraphHelper.resolveComponentStackProperties(graph, component);
+        Map<String, Property> computedProperties = new HashMap<>();
+        for (var entry : properties.entrySet()) {
+            var p = entry.getValue();
+            if (p.isComputed() || p.getValue() == null || p.getValue().startsWith("$")) {
+                computedProperties.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return TopologyGraphHelper.resolvePropertyReferences(graph, component, computedProperties);
     }
 }

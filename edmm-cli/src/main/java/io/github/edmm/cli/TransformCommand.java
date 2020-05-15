@@ -34,8 +34,8 @@ public class TransformCommand implements Callable<Integer> {
 
     @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation target")
     public void setTarget(String target) {
-        List<String> availableTargets = pluginService.getPlugins().stream()
-            .map(p -> p.getTargetTechnology().getId()).collect(Collectors.toList());
+        List<String> availableTargets = pluginService.getTransformationPlugins().stream()
+            .map(p -> p.getDeploymentTechnology().getId()).collect(Collectors.toList());
         if (!availableTargets.contains(target)) {
             String message = String.format("Specified target technology not supported. Valid values are: %s", availableTargets);
             throw new CommandLine.ParameterException(spec.commandLine(), message);
@@ -57,7 +57,7 @@ public class TransformCommand implements Callable<Integer> {
         File targetDirectory = new File(sourceDirectory, target);
         DeploymentModel model = DeploymentModel.of(input);
         TransformationContext context = transformationService.createContext(model, target, sourceDirectory, targetDirectory);
-        transformationService.startTransformation(context);
+        transformationService.start(context);
         return 42;
     }
 

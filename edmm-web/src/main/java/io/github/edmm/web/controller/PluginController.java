@@ -33,7 +33,7 @@ public class PluginController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Returns a list of supported plugins.")
     public List<PluginResult> getPlugins() {
-        return pluginService.getPlugins().stream()
+        return pluginService.getTransformationPlugins().stream()
             .map(PluginResult::of).collect(Collectors.toList());
     }
 

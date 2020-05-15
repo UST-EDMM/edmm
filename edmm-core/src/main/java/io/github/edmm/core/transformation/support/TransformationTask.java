@@ -3,8 +3,8 @@ package io.github.edmm.core.transformation.support;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import io.github.edmm.core.plugin.Plugin;
-import io.github.edmm.core.transformation.TargetTechnology;
+import io.github.edmm.core.DeploymentTechnology;
+import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 import lombok.NonNull;
@@ -15,23 +15,22 @@ import static io.github.edmm.core.transformation.TransformationContext.State.DON
 import static io.github.edmm.core.transformation.TransformationContext.State.ERROR;
 import static io.github.edmm.core.transformation.TransformationContext.State.TRANSFORMING;
 
-public final class ExecutionTask implements Callable<Void> {
+public final class TransformationTask implements Callable<Void> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransformationTask.class);
 
-    private final Plugin<?> plugin;
+    private final TransformationPlugin<?> plugin;
     private final TransformationContext context;
 
-    public ExecutionTask(@NonNull Plugin<?> plugin, @NonNull TransformationContext context) {
+    public TransformationTask(@NonNull TransformationPlugin<?> plugin, @NonNull TransformationContext context) {
         this.plugin = plugin;
         this.context = context;
     }
 
     @Override
     public Void call() {
-        boolean failed = false;
-        TargetTechnology targetTechnology = plugin.getTargetTechnology();
-        logger.info("Starting transformation for {}", targetTechnology.getName());
+        DeploymentTechnology deploymentTechnology = plugin.getDeploymentTechnology();
+        logger.info("Starting transformation for {}", deploymentTechnology.getName());
         context.setState(TRANSFORMING);
         File targetDirectory = context.getTargetDirectory();
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
@@ -46,13 +45,13 @@ public final class ExecutionTask implements Callable<Void> {
         }
         try {
             plugin.execute(context);
+            plugin.finalize(context);
             context.setState(DONE);
         } catch (Exception e) {
-            logger.info("Transformation to {} failed", targetTechnology.getName());
+            logger.info("Transformation to {} failed", deploymentTechnology.getName());
             logger.error("Something went wrong while transforming", e);
-            failed = true;
+            context.setState(ERROR);
         }
-        context.setState(failed ? ERROR : DONE);
         return null;
     }
 }

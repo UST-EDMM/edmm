@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.github.edmm.core.BashScript;
+import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.BashScript;
-import io.github.edmm.core.plugin.JsonHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -43,7 +43,7 @@ public class AzureLifecycle extends AbstractLifecycle {
     private void populateAzureTemplateFile(ResourceManagerTemplate resultTemplate) {
         PluginFileAccess fileAccess = context.getFileAccess();
         try {
-            final String templateString = JsonHelper.toJson(resultTemplate);
+            final String templateString = JsonHelper.writeValue(resultTemplate);
             fileAccess.append(FILE_NAME, templateString);
         } catch (IOException e) {
             logger.error("Failed to write Azure Resource Manager file: {}", e.getMessage(), e);

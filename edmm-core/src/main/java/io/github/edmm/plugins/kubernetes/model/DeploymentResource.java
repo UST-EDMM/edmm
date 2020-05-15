@@ -10,9 +10,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarSourceBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.internal.SerializationUtils;
+import lombok.var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +42,15 @@ public final class DeploymentResource implements KubernetesResource {
             .addAllToEnv(stack.getEnvVars().entrySet().stream()
                 .map(e -> new EnvVar(e.getKey(), e.getValue(), null))
                 .collect(Collectors.toSet()))
+            .addAllToEnv(stack.getRuntimeEnvVars().stream().map(name -> {
+                var source = new EnvVarSourceBuilder().withNewConfigMapKeyRef().withNewKey(name)
+                    .withNewName(stack.getConfigMapName()).endConfigMapKeyRef().build();
+                return new EnvVarBuilder().withName(name).withValueFrom(source).build();
+            }).collect(Collectors.toSet()))
             .build();
         deployment = new DeploymentBuilder()
             .withNewMetadata()
             .withName(stack.getLabel())
-            // The Unspecific name is used here to improve the ability to find objects belonging together
             .addToLabels("app", stack.getLabel())
             .endMetadata()
             .withNewSpec()

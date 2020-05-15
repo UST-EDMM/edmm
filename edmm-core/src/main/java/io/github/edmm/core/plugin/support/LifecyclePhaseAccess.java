@@ -6,5 +6,5 @@ import io.github.edmm.core.plugin.LifecyclePhase;
 
 public interface LifecyclePhaseAccess {
 
-    List<LifecyclePhase> getLifecyclePhases();
+    List<LifecyclePhase<?>> getLifecyclePhases();
 }

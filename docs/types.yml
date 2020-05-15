@@ -41,6 +41,9 @@ component_types:
       public_key:
         type: string
         description: The public key of the key pair to use for authentication
+      public_address:
+        type: string
+        description: The public ip address of this instance
 
   web_server:
     extends: software_component
@@ -143,13 +146,6 @@ relation_types:
   depends_on:
     extends: null
     properties: {}
-    operations:
-      pre_configure_source: ~
-      pre_configure_target: ~
-      post_configure_source: ~
-      post_configure_target: ~
-      target_changed: ~
-      target_removed: ~
 
   hosted_on:
     extends: depends_on
