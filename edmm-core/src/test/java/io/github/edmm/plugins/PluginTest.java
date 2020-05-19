@@ -59,7 +59,7 @@ public abstract class PluginTest {
         }
     }
 
-    protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) {
+    protected void executeDeployment(ExecutionPlugin plugin, ExecutionContext context) throws Exception {
         plugin.init();
         List<String> errors = new ArrayList<>();
         ParameterInstance.of(context.getUserInputs(), plugin.getDeploymentTechnology().getExecutionParameters()).forEach(p -> {
@@ -78,6 +78,8 @@ public abstract class PluginTest {
             } catch (Exception e) {
                 logger.error("Error executing deployment: {}", e.getMessage(), e);
                 context.setState(ExecutionContext.State.ERROR);
+                plugin.finalize(context);
+                throw e;
             }
             plugin.finalize(context);
             context.setState(ExecutionContext.State.DONE);

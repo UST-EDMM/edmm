@@ -2,6 +2,7 @@ package io.github.edmm.plugins.terraform.aws;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,10 +38,7 @@ import io.github.edmm.plugins.terraform.model.Auth0ResourceServer;
 import io.github.edmm.plugins.terraform.model.Aws;
 import io.github.edmm.plugins.terraform.model.FileProvisioner;
 import io.github.edmm.plugins.terraform.model.RemoteExecProvisioner;
-import io.github.edmm.utils.Consts;
 
-import lombok.SneakyThrows;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,14 +132,14 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     public void visit(Compute component) {
         Aws.Instance awsInstance = Aws.Instance.builder()
             .name(component.getNormalizedName())
-            // TODO: Try to resolve image
-            .ami("ami-0bbc25e23a7640b9b")
+            // TODO: Try to resolve image, see https://www.terraform.io/docs/providers/aws/d/ami.html
+            .ami("ami-0701e7be9b2a77600")
             // TODO: Try to resolve instance type
             .instanceType("t2.micro")
             .build();
         List<String> operations = collectOperations(component);
         awsInstance.addRemoteExecProvisioner(new RemoteExecProvisioner(operations));
-        awsInstance.addFileProvisioner(new FileProvisioner("./env.sh", "/opt/env.sh"));
+        awsInstance.addFileProvisioner(new FileProvisioner("./env.sh", "~/env.sh"));
         computeInstances.put(component, awsInstance);
         component.setTransformed(true);
     }
@@ -188,7 +186,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             Compute hostingCompute = optionalCompute.get();
             Aws.Instance awsInstance = computeInstances.get(hostingCompute);
             for (Artifact artifact : component.getArtifacts()) {
-                String destination = "/opt/" + component.getNormalizedName();
+                String destination = "~/" + component.getNormalizedName();
                 awsInstance.addFileProvisioner(new FileProvisioner(artifact.getValue(), destination));
             }
         }
@@ -263,7 +261,6 @@ public class TerraformAwsVisitor extends TerraformVisitor {
     }
 
     @Override
-    @SneakyThrows
     public void visit(WebApplication component) {
         Optional<RootComponent> optionalHostingComponent = TopologyGraphHelper.resolveHostingComponent(graph, component);
         if (optionalHostingComponent.isPresent()) {
@@ -273,8 +270,8 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 beanstalk.setName(component.getNormalizedName());
                 component.getArtifacts().stream().findFirst().ifPresent(artifact -> {
                     File file = new File(artifact.getValue());
-                    String filepath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
-                    beanstalk.setFilepath(filepath + Consts.FS);
+                    Path resolvedFile = context.getSourceDirectory().toPath().resolve(file.toPath()).normalize();
+                    beanstalk.setFilepath(resolvedFile.getParent().toString().replace("\\", "\\\\"));
                     beanstalk.setFilename(file.getName());
                 });
                 component.setTransformed(true);

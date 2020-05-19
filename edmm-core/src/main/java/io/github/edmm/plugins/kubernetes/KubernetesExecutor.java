@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
+import io.github.edmm.plugins.DeploymentExecutor;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -13,23 +15,19 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import static io.github.edmm.plugins.kubernetes.KubernetesPlugin.STACKS_ENTRY;
 
-public class KubernetesExecutor {
+public class KubernetesExecutor extends DeploymentExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesExecutor.class);
 
     private final KubernetesClient client = new DefaultKubernetesClient().inNamespace("default");
 
-    private final ExecutionContext context;
     private final List<String> stacks;
 
-    public KubernetesExecutor(ExecutionContext context) {
-        this.context = context;
+    public KubernetesExecutor(ExecutionContext context, DeploymentTechnology deploymentTechnology) {
+        super(context, deploymentTechnology);
         this.stacks = getStacks(context);
     }
 
@@ -38,6 +36,11 @@ public class KubernetesExecutor {
             buildDockerImages(stack, context);
             applyToKubernetes(stack, context);
         }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        // noop
     }
 
     @SuppressWarnings("unchecked")
@@ -53,16 +56,7 @@ public class KubernetesExecutor {
             throw new IllegalArgumentException("Dockerfile not available for deployment");
         }
         try {
-            ProcessResult pr = new ProcessExecutor()
-                .directory(directory)
-                .command("docker", "build", "-t", name + ":latest", ".")
-                .redirectError(Slf4jStream.of(getClass()).asError())
-                .redirectOutput(Slf4jStream.of(getClass()).asDebug())
-                .readOutput(true)
-                .execute();
-            if (pr.getExitValue() > 0) {
-                throw new IllegalStateException("Error while executing 'docker' executable");
-            }
+            executeProcess(directory, "docker", "build", "-t", name + ":latest", ".");
         } catch (Exception e) {
             logger.error("Error building Dockerfile: {}", e.getMessage(), e);
         }
