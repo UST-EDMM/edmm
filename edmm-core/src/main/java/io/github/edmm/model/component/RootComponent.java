@@ -109,4 +109,11 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
             return Optional.ofNullable(operations.get("delete"));
         }
     }
+
+    @Override
+    public boolean equals(Object c) {
+        if (this == c) return true;
+        if (c == null || getClass() != c.getClass()) return false;
+        return this.entity.equals( ((RootComponent) c).entity);
+    }
 }
