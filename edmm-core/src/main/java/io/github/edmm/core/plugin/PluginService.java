@@ -3,7 +3,6 @@ package io.github.edmm.core.plugin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,13 +86,14 @@ public class PluginService {
 
             RuleEngine ruleEngine = new RuleEngine();
             ruleEngine.fire(context,plugin);
-            Map<String,List<Rule.Result>> ruleResults = ruleEngine.getResults();
+            List<Rule.Result> ruleResults = ruleEngine.getResults();
 
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
                 .id(plugin.getDeploymentTechnology().getId())
                 .name(plugin.getDeploymentTechnology().getName())
                 .replacementRules(ruleResults);
-            double s = 1 - (ruleResults.keySet().size() / (double) model.getComponents().size());
+
+            double s = 1 - ( ruleEngine.getUnsupportedRulesCount() / (double) model.getComponents().size());
             psr.supports(s);
             response.add(psr.build());
         }

@@ -13,6 +13,7 @@ import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.ParameterInstance;
 
+import io.github.edmm.plugins.rules.Rule;
 import io.github.edmm.plugins.rules.RuleEngine;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -47,11 +48,11 @@ public abstract class PluginTest {
 
             RuleEngine ruleEngine = new RuleEngine();
             ruleEngine.fire(context,plugin);
-            Set<String> unsupportedComponents = ruleEngine.getResults().keySet();
+            long unsupportedRulesCount = ruleEngine.getUnsupportedRulesCount();
 
-            logger.info("RuleEngine.fire(): unsupportedComponents={}", unsupportedComponents);
+            logger.info("RuleEngine.fire(): unsupportedRuless={}", unsupportedRulesCount);
 
-            if (unsupportedComponents.isEmpty()) {
+            if (unsupportedRulesCount == 0) {
                 context.setState(TransformationContext.State.TRANSFORMING);
                 lifecycle.prepare();
                 lifecycle.transform();

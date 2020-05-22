@@ -2,9 +2,7 @@ package io.github.edmm.plugins.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -17,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RuleEngine {
     @Getter
-    private final Map<String, List<Rule.Result>> results;
+    private final List<Rule.Result> results; // the results will follow the rule priority order
 
     public RuleEngine() {
-        results = new HashMap<>();
+        results = new ArrayList<>();
     }
 
     public void fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent ) {
@@ -39,7 +37,11 @@ public class RuleEngine {
             if (evaluationResult) {
                 log.debug("Rule '{}' triggered", name);
                 Rule.Result result = rule.execute();
-                this.put(unsupportedComponent,result);
+
+                if (!results.contains(result)) {
+                    // we do not want duplicates
+                    results.add(result);
+                }
             } else {
                 log.debug("Rule '{}' has been evaluated to false, it has not been executed", name);
             }
@@ -54,13 +56,12 @@ public class RuleEngine {
         }
     }
 
-    private void put(RootComponent unsupportedComponent, Rule.Result result) {
-        List<Rule.Result> ruleResults = results.get(unsupportedComponent.getName());
-        if (ruleResults == null) {
-          ruleResults = new ArrayList<>();
-        }
-        ruleResults.add(result);
-        results.put(unsupportedComponent.getName(), ruleResults);
+    /**
+     * @return the number of rule results that has UNSUPPORTED or PARTLY_SUPPORTED has reason field value
+     */
+    public long getUnsupportedRulesCount() {
+        return results.stream()
+            .filter(result -> !result.getReason().equals(Rule.ReplacementReason.PREFERRED.toString()))
+            .count();
     }
-
 }
