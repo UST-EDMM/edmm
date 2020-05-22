@@ -11,6 +11,8 @@ import io.github.edmm.model.support.EdmmYamlBuilder;
 import lombok.Getter;
 
 public abstract class Rule implements Comparable<Rule> {
+    public static int DEFAULT_PRIORITY = Integer.MAX_VALUE - 1;
+
     @Getter
     protected String name;
 
@@ -24,6 +26,7 @@ public abstract class Rule implements Comparable<Rule> {
     protected ReplacementReason reason;
 
     private final RuleAssessor ruleAssessor;
+    private List<RootComponent> unsupportedComponents = null;
 
     public Rule(String name, String description, int priority, ReplacementReason reason) {
         this.name = name;
@@ -35,13 +38,19 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     public Rule(String name, String description) {
-        this(name,description,Integer.MAX_VALUE - 1, ReplacementReason.UNSUPPORTED);
+        this(name,description, DEFAULT_PRIORITY, ReplacementReason.UNSUPPORTED);
     }
 
-    public boolean evaluate(DeploymentModel actualModel,RootComponent unsupportedComponent) {
+    /**
+     * @param currentComponent the component currently visited
+     */
+    public boolean evaluate(DeploymentModel actualModel,RootComponent currentComponent) {
         DeploymentModel expectedModel = DeploymentModel.of(fromTopology(new EdmmYamlBuilder()).build());
 
-        boolean topologyMatches = ruleAssessor.assess(expectedModel,actualModel,unsupportedComponent,false);
+        boolean topologyMatches = ruleAssessor.assess(expectedModel,actualModel,currentComponent,false);
+        // the unsupportedComponents should be retrieved immediately after the asses function
+        // if evaluate returns true their value is valid and will be used in the execute function
+        unsupportedComponents = ruleAssessor.getUnsupportedComponents();
 
         List<EdmmYamlBuilder> exceptYamlBuilders = this.exceptTopologies(new ArrayList<>());
 
@@ -49,7 +58,7 @@ public abstract class Rule implements Comparable<Rule> {
             // if the topology matches we check for exceptions
             for (EdmmYamlBuilder yamlBuilder: exceptYamlBuilders) {
                  DeploymentModel exceptionModel = DeploymentModel.of(yamlBuilder.build());
-                 if ( ruleAssessor.assess(exceptionModel, actualModel, unsupportedComponent, true) ) {
+                 if ( ruleAssessor.assess(exceptionModel, actualModel, currentComponent, true) ) {
                      // if there is an exact match this rule shouldn't be evaluated because
                      // we found a topology representing an exception
                      return false;
@@ -59,13 +68,15 @@ public abstract class Rule implements Comparable<Rule> {
         return topologyMatches;
     }
 
-    public Rule.Result execute() {
-        EdmmYamlBuilder yamlBuilderFrom = new EdmmYamlBuilder();
-        EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
+    public Rule.Result execute() throws NullPointerException {
+        if (unsupportedComponents == null) {
+            throw new NullPointerException("Rule must be evaluated before getting executed");
+        }
 
+        EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
         return new Rule.Result(
             this.reason,
-            fromTopology(yamlBuilderFrom).getComponentsMap(),
+            this.unsupportedComponents,
             toTopology(yamlBuilderTo).getComponentsMap());
     }
 
@@ -110,18 +121,36 @@ public abstract class Rule implements Comparable<Rule> {
         ReplacementReason(String reason) {
             this.label = reason;
         }
+
+        @Override
+        public String toString() {
+            return this.label;
+        }
     }
 
     @Getter
     public static class Result {
         private final String reason;
-        private final Map<String,Object> fromTopology;
+        private final List<String> unsupportedComponents;
         private final Map<String,Object> toTopology;
 
-        public Result(ReplacementReason reason, Map<String,Object> from, Map<String,Object> to) {
+        public Result(ReplacementReason reason, List<RootComponent> unsupportedComponents, Map<String,Object> toTopology) {
             this.reason = reason.label;
-            fromTopology = from;
-            toTopology = to;
+            this.toTopology = toTopology;
+            this.unsupportedComponents = new ArrayList<>();
+            for (RootComponent c : unsupportedComponents) {
+                this.unsupportedComponents.add(c.getName());
+            }
+        }
+
+        @Override
+        public boolean equals(Object r) {
+            if (this == r) return true;
+            if (r == null || getClass() != r.getClass()) return false;
+            Result result = (Result) r;
+            return this.reason.equals(result.reason) &&
+                this.unsupportedComponents.equals(result.unsupportedComponents) &&
+                this.toTopology.equals(result.toTopology);
         }
     }
 }

@@ -19,6 +19,13 @@ public class RuleAssessor {
     private final BiPredicate<ModelEntity,ModelEntity> similarity;
     private final BiPredicate<ModelEntity,ModelEntity> equality;
 
+    /**
+     * With unsupportedComponent we mean a component that belongs to a sub graph matching the expected topology.
+     * if the matching sub graph is: ComponentA -- hosted_on --> ComponentB
+     * both ComponentA and ComponentB are considered unsupportedComponents even if they are supported in other kinds of topologies
+     */
+    private Set<RootComponent> actualUnsupportedComponents;
+
     private Graph<RootComponent,RootRelation> expectedTopology;
     private Graph<RootComponent,RootRelation> actualTopology;
 
@@ -37,16 +44,18 @@ public class RuleAssessor {
      *                        i.e Auth0 does not match exactly with Saas.
      *                        False, if we want a more relaxed match (see RuleAssessor.ModelEntitySimilarity)
      *                        i.e AwsBeanstalk matches with Paas.
+     * @param currentComponent the component that is being visited
      *
-     * @return True, if, in the neighbourhood of the unsupportedComponent (in the actual topology), there is
+     * @return True, if, in the neighbourhood of the currentComponent (in the actual topology), there is
      *              a sub graph matching the expected topology.
      */
     public boolean assess(
         DeploymentModel expectedModel,
         DeploymentModel actualModel,
-        RootComponent unsupportedComponent,
+        RootComponent currentComponent,
         boolean exactAssessment
     ) {
+        actualUnsupportedComponents = new HashSet<>();
         expectedTopology = expectedModel.getTopology();
         actualTopology = actualModel.getTopology();
         // Getting the nodes in the expected topology that are similar to the unsupported node.
@@ -54,11 +63,11 @@ public class RuleAssessor {
         List<RootComponent> candidates = new ArrayList<>();
         for (RootComponent c : expectedTopology.vertexSet()) {
             if (exactAssessment) {
-                if (equality.test(c, unsupportedComponent)) {
+                if (equality.test(c, currentComponent)) {
                     candidates.add(c);
                 }
             } else {
-                if (similarity.test(c, unsupportedComponent)) {
+                if (similarity.test(c, currentComponent)) {
                     candidates.add(c);
                 }
             }
@@ -68,18 +77,20 @@ public class RuleAssessor {
         // similar to the topology specified by the plugin developer.
         // If it exists then we have found a match and the rule can be applied
         boolean match = false;
-        for (RootComponent current : candidates) {
+        for (RootComponent candidate : candidates) {
             // every time we find a match of type component -> relation -> component we delete this elements from the sets below
             expectedComponents = new HashSet<>(expectedTopology.vertexSet());
             expectedRelations = new HashSet<>(expectedTopology.edgeSet());
 
-            expectedComponents.remove(current);
+            expectedComponents.remove(candidate);
+            // currentComponent matches with candidate so it is considered as a not supported component in the actual topology
+            actualUnsupportedComponents.add(currentComponent);
             // we first check exact matches i.e  expected Auth0 - actual Auth0
-            checkGraph(unsupportedComponent,current,equality);
+            checkGraph(currentComponent, candidate,equality);
 
             if (!exactAssessment) {
                 // then we search similar matches i.e expected PaaS - actual AwsBeanstalk
-                checkGraph(unsupportedComponent,current,similarity);
+                checkGraph(currentComponent, candidate,similarity);
             }
 
             // once the sets are empty it means that there is a match
@@ -93,7 +104,7 @@ public class RuleAssessor {
     }
 
     private void checkGraph(
-        RootComponent unsupportedComponent,
+        RootComponent currentComponent,
         RootComponent candidate,
         BiPredicate<ModelEntity,ModelEntity> replace
     ) {
@@ -102,7 +113,7 @@ public class RuleAssessor {
         Queue<RootComponent> expectedToVisit = new LinkedList<>();
         Queue<RootComponent> actualToVisit = new LinkedList<>();
         expectedToVisit.add(candidate);
-        actualToVisit.add(unsupportedComponent);
+        actualToVisit.add(currentComponent);
 
         // the graph is navigated popping out the nodes from the to-visit-queue
         while (expectedToVisit.size() > 0) {
@@ -154,6 +165,11 @@ public class RuleAssessor {
                         expectedComponents.remove(expectedSource);
                         expectedComponents.remove(expectedTarget);
 
+                        // actualSource and actualTarget match in the expectedTopology so they are
+                        // considered has not supported components
+                        actualUnsupportedComponents.add(actualSource);
+                        actualUnsupportedComponents.add(actualTarget);
+
                         // it's important to add the nodes in the same order, so that when they are removed
                         // we do not invert sources with targets
                         expectedToVisit.add(expectedSource);
@@ -165,6 +181,13 @@ public class RuleAssessor {
                 }
             }
         }
+    }
+
+    /**
+     * the return value has meaning only if the assess function returned true
+     */
+    List<RootComponent> getUnsupportedComponents() {
+        return new ArrayList<>(this.actualUnsupportedComponents);
     }
 
     /**
