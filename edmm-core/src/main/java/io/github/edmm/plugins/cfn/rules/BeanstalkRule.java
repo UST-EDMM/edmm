@@ -11,7 +11,7 @@ public class BeanstalkRule extends Rule {
     public BeanstalkRule() {
         super("cfn-beanstalk",
             "suggest to use aws beanstalk instead of web server",
-            Rule.DEFAULT_PRIORITY,
+            1,
             ReplacementReason.PREFERRED);
     }
 

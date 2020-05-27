@@ -10,7 +10,7 @@ public class AuroraRule extends Rule {
     public AuroraRule() {
         super("cfn-aurora",
             "suggest to use aws aurora instead of dbms",
-            Rule.DEFAULT_PRIORITY,
+            1,
             ReplacementReason.PREFERRED);
     }
 

@@ -85,15 +85,16 @@ public class PluginService {
             TransformationContext context = new TransformationContext(model, plugin.getDeploymentTechnology());
 
             RuleEngine ruleEngine = new RuleEngine();
-            ruleEngine.fire(context,plugin);
-            List<Rule.Result> ruleResults = ruleEngine.getResults();
+            List<Rule.Result> ruleResults = ruleEngine.fire(context,plugin);
 
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
                 .id(plugin.getDeploymentTechnology().getId())
                 .name(plugin.getDeploymentTechnology().getName())
                 .replacementRules(ruleResults);
 
-            double s = 1 - ( ruleEngine.getUnsupportedRulesCount() / (double) model.getComponents().size());
+            double s = 1 - ( RuleEngine.countUnsupportedRules(ruleResults) / (double) model.getComponents().size());
+            // there is the rare possibility that s is less than 0, in this case is ok to put it at 0
+            s = ( s < 0) ? 0 : s;
             psr.supports(s);
             response.add(psr.build());
         }

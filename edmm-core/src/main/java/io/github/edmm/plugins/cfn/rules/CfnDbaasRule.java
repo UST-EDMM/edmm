@@ -1,7 +1,5 @@
 package io.github.edmm.plugins.cfn.rules;
 
-import java.util.List;
-
 import io.github.edmm.model.component.AwsAurora;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Dbaas;
@@ -13,7 +11,9 @@ public class CfnDbaasRule extends Rule {
 
     public CfnDbaasRule() {
         super("cfn-dbaas",
-            "not supporting every DbaaS except AwsAurora");
+            "not supporting every DbaaS except AwsAurora",
+            0,
+            ReplacementReason.UNSUPPORTED);
     }
 
     @Override
@@ -30,11 +30,10 @@ public class CfnDbaasRule extends Rule {
     }
 
     @Override
-    protected List<EdmmYamlBuilder> exceptTopologies(List<EdmmYamlBuilder> yamlBuilders) {
+    protected EdmmYamlBuilder[] exceptTopologies() {
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder.component(AwsAurora.class);
 
-        yamlBuilders.add(yamlBuilder);
-        return yamlBuilders;
+        return new EdmmYamlBuilder[] {yamlBuilder};
     }
 }

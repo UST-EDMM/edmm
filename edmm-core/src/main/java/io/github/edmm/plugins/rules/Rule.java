@@ -3,9 +3,11 @@ package io.github.edmm.plugins.rules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.model.support.BaseElement;
 import io.github.edmm.model.support.EdmmYamlBuilder;
 
 import lombok.Getter;
@@ -28,6 +30,9 @@ public abstract class Rule implements Comparable<Rule> {
     private final RuleAssessor ruleAssessor;
     private List<RootComponent> unsupportedComponents = null;
 
+    /**
+     * @param priority the order of evaluation/execution of the rule
+     */
     public Rule(String name, String description, int priority, ReplacementReason reason) {
         this.name = name;
         this.description = description;
@@ -37,6 +42,10 @@ public abstract class Rule implements Comparable<Rule> {
         ruleAssessor = new RuleAssessor();
     }
 
+    public Rule (String name, String description, ReplacementReason reason) {
+        this(name, description, DEFAULT_PRIORITY, reason);
+    }
+
     public Rule(String name, String description) {
         this(name,description, DEFAULT_PRIORITY, ReplacementReason.UNSUPPORTED);
     }
@@ -44,28 +53,28 @@ public abstract class Rule implements Comparable<Rule> {
     /**
      * @param currentComponent the component currently visited
      */
-    public boolean evaluate(DeploymentModel actualModel,RootComponent currentComponent) {
+    public boolean evaluate(DeploymentModel actualModel, RootComponent currentComponent) {
         DeploymentModel expectedModel = DeploymentModel.of(fromTopology(new EdmmYamlBuilder()).build());
 
-        boolean topologyMatches = ruleAssessor.assess(expectedModel,actualModel,currentComponent,false);
+        RuleAssessor.Result assessResult = ruleAssessor.assess(expectedModel,actualModel,currentComponent,false);
         // the unsupportedComponents should be retrieved immediately after the asses function
-        // if evaluate returns true their value is valid and will be used in the execute function
-        unsupportedComponents = ruleAssessor.getUnsupportedComponents();
+        // if evaluate returns true its value is valid and will be used in the execute function
+        unsupportedComponents = assessResult.getUnsupportedComponents();
 
-        List<EdmmYamlBuilder> exceptYamlBuilders = this.exceptTopologies(new ArrayList<>());
+        EdmmYamlBuilder[] exceptYamlBuilders = this.exceptTopologies();
 
-        if (exceptYamlBuilders != null && topologyMatches) {
+        if (exceptYamlBuilders != null && assessResult.matches()) {
             // if the topology matches we check for exceptions
             for (EdmmYamlBuilder yamlBuilder: exceptYamlBuilders) {
                  DeploymentModel exceptionModel = DeploymentModel.of(yamlBuilder.build());
-                 if ( ruleAssessor.assess(exceptionModel, actualModel, currentComponent, true) ) {
+                 if ( ruleAssessor.assess(exceptionModel, actualModel, currentComponent, true).matches() ) {
                      // if there is an exact match this rule shouldn't be evaluated because
                      // we found a topology representing an exception
                      return false;
                  }
             }
         }
-        return topologyMatches;
+        return assessResult.matches();
     }
 
     public Rule.Result execute() throws NullPointerException {
@@ -73,11 +82,10 @@ public abstract class Rule implements Comparable<Rule> {
             throw new NullPointerException("Rule must be evaluated before getting executed");
         }
 
-        EdmmYamlBuilder yamlBuilderTo = new EdmmYamlBuilder();
         return new Rule.Result(
             this.reason,
             this.unsupportedComponents,
-            toTopology(yamlBuilderTo).getComponentsMap());
+            toTopology(new EdmmYamlBuilder()).getComponentsMap());
     }
 
     protected abstract EdmmYamlBuilder fromTopology(EdmmYamlBuilder yamlBuilder);
@@ -85,11 +93,11 @@ public abstract class Rule implements Comparable<Rule> {
     protected abstract EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder);
 
     /**
-     * @return a list of topologies that are exceptions w.r.t. fromTopology
+     * @return an array of topologies that are exceptions w.r.t. fromTopology
      *          i.e. the plugin supports Auth0 but not any other Saas: fromTopology function will return Saas,
      *          while this function will return Auth0, so that this rule will match every Saas except Auth0
      */
-    protected List<EdmmYamlBuilder> exceptTopologies(List<EdmmYamlBuilder> yamlBuilders) {
+    protected EdmmYamlBuilder[] exceptTopologies() {
         return null;
     }
 
@@ -129,18 +137,22 @@ public abstract class Rule implements Comparable<Rule> {
     }
 
     @Getter
-    public static class Result {
+    public class Result {
         private final String reason;
         private final List<String> unsupportedComponents;
         private final Map<String,Object> toTopology;
 
         public Result(ReplacementReason reason, List<RootComponent> unsupportedComponents, Map<String,Object> toTopology) {
-            this.reason = reason.label;
+            this.reason = reason.toString();
             this.toTopology = toTopology;
-            this.unsupportedComponents = new ArrayList<>();
-            for (RootComponent c : unsupportedComponents) {
-                this.unsupportedComponents.add(c.getName());
-            }
+
+            this.unsupportedComponents = unsupportedComponents.stream()
+                                                            .map(BaseElement::getName)
+                                                            .collect(Collectors.toList());
+        }
+
+        public boolean isUnsupported() {
+            return !this.reason.equals(ReplacementReason.PREFERRED.toString());
         }
 
         @Override

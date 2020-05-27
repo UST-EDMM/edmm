@@ -9,19 +9,18 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.component.RootComponent;
 
-import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RuleEngine {
-    @Getter
     private final List<Rule.Result> results; // the results will follow the rule priority order
 
     public RuleEngine() {
         results = new ArrayList<>();
     }
 
-    public void fire(DeploymentModel model, List<Rule> rules, RootComponent unsupportedComponent ) {
+    public List<Rule.Result> fire(DeploymentModel model, @NonNull List<Rule> rules, RootComponent unsupportedComponent ) {
         // the rules are sorted by their priority
         Collections.sort(rules);
 
@@ -36,32 +35,37 @@ public class RuleEngine {
             }
             if (evaluationResult) {
                 log.debug("Rule '{}' triggered", name);
-                Rule.Result result = rule.execute();
-
-                if (!results.contains(result)) {
+                try {
+                    Rule.Result result = rule.execute();
                     // we do not want duplicates
-                    results.add(result);
+                    if (!results.contains(result)) { results.add(result); }
+                } catch (NullPointerException e) {
+                    log.error("Rule '" + name + "' executed with error", e);
                 }
             } else {
                 log.debug("Rule '{}' has been evaluated to false, it has not been executed", name);
             }
         }
+
+        return results;
     }
 
-    public void fire(TransformationContext context, TransformationPlugin<?> plugin) {
+    public List<Rule.Result> fire(TransformationContext context, TransformationPlugin<?> plugin) {
         DeploymentModel model = context.getModel();
 
         for (RootComponent component : model.getComponents()) {
             this.fire(model, plugin.getRules(), component);
         }
+
+        return results;
     }
 
     /**
-     * @return the number of rule results that has UNSUPPORTED or PARTLY_SUPPORTED has reason field value
+     * @return the number of rule results that has UNSUPPORTED or PARTLY_SUPPORTED as reason field value
      */
-    public long getUnsupportedRulesCount() {
-        return results.stream()
-            .filter(result -> !result.getReason().equals(Rule.ReplacementReason.PREFERRED.toString()))
+    public static long countUnsupportedRules(List<Rule.Result> resultList) {
+        return resultList.stream()
+            .filter(Rule.Result::isUnsupported)
             .count();
     }
 }

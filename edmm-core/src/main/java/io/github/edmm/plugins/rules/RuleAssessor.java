@@ -13,6 +13,7 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.support.ModelEntity;
 
+import lombok.Getter;
 import org.jgrapht.Graph;
 
 public class RuleAssessor {
@@ -49,7 +50,7 @@ public class RuleAssessor {
      * @return True, if, in the neighbourhood of the currentComponent (in the actual topology), there is
      *              a sub graph matching the expected topology.
      */
-    public boolean assess(
+    public RuleAssessor.Result assess(
         DeploymentModel expectedModel,
         DeploymentModel actualModel,
         RootComponent currentComponent,
@@ -100,7 +101,7 @@ public class RuleAssessor {
             }
         }
 
-        return match;
+        return new RuleAssessor.Result(match, actualUnsupportedComponents);
     }
 
     private void checkGraph(
@@ -184,13 +185,6 @@ public class RuleAssessor {
     }
 
     /**
-     * the return value has meaning only if the assess function returned true
-     */
-    List<RootComponent> getUnsupportedComponents() {
-        return new ArrayList<>(this.actualUnsupportedComponents);
-    }
-
-    /**
      * two model entities are equal if they have the same class
      */
     public static class ModelEntityEquality implements BiPredicate<ModelEntity,ModelEntity> {
@@ -211,5 +205,17 @@ public class RuleAssessor {
             Class<? extends ModelEntity> actualClass = actual.getClass();
             return expectedClass == actualClass || expectedClass == actualClass.getSuperclass();
         }
+    }
+
+    public class Result {
+        private final boolean match;
+        @Getter
+        private final List<RootComponent> unsupportedComponents;
+
+        public Result(boolean match, Set<RootComponent> components) {
+            this.match = match;
+            unsupportedComponents = (match) ? new ArrayList<>(components) : null;
+        }
+        public boolean matches() { return this.match; }
     }
 }

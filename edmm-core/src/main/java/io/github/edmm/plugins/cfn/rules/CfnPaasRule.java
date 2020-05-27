@@ -1,7 +1,5 @@
 package io.github.edmm.plugins.cfn.rules;
 
-import java.util.List;
-
 import io.github.edmm.model.component.AwsBeanstalk;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Paas;
@@ -12,7 +10,11 @@ import io.github.edmm.plugins.rules.Rule;
 public class CfnPaasRule extends Rule {
 
     public CfnPaasRule() {
-        super("cfn-paas", "not supporting every PaaS except AwsBeanstalk");
+        super("cfn-paas",
+            "not supporting every PaaS except AwsBeanstalk",
+            0,
+            ReplacementReason.UNSUPPORTED
+            );
     }
 
     @Override
@@ -29,11 +31,10 @@ public class CfnPaasRule extends Rule {
     }
 
     @Override
-    protected List<EdmmYamlBuilder> exceptTopologies(List<EdmmYamlBuilder> yamlBuilders) {
+    protected EdmmYamlBuilder[] exceptTopologies() {
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder.component(AwsBeanstalk.class);
 
-        yamlBuilders.add(yamlBuilder);
-        return yamlBuilders;
+        return new EdmmYamlBuilder[] {yamlBuilder};
     }
 }

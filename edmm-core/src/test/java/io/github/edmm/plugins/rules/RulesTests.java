@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.rules;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import io.github.edmm.core.transformation.TransformationContext;
@@ -42,7 +41,7 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(),false));
+            Assert.assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(),false).matches());
         else
             Assert.fail("component not present");
     }
@@ -67,14 +66,14 @@ public class RulesTests {
 
         // the actual model should match the expected model, but not the other way around
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(expectedModel,actualModel,currentComponent.get(),false));
+            Assert.assertTrue(ruleAssessor.assess(expectedModel,actualModel,currentComponent.get(),false).matches());
         else Assert.fail("component not present");
 
         currentComponent = expectedModel.getComponent("WebApplication");
         ruleAssessor  = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertFalse(ruleAssessor.assess(actualModel, expectedModel,currentComponent.get(),false));
+            Assert.assertFalse(ruleAssessor.assess(actualModel, expectedModel,currentComponent.get(),false).matches());
         else Assert.fail("component not present");
     }
 
@@ -94,27 +93,8 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(model,model,currentComponent.get(),false));
+            Assert.assertTrue(ruleAssessor.assess(model,model,currentComponent.get(),false).matches());
         else
-            Assert.fail("component not present");
-    }
-
-    @Test
-    public void testRuleEngine(){
-        RuleEngine ruleEngine = new RuleEngine();
-        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder().component(Saas.class);
-        DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
-        Optional<RootComponent> currentComponent = model.getComponent("Saas");
-
-        if (currentComponent.isPresent()) {
-            ruleEngine.fire(model, Rule.getDefault(), currentComponent.get());
-            List<Rule.Result> result = ruleEngine.getResults();
-            Assert.assertEquals(1,result.size());
-
-            SaasDefaultRule saasDefaultRule = new SaasDefaultRule();
-            saasDefaultRule.evaluate(model, currentComponent.get());
-            Assert.assertEquals( saasDefaultRule.execute(), result.get(0));
-        } else
             Assert.fail("component not present");
     }
 
@@ -137,8 +117,7 @@ public class RulesTests {
         DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
         TransformationContext context = new TransformationContext(model, ansible.getDeploymentTechnology());
 
-        ruleEngine.fire(context, ansible);
-        List<Rule.Result> results = ruleEngine.getResults();
+        List<Rule.Result> results = ruleEngine.fire(context, ansible);
 
         Assert.assertEquals(3,results.size());
 
@@ -171,7 +150,7 @@ public class RulesTests {
         yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder
             .component(Paas.class);
-        actualModel = DeploymentModel.of(yamlBuilder.build());;
+        actualModel = DeploymentModel.of(yamlBuilder.build());
         component = actualModel.getComponent("Paas");
 
         // every other Paas component evaluation should return true instead
@@ -199,8 +178,7 @@ public class RulesTests {
             // we add the same rule another time, it will be executed but at the end we don't want the same result two times
             rules.add(new BeanstalkRule());
 
-            ruleEngine.fire(actualModel, rules, currentComponent.get());
-            List<Rule.Result> results = ruleEngine.getResults();
+            List<Rule.Result> results = ruleEngine.fire(actualModel, rules, currentComponent.get());
 
             Assert.assertEquals(1,results.size());
             List<String> unsupportedComponents = results.get(0).getUnsupportedComponents();

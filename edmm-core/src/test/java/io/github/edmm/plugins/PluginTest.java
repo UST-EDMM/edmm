@@ -47,8 +47,7 @@ public abstract class PluginTest {
             AbstractLifecycle lifecycle = plugin.getLifecycle(context);
 
             RuleEngine ruleEngine = new RuleEngine();
-            ruleEngine.fire(context,plugin);
-            long unsupportedRulesCount = ruleEngine.getUnsupportedRulesCount();
+            long unsupportedRulesCount = RuleEngine.countUnsupportedRules(ruleEngine.fire(context,plugin));
 
             logger.info("RuleEngine.fire(): unsupportedRuless={}", unsupportedRulesCount);
 
