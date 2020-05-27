@@ -68,7 +68,7 @@ public class EdmmYamlBuilder {
     }
 
     public EdmmYamlBuilder hostedOn(Class<? extends RootComponent> componentClass) {
-        return relation("hosted_on", componentClass, componentClass.getSimpleName());
+        return hostedOn( componentClass, componentClass.getSimpleName());
     }
 
     /**
@@ -81,7 +81,7 @@ public class EdmmYamlBuilder {
     }
 
     public EdmmYamlBuilder dependsOn(Class<? extends RootComponent> componentClass) {
-        return relation("depends_on", componentClass, componentClass.getSimpleName());
+        return dependsOn( componentClass, componentClass.getSimpleName());
     }
 
     /**
@@ -94,7 +94,7 @@ public class EdmmYamlBuilder {
     }
 
     public EdmmYamlBuilder connectsTo(Class<? extends RootComponent> componentClass) {
-        return relation("connects_to", componentClass, componentClass.getSimpleName());
+        return connectsTo( componentClass, componentClass.getSimpleName());
     }
 
     public String build() {

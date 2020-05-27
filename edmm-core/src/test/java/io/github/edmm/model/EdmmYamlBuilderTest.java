@@ -12,23 +12,6 @@ import org.junit.Test;
 public class EdmmYamlBuilderTest {
 
     @Test
-    public void testSimpleYaml(){
-        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
-
-        String yamlString =  yamlBuilder.component(Paas.class)
-            .hostedOn(Compute.class)
-            .component(Compute.class)
-            .build();
-
-        try {
-            DeploymentModel.of(yamlString);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-    }
-
-    @Test
     public void testSameComponent(){
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
 
@@ -38,7 +21,14 @@ public class EdmmYamlBuilderTest {
             .component(Compute.class, "ComputeTwo")
             .build();
 
-        DeploymentModel model = DeploymentModel.of(yamlString);
+        DeploymentModel model;
+        try {
+             model = DeploymentModel.of(yamlString);
+        } catch (Exception e) {
+            Assert.fail();
+            return;
+        }
+
         Optional<RootComponent> computeOne = model.getComponent("ComputeOne");
         Optional<RootComponent> computeTwo = model.getComponent("ComputeTwo");
 
