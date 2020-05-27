@@ -71,5 +71,5 @@ public abstract class TransformationPlugin<L extends AbstractLifecycle> {
      * Override this function to specify the rules to be applied.
      * If the plugin has no rules and accepts all the components, just return an empty list.
      */
-    public List<Rule> getRules() { return Rule.getDefault(); }
+    public @NonNull List<Rule> getRules() { return Rule.getDefault(); }
 }
