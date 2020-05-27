@@ -11,6 +11,8 @@ public interface ExecutionPlugin {
 
     void execute(ExecutionContext context) throws Exception;
 
+    void destroy(ExecutionContext context) throws Exception;
+
     default void finalize(ExecutionContext context) {
         // default
     }

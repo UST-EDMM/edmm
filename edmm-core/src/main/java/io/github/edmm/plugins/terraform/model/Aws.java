@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.edmm.utils.Consts;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,6 +18,12 @@ public class Aws {
         private String name;
         private String filepath = "./";
         private String filename;
+
+        public void setFilepath(String filepath) {
+            this.filepath = filepath != null && filepath.endsWith(Consts.FS)
+                ? filepath
+                : Consts.FS.endsWith("\\") ? filepath + Consts.FS + Consts.FS : filepath + Consts.FS;
+        }
     }
 
     @Data
