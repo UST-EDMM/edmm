@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.cfn.api;
 
 import io.github.edmm.core.plugin.Authenticator;
+import io.github.edmm.core.transformation.InstanceTransformationException;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -20,7 +21,7 @@ public class AuthenticatorImpl implements Authenticator {
         try {
             credentialsProvider.getCredentials();
         } catch (AmazonClientException e) {
-            System.out.println("Failed to locate credentials for AWS! Make sure they are in ~/.aws/credentials");
+            throw new InstanceTransformationException("Failed to locate credentials for AWS! Make sure they are in ~/.aws/credentials");
         }
         this.cloudFormation = AmazonCloudFormationClientBuilder.standard()
             .withCredentials(credentialsProvider)

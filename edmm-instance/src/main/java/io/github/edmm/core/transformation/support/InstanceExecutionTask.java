@@ -15,7 +15,7 @@ import static io.github.edmm.core.transformation.InstanceTransformationContext.S
 import static io.github.edmm.core.transformation.InstanceTransformationContext.State.TRANSFORMING;
 
 public class InstanceExecutionTask implements Callable<Void> {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(InstanceExecutionTask.class);
 
     private final InstancePlugin<?> plugin;
     private final InstanceTransformationContext context;
