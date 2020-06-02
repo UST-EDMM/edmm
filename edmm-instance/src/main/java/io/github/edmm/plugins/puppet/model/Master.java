@@ -3,6 +3,7 @@ package io.github.edmm.plugins.puppet.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.Commands;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -77,7 +79,6 @@ public class Master {
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
 
             channelExec.setCommand(Commands.getFacts(certName));
-            System.out.println(Commands.getFacts(certName));
             channelExec.connect();
 
             return buildFactsFromString(reader.readLine());
@@ -91,12 +92,14 @@ public class Master {
     }
 
     private List<Node> buildNodesFromString(String jsonString) {
+        Type nodeType = new TypeToken<ArrayList<Node>>(){}.getType();
         Gson gson = new Gson();
-        return gson.fromJson(jsonString, ArrayList.class);
+        return gson.fromJson(jsonString, nodeType);
     }
 
     private List<Fact> buildFactsFromString(String jsonString) {
+        Type factType = new TypeToken<ArrayList<Fact>>(){}.getType();
         Gson gson = new Gson();
-        return gson.fromJson(jsonString, ArrayList.class);
+        return gson.fromJson(jsonString, factType);
     }
 }
