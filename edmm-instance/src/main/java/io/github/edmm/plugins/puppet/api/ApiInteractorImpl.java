@@ -1,7 +1,10 @@
 package io.github.edmm.plugins.puppet.api;
 
+import java.util.List;
+
 import io.github.edmm.core.plugin.ApiInteractor;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.Node;
 
 public class ApiInteractorImpl implements ApiInteractor {
     private Master master;
@@ -11,13 +14,13 @@ public class ApiInteractorImpl implements ApiInteractor {
     }
 
     @Override
-    public Object getDeployment() {
-        return null;
+    public Master getDeployment() {
+        return this.master;
     }
 
     @Override
-    public Object getComponents() {
-        return null;
+    public List<Node> getComponents() {
+        return this.master.getNodes();
     }
 
     @Override

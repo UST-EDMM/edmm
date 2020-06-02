@@ -1,10 +1,14 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.List;
+
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.puppet.api.ApiInteractorImpl;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.Node;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     private String user = "ubuntu";
@@ -13,6 +17,8 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     private Integer port = 22;
 
     private Master master;
+    private List<Node> nodes;
+    private DeploymentInstance deploymentInstance;
 
     PuppetInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);
@@ -28,7 +34,8 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     @Override
     public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.master);
-        apiInteractor.getDeployment();
+        this.master = apiInteractor.getDeployment();
+        this.nodes = apiInteractor.getComponents();
     }
 
     @Override

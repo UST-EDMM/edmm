@@ -3,6 +3,7 @@ package io.github.edmm.plugins.puppet.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
@@ -55,7 +56,7 @@ public class Master {
         }
     }
 
-    public void getNodes() {
+    public List<Node> getNodes() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
@@ -67,6 +68,7 @@ public class Master {
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
+        return Collections.emptyList();
     }
 
     private ChannelExec setupChannelExec() throws JSchException {
