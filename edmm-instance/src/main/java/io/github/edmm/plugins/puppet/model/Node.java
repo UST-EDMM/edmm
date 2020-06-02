@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.puppet.model;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class Node {

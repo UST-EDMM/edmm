@@ -7,6 +7,6 @@ public class Commands {
     private static final String GET_FACTS = BASE_COMMAND + "facts";
 
     public static String getFacts(String certName) {
-        return GET_FACTS + " 'query=[\"=\", \"certName\", \"" + certName + "\"]'";
+        return GET_FACTS + "/ipaddress 'query=[\"=\", \"certName\", \"" + certName + "\"]'";
     }
 }
