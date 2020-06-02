@@ -270,7 +270,9 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 beanstalk.setName(component.getNormalizedName());
                 component.getArtifacts().stream().findFirst().ifPresent(artifact -> {
                     File file = new File(artifact.getValue());
-                    Path resolvedFile = context.getSourceDirectory().toPath().resolve(file.toPath()).normalize();
+                    Path resolvedFile = (context.getSourceDirectory() != null) ?
+                                context.getSourceDirectory().toPath().resolve(file.toPath()).normalize() :
+                                file.toPath().normalize();
                     beanstalk.setFilepath(resolvedFile.getParent().toString().replace("\\", "\\\\"));
                     beanstalk.setFilename(file.getName());
                 });
