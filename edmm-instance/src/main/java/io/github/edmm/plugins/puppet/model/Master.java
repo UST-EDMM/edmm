@@ -73,7 +73,7 @@ public class Master {
         }
     }
 
-    public List<Fact> getFacts(String certName) {
+    public List<Fact> getFactsForNodeByCertName(String certName) {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));

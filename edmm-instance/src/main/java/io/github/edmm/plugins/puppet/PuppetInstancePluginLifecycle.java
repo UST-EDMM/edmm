@@ -13,7 +13,7 @@ import io.github.edmm.plugins.puppet.model.Node;
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     private String user = "ubuntu";
     private String ip = "master-ip";
-    private String privateKeyLocation = "your-private-key-location";
+    private String privateKeyLocation = "master-private-key-location";
     private Integer port = 22;
 
     private Master master;
@@ -36,6 +36,7 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.master);
         this.master = apiInteractor.getDeployment();
         this.nodes = apiInteractor.getComponents();
+        this.nodes.forEach(node -> node.setFacts(this.master.getFactsForNodeByCertName(node.getCertname())));
     }
 
     @Override
