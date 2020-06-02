@@ -35,19 +35,20 @@ public final class TransformationTask implements Callable<Void> {
         logger.info("Starting transformation for {}", deploymentTechnology.getName());
         context.setState(TRANSFORMING);
         File targetDirectory = context.getTargetDirectory();
-        if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
+        if (targetDirectory.exists()) {
+            try {
+                FileUtils.deleteDirectory(targetDirectory);
+                logger.info("{} directory will be overwritten", targetDirectory.getName());
+            } catch (IOException e) {
+                logger.warn("Could not delete {} directory, content will be appended to files", targetDirectory.getName());
+            }
+        }
+        if (!targetDirectory.mkdirs()) {
             logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
             context.setState(ERROR);
             return null;
-        } else if (targetDirectory.exists()) {
-            try {
-                FileUtils.deleteDirectory(targetDirectory);
-                targetDirectory.mkdirs();
-                logger.info("{} directory overwritten", targetDirectory.getName());
-            } catch (IOException e) {
-                logger.warn("Could not overwrite {} directory, content will be appended to files", targetDirectory.getName());
-            }
         }
+
         if (!targetDirectory.isDirectory() || !targetDirectory.canWrite()) {
             logger.error("Given value is not a directory or not writable: {}", targetDirectory.getAbsolutePath());
             context.setState(ERROR);
