@@ -74,7 +74,6 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             logger.error("Failed to write Terraform file", e);
             throw new TransformationException(e);
         }
-        BashScript envScript = new BashScript(fileAccess, "env.sh");
         for (Aws.Instance awsInstance : computeInstances.values()) {
             // Copy artifacts to target directory
             for (FileProvisioner provisioner : awsInstance.getFileProvisioners()) {
@@ -97,6 +96,7 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 }
             }
             // Write env.sh script entries
+            BashScript envScript = new BashScript(fileAccess, "env.sh");
             awsInstance.getEnvVars().forEach((name, value) -> envScript.append("export " + name + "=" + value));
         }
     }
