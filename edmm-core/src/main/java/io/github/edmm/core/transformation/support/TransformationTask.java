@@ -43,7 +43,7 @@ public final class TransformationTask implements Callable<Void> {
                 logger.warn("Could not delete {} directory, content will be appended to files", targetDirectory.getName());
             }
         }
-        if (!targetDirectory.mkdirs()) {
+        if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
             logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
             context.setState(ERROR);
             return null;
