@@ -1,6 +1,12 @@
 package io.github.edmm.plugins.puppet.util;
 
 public class Commands {
-    public static final String GET_REPORTS = "curl http://localhost:8080/pdb/query/v4/reports";
-    public static final String GET_NODES = "curl http://localhost:8080/pdb/query/v4/nodes";
+    private static final String BASE_COMMAND = "curl http://localhost:8080/pdb/query/v4/";
+    public static final String GET_REPORTS = BASE_COMMAND + "reports";
+    public static final String GET_NODES = BASE_COMMAND + "nodes";
+    private static final String GET_FACTS = BASE_COMMAND + "facts";
+
+    public static String getFacts(String certName) {
+        return GET_FACTS + " 'query=[\"=\", \"certName\", \"" + certName + "\"]'";
+    }
 }

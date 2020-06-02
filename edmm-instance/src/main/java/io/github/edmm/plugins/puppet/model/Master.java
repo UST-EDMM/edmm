@@ -3,12 +3,13 @@ package io.github.edmm.plugins.puppet.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.Commands;
 
+import com.google.gson.Gson;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -64,14 +65,38 @@ public class Master {
             channelExec.setCommand(Commands.GET_NODES);
             channelExec.connect();
 
-            System.out.println(reader.readLine());
+            return this.buildNodesFromString(reader.readLine());
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
-        return Collections.emptyList();
+    }
+
+    public List<Fact> getFacts(String certName) {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(Commands.getFacts(certName));
+            System.out.println(Commands.getFacts(certName));
+            channelExec.connect();
+
+            return buildFactsFromString(reader.readLine());
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
     }
 
     private ChannelExec setupChannelExec() throws JSchException {
         return (ChannelExec) this.session.openChannel("exec");
+    }
+
+    private List<Node> buildNodesFromString(String jsonString) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonString, ArrayList.class);
+    }
+
+    private List<Fact> buildFactsFromString(String jsonString) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonString, ArrayList.class);
     }
 }
