@@ -46,19 +46,6 @@ public class Master {
         }
     }
 
-    public String getReports() {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.GET_REPORTS);
-            channelExec.connect();
-            return reader.readLine();
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
-    }
-
     public List<Node> getNodes() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
@@ -74,14 +61,24 @@ public class Master {
     }
 
     public List<Fact> getFactsForNodeByCertName(String certName) {
+        List<Fact> facts = new ArrayList<>();
+
+        facts.add(this.getFact(certName, FactType.IPAddress));
+        facts.add(this.getFact(certName, FactType.OperatingSystem));
+        facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
+
+        return facts;
+    }
+
+    private Fact getFact(String certName, FactType factType) {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
 
-            channelExec.setCommand(Commands.getFacts(certName));
+            channelExec.setCommand(Commands.getFactCommandByFactType(certName, factType));
             channelExec.connect();
 
-            return buildFactsFromString(reader.readLine());
+            return buildFactFromString(reader.readLine());
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
@@ -92,14 +89,17 @@ public class Master {
     }
 
     private List<Node> buildNodesFromString(String jsonString) {
-        Type nodeType = new TypeToken<ArrayList<Node>>(){}.getType();
+        Type nodeType = new TypeToken<ArrayList<Node>>() {
+        }.getType();
         Gson gson = new Gson();
         return gson.fromJson(jsonString, nodeType);
     }
 
-    private List<Fact> buildFactsFromString(String jsonString) {
-        Type factType = new TypeToken<ArrayList<Fact>>(){}.getType();
+    private Fact buildFactFromString(String jsonString) {
+        Type factType = new TypeToken<Fact>() {
+        }.getType();
         Gson gson = new Gson();
-        return gson.fromJson(jsonString, factType);
+        // the query always returns an array with ONE object, so we remove the array brackets and convert it as object
+        return gson.fromJson(jsonString.substring(1, jsonString.length() - 1), factType);
     }
 }
