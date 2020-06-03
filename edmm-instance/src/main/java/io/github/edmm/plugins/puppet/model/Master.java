@@ -17,7 +17,11 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+// TODO: hide these ugly implementation details via factory pattern
 public class Master {
     private String hostName;
     private String user;
@@ -25,7 +29,8 @@ public class Master {
     private String privateKeyLocation;
     private Integer port;
     private Session session;
-    @Getter
+    private String operatingSystem;
+    private String operatingSystemRelease;
     private List<Node> nodes;
 
     public Master(String user, String ip, String privateKeyLocation, Integer port) {
