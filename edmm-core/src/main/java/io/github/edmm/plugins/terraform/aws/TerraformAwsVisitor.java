@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import io.github.edmm.core.BashScript;
 import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.TopologyGraphHelper;
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
@@ -98,6 +99,23 @@ public class TerraformAwsVisitor extends TerraformVisitor {
             // Write env.sh script entries
             BashScript envScript = new BashScript(fileAccess, "env.sh");
             awsInstance.getEnvVars().forEach((name, value) -> envScript.append("export " + name + "=" + value));
+        }
+
+        for (Aws.DbInstance dbInstance: dbInstances.values()) {
+            try {
+                fileAccess.copy(dbInstance.getSchemaPath(), dbInstance.getSchemaPath());
+                fileAccess.copy(dbInstance.getConfigurePath(), dbInstance.getConfigurePath());
+            } catch (IOException e) {
+                logger.warn("Failed to copy database files");
+            }
+        }
+
+        for (Aws.Beanstalk beanstalkComponent: beanstalkComponents.values()) {
+            try {
+                fileAccess.copy(beanstalkComponent.getFilepath(),beanstalkComponent.getFilepath());
+            } catch (IOException e) {
+                logger.warn("Failed to copy file '{}'", beanstalkComponent.getFilename());
+            }
         }
     }
 
@@ -247,12 +265,21 @@ public class TerraformAwsVisitor extends TerraformVisitor {
                 db.setName(component.getNormalizedName());
                 component.getUser().ifPresent(db::setUsername);
                 component.getPassword().ifPresent(db::setPassword);
-                // TODO: Upload SQL file?
                 component.getArtifacts().stream().findFirst().ifPresent(artifact -> {
-                    // File file = new File(artifact.getValue());
-                    // String filepath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
-                    // String filename = file.getName();
+                    File file = new File(artifact.getValue());
+                    Path resolvedFile = (context.getSourceDirectory() != null) ?
+                        context.getSourceDirectory().toPath().resolve(file.toPath()).normalize() :
+                        file.toPath().normalize();
+                    db.setSchemaPath(resolvedFile.getParent().toString().replace("\\", "\\\\"), file.getName());
                 });
+                component.getOperations().get(DefaultKeys.CONFIGURE).getArtifacts()
+                        .stream().findFirst().ifPresent( artifact -> {
+                            File file = new File(artifact.getValue());
+                            Path resolvedFile = (context.getSourceDirectory() != null) ?
+                                    context.getSourceDirectory().toPath().resolve(file.toPath()).normalize() :
+                                    file.toPath().normalize();
+                            db.setConfigurePath(resolvedFile.getParent().toString().replace("\\", "\\\\"), file.getName());
+                        });
                 component.setTransformed(true);
                 return;
             }

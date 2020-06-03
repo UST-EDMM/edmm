@@ -161,6 +161,22 @@ resource "aws_db_instance" "${db.name}" {
   parameter_group_name = "edmm.mysql5.7"
 }
 
+resource "null_resource" "db_setup" {
+
+  depends_on = ["aws_db_instance.${db.name}"]
+
+    provisioner "local-exec" {
+        command = "${db.configurePath}"
+        environment {
+          MYSQL_SCHEMA_PATH = "${db.schemaPath}"
+          MYSQL_DBMS_ENDPOINT = aws_db_instance.${db.name}.endpoint
+          MYSQL_DBMS_PORT = aws_db_instance.${db.name}.port
+          MYSQL_DATABASE_USER = aws_db_instance.${db.name}.username
+          MYSQL_DBMS_ROOT_PASSWORD = aws_db_instance.${db.name}.password
+        }
+    }
+}
+
 </#list>
 </#if>
 </#if>
