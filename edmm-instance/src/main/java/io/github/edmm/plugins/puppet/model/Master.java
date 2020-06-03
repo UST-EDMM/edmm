@@ -3,16 +3,15 @@ package io.github.edmm.plugins.puppet.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.Commands;
+import io.github.edmm.plugins.puppet.util.GsonHelper;
+import io.github.edmm.util.CastUtil;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -62,7 +61,7 @@ public class Master {
         }
     }
 
-    public void getMasterHostName() {
+    public void setMasterHostName() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
@@ -74,14 +73,6 @@ public class Master {
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
-    }
-
-    private String buildMasterNameFromString(String jsonString) {
-        Type masterNameType = new TypeToken<Map<String, String>>() {
-        }.getType();
-        Gson gson = new Gson();
-        Map<String, String> typ = gson.fromJson(jsonString.substring(1, jsonString.length() - 1), masterNameType);
-        return typ.get("name");
     }
 
     public List<Fact> getFactsForNodeByCertName(String certName) {
@@ -114,18 +105,16 @@ public class Master {
         return (ChannelExec) this.session.openChannel("exec");
     }
 
+    private String buildMasterNameFromString(String jsonString) {
+        Map<String, String> masterNameKeyValuePair = CastUtil.safelyCastToStringStringMap(GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Map.class));
+        return masterNameKeyValuePair.get("name");
+    }
+
     private List<Node> buildNodesFromString(String jsonString) {
-        Type nodeType = new TypeToken<ArrayList<Node>>() {
-        }.getType();
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, nodeType);
+        return GsonHelper.parseJsonStringToParameterizedList(jsonString, Node.class);
     }
 
     private Fact buildFactFromString(String jsonString) {
-        Type factType = new TypeToken<Fact>() {
-        }.getType();
-        Gson gson = new Gson();
-        // the query always returns an array with ONE object, so we remove the array brackets and convert it as object
-        return gson.fromJson(jsonString.substring(1, jsonString.length() - 1), factType);
+        return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
     }
 }
