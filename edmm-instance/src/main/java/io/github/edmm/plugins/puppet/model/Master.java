@@ -66,6 +66,8 @@ public class Master {
         facts.add(this.getFact(certName, FactType.IPAddress));
         facts.add(this.getFact(certName, FactType.OperatingSystem));
         facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
+        facts.add(this.getFact(certName, FactType.SSHDSAKey));
+        facts.add(this.getFact(certName, FactType.SSHRSAKey));
 
         return facts;
     }
