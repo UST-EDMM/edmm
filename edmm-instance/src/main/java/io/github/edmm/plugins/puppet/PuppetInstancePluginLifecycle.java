@@ -35,6 +35,8 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.master);
         this.master = apiInteractor.getDeployment();
+        this.master.getMasterHostName();
+
         this.nodes = apiInteractor.getComponents();
         this.nodes.forEach(node -> node.setFacts(this.master.getFactsForNodeByCertName(node.getCertname())));
     }

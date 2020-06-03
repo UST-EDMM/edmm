@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.Commands;
@@ -19,6 +20,7 @@ import com.jcraft.jsch.Session;
 import lombok.Getter;
 
 public class Master {
+    private String hostName;
     private String user;
     private String ip;
     private String privateKeyLocation;
@@ -58,6 +60,28 @@ public class Master {
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
+    }
+
+    public void getMasterHostName() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(Commands.GET_MASTER);
+            channelExec.connect();
+
+            this.hostName = buildMasterNameFromString(reader.readLine());
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
+    }
+
+    private String buildMasterNameFromString(String jsonString) {
+        Type masterNameType = new TypeToken<Map<String, String>>() {
+        }.getType();
+        Gson gson = new Gson();
+        Map<String, String> typ = gson.fromJson(jsonString.substring(1, jsonString.length() - 1), masterNameType);
+        return typ.get("name");
     }
 
     public List<Fact> getFactsForNodeByCertName(String certName) {

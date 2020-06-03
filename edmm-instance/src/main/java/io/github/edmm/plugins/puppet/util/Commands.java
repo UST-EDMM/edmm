@@ -4,6 +4,7 @@ import io.github.edmm.plugins.puppet.model.FactType;
 
 public class Commands {
     private static final String BASE_COMMAND = "curl http://localhost:8080/pdb/query/v4/";
+    public static final String GET_MASTER = BASE_COMMAND + "producers";
     public static final String GET_NODES = BASE_COMMAND + "nodes";
 
     private static String getIPAddressFact(String certName) {
