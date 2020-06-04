@@ -25,6 +25,7 @@ import lombok.Setter;
 @Setter
 // TODO: hide these ugly implementation details via factory pattern
 public class Master {
+    private String id;
     private String hostName;
     private String user;
     private String ip;
@@ -48,7 +49,7 @@ public class Master {
 
     public ComponentInstance toComponentInstance() {
         ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(String.valueOf((this.hostName + this.ip).hashCode()));
+        componentInstance.setId(this.id);
         componentInstance.setName(this.hostName);
         componentInstance.setCreatedAt(this.createdAtTimestamp);
         componentInstance.setType(this.operatingSystem + this.operatingSystemRelease);
@@ -74,11 +75,16 @@ public class Master {
 
     private void initMasterData() {
         this.setMasterHostName();
+        this.setMasterId();
         this.setNodes();
         this.setPuppetVersion();
         this.setCreatedAtTimestamp();
         this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
         this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(this.getStateForNodeByReportHash(node.getLatest_report_hash()))));
+    }
+
+    private void setMasterId() {
+        this.id = String.valueOf((this.hostName + this.ip).hashCode());
     }
 
     private void setNodes() {

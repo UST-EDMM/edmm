@@ -33,6 +33,12 @@ public class PuppetState {
         }
     }
 
-    public enum MasterStateAsDeploymentInstance {
+    public static InstanceState.InstanceStateForDeploymentInstance getDeploymentInstanceState(Master master) {
+        if (master.getState().equals(PuppetState.MasterStateAsComponentInstance.running)) {
+            if (!master.getNodes().stream().anyMatch(node -> node.getState().equals(NodeState.failed))) {
+                return InstanceState.InstanceStateForDeploymentInstance.CREATED;
+            }
+        }
+        return InstanceState.InstanceStateForDeploymentInstance.ERROR;
     }
 }

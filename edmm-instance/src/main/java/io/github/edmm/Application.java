@@ -55,7 +55,7 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
         // exitCode = new CommandLine(this, factory).execute("transform", "kubernetes", "/users/tobi/downloads/edimm_generated_models/");
         // exitCode = new CommandLine(this, factory).execute("transform", "heat", "/users/tobi/downloads/edimm_generated_models/");
         // exitCode = new CommandLine(this, factory).execute("transform", "cfn", "/users/tobi/downloads/");
-        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "/users/tobi/downloads");
+        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "/users/tobi/downloads/");
     }
 
     @Override

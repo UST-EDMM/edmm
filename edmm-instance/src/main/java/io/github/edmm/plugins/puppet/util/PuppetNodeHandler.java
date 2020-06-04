@@ -6,18 +6,19 @@ import java.util.List;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.FactType;
-import io.github.edmm.plugins.puppet.model.Node;
+import io.github.edmm.plugins.puppet.model.Master;
 
 public class PuppetNodeHandler {
-    public static List<ComponentInstance> getComponentInstances(List<Node> nodes) {
+    public static List<ComponentInstance> getComponentInstances(Master master) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
-        nodes.forEach(node -> {
+        master.getNodes().forEach(node -> {
             ComponentInstance componentInstance = new ComponentInstance();
             componentInstance.setId(String.valueOf(node.getCertname().hashCode()));
             componentInstance.setType(getTypeFromFacts(node.getFacts()));
             componentInstance.setName(node.getCertname());
             componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(node.getFacts()));
             componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
+            componentInstance.setRelationInstances(PuppetRelationHandler.getRelationInstances(master, node));
             componentInstances.add(componentInstance);
         });
 

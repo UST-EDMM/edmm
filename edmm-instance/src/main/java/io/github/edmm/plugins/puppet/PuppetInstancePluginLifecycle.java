@@ -2,10 +2,14 @@ package io.github.edmm.plugins.puppet;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.core.yaml.YamlTransformer;
 import io.github.edmm.model.edimm.DeploymentInstance;
+import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.puppet.api.ApiInteractorImpl;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.PuppetState;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
@@ -41,27 +45,33 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
 
     @Override
     public void transformToEDIMM() {
-        this.deploymentInstance.setId(String.valueOf((this.master.getHostName() + this.master.getIp()).hashCode()));
+        this.deploymentInstance.setId(this.master.getId());
         this.deploymentInstance.setCreatedAt(this.master.getCreatedAtTimestamp());
         this.deploymentInstance.setName(this.master.getHostName());
         this.deploymentInstance.setVersion(this.master.getPuppetVersion());
-        this.deploymentInstance.setComponentInstances(PuppetNodeHandler.getComponentInstances(this.master.getNodes()));
+        this.deploymentInstance.setComponentInstances(PuppetNodeHandler.getComponentInstances(this.master));
+        this.deploymentInstance.setState(PuppetState.getDeploymentInstanceState(this.master));
         // special case since master is deployment and component instance
         this.deploymentInstance.getComponentInstances().add(this.master.toComponentInstance());
+        // TODO metadata, instance properties, description? if any
     }
 
     @Override
     public void transformToTOSCA() {
-
+        TOSCATransformer toscaTransformer = new TOSCATransformer();
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
     }
 
     @Override
     public void createYAML() {
-
+        YamlTransformer yamlTransformer = new YamlTransformer();
+        yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override
     public void cleanup() {
-
+        this.master.getSession().disconnect();
     }
 }
