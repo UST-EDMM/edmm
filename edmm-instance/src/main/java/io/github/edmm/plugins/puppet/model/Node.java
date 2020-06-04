@@ -11,4 +11,5 @@ public class Node {
     private String certname;
     private String latest_report_hash;
     private List<Fact> facts;
+    private PuppetState.NodeState state;
 }

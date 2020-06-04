@@ -3,7 +3,9 @@ package io.github.edmm.plugins.puppet.util;
 import io.github.edmm.plugins.puppet.model.FactType;
 
 public class Commands {
-    private static final String BASE_COMMAND = "curl http://localhost:8080/pdb/query/v4/";
+    private static final String CURL_COMMAND = "curl ";
+    private static final String API = "http://localhost:8080/pdb/query/v4/";
+    private static final String BASE_COMMAND = CURL_COMMAND + API;
     public static final String GET_MASTER = BASE_COMMAND + "producers";
     public static final String GET_NODES = BASE_COMMAND + "nodes";
     public static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
@@ -55,5 +57,9 @@ public class Commands {
             default:
                 return null;
         }
+    }
+
+    public static String getNodeStateByReportHash(String reportHash) {
+        return CURL_COMMAND + "-X GET " + API + "reports -d 'query=[\"extract\", [\"status\"], [\"~\", \"hash\", \"" + reportHash + "\"]]'";
     }
 }

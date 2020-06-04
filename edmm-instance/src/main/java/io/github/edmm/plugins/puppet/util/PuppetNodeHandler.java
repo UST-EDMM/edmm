@@ -17,7 +17,7 @@ public class PuppetNodeHandler {
             componentInstance.setType(getTypeFromFacts(node.getFacts()));
             componentInstance.setName(node.getCertname());
             componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(node.getFacts()));
-
+            componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
             componentInstances.add(componentInstance);
         });
 
