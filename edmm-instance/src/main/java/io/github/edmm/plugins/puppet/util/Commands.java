@@ -6,6 +6,7 @@ public class Commands {
     private static final String BASE_COMMAND = "curl http://localhost:8080/pdb/query/v4/";
     public static final String GET_MASTER = BASE_COMMAND + "producers";
     public static final String GET_NODES = BASE_COMMAND + "nodes";
+    public static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
 
     private static String getIPAddressFact(String certName) {
         return buildNodeFactQuery(certName) + "ipaddress";

@@ -27,32 +27,42 @@ public class Master {
     private String user;
     private String ip;
     private String privateKeyLocation;
-    private Integer port;
+    private Integer sshPort;
     private Session session;
     private String operatingSystem;
     private String operatingSystemRelease;
     private List<Node> nodes;
+    private String puppetVersion;
 
-    public Master(String user, String ip, String privateKeyLocation, Integer port) {
+    public Master(String user, String ip, String privateKeyLocation, Integer sshPort) {
         this.user = user;
         this.ip = ip;
         this.privateKeyLocation = privateKeyLocation;
-        this.port = port;
+        this.sshPort = sshPort;
     }
 
     public void connectToMaster() {
         try {
             JSch jsch = new JSch();
             jsch.addIdentity(this.privateKeyLocation);
-            this.session = jsch.getSession(this.user, this.ip, this.port);
+            this.session = jsch.getSession(this.user, this.ip, this.sshPort);
             this.session.setConfig("StrictHostKeyChecking", "no");
             this.session.connect();
+
+            this.initMasterData();
         } catch (JSchException e) {
-            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the correct user, host, port and private key location of the Puppet Master is set.");
+            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the correct user, host, sshPort and private key location of the Puppet Master is set.");
         }
     }
 
-    public List<Node> getNodes() {
+    private void initMasterData() {
+        this.setMasterHostName();
+        this.setNodes();
+        this.setPuppetVersion();
+        this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
+    }
+
+    private void setNodes() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
@@ -60,13 +70,26 @@ public class Master {
             channelExec.setCommand(Commands.GET_NODES);
             channelExec.connect();
 
-            return this.buildNodesFromString(reader.readLine());
+            this.nodes = this.buildNodesFromString(reader.readLine());
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
     }
 
-    public void setMasterHostName() {
+    private void setPuppetVersion() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            channelExec.setPty(true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+            channelExec.setCommand(Commands.GET_VERSION);
+            channelExec.connect();
+            this.puppetVersion = reader.readLine();
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
+    }
+
+    private void setMasterHostName() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
@@ -80,7 +103,7 @@ public class Master {
         }
     }
 
-    public List<Fact> getFactsForNodeByCertName(String certName) {
+    private List<Fact> getFactsForNodeByCertName(String certName) {
         List<Fact> facts = new ArrayList<>();
 
         facts.add(this.getFact(certName, FactType.IPAddress));

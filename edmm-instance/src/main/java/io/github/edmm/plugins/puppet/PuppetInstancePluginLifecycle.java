@@ -11,7 +11,7 @@ import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.Node;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
-    // puppet master info
+    // puppet master info, this is only temporary for testing
     private String user = "ubuntu";
     private String ip = "master-ip";
     private String privateKeyLocation = "master-private-key-location";
@@ -38,12 +38,11 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.master);
         this.master = apiInteractor.getDeployment();
-        this.master.setMasterHostName();
         this.master.setOperatingSystem(this.operatingSystem);
         this.master.setOperatingSystemRelease(this.operatingSystemRelease);
 
         this.nodes = apiInteractor.getComponents();
-        this.nodes.forEach(node -> node.setFacts(this.master.getFactsForNodeByCertName(node.getCertname())));
+
     }
 
     @Override
@@ -54,6 +53,8 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         // there is (probably) no description
         // this.deploymentInstance.setDescription("");
         this.deploymentInstance.setName(this.master.getHostName());
+        this.deploymentInstance.setVersion(this.master.getPuppetVersion());
+
 
     }
 
