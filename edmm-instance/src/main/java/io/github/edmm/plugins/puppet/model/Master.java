@@ -36,6 +36,8 @@ public class Master {
     private List<Node> nodes;
     private String puppetVersion;
     private String createdAtTimestamp;
+    // master is reachable, thus is running
+    private PuppetState.MasterStateAsComponentInstance state = PuppetState.MasterStateAsComponentInstance.running;
 
     public Master(String user, String ip, String privateKeyLocation, Integer sshPort) {
         this.user = user;
@@ -50,7 +52,7 @@ public class Master {
         componentInstance.setName(this.hostName);
         componentInstance.setCreatedAt(this.createdAtTimestamp);
         componentInstance.setType(this.operatingSystem + this.operatingSystemRelease);
-        // TODO state
+        componentInstance.setState(this.state.toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
 
         return componentInstance;

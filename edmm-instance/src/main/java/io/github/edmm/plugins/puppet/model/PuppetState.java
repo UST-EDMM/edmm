@@ -20,7 +20,7 @@ public class PuppetState {
     }
 
     public enum MasterStateAsComponentInstance {
-        created(InstanceState.InstanceStateForComponentInstance.CREATED);
+        running(InstanceState.InstanceStateForComponentInstance.CREATED);
 
         private final InstanceState.InstanceStateForComponentInstance componentInstance;
 
