@@ -1,17 +1,15 @@
 package io.github.edmm.plugins.puppet;
 
-import java.util.List;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.puppet.api.ApiInteractorImpl;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.model.Master;
-import io.github.edmm.plugins.puppet.model.Node;
+import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
-    // puppet master info, this is only temporary for testing
+    // puppet master info
     private String user = "ubuntu";
     private String ip = "master-ip";
     private String privateKeyLocation = "master-private-key-location";
@@ -20,7 +18,6 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     private String operatingSystemRelease = "18.04";
 
     private Master master;
-    private List<Node> nodes;
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     PuppetInstancePluginLifecycle(InstanceTransformationContext context) {
@@ -40,22 +37,17 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         this.master = apiInteractor.getDeployment();
         this.master.setOperatingSystem(this.operatingSystem);
         this.master.setOperatingSystemRelease(this.operatingSystemRelease);
-
-        this.nodes = apiInteractor.getComponents();
-
     }
 
     @Override
     public void transformToEDIMM() {
-        // TODO: think about id, createdAt,...
-        // this.deploymentInstance.setId("");
-        // this.deploymentInstance.setCreatedAt("");
-        // there is (probably) no description
-        // this.deploymentInstance.setDescription("");
+        this.deploymentInstance.setId(String.valueOf((this.master.getHostName() + this.master.getIp()).hashCode()));
+        this.deploymentInstance.setCreatedAt(this.master.getCreatedAtTimestamp());
         this.deploymentInstance.setName(this.master.getHostName());
         this.deploymentInstance.setVersion(this.master.getPuppetVersion());
-
-
+        this.deploymentInstance.setComponentInstances(PuppetNodeHandler.getComponentInstances(this.master.getNodes()));
+        // special case since master is deployment and component instance
+        this.deploymentInstance.getComponentInstances().add(this.master.toComponentInstance());
     }
 
     @Override

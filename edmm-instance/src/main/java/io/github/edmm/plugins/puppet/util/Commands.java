@@ -7,6 +7,8 @@ public class Commands {
     public static final String GET_MASTER = BASE_COMMAND + "producers";
     public static final String GET_NODES = BASE_COMMAND + "nodes";
     public static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
+    // only linux is allowed as OS for puppet master, so this is fine
+    public static final String GET_CREATED_AT_TIMESTAMP = "stat -c %Z /proc/";
 
     private static String getIPAddressFact(String certName) {
         return buildNodeFactQuery(certName) + "ipaddress";
@@ -50,7 +52,8 @@ public class Commands {
                 return getSSHDSAKeyFact(certName);
             case SSHRSAKey:
                 return getSSHRSAKeyFact(certName);
+            default:
+                return null;
         }
-        return null;
     }
 }

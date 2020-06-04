@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
+import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.puppet.util.Commands;
 import io.github.edmm.plugins.puppet.util.GsonHelper;
+import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 import io.github.edmm.util.CastUtil;
 
 import com.jcraft.jsch.ChannelExec;
@@ -33,12 +35,24 @@ public class Master {
     private String operatingSystemRelease;
     private List<Node> nodes;
     private String puppetVersion;
+    private String createdAtTimestamp;
 
     public Master(String user, String ip, String privateKeyLocation, Integer sshPort) {
         this.user = user;
         this.ip = ip;
         this.privateKeyLocation = privateKeyLocation;
         this.sshPort = sshPort;
+    }
+
+    public ComponentInstance toComponentInstance() {
+        ComponentInstance componentInstance = new ComponentInstance();
+        componentInstance.setId(String.valueOf((this.hostName + this.ip).hashCode()));
+        componentInstance.setName(this.hostName);
+        componentInstance.setCreatedAt(this.createdAtTimestamp);
+        componentInstance.setType(this.operatingSystem + this.operatingSystemRelease);
+        componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
+
+        return componentInstance;
     }
 
     public void connectToMaster() {
@@ -59,6 +73,7 @@ public class Master {
         this.setMasterHostName();
         this.setNodes();
         this.setPuppetVersion();
+        this.setCreatedAtTimestamp();
         this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
     }
 
@@ -71,6 +86,20 @@ public class Master {
             channelExec.connect();
 
             this.nodes = this.buildNodesFromString(reader.readLine());
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
+    }
+
+    private void setCreatedAtTimestamp() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(Commands.GET_CREATED_AT_TIMESTAMP);
+            channelExec.connect();
+
+            this.createdAtTimestamp = reader.readLine();
         } catch (JSchException | IOException e) {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }

@@ -10,6 +10,5 @@ import lombok.Setter;
 public class Node {
     private String certname;
     private String latest_report_hash;
-    private String facts_timestamp;
     private List<Fact> facts;
 }
