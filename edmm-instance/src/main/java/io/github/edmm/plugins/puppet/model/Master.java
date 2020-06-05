@@ -78,10 +78,20 @@ public class Master {
         this.setMasterId();
         this.setNodes();
         this.setPuppetVersion();
+        this.generateSSHKeyPair();
+        this.copyPublicKeyToPuppetModule();
         this.setCreatedAtTimestamp();
+        this.setNodeFacts();
+        this.setNodeState();
+    }
+
+    private void setNodeFacts() {
         this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
+    }
+
+    private void setNodeState() {
         this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
-        this.nodes.forEach(node -> generateSSHKeyPairForNode(node.getCertname()));
+
     }
 
     private void setMasterId() {
@@ -186,15 +196,25 @@ public class Master {
         return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
     }
 
-    private void generateSSHKeyPairForNode(String certName) {
+    private void generateSSHKeyPair() {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
 
-            channelExec.setCommand(Commands.generateSSHKeyPairWithCertName(certName));
+            channelExec.setCommand(Commands.generateSSHKeyPairWithCertName("puppet"));
             channelExec.connect();
         } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to generate SSHKeyPair on node " + certName);
+            throw new InstanceTransformationException("Failed to generate SSHKeyPair");
+        }
+    }
+
+    private void copyPublicKeyToPuppetModule() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            channelExec.setCommand(Commands.COPY_PUBLIC_KEY);
+            channelExec.connect();
+        } catch (JSchException e) {
+            throw new InstanceTransformationException("Failed to copy public key");
         }
     }
 }
