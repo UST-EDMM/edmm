@@ -6,6 +6,8 @@ public class Commands {
     private static final String CURL_COMMAND = "curl ";
     private static final String API = "http://localhost:8080/pdb/query/v4/";
     private static final String BASE_COMMAND = CURL_COMMAND + API;
+    private static final String SSH_KEY_GENERATION_PREFIX = "ssh-keygen -f ~/.ssh/";
+    private static final String SSH_KEY_GENERATION_SUFFIX = " -t rsa -N ''";
     public static final String GET_MASTER = BASE_COMMAND + "producers";
     public static final String GET_NODES = BASE_COMMAND + "nodes";
     public static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
@@ -57,6 +59,10 @@ public class Commands {
             default:
                 return null;
         }
+    }
+
+    public static String generateSSHKeyPairWithCertName(String certName) {
+        return Commands.SSH_KEY_GENERATION_PREFIX + certName + SSH_KEY_GENERATION_SUFFIX;
     }
 
     public static String getNodeStateByReportHash(String reportHash) {

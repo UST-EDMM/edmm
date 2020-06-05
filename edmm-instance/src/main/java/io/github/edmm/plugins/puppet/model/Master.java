@@ -81,6 +81,7 @@ public class Master {
         this.setCreatedAtTimestamp();
         this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
         this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
+        this.nodes.forEach(node -> generateSSHKeyPairForNode(node.getCertname()));
     }
 
     private void setMasterId() {
@@ -183,5 +184,17 @@ public class Master {
 
     private Fact buildFactFromString(String jsonString) {
         return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
+    }
+
+    private void generateSSHKeyPairForNode(String certName) {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(Commands.generateSSHKeyPairWithCertName(certName));
+            channelExec.connect();
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to generate SSHKeyPair on node " + certName);
+        }
     }
 }
