@@ -2,6 +2,7 @@ package io.github.edmm.plugins.puppet.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,11 @@ import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 import io.github.edmm.util.CastUtil;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,6 +40,8 @@ public class Master {
     private List<Node> nodes;
     private String puppetVersion;
     private String createdAtTimestamp;
+    private String generatedPrivateKey;
+    private String generatedPublicKey;
     // master is reachable, thus is running
     private PuppetState.MasterStateAsComponentInstance state = PuppetState.MasterStateAsComponentInstance.running;
 
@@ -80,6 +85,7 @@ public class Master {
         this.setPuppetVersion();
         this.generateSSHKeyPair();
         this.copyPublicKeyToPuppetModule();
+        this.readGeneratedKeys();
         this.setCreatedAtTimestamp();
         this.setNodeFacts();
         this.setNodeState();
@@ -159,8 +165,8 @@ public class Master {
         facts.add(this.getFact(certName, FactType.IPAddress));
         facts.add(this.getFact(certName, FactType.OperatingSystem));
         facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
-        facts.add(this.getFact(certName, FactType.SSHDSAKey));
-        facts.add(this.getFact(certName, FactType.SSHRSAKey));
+        facts.add(new Fact(certName, "privateKey", this.generatedPrivateKey));
+        facts.add(new Fact(certName, "publicKey", this.generatedPublicKey));
 
         return facts;
     }
@@ -215,6 +221,43 @@ public class Master {
             channelExec.connect();
         } catch (JSchException e) {
             throw new InstanceTransformationException("Failed to copy public key");
+        }
+    }
+
+    private void readGeneratedKeys() {
+        this.readPublicKey();
+        this.readPrivateKey();
+    }
+
+    private void readPrivateKey() {
+        try {
+            ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
+            sftp.connect();
+            // TODO make this less brittle
+            InputStream stream = sftp.get("/home/ubuntu/.ssh/puppet");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line = reader.readLine();
+            while (line != null) {
+                stringBuilder.append(line).append("\n");
+                line = reader.readLine();
+            }
+            this.generatedPrivateKey = stringBuilder.toString();
+        } catch (JSchException | SftpException | IOException e) {
+
+        }
+    }
+
+    private void readPublicKey() {
+        try {
+            ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
+            sftp.connect();
+            // TODO make this less brittle
+            InputStream stream = sftp.get("/home/ubuntu/.ssh/puppet.pub");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            this.generatedPublicKey = reader.readLine();
+        } catch (JSchException | SftpException | IOException e) {
+            throw new InstanceTransformationException("Failed to retrieve public or private key from master", e.getCause());
         }
     }
 }
