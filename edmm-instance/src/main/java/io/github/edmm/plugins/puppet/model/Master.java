@@ -80,7 +80,7 @@ public class Master {
         this.setPuppetVersion();
         this.setCreatedAtTimestamp();
         this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
-        this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(this.getStateForNodeByReportHash(node.getLatest_report_hash()))));
+        this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
     }
 
     private void setMasterId() {
@@ -142,20 +142,6 @@ public class Master {
         }
     }
 
-    private String getStateForNodeByReportHash(String reportHash) {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.getNodeStateByReportHash(reportHash));
-            channelExec.connect();
-
-            return buildStateFromString(reader.readLine()).get("status");
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
-    }
-
     private List<Fact> getFactsForNodeByCertName(String certName) {
         List<Fact> facts = new ArrayList<>();
 
@@ -197,9 +183,5 @@ public class Master {
 
     private Fact buildFactFromString(String jsonString) {
         return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
-    }
-
-    private Map<String, String> buildStateFromString(String jsonString) {
-        return GsonHelper.parseJsonStringToStringStringMap(jsonString.substring(1, jsonString.length() - 1));
     }
 }

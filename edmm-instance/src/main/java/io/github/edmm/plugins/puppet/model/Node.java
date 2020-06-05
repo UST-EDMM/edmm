@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Node {
     private String certname;
     private String latest_report_hash;
+    private String latest_report_status;
     private List<Fact> facts;
     private PuppetState.NodeState state;
 }
