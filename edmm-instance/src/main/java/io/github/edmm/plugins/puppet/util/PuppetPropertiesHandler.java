@@ -1,8 +1,13 @@
 package io.github.edmm.plugins.puppet.util;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.puppet.model.Fact;
 
@@ -37,12 +42,21 @@ public class PuppetPropertiesHandler {
         return new InstanceProperty("ip", ip.getClass().getSimpleName(), ip);
     }
 
-    // TODO change this and read the actual private key from the location and set it as property
     private static InstanceProperty handlePrivateKeyLocation(String privateKeyLocation) {
-        return new InstanceProperty("privateKeyLocation", privateKeyLocation.getClass().getSimpleName(), privateKeyLocation);
+        return new InstanceProperty("privateKey", privateKeyLocation.getClass().getSimpleName(), readPrivateKeyFileIntoString(privateKeyLocation));
     }
 
     private static InstanceProperty handleSSHPort(Integer sshPort) {
         return new InstanceProperty("SSHPort", sshPort.getClass().getSimpleName(), sshPort);
+    }
+
+    private static String readPrivateKeyFileIntoString(String privateKeyLocation) {
+        StringBuilder privateKey = new StringBuilder();
+        try (Stream<String> stream = Files.lines(Paths.get(privateKeyLocation))) {
+            stream.forEach(line -> privateKey.append(line).append("\n"));
+        } catch (IOException e) {
+            throw new InstanceTransformationException("Failed to convert private key!");
+        }
+        return privateKey.toString();
     }
 }
