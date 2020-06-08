@@ -28,18 +28,6 @@ public class Commands {
         return buildNodeFactQuery(certName) + "operatingsystemrelease";
     }
 
-    private static String getEC2MetadataFact(String certName) {
-        return buildNodeFactQuery(certName) + "ec2_metadata";
-    }
-
-    private static String getSSHRSAKeyFact(String certName) {
-        return buildNodeFactQuery(certName) + "sshrsakey";
-    }
-
-    private static String getSSHDSAKeyFact(String certName) {
-        return buildNodeFactQuery(certName) + "sshdsakey";
-    }
-
     private static String buildNodeFactQuery(String certName) {
         return GET_NODES + "/" + certName + "/facts/";
     }
@@ -52,12 +40,6 @@ public class Commands {
                 return getOperatingSystemFact(certName);
             case OperatingSystemRelease:
                 return getOperatingSystemReleaseFact(certName);
-            case EC2Metadata:
-                return getEC2MetadataFact(certName);
-            case SSHDSAKey:
-                return getSSHDSAKeyFact(certName);
-            case SSHRSAKey:
-                return getSSHRSAKeyFact(certName);
             default:
                 return null;
         }
