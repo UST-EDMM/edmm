@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.puppet.model;
+package io.github.edmm.plugins.puppet.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
-import io.github.edmm.plugins.puppet.util.Commands;
+import io.github.edmm.plugins.puppet.model.Master;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
@@ -16,16 +16,16 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
-class MasterSSHConfigurator {
+public class MasterSSHConfigurator {
     private Master master;
     private Session session;
 
-    MasterSSHConfigurator(Master master) {
+    public MasterSSHConfigurator(Master master) {
         this.master = master;
         this.session = master.getSession();
     }
 
-    void configurePuppetMaster() {
+    public void configurePuppetMaster() {
         this.copyPuppetModule();
         this.unzipPuppetModule();
         this.deleteZip();

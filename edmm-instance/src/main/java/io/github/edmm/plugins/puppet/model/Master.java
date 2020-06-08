@@ -7,6 +7,9 @@ import java.util.List;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.ComponentInstance;
+import io.github.edmm.plugins.puppet.util.MasterInitializer;
+import io.github.edmm.plugins.puppet.util.MasterNodeHandler;
+import io.github.edmm.plugins.puppet.util.MasterSSHConfigurator;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 
 import com.jcraft.jsch.ChannelExec;
@@ -85,7 +88,7 @@ public class Master {
         return (ChannelExec) this.session.openChannel("exec");
     }
 
-    String executeCommandAndHandleResult(String command) {
+    public String executeCommandAndHandleResult(String command) {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));

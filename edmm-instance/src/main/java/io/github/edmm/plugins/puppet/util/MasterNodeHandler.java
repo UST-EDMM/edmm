@@ -1,19 +1,22 @@
-package io.github.edmm.plugins.puppet.model;
+package io.github.edmm.plugins.puppet.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.edmm.plugins.puppet.util.Commands;
-import io.github.edmm.plugins.puppet.util.GsonHelper;
+import io.github.edmm.plugins.puppet.model.Fact;
+import io.github.edmm.plugins.puppet.model.FactType;
+import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.Node;
+import io.github.edmm.plugins.puppet.model.PuppetState;
 
-class MasterNodeHandler {
+public class MasterNodeHandler {
     private Master master;
 
-    MasterNodeHandler(Master master) {
+    public MasterNodeHandler(Master master) {
         this.master = master;
     }
 
-    void handleNodes() {
+    public void handleNodes() {
         this.setNodes();
         this.setNodeFacts();
         this.setNodeState();

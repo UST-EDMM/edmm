@@ -1,19 +1,18 @@
-package io.github.edmm.plugins.puppet.model;
+package io.github.edmm.plugins.puppet.util;
 
 import java.util.Map;
 
-import io.github.edmm.plugins.puppet.util.Commands;
-import io.github.edmm.plugins.puppet.util.GsonHelper;
+import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.util.CastUtil;
 
-class MasterInitializer {
+public class MasterInitializer {
     private Master master;
 
-    MasterInitializer(Master master) {
+    public MasterInitializer(Master master) {
         this.master = master;
     }
 
-    void setupMaster() {
+    public void setupMaster() {
         this.setMasterHostName();
         this.setMasterId();
         this.setPuppetVersion();

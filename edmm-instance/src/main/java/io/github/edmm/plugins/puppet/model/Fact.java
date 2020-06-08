@@ -8,7 +8,7 @@ public class Fact {
     private String name;
     private String value;
 
-    Fact(String certname, String name, String value) {
+    public Fact(String certname, String name, String value) {
         this.certname = certname;
         this.name = name;
         this.value = value;
