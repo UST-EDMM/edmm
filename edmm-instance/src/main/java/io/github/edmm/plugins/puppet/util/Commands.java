@@ -2,6 +2,7 @@ package io.github.edmm.plugins.puppet.util;
 
 import io.github.edmm.plugins.puppet.model.FactType;
 
+// TODO make commands less brittle by actively searching for location of things like puppet executable
 public class Commands {
     private static final String CURL_COMMAND = "curl ";
     private static final String API = "http://localhost:8080/pdb/query/v4/";
@@ -12,6 +13,7 @@ public class Commands {
     public static final String UNZIP_PUPPET_MODULE = "unzip " + EDIMM_ZIP_FILE;
     public static final String DELETE_ZIP = "rm " + EDIMM_ZIP_FILE;
     public static final String MOVE_PUPPET_MODULE = "sudo mv edimm_ssh /etc/puppetlabs/code/environments/production/modules/edimm_ssh";
+    public static final String EXECUTE_HELPER_SCRIPT = "sudo chmod +x edimm_ssh.sh; sudo ./edimm_ssh.sh";
 
     private static final String SSH_KEY_GENERATION_PREFIX = "ssh-keygen -f ~/.ssh/";
     private static final String SSH_KEY_GENERATION_SUFFIX = " -t rsa -N ''";

@@ -16,6 +16,6 @@ public class AuthenticatorImpl implements Authenticator {
 
     @Override
     public void authenticate() {
-        this.master.connectToMaster();
+        this.master.connectAndSetupMaster();
     }
 }
