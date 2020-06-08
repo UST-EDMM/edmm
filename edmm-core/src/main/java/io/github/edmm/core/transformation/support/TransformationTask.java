@@ -61,7 +61,7 @@ public final class TransformationTask implements Callable<Void> {
         } catch (Exception e) {
             logger.info("Transformation to {} failed", deploymentTechnology.getName());
             logger.error("Something went wrong while transforming", e);
-            context.setState(ERROR);
+            context.setErrorState(e);
         }
         return null;
     }
