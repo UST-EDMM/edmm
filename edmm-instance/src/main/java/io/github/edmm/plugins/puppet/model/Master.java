@@ -80,17 +80,7 @@ public class Master {
     }
 
     private void setMasterHostName() {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.GET_MASTER);
-            channelExec.connect();
-
-            this.hostName = buildMasterNameFromString(reader.readLine());
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
+        this.hostName = this.buildMasterNameFromString(this.executeCommandAndHandleResult(Commands.GET_MASTER));
     }
 
     private void setMasterId() {
@@ -98,30 +88,11 @@ public class Master {
     }
 
     private void setPuppetVersion() {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            channelExec.setPty(true);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-            channelExec.setCommand(Commands.GET_VERSION);
-            channelExec.connect();
-            this.puppetVersion = reader.readLine();
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
+        this.puppetVersion = this.executeCommandAndHandleResult(Commands.GET_VERSION);
     }
 
     private void setCreatedAtTimestamp() {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.GET_CREATED_AT_TIMESTAMP);
-            channelExec.connect();
-
-            this.createdAtTimestamp = reader.readLine();
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
+        this.createdAtTimestamp = this.executeCommandAndHandleResult(Commands.GET_CREATED_AT_TIMESTAMP);
     }
 
     private void setupSSH() {
@@ -136,17 +107,7 @@ public class Master {
     }
 
     private void setNodes() {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.GET_NODES);
-            channelExec.connect();
-
-            this.nodes = this.buildNodesFromString(reader.readLine());
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
+        this.nodes = this.buildNodesFromString(this.executeCommandAndHandleResult(Commands.GET_NODES));
     }
 
     private void setNodeFacts() {
@@ -166,17 +127,7 @@ public class Master {
     }
 
     private Fact getFact(String certName, FactType factType) {
-        try {
-            ChannelExec channelExec = this.setupChannelExec();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
-
-            channelExec.setCommand(Commands.getFactCommandByFactType(certName, factType));
-            channelExec.connect();
-
-            return buildFactFromString(reader.readLine());
-        } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
-        }
+        return buildFactFromString(this.executeCommandAndHandleResult(Commands.getFactCommandByFactType(certName, factType)));
     }
 
     private void setNodeState() {
@@ -199,6 +150,20 @@ public class Master {
 
     private Fact buildFactFromString(String jsonString) {
         return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
+    }
+
+    private String executeCommandAndHandleResult(String command) {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(command);
+            channelExec.connect();
+
+            return reader.readLine();
+        } catch (JSchException | IOException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
     }
 
     public ComponentInstance toComponentInstance() {
