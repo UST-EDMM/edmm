@@ -3,16 +3,11 @@ package io.github.edmm.plugins.puppet.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.ComponentInstance;
-import io.github.edmm.plugins.puppet.util.Commands;
-import io.github.edmm.plugins.puppet.util.GsonHelper;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
-import io.github.edmm.util.CastUtil;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -23,7 +18,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-// TODO: hide these ugly implementation details via factory pattern
 public class Master {
     private String id;
     private String hostName;
@@ -73,26 +67,8 @@ public class Master {
     }
 
     private void setupMaster() {
-        this.setMasterHostName();
-        this.setMasterId();
-        this.setPuppetVersion();
-        this.setCreatedAtTimestamp();
-    }
-
-    private void setMasterHostName() {
-        this.hostName = this.buildMasterNameFromString(this.executeCommandAndHandleResult(Commands.GET_MASTER));
-    }
-
-    private void setMasterId() {
-        this.id = String.valueOf((this.hostName + this.ip).hashCode());
-    }
-
-    private void setPuppetVersion() {
-        this.puppetVersion = this.executeCommandAndHandleResult(Commands.GET_VERSION);
-    }
-
-    private void setCreatedAtTimestamp() {
-        this.createdAtTimestamp = this.executeCommandAndHandleResult(Commands.GET_CREATED_AT_TIMESTAMP);
+        MasterInitializer masterInitializer = new MasterInitializer(this);
+        masterInitializer.setupMaster();
     }
 
     private void setupSSH() {
@@ -101,58 +77,15 @@ public class Master {
     }
 
     private void setupNodes() {
-        this.setNodes();
-        this.setNodeFacts();
-        this.setNodeState();
-    }
-
-    private void setNodes() {
-        this.nodes = this.buildNodesFromString(this.executeCommandAndHandleResult(Commands.GET_NODES));
-    }
-
-    private void setNodeFacts() {
-        this.nodes.forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
-    }
-
-    private List<Fact> getFactsForNodeByCertName(String certName) {
-        List<Fact> facts = new ArrayList<>();
-
-        facts.add(this.getFact(certName, FactType.IPAddress));
-        facts.add(this.getFact(certName, FactType.OperatingSystem));
-        facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
-        facts.add(new Fact(certName, "privateKey", this.generatedPrivateKey));
-        facts.add(new Fact(certName, "publicKey", this.generatedPublicKey));
-
-        return facts;
-    }
-
-    private Fact getFact(String certName, FactType factType) {
-        return buildFactFromString(this.executeCommandAndHandleResult(Commands.getFactCommandByFactType(certName, factType)));
-    }
-
-    private void setNodeState() {
-        this.nodes.forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
-
+        MasterNodeHandler masterNodeHandler = new MasterNodeHandler(this);
+        masterNodeHandler.handleNodes();
     }
 
     private ChannelExec setupChannelExec() throws JSchException {
         return (ChannelExec) this.session.openChannel("exec");
     }
 
-    private String buildMasterNameFromString(String jsonString) {
-        Map<String, String> masterNameKeyValuePair = CastUtil.safelyCastToStringStringMap(GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Map.class));
-        return masterNameKeyValuePair.get("name");
-    }
-
-    private List<Node> buildNodesFromString(String jsonString) {
-        return GsonHelper.parseJsonStringToParameterizedList(jsonString, Node.class);
-    }
-
-    private Fact buildFactFromString(String jsonString) {
-        return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
-    }
-
-    private String executeCommandAndHandleResult(String command) {
+    String executeCommandAndHandleResult(String command) {
         try {
             ChannelExec channelExec = this.setupChannelExec();
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
