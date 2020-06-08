@@ -121,6 +121,22 @@ public final class TransformationContext {
         return values.get(name);
     }
 
+    public void setErrorState(Exception e) {
+        this.state = State.ERROR;
+        this.putValue("exception",e);
+    }
+
+    /**
+     * This function will be called by Winery to re-throw the exception triggered during the
+     * transformation and inform the user about that.
+     */
+    public void throwExceptionIfErrorState() throws Exception {
+        Exception e = (Exception) this.getValue("exception");
+        if (this.state == State.ERROR &&  e != null) {
+            throw e;
+        }
+    }
+
     public enum State {
         READY,
         TRANSFORMING,
