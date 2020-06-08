@@ -4,7 +4,4 @@ public enum FactType {
     IPAddress,
     OperatingSystem,
     OperatingSystemRelease,
-    EC2Metadata,
-    SSHDSAKey,
-    SSHRSAKey
 }
