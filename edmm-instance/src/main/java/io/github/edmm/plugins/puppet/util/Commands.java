@@ -8,6 +8,9 @@ public class Commands {
     private static final String BASE_COMMAND = CURL_COMMAND + API;
     // TODO: make this more stable and less brittle e.g. by searching actively for where puppet modules are stored on master, and by checking environment, but for now its ok
     public static final String COPY_PUBLIC_KEY = "sudo cp ~/.ssh/puppet.pub /etc/puppetlabs/code/environments/production/modules/edimm_ssh/files/puppet.pub";
+    public static final String UNZIP_PUPPET_MODULE = "unzip edimm_ssh.zip";
+    public static final String DELETE_ZIP = "rm edimm_ssh.zip";
+    public static final String MOVE_PUPPET_MODULE = "sudo mv edimm_ssh /etc/puppetlabs/code/environments/production/modules/edimm_ssh";
     private static final String SSH_KEY_GENERATION_PREFIX = "ssh-keygen -f ~/.ssh/";
     private static final String SSH_KEY_GENERATION_SUFFIX = " -t rsa -N ''";
     public static final String GET_MASTER = BASE_COMMAND + "producers";

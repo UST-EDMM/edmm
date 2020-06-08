@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,16 +81,54 @@ public class Master {
     }
 
     private void initMasterData() {
+        this.prepareMaster();
+        this.configurePuppetMaster();
+        this.prepareNodes();
+    }
+
+    private void prepareMaster() {
         this.setMasterHostName();
         this.setMasterId();
-        this.setNodes();
         this.setPuppetVersion();
+        this.setCreatedAtTimestamp();
+    }
+
+    private void prepareNodes() {
+        this.setNodes();
+        this.setNodeFacts();
+        this.setNodeState();
+    }
+
+    private void configurePuppetMaster() {
+        this.copyPuppetModule();
+        this.unzipPuppetModule();
+        this.movePuppetModuleToProduction();
+        this.transferAndExecPuppetSiteScript();
         this.generateSSHKeyPair();
         this.copyPublicKeyToPuppetModule();
         this.readGeneratedKeys();
-        this.setCreatedAtTimestamp();
-        this.setNodeFacts();
-        this.setNodeState();
+    }
+
+    private void unzipPuppetModule() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+
+            channelExec.setCommand(Commands.UNZIP_PUPPET_MODULE + ";" + Commands.DELETE_ZIP);
+            channelExec.connect();
+        } catch (JSchException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
+    }
+
+    private void movePuppetModuleToProduction() {
+        try {
+            ChannelExec channelExec = this.setupChannelExec();
+
+            channelExec.setCommand(Commands.MOVE_PUPPET_MODULE);
+            channelExec.connect();
+        } catch (JSchException e) {
+            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+        }
     }
 
     private void setNodeFacts() {
@@ -258,6 +298,31 @@ public class Master {
             this.generatedPublicKey = reader.readLine();
         } catch (JSchException | SftpException | IOException e) {
             throw new InstanceTransformationException("Failed to retrieve public or private key from master", e.getCause());
+        }
+    }
+
+    private void copyPuppetModule() {
+        try {
+            ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
+            channelSftp.connect();
+
+            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.zip").toURI())), "/home/ubuntu/");
+        } catch (JSchException | SftpException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void transferAndExecPuppetSiteScript() {
+        try {
+            ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
+            channelSftp.connect();
+
+            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.sh").toURI())), "/home/ubuntu/");
+            ChannelExec channelExec = this.setupChannelExec();
+            channelExec.setCommand("sudo chmod +x edimm_ssh.sh; sudo ./edimm_ssh.sh");
+            channelExec.connect();
+        } catch (JSchException | SftpException | URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 }
