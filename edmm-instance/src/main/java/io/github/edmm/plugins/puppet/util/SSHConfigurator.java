@@ -19,10 +19,12 @@ import com.jcraft.jsch.SftpException;
 public class SSHConfigurator {
     private Master master;
     private Session session;
+    private String outputLocation;
 
     public SSHConfigurator(Master master) {
         this.master = master;
         this.session = master.getSession();
+        this.outputLocation = "/home/" + this.master.getUser() + "/";
     }
 
     public void configurePuppetMaster() {
@@ -40,7 +42,7 @@ public class SSHConfigurator {
         try {
             ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
-            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.zip").toURI())), "/home/ubuntu/");
+            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.zip").toURI())), this.outputLocation);
         } catch (JSchException | SftpException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -62,7 +64,7 @@ public class SSHConfigurator {
         try {
             ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
-            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.sh").toURI())), "/home/ubuntu/");
+            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.sh").toURI())), this.outputLocation);
 
             this.executeSimpleCommand(Commands.EXECUTE_HELPER_SCRIPT);
         } catch (JSchException | SftpException | URISyntaxException e) {
@@ -88,7 +90,7 @@ public class SSHConfigurator {
             ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
             sftp.connect();
             // TODO make this less brittle
-            InputStream stream = sftp.get("/home/ubuntu/.ssh/puppet");
+            InputStream stream = sftp.get(this.outputLocation + ".ssh/puppet");
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             StringBuilder stringBuilder = new StringBuilder();
             String line = reader.readLine();
@@ -107,7 +109,7 @@ public class SSHConfigurator {
             ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
             sftp.connect();
             // TODO make this less brittle
-            InputStream stream = sftp.get("/home/ubuntu/.ssh/puppet.pub");
+            InputStream stream = sftp.get(this.outputLocation + ".ssh/puppet.pub");
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             this.master.setGeneratedPublicKey(reader.readLine());
         } catch (JSchException | SftpException | IOException e) {
