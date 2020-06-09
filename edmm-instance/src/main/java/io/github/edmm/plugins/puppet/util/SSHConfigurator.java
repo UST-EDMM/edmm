@@ -16,11 +16,11 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
-public class MasterSSHConfigurator {
+public class SSHConfigurator {
     private Master master;
     private Session session;
 
-    public MasterSSHConfigurator(Master master) {
+    public SSHConfigurator(Master master) {
         this.master = master;
         this.session = master.getSession();
     }

@@ -8,8 +8,8 @@ import java.util.List;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
-import io.github.edmm.plugins.puppet.util.MasterNodeHandler;
-import io.github.edmm.plugins.puppet.util.MasterSSHConfigurator;
+import io.github.edmm.plugins.puppet.util.NodesHandler;
+import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 
 import com.jcraft.jsch.ChannelExec;
@@ -75,13 +75,13 @@ public class Master {
     }
 
     private void setupSSH() {
-        MasterSSHConfigurator masterSSHConfigurator = new MasterSSHConfigurator(this);
-        masterSSHConfigurator.configurePuppetMaster();
+        SSHConfigurator SSHConfigurator = new SSHConfigurator(this);
+        SSHConfigurator.configurePuppetMaster();
     }
 
     private void setupNodes() {
-        MasterNodeHandler masterNodeHandler = new MasterNodeHandler(this);
-        masterNodeHandler.handleNodes();
+        NodesHandler nodesHandler = new NodesHandler(this);
+        nodesHandler.handleNodes();
     }
 
     private ChannelExec setupChannelExec() throws JSchException {

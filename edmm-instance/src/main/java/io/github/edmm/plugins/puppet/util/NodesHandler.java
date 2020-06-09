@@ -9,10 +9,10 @@ import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.Node;
 import io.github.edmm.plugins.puppet.model.PuppetState;
 
-public class MasterNodeHandler {
+public class NodesHandler {
     private Master master;
 
-    public MasterNodeHandler(Master master) {
+    public NodesHandler(Master master) {
         this.master = master;
     }
 
