@@ -35,7 +35,7 @@ public class PuppetState {
 
     public static InstanceState.InstanceStateForDeploymentInstance getDeploymentInstanceState(Master master) {
         if (master.getState().equals(PuppetState.MasterStateAsComponentInstance.running)) {
-            if (!master.getNodes().stream().anyMatch(node -> node.getState().equals(NodeState.failed))) {
+            if (master.getNodes().stream().noneMatch(node -> node.getState().equals(NodeState.failed))) {
                 return InstanceState.InstanceStateForDeploymentInstance.CREATED;
             }
         }

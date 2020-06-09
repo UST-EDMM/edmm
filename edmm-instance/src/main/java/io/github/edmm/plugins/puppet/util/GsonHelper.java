@@ -9,13 +9,13 @@ import com.google.gson.reflect.TypeToken;
 
 public class GsonHelper {
 
-    public static <T> T parseJsonStringToObjectType(String jsonString, Class<T> type) {
+    static <T> T parseJsonStringToObjectType(String jsonString, Class<T> type) {
         Type genericType = TypeToken.get(type).getType();
         Gson gson = new Gson();
         return gson.fromJson(jsonString, genericType);
     }
 
-    public static <T> List<T> parseJsonStringToParameterizedList(String jsonString, Class<T> type) {
+    static <T> List<T> parseJsonStringToParameterizedList(String jsonString, Class<T> type) {
         Type genericType = TypeToken.getParameterized(List.class, type).getType();
         Gson gson = new Gson();
         return gson.fromJson(jsonString, genericType);
