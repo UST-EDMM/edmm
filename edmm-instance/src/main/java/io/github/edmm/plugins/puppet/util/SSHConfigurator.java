@@ -28,7 +28,7 @@ public class SSHConfigurator {
     }
 
     public void configurePuppetMaster() {
-        this.copyPuppetModule();
+        this.copyPuppetModuleToMaster();
         this.unzipPuppetModule();
         this.deleteZip();
         this.movePuppetModuleToProduction();
@@ -38,9 +38,9 @@ public class SSHConfigurator {
         this.readGeneratedKeys();
     }
 
-    private void copyPuppetModule() {
+    private void copyPuppetModuleToMaster() {
         try {
-            ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
+            ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
             channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.zip").toURI())), this.outputLocation);
         } catch (JSchException | SftpException | URISyntaxException e) {
@@ -62,7 +62,7 @@ public class SSHConfigurator {
 
     private void transferAndExecPuppetSiteScript() {
         try {
-            ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
+            ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
             channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.sh").toURI())), this.outputLocation);
 
@@ -87,7 +87,7 @@ public class SSHConfigurator {
 
     private void readPrivateKey() {
         try {
-            ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
+            ChannelSftp sftp = this.setupChannelSftp();
             sftp.connect();
             // TODO make this less brittle
             InputStream stream = sftp.get(this.outputLocation + ".ssh/puppet");
@@ -106,7 +106,7 @@ public class SSHConfigurator {
 
     private void readPublicKey() {
         try {
-            ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
+            ChannelSftp sftp = this.setupChannelSftp();
             sftp.connect();
             // TODO make this less brittle
             InputStream stream = sftp.get(this.outputLocation + ".ssh/puppet.pub");
@@ -130,5 +130,9 @@ public class SSHConfigurator {
 
     private ChannelExec setupChannelExec() throws JSchException {
         return (ChannelExec) this.session.openChannel("exec");
+    }
+
+    private ChannelSftp setupChannelSftp() throws JSchException {
+        return (ChannelSftp) this.session.openChannel("sftp");
     }
 }
