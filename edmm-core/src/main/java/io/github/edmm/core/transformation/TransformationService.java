@@ -64,6 +64,7 @@ public class TransformationService {
                 executor.submit(new TransformationTask(plugin.get(), context)).get();
             } catch (Exception e) {
                 logger.error("Error executing transformation task", e);
+                context.setErrorState(e);
             }
         }
     }

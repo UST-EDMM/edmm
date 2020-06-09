@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.edmm.utils.Consts;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,6 +18,10 @@ public class Aws {
         private String name;
         private String filepath = "./";
         private String filename;
+
+        public void setFilepath(String filepath) {
+            this.filepath = Aws.setFilePath(filepath);
+        }
     }
 
     @Data
@@ -27,6 +33,19 @@ public class Aws {
         private String instanceClass = "db.t2.micro";
         private String username = "user";
         private String password = "password";
+
+        private String schemaPath = "./";
+        private String configurePath = "./";
+
+        public void setSchemaPath(String filepath, String filename) {
+            this.schemaPath = Aws.setFilePath(filepath);
+            this.schemaPath += filename;
+        }
+
+        public void setConfigurePath(String filepath, String filename) {
+            this.configurePath = Aws.setFilePath(filepath);
+            this.configurePath += filename;
+        }
     }
 
     @Data
@@ -67,5 +86,11 @@ public class Aws {
         public void addEnvVar(String name, String value) {
             envVars.put(name, value);
         }
+    }
+
+    private static String setFilePath(String filepath) {
+        return filepath != null && filepath.endsWith(Consts.FS)
+            ? filepath
+            : Consts.FS.endsWith("\\") ? filepath + Consts.FS + Consts.FS : filepath + Consts.FS;
     }
 }
