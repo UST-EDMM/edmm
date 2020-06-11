@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import io.github.edmm.model.component.WebServer;
 import io.github.edmm.model.support.EdmmYamlBuilder;
 import io.github.edmm.plugins.ansible.AnsiblePlugin;
 import io.github.edmm.plugins.cfn.CloudFormationPlugin;
+import io.github.edmm.plugins.cfn.rules.AuroraRule;
 import io.github.edmm.plugins.cfn.rules.BeanstalkRule;
 import io.github.edmm.plugins.cfn.rules.CfnPaasRule;
 import org.junit.Assert;
@@ -185,5 +187,31 @@ public class RulesTests {
             Assert.assertTrue(unsupportedComponents.contains("WebServer1") && unsupportedComponents.contains("Compute1"));
         } else
             Assert.fail("component not present");
+    }
+
+    @Test
+    public void testPriority() {
+        RuleEngine ruleEngine = new RuleEngine();
+        EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
+        yamlBuilder.component(Saas.class)
+                   .hostedOn(Paas.class)
+                   .component(Paas.class);
+        DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
+
+        List<Rule> rules = new ArrayList<>();
+        rules.add(new SaasDefaultRule());
+        rules.add(new CfnPaasRule());
+        rules.add(new AuroraRule());
+
+
+
+        for (RootComponent component: actualModel.getComponents()) {
+             ruleEngine.fire(actualModel, rules, component);
+        }
+        // bad trick to get the results list
+        List<Rule.Result> results  = ruleEngine.fire(actualModel, new ArrayList<>(), null);
+        Assert.assertEquals(2, results.size());
+        Assert.assertEquals("Paas", results.get(0).getUnsupportedComponents().get(0));
+        Assert.assertEquals("Saas", results.get(1).getUnsupportedComponents().get(0));
     }
 }
