@@ -4,26 +4,22 @@ components:
     type: compute
   tomcat:
     relations:
-    - '2':
-        depends_on:
-          type: depends_on
-          target: ubuntu
-    - '0':
-        hosted_on:
-          type: hosted_on
-          target: ubuntu
-    - '1':
-        depends_on:
-          type: depends_on
-          target: db
+    - depends_on:
+        type: depends_on
+        target: ubuntu
+    - depends_on:
+        type: depends_on
+        target: db
+    - hosted_on:
+        type: hosted_on
+        target: ubuntu
     type: software_component
   db:
     type: software_component
     relations:
-    - '0':
-        hosted_on:
-          type: hosted_on
-          target: ubuntu
+    - hosted_on:
+        type: hosted_on
+        target: ubuntu
 metadata:
   maintainer: Michael Wurster
 relation_types:

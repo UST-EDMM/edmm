@@ -12,8 +12,15 @@ import io.github.edmm.model.support.TypeWrapper;
 
 public class MappingEntity extends Entity {
 
+    private final String value;
+
     public MappingEntity(EntityId id, EntityGraph graph) {
+        this(id, graph, null);
+    }
+
+    public MappingEntity(EntityId id, EntityGraph graph, String value) {
         super(id, graph);
+        this.value = value;
     }
 
     public <T> void setValue(Attribute<T> key, T value) {
@@ -74,5 +81,13 @@ public class MappingEntity extends Entity {
     @Override
     public String toString() {
         return (String.format("MappingEntity (id='%s')", getId()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MappingEntity entity = (MappingEntity) o;
+        return super.equals(o) && this.value == entity.value;
     }
 }

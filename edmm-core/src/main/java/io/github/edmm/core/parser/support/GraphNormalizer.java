@@ -52,8 +52,7 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity entry : relations.get().getChildren()) {
-                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
+                for (Entity relation : relations.get().getChildren()) {
                     relation.getChild(DefaultKeys.TYPE)
                         .flatMap(type -> GraphHelper.findMappingEntity(graph, ((ScalarEntity) type).getValue(), EntityGraph.RELATION_TYPES))
                         .ifPresent(value -> graph.addEdge(relation, value, DefaultKeys.INSTANCE_OF));
@@ -66,8 +65,7 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity entry : relations.get().getChildren()) {
-                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
+                for (Entity relation : relations.get().getChildren()) {
                     Optional<Entity> entity = relation.getChild(DefaultKeys.TARGET);
                     if (entity.isPresent()) {
                         ScalarEntity targetAssignment = (ScalarEntity) entity.get();
@@ -84,11 +82,10 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity entry : relations.get().getChildren()) {
-                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
+                for (Entity relation : relations.get().getChildren()) {
                     if (relation instanceof ScalarEntity) {
                         ScalarEntity scalarEntity = (ScalarEntity) relation;
-                        MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                        MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                         ScalarEntity type = new ScalarEntity(scalarEntity.getName(), normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                         ScalarEntity target = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.TARGET), graph);
                         graph.replaceEntity(scalarEntity, normalizedEntity);
@@ -118,7 +115,7 @@ public abstract class GraphNormalizer {
             for (Entity op : operations.get().getChildren()) {
                 if (op instanceof ScalarEntity) {
                     ScalarEntity scalarEntity = (ScalarEntity) op;
-                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                     SequenceEntity artifacts = new SequenceEntity(op.getId().extend(DefaultKeys.ARTIFACTS), graph);
                     ScalarEntity artifact = new ScalarEntity(scalarEntity.getValue(), artifacts.getId().extend(DefaultKeys.CMD), graph);
                     graph.replaceEntity(scalarEntity, normalizedEntity);
@@ -141,7 +138,7 @@ public abstract class GraphNormalizer {
             for (Entity prop : properties.get().getChildren()) {
                 if (prop instanceof ScalarEntity) {
                     ScalarEntity scalarEntity = (ScalarEntity) prop;
-                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+                    MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph, scalarEntity.getValue());
                     ScalarEntity type = new ScalarEntity(DefaultKeys.STRING, normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                     ScalarEntity value = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.VALUE), graph);
                     graph.replaceEntity(scalarEntity, normalizedEntity);
