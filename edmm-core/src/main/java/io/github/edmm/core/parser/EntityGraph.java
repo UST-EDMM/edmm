@@ -133,7 +133,9 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
                 } else {
                     childName = String.valueOf(i);
                 }
-                EntityId childId = id.extend(childName);
+                EntityId entryId = id.extend(String.valueOf(i));
+                addEntity(new MappingEntity(entryId, this));
+                EntityId childId = entryId.extend(childName);
                 populateGraph(childNode, childId);
             }
         } else if (node instanceof ScalarNode) {
