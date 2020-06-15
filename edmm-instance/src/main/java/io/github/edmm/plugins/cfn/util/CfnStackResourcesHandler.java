@@ -1,9 +1,12 @@
 package io.github.edmm.plugins.cfn.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.edmm.model.edimm.ComponentInstance;
+import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.cfn.model.Status;
 import io.github.edmm.plugins.cfn.model.Template;
 
@@ -26,7 +29,8 @@ public class CfnStackResourcesHandler {
             componentInstance.setName(stackResource.getLogicalResourceId());
             componentInstance.setId(stackResource.getPhysicalResourceId());
             componentInstance.setDescription(stackResource.getDescription());
-            componentInstance.setType(stackResource.getResourceType());
+            componentInstance.setType(new TypeMapperImplementation().toComponentType(stackResource.getResourceType()));
+            componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty("type", String.class.getSimpleName(), stackResource.getResourceType())));
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
             componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());
             componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus()).toEDiMMComponentInstanceState());

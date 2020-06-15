@@ -92,7 +92,6 @@ public class DeploymentInstanceTest {
         assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(2).getType());
         assertEquals("containerStatus::nginx::restartCount", this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(4).getKey());
         assertEquals(this.deploymentInstance.getComponentInstances().get(1).getState().toTOSCANodeTemplateInstanceState(), TOSCAState.NodeTemplateInstanceState.CREATED);
-        assertTrue(this.deploymentInstance.getComponentInstances().get(0).getType().contains("nginx"));
         assertEquals(Collections.emptyList(), this.deploymentInstance.getComponentInstances().get(0).getRelationInstances());
         assertEquals("containerStatus::nginx::image", this.deploymentInstance.getComponentInstances().get(2).getInstanceProperties().get(2).getKey());
         assertTrue(this.deploymentInstance.getComponentInstances().get(0).getMetadata().containsKey("app"));

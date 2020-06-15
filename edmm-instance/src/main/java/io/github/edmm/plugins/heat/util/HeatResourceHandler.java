@@ -30,13 +30,15 @@ public class HeatResourceHandler {
     private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Object> resourceContent) {
         ComponentInstance componentInstance = new ComponentInstance();
 
-        // TODO artifacts
-        componentInstance.setType(resource.getType());
+        // TODO: artifacts
+        componentInstance.setType(new TypeMapperImplementation().toComponentType(resource.getType()));
         componentInstance.setId(resource.getPhysicalResourceId());
         componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
         componentInstance.setName(resource.getResourceName());
         componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
+        // set property with original type string in order to avoid losing this info since we map to EDMM types
+        componentInstance.getInstanceProperties().add(new InstanceProperty("type", String.class.getSimpleName(), resource.getType()));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
 

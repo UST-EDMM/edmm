@@ -7,10 +7,11 @@ import java.util.List;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.ComponentInstance;
+import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
-import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
+import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -107,7 +108,8 @@ public class Master {
         componentInstance.setId(this.id);
         componentInstance.setName(this.hostName);
         componentInstance.setCreatedAt(this.createdAtTimestamp);
-        componentInstance.setType(this.operatingSystem + this.operatingSystemRelease);
+        // master is always of type compute
+        componentInstance.setType(ComponentType.Compute);
         componentInstance.setState(this.state.toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
 

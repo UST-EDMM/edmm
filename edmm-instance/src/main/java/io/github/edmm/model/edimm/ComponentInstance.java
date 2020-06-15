@@ -21,14 +21,14 @@ public class ComponentInstance extends BasicInstance {
     private String name;
     private String createdAt;
     private InstanceState.InstanceStateForComponentInstance state;
-    private String type;
+    private ComponentType type;
     private List<Artifact> artifacts;
     private List<RelationInstance> relationInstances;
 
     public static ComponentInstance ofYamlContent(Map<String, Object> yamlContent) {
         ComponentInstance componentInstance = new ComponentInstance();
         componentInstance.setName(yamlContent.get(YamlConstants.NAME) != null ? String.valueOf(yamlContent.get(YamlConstants.NAME)) : null);
-        componentInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? String.valueOf(yamlContent.get(YamlConstants.TYPE)) : null);
+        componentInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? ComponentType.valueOf(yamlContent.get(YamlConstants.TYPE).toString()) : null);
         componentInstance.setState(yamlContent.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForComponentInstance.valueOf(String.valueOf(yamlContent.get(YamlConstants.STATE))) : null);
         componentInstance.setId(yamlContent.get(YamlConstants.ID) != null ? String.valueOf(yamlContent.get(YamlConstants.ID)) : null);
         componentInstance.setCreatedAt(yamlContent.get(YamlConstants.CREATED_AT) != null ? String.valueOf(yamlContent.get(YamlConstants.CREATED_AT)) : null);

@@ -19,7 +19,7 @@ public class NodesHandler {
     public void handleNodes() {
         this.setNodes();
         this.setNodeFacts();
-        this.setNodeState();
+        this.setNodeStates();
     }
 
     private void setNodes() {
@@ -46,10 +46,9 @@ public class NodesHandler {
         return buildFactFromString(this.master.executeCommandAndHandleResult(Commands.getFactCommandByFactType(certName, factType)));
     }
 
-    private void setNodeState() {
+    private void setNodeStates() {
         this.master.getNodes().forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
     }
-
 
     private List<Node> buildNodesFromString(String jsonString) {
         return GsonHelper.parseJsonStringToParameterizedList(jsonString, Node.class);
