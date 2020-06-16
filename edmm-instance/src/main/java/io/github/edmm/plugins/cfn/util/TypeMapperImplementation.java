@@ -2,22 +2,374 @@ package io.github.edmm.plugins.cfn.util;
 
 import io.github.edmm.core.plugin.TypeMapper;
 import io.github.edmm.model.edimm.ComponentType;
+import io.github.edmm.plugins.cfn.model.types.ACMPCAType;
+import io.github.edmm.plugins.cfn.model.types.AccessAnalyzerType;
+import io.github.edmm.plugins.cfn.model.types.AmazonMQType;
+import io.github.edmm.plugins.cfn.model.types.AmplifyType;
+import io.github.edmm.plugins.cfn.model.types.ApiGatewayType;
+import io.github.edmm.plugins.cfn.model.types.ApiGatewayV2Type;
+import io.github.edmm.plugins.cfn.model.types.AppConfigType;
+import io.github.edmm.plugins.cfn.model.types.AppMeshType;
+import io.github.edmm.plugins.cfn.model.types.AppStreamType;
+import io.github.edmm.plugins.cfn.model.types.ApplicationAutoScalingType;
+import io.github.edmm.plugins.cfn.model.types.AthenaType;
+import io.github.edmm.plugins.cfn.model.types.AutoScalingPlansType;
+import io.github.edmm.plugins.cfn.model.types.AutoScalingType;
+import io.github.edmm.plugins.cfn.model.types.BackupType;
+import io.github.edmm.plugins.cfn.model.types.BatchType;
+import io.github.edmm.plugins.cfn.model.types.BudgetsType;
+import io.github.edmm.plugins.cfn.model.types.CassandraType;
+import io.github.edmm.plugins.cfn.model.types.CertificateManagerType;
+import io.github.edmm.plugins.cfn.model.types.ChatbotType;
+import io.github.edmm.plugins.cfn.model.types.Cloud9Type;
+import io.github.edmm.plugins.cfn.model.types.CloudFormationType;
+import io.github.edmm.plugins.cfn.model.types.CloudFrontType;
+import io.github.edmm.plugins.cfn.model.types.CloudTrailType;
+import io.github.edmm.plugins.cfn.model.types.CodeBuildType;
+import io.github.edmm.plugins.cfn.model.types.CodeCommitType;
+import io.github.edmm.plugins.cfn.model.types.CodeDeployType;
+import io.github.edmm.plugins.cfn.model.types.CodeGuruProfilerType;
+import io.github.edmm.plugins.cfn.model.types.CodePipelineType;
+import io.github.edmm.plugins.cfn.model.types.CodeStarConnectionsType;
+import io.github.edmm.plugins.cfn.model.types.CodeStarNotificationsType;
+import io.github.edmm.plugins.cfn.model.types.CodeStarType;
+import io.github.edmm.plugins.cfn.model.types.CognitoType;
+import io.github.edmm.plugins.cfn.model.types.ConfigType;
+import io.github.edmm.plugins.cfn.model.types.DAXType;
+import io.github.edmm.plugins.cfn.model.types.DLMType;
+import io.github.edmm.plugins.cfn.model.types.DMSType;
+import io.github.edmm.plugins.cfn.model.types.DataPipelineType;
+import io.github.edmm.plugins.cfn.model.types.DetectiveType;
+import io.github.edmm.plugins.cfn.model.types.DirectoryServiceType;
+import io.github.edmm.plugins.cfn.model.types.DocDBType;
+import io.github.edmm.plugins.cfn.model.types.DynamoDBType;
 import io.github.edmm.plugins.cfn.model.types.EC2Type;
+import io.github.edmm.plugins.cfn.model.types.ECRType;
+import io.github.edmm.plugins.cfn.model.types.ECSType;
+import io.github.edmm.plugins.cfn.model.types.EFSType;
+import io.github.edmm.plugins.cfn.model.types.EKSType;
+import io.github.edmm.plugins.cfn.model.types.EMRType;
+import io.github.edmm.plugins.cfn.model.types.ElastiCacheType;
+import io.github.edmm.plugins.cfn.model.types.ElasticBeanstalkType;
+import io.github.edmm.plugins.cfn.model.types.ElasticLoadBalancingType;
+import io.github.edmm.plugins.cfn.model.types.ElasticLoadBalancingV2Type;
+import io.github.edmm.plugins.cfn.model.types.ElasticsearchType;
+import io.github.edmm.plugins.cfn.model.types.EventSchemasType;
+import io.github.edmm.plugins.cfn.model.types.EventsType;
+import io.github.edmm.plugins.cfn.model.types.FMSType;
+import io.github.edmm.plugins.cfn.model.types.GameLiftType;
+import io.github.edmm.plugins.cfn.model.types.GlobalAcceleratorType;
+import io.github.edmm.plugins.cfn.model.types.GlueType;
+import io.github.edmm.plugins.cfn.model.types.GreengrassType;
+import io.github.edmm.plugins.cfn.model.types.GroundStationType;
+import io.github.edmm.plugins.cfn.model.types.GuardDutyType;
+import io.github.edmm.plugins.cfn.model.types.IAMType;
+import io.github.edmm.plugins.cfn.model.types.ImageBuilderType;
+import io.github.edmm.plugins.cfn.model.types.InspectorType;
+import io.github.edmm.plugins.cfn.model.types.IoT1ClickType;
+import io.github.edmm.plugins.cfn.model.types.IoTAnalyticsType;
+import io.github.edmm.plugins.cfn.model.types.IoTEventsType;
+import io.github.edmm.plugins.cfn.model.types.IoTThingsGraphType;
+import io.github.edmm.plugins.cfn.model.types.IoTType;
+import io.github.edmm.plugins.cfn.model.types.KMSType;
+import io.github.edmm.plugins.cfn.model.types.KinesisAnalyticsType;
+import io.github.edmm.plugins.cfn.model.types.KinesisAnalyticsV2Type;
+import io.github.edmm.plugins.cfn.model.types.KinesisFirehoseType;
+import io.github.edmm.plugins.cfn.model.types.KinesisType;
+import io.github.edmm.plugins.cfn.model.types.LakeFormationType;
+import io.github.edmm.plugins.cfn.model.types.LambdaType;
+import io.github.edmm.plugins.cfn.model.types.MSKType;
+import io.github.edmm.plugins.cfn.model.types.MacieType;
+import io.github.edmm.plugins.cfn.model.types.ManagedBlockchainType;
+import io.github.edmm.plugins.cfn.model.types.MediaConvertType;
+import io.github.edmm.plugins.cfn.model.types.MediaLiveType;
+import io.github.edmm.plugins.cfn.model.types.MediaStoreType;
+import io.github.edmm.plugins.cfn.model.types.NeptuneType;
+import io.github.edmm.plugins.cfn.model.types.NetworkManagerType;
+import io.github.edmm.plugins.cfn.model.types.OpsWorkType;
+import io.github.edmm.plugins.cfn.model.types.OpsWorksCMType;
+import io.github.edmm.plugins.cfn.model.types.PinpointEmailType;
+import io.github.edmm.plugins.cfn.model.types.PinpointType;
+import io.github.edmm.plugins.cfn.model.types.QLDBType;
+import io.github.edmm.plugins.cfn.model.types.RAMType;
+import io.github.edmm.plugins.cfn.model.types.RDSType;
+import io.github.edmm.plugins.cfn.model.types.RedshiftType;
+import io.github.edmm.plugins.cfn.model.types.ResourceGroupsType;
+import io.github.edmm.plugins.cfn.model.types.RoboMakerType;
+import io.github.edmm.plugins.cfn.model.types.Route53ResolverType;
+import io.github.edmm.plugins.cfn.model.types.Route53Type;
+import io.github.edmm.plugins.cfn.model.types.S3Type;
+import io.github.edmm.plugins.cfn.model.types.SDBType;
+import io.github.edmm.plugins.cfn.model.types.SESType;
+import io.github.edmm.plugins.cfn.model.types.SNSType;
+import io.github.edmm.plugins.cfn.model.types.SQSType;
+import io.github.edmm.plugins.cfn.model.types.SageMakerType;
+import io.github.edmm.plugins.cfn.model.types.SecretsManagerType;
+import io.github.edmm.plugins.cfn.model.types.SecurityHubType;
+import io.github.edmm.plugins.cfn.model.types.ServiceCatalogType;
+import io.github.edmm.plugins.cfn.model.types.ServiceDiscoveryType;
+import io.github.edmm.plugins.cfn.model.types.StepFunctionsType;
+import io.github.edmm.plugins.cfn.model.types.SyntheticsType;
+import io.github.edmm.plugins.cfn.model.types.TransferType;
+import io.github.edmm.plugins.cfn.model.types.WAFRegionalType;
+import io.github.edmm.plugins.cfn.model.types.WAFType;
+import io.github.edmm.plugins.cfn.model.types.WAFv2Type;
+import io.github.edmm.plugins.cfn.model.types.WorkSpacesType;
 
 class TypeMapperImplementation implements TypeMapper {
     private static final String EC2_PREFIX = "AWS::EC2::";
+    private static final String DELIMITER = "::";
 
     @Override
     public ComponentType toComponentType(String type) {
-        if (type.contains(EC2_PREFIX)) {
-            return this.handleTypes(type.replace(EC2_PREFIX, ""));
+        switch (extractTopLevelType(type)) {
+            case AwsTypeConstants.AccessAnalyzer:
+                return AccessAnalyzerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ACMPCA:
+                return ACMPCAType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AmazonMQ:
+                return AmazonMQType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Amplify:
+                return AmplifyType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ApiGateway:
+                return ApiGatewayType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ApiGatewayV2:
+                return ApiGatewayV2Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AppConfig:
+                return AppConfigType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ApplicationAutoScaling:
+                return ApplicationAutoScalingType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AppMesh:
+                return AppMeshType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AppStream:
+                return AppStreamType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AppSync:
+                return AppStreamType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Athena:
+                return AthenaType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AutoScaling:
+                return AutoScalingType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.AutoScalingPlans:
+                return AutoScalingPlansType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Backup:
+                return BackupType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Batch:
+                return BatchType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Budgets:
+                return BudgetsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Cassandra:
+                return CassandraType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CertificateManager:
+                return CertificateManagerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Chatbot:
+                return ChatbotType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Cloud9:
+                return Cloud9Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CloudFormation:
+                return CloudFormationType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CloudFront:
+                return CloudFrontType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CloudTrail:
+                return CloudTrailType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeBuild:
+                return CodeBuildType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeCommit:
+                return CodeCommitType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeDeploy:
+                return CodeDeployType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeGuruProfiler:
+                return CodeGuruProfilerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodePipeline:
+                return CodePipelineType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeStar:
+                return CodeStarType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeStarConnections:
+                return CodeStarConnectionsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.CodeStarNotifications:
+                return CodeStarNotificationsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Cognito:
+                return CognitoType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Config:
+                return ConfigType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DataPipeline:
+                return DataPipelineType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DAX:
+                return DAXType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Detective:
+                return DetectiveType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DirectoryService:
+                return DirectoryServiceType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DLM:
+                return DLMType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DMS:
+                return DMSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DocDB:
+                return DocDBType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.DynamoDB:
+                return DynamoDBType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.EC2:
+                return EC2Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ECR:
+                return ECRType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ECS:
+                return ECSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.EFS:
+                return EFSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.EKS:
+                return EKSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ElastiCache:
+                return ElastiCacheType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ElasticBeanstalk:
+                return ElasticBeanstalkType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ElasticLoadBalancing:
+                return ElasticLoadBalancingType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ElasticLoadBalancingV2:
+                return ElasticLoadBalancingV2Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Elasticsearch:
+                return ElasticsearchType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.EMR:
+                return EMRType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Events:
+                return EventsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.EventSchemas:
+                return EventSchemasType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.FMS:
+                return FMSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.GameLift:
+                return GameLiftType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.GlobalAccelerator:
+                return GlobalAcceleratorType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Glue:
+                return GlueType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Greengrass:
+                return GreengrassType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.GroundStation:
+                return GroundStationType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.GuardDuty:
+                return GuardDutyType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IAM:
+                return IAMType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ImageBuilder:
+                return ImageBuilderType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Inspector:
+                return InspectorType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IoT1Click:
+                return IoT1ClickType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IoTAnalytics:
+                return IoTAnalyticsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IoTEvents:
+                return IoTEventsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IoTThingsGraph:
+                return IoTThingsGraphType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.IoT:
+                return IoTType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Kinesis:
+                return KinesisType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.KinesisAnalytics:
+                return KinesisAnalyticsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.KinesisAnalyticsV2:
+                return KinesisAnalyticsV2Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.KinesisFirehose:
+                return KinesisFirehoseType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.KMS:
+                return KMSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.LakeFormation:
+                return LakeFormationType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Lambda:
+                return LambdaType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Macie:
+                return MacieType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ManagedBlockchain:
+                return ManagedBlockchainType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.MediaConvert:
+                return MediaConvertType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.MediaLive:
+                return MediaLiveType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.MediaStore:
+                return MediaStoreType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.MSK:
+                return MSKType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Neptune:
+                return NeptuneType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.NetworkManager:
+                return NetworkManagerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.OpsWork:
+                return OpsWorkType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.OpsWorksCM:
+                return OpsWorksCMType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Pinpoint:
+                return PinpointType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.PinpointEmail:
+                return PinpointEmailType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.QLDB:
+                return QLDBType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.RAM:
+                return RAMType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.RDS:
+                return RDSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Redshift:
+                return RedshiftType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ResourceGroups:
+                return ResourceGroupsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.RoboMaker:
+                return RoboMakerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Route53:
+                return Route53Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Route53Resolver:
+                return Route53ResolverType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.S3:
+                return S3Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SageMaker:
+                return SageMakerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SDB:
+                return SDBType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SecretsManager:
+                return SecretsManagerType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SecurityHub:
+                return SecurityHubType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ServiceCatalog:
+                return ServiceCatalogType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.ServiceDiscovery:
+                return ServiceDiscoveryType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SES:
+                return SESType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SNS:
+                return SNSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SQS:
+                return SQSType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.SSM:
+                return KinesisFirehoseType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.StepFunctions:
+                return StepFunctionsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Synthetics:
+                return SyntheticsType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.Transfer:
+                return TransferType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.WAF:
+                return WAFType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.WAFRegional:
+                return WAFRegionalType.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.WAFv2:
+                return WAFv2Type.valueOf(extractSpecificType(type)).toComponentType();
+            case AwsTypeConstants.WorkSpaces:
+                return WorkSpacesType.valueOf(extractSpecificType(type)).toComponentType();
+            default:
+                return ComponentType.Software_Component;
         }
-        // TODO make this better (handle all types, cinder, etc ...)
-        return null;
     }
 
     @Override
     public ComponentType handleTypes(String type) {
         return EC2Type.valueOf(type).toComponentType();
     }
+
+    private String extractTopLevelType(String type) {
+        return type.substring(0, type.lastIndexOf(DELIMITER) + 2);
+    }
+
+    private String extractSpecificType(String type) {
+        return type.substring(type.lastIndexOf(DELIMITER) + 2, type.length());
+    }
+
+
 }
