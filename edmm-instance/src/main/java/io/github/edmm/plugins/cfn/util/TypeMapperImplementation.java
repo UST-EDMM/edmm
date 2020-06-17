@@ -354,20 +354,17 @@ class TypeMapperImplementation implements TypeMapper {
             case AwsTypeConstants.WorkSpaces:
                 return WorkSpacesType.valueOf(extractSpecificType(type)).toComponentType();
             default:
-                return ComponentType.Software_Component;
+                return ComponentType.Compute;
         }
     }
 
     @Override
-    public ComponentType handleTypes(String type) {
-        return EC2Type.valueOf(type).toComponentType();
-    }
-
-    private String extractTopLevelType(String type) {
+    public String extractTopLevelType(String type) {
         return type.substring(0, type.lastIndexOf(DELIMITER) + 2);
     }
 
-    private String extractSpecificType(String type) {
+    @Override
+    public String extractSpecificType(String type) {
         return type.substring(type.lastIndexOf(DELIMITER) + 2, type.length());
     }
 

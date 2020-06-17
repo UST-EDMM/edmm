@@ -2,9 +2,11 @@ package io.github.edmm.plugins.heat.model.types;
 
 import io.github.edmm.model.edimm.ComponentType;
 
-// TODO add all other types, these are only for validation of approach
 public enum NovaType {
+    Flavor(ComponentType.Software_Component),
+    HostAggregate(ComponentType.Compute),
     KeyPair(ComponentType.Software_Component),
+    Quota(ComponentType.Software_Component),
     Server(ComponentType.Compute),
     ServerGroup(ComponentType.Compute);
 
