@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.InstanceProperty;
+import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.plugins.puppet.model.Fact;
 
 import org.apache.commons.codec.binary.Base64;
@@ -50,7 +51,7 @@ public class PuppetPropertiesHandler {
     }
 
     private static InstanceProperty handleIp(String ip) {
-        return new InstanceProperty("ip", ip.getClass().getSimpleName(), ip);
+        return new InstanceProperty(String.valueOf(PropertyKey.Compute.public_address), ip.getClass().getSimpleName(), ip);
     }
 
     private static InstanceProperty handlePrivateKeyLocation(String privateKeyLocation) {
@@ -62,7 +63,7 @@ public class PuppetPropertiesHandler {
     }
 
     private static InstanceProperty handlePublicKey(String privateKeyLocation) {
-        return new InstanceProperty("publicKey", String.class.getSimpleName(), generatePublicKeyFromPrivateKeyLocation(privateKeyLocation));
+        return new InstanceProperty(String.valueOf(PropertyKey.Compute.public_key), String.class.getSimpleName(), generatePublicKeyFromPrivateKeyLocation(privateKeyLocation));
     }
 
     private static String readPrivateKeyFileIntoString(String privateKeyLocation) {

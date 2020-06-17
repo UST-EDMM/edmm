@@ -2,7 +2,7 @@ package io.github.edmm.plugins.cfn.util;
 
 import io.github.edmm.util.Constants;
 
-class AwsTypeConstants {
+class CfnTypeConstants {
     private static final String AWS_PREFIX = "AWS" + Constants.DELIMITER;
 
     static final String AccessAnalyzer = AWS_PREFIX + "AccessAnalyzer" + Constants.DELIMITER;

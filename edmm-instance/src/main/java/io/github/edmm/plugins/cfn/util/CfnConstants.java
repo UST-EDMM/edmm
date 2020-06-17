@@ -20,6 +20,4 @@ class CfnConstants {
     static final String TYPE = "type";
     static final String DELIMITER = "::";
     static final String CONFIG = "config";
-
-
 }

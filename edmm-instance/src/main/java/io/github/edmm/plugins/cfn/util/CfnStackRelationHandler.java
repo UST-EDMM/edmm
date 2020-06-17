@@ -6,10 +6,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.RelationInstance;
-import io.github.edmm.model.edimm.RelationTypes;
+import io.github.edmm.model.edimm.RelationType;
 import io.github.edmm.plugins.cfn.model.Resource;
 import io.github.edmm.plugins.cfn.model.Template;
 import io.github.edmm.util.CastUtil;
+import io.github.edmm.util.Constants;
 
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
@@ -66,13 +67,13 @@ class CfnStackRelationHandler {
     private void createRelationInstance(String dependsOnValue, AtomicInteger relationCount) {
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setId(this.generateIdOfRelation(relationCount));
-        relationInstance.setType(RelationTypes.RelationType.dependsOn);
+        relationInstance.setType(RelationType.DependsOn);
         relationInstance.setTargetInstanceId(this.getTargetInstanceIdOfRelation(dependsOnValue));
         this.relationInstances.add(relationInstance);
     }
 
     private String generateIdOfRelation(AtomicInteger relationCount) {
-        return RelationTypes.RelationType.dependsOn + RelationTypes.relationDelimiter + String.valueOf(relationCount.getAndIncrement());
+        return RelationType.DependsOn + Constants.DELIMITER + String.valueOf(relationCount.getAndIncrement());
     }
 
     private String getTargetInstanceIdOfRelation(String dependsOnValue) {

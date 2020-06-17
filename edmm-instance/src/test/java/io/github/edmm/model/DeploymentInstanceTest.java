@@ -8,7 +8,7 @@ import io.github.edmm.core.yaml.YamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.model.edimm.RelationInstance;
-import io.github.edmm.model.edimm.RelationTypes;
+import io.github.edmm.model.edimm.RelationType;
 import io.github.edmm.model.opentosca.TOSCAState;
 
 import org.junit.jupiter.api.Test;
@@ -120,8 +120,8 @@ public class DeploymentInstanceTest {
 
         assertNotNull(relationInstance);
         assertEquals("4aeb6497-90e8-4c68-99b4-dea09d4848da", relationInstance.getTargetInstanceId());
-        assertEquals(RelationTypes.RelationType.dependsOn, relationInstance.getType());
-        assertEquals("dependsOn::0", relationInstance.getId());
+        assertEquals(RelationType.DependsOn, relationInstance.getType());
+        assertEquals("DependsOn::0", relationInstance.getId());
     }
 
     @Test

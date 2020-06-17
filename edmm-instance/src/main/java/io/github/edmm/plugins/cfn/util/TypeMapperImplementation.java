@@ -123,235 +123,235 @@ class TypeMapperImplementation implements TypeMapper {
     @Override
     public ComponentType toComponentType(String type) {
         switch (extractTopLevelType(type)) {
-            case AwsTypeConstants.AccessAnalyzer:
+            case CfnTypeConstants.AccessAnalyzer:
                 return AccessAnalyzerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ACMPCA:
+            case CfnTypeConstants.ACMPCA:
                 return ACMPCAType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AmazonMQ:
+            case CfnTypeConstants.AmazonMQ:
                 return AmazonMQType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Amplify:
+            case CfnTypeConstants.Amplify:
                 return AmplifyType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ApiGateway:
+            case CfnTypeConstants.ApiGateway:
                 return ApiGatewayType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ApiGatewayV2:
+            case CfnTypeConstants.ApiGatewayV2:
                 return ApiGatewayV2Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AppConfig:
+            case CfnTypeConstants.AppConfig:
                 return AppConfigType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ApplicationAutoScaling:
+            case CfnTypeConstants.ApplicationAutoScaling:
                 return ApplicationAutoScalingType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AppMesh:
+            case CfnTypeConstants.AppMesh:
                 return AppMeshType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AppStream:
+            case CfnTypeConstants.AppStream:
                 return AppStreamType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AppSync:
+            case CfnTypeConstants.AppSync:
                 return AppStreamType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Athena:
+            case CfnTypeConstants.Athena:
                 return AthenaType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AutoScaling:
+            case CfnTypeConstants.AutoScaling:
                 return AutoScalingType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.AutoScalingPlans:
+            case CfnTypeConstants.AutoScalingPlans:
                 return AutoScalingPlansType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Backup:
+            case CfnTypeConstants.Backup:
                 return BackupType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Batch:
+            case CfnTypeConstants.Batch:
                 return BatchType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Budgets:
+            case CfnTypeConstants.Budgets:
                 return BudgetsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Cassandra:
+            case CfnTypeConstants.Cassandra:
                 return CassandraType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CertificateManager:
+            case CfnTypeConstants.CertificateManager:
                 return CertificateManagerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Chatbot:
+            case CfnTypeConstants.Chatbot:
                 return ChatbotType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Cloud9:
+            case CfnTypeConstants.Cloud9:
                 return Cloud9Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CloudFormation:
+            case CfnTypeConstants.CloudFormation:
                 return CloudFormationType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CloudFront:
+            case CfnTypeConstants.CloudFront:
                 return CloudFrontType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CloudTrail:
+            case CfnTypeConstants.CloudTrail:
                 return CloudTrailType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeBuild:
+            case CfnTypeConstants.CodeBuild:
                 return CodeBuildType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeCommit:
+            case CfnTypeConstants.CodeCommit:
                 return CodeCommitType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeDeploy:
+            case CfnTypeConstants.CodeDeploy:
                 return CodeDeployType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeGuruProfiler:
+            case CfnTypeConstants.CodeGuruProfiler:
                 return CodeGuruProfilerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodePipeline:
+            case CfnTypeConstants.CodePipeline:
                 return CodePipelineType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeStar:
+            case CfnTypeConstants.CodeStar:
                 return CodeStarType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeStarConnections:
+            case CfnTypeConstants.CodeStarConnections:
                 return CodeStarConnectionsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.CodeStarNotifications:
+            case CfnTypeConstants.CodeStarNotifications:
                 return CodeStarNotificationsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Cognito:
+            case CfnTypeConstants.Cognito:
                 return CognitoType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Config:
+            case CfnTypeConstants.Config:
                 return ConfigType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DataPipeline:
+            case CfnTypeConstants.DataPipeline:
                 return DataPipelineType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DAX:
+            case CfnTypeConstants.DAX:
                 return DAXType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Detective:
+            case CfnTypeConstants.Detective:
                 return DetectiveType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DirectoryService:
+            case CfnTypeConstants.DirectoryService:
                 return DirectoryServiceType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DLM:
+            case CfnTypeConstants.DLM:
                 return DLMType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DMS:
+            case CfnTypeConstants.DMS:
                 return DMSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DocDB:
+            case CfnTypeConstants.DocDB:
                 return DocDBType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.DynamoDB:
+            case CfnTypeConstants.DynamoDB:
                 return DynamoDBType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.EC2:
+            case CfnTypeConstants.EC2:
                 return EC2Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ECR:
+            case CfnTypeConstants.ECR:
                 return ECRType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ECS:
+            case CfnTypeConstants.ECS:
                 return ECSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.EFS:
+            case CfnTypeConstants.EFS:
                 return EFSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.EKS:
+            case CfnTypeConstants.EKS:
                 return EKSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ElastiCache:
+            case CfnTypeConstants.ElastiCache:
                 return ElastiCacheType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ElasticBeanstalk:
+            case CfnTypeConstants.ElasticBeanstalk:
                 return ElasticBeanstalkType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ElasticLoadBalancing:
+            case CfnTypeConstants.ElasticLoadBalancing:
                 return ElasticLoadBalancingType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ElasticLoadBalancingV2:
+            case CfnTypeConstants.ElasticLoadBalancingV2:
                 return ElasticLoadBalancingV2Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Elasticsearch:
+            case CfnTypeConstants.Elasticsearch:
                 return ElasticsearchType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.EMR:
+            case CfnTypeConstants.EMR:
                 return EMRType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Events:
+            case CfnTypeConstants.Events:
                 return EventsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.EventSchemas:
+            case CfnTypeConstants.EventSchemas:
                 return EventSchemasType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.FMS:
+            case CfnTypeConstants.FMS:
                 return FMSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.GameLift:
+            case CfnTypeConstants.GameLift:
                 return GameLiftType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.GlobalAccelerator:
+            case CfnTypeConstants.GlobalAccelerator:
                 return GlobalAcceleratorType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Glue:
+            case CfnTypeConstants.Glue:
                 return GlueType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Greengrass:
+            case CfnTypeConstants.Greengrass:
                 return GreengrassType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.GroundStation:
+            case CfnTypeConstants.GroundStation:
                 return GroundStationType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.GuardDuty:
+            case CfnTypeConstants.GuardDuty:
                 return GuardDutyType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IAM:
+            case CfnTypeConstants.IAM:
                 return IAMType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ImageBuilder:
+            case CfnTypeConstants.ImageBuilder:
                 return ImageBuilderType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Inspector:
+            case CfnTypeConstants.Inspector:
                 return InspectorType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IoT1Click:
+            case CfnTypeConstants.IoT1Click:
                 return IoT1ClickType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IoTAnalytics:
+            case CfnTypeConstants.IoTAnalytics:
                 return IoTAnalyticsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IoTEvents:
+            case CfnTypeConstants.IoTEvents:
                 return IoTEventsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IoTThingsGraph:
+            case CfnTypeConstants.IoTThingsGraph:
                 return IoTThingsGraphType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.IoT:
+            case CfnTypeConstants.IoT:
                 return IoTType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Kinesis:
+            case CfnTypeConstants.Kinesis:
                 return KinesisType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.KinesisAnalytics:
+            case CfnTypeConstants.KinesisAnalytics:
                 return KinesisAnalyticsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.KinesisAnalyticsV2:
+            case CfnTypeConstants.KinesisAnalyticsV2:
                 return KinesisAnalyticsV2Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.KinesisFirehose:
+            case CfnTypeConstants.KinesisFirehose:
                 return KinesisFirehoseType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.KMS:
+            case CfnTypeConstants.KMS:
                 return KMSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.LakeFormation:
+            case CfnTypeConstants.LakeFormation:
                 return LakeFormationType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Lambda:
+            case CfnTypeConstants.Lambda:
                 return LambdaType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Macie:
+            case CfnTypeConstants.Macie:
                 return MacieType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ManagedBlockchain:
+            case CfnTypeConstants.ManagedBlockchain:
                 return ManagedBlockchainType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.MediaConvert:
+            case CfnTypeConstants.MediaConvert:
                 return MediaConvertType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.MediaLive:
+            case CfnTypeConstants.MediaLive:
                 return MediaLiveType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.MediaStore:
+            case CfnTypeConstants.MediaStore:
                 return MediaStoreType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.MSK:
+            case CfnTypeConstants.MSK:
                 return MSKType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Neptune:
+            case CfnTypeConstants.Neptune:
                 return NeptuneType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.NetworkManager:
+            case CfnTypeConstants.NetworkManager:
                 return NetworkManagerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.OpsWork:
+            case CfnTypeConstants.OpsWork:
                 return OpsWorkType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.OpsWorksCM:
+            case CfnTypeConstants.OpsWorksCM:
                 return OpsWorksCMType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Pinpoint:
+            case CfnTypeConstants.Pinpoint:
                 return PinpointType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.PinpointEmail:
+            case CfnTypeConstants.PinpointEmail:
                 return PinpointEmailType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.QLDB:
+            case CfnTypeConstants.QLDB:
                 return QLDBType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.RAM:
+            case CfnTypeConstants.RAM:
                 return RAMType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.RDS:
+            case CfnTypeConstants.RDS:
                 return RDSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Redshift:
+            case CfnTypeConstants.Redshift:
                 return RedshiftType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ResourceGroups:
+            case CfnTypeConstants.ResourceGroups:
                 return ResourceGroupsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.RoboMaker:
+            case CfnTypeConstants.RoboMaker:
                 return RoboMakerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Route53:
+            case CfnTypeConstants.Route53:
                 return Route53Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Route53Resolver:
+            case CfnTypeConstants.Route53Resolver:
                 return Route53ResolverType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.S3:
+            case CfnTypeConstants.S3:
                 return S3Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SageMaker:
+            case CfnTypeConstants.SageMaker:
                 return SageMakerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SDB:
+            case CfnTypeConstants.SDB:
                 return SDBType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SecretsManager:
+            case CfnTypeConstants.SecretsManager:
                 return SecretsManagerType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SecurityHub:
+            case CfnTypeConstants.SecurityHub:
                 return SecurityHubType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ServiceCatalog:
+            case CfnTypeConstants.ServiceCatalog:
                 return ServiceCatalogType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.ServiceDiscovery:
+            case CfnTypeConstants.ServiceDiscovery:
                 return ServiceDiscoveryType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SES:
+            case CfnTypeConstants.SES:
                 return SESType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SNS:
+            case CfnTypeConstants.SNS:
                 return SNSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SQS:
+            case CfnTypeConstants.SQS:
                 return SQSType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.SSM:
+            case CfnTypeConstants.SSM:
                 return KinesisFirehoseType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.StepFunctions:
+            case CfnTypeConstants.StepFunctions:
                 return StepFunctionsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Synthetics:
+            case CfnTypeConstants.Synthetics:
                 return SyntheticsType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.Transfer:
+            case CfnTypeConstants.Transfer:
                 return TransferType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.WAF:
+            case CfnTypeConstants.WAF:
                 return WAFType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.WAFRegional:
+            case CfnTypeConstants.WAFRegional:
                 return WAFRegionalType.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.WAFv2:
+            case CfnTypeConstants.WAFv2:
                 return WAFv2Type.valueOf(extractSpecificType(type)).toComponentType();
-            case AwsTypeConstants.WorkSpaces:
+            case CfnTypeConstants.WorkSpaces:
                 return WorkSpacesType.valueOf(extractSpecificType(type)).toComponentType();
             default:
                 return ComponentType.Compute;

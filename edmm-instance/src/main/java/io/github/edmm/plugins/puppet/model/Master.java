@@ -9,11 +9,11 @@ import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.InstanceProperty;
+import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
-import io.github.edmm.util.Constants;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -114,7 +114,7 @@ public class Master {
         componentInstance.setType(ComponentType.Compute);
         componentInstance.setState(this.state.toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
-        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), this.operatingSystem + this.operatingSystemRelease));
+        componentInstance.getInstanceProperties().add(new InstanceProperty(String.valueOf(PropertyKey.Compute.os_family), String.class.getSimpleName(), this.operatingSystem + this.operatingSystemRelease));
         return componentInstance;
     }
 }

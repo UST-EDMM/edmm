@@ -1,10 +1,12 @@
 package io.github.edmm.plugins.puppet.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Fact {
     private String certname;
+    @Setter
     private String name;
     private String value;
 
