@@ -3,17 +3,17 @@ package io.github.edmm.model.edimm;
 import io.github.edmm.model.opentosca.TOSCABaseTypes;
 
 public enum RelationType {
-    DependsOn(TOSCABaseTypes.TOSCARelationBaseTypes.DependsOn),
-    ConnectsTo(TOSCABaseTypes.TOSCARelationBaseTypes.ConnectsTo),
-    HostedOn(TOSCABaseTypes.TOSCARelationBaseTypes.HostedOn);
+    DependsOn(TOSCABaseTypes.TOSCABaseRelationTypes.DependsOn),
+    ConnectsTo(TOSCABaseTypes.TOSCABaseRelationTypes.ConnectsTo),
+    HostedOn(TOSCABaseTypes.TOSCABaseRelationTypes.HostedOn);
 
-    private final TOSCABaseTypes.TOSCARelationBaseTypes toscaRelationBaseType;
+    private final TOSCABaseTypes.TOSCABaseRelationTypes toscaRelationBaseType;
 
-    RelationType(TOSCABaseTypes.TOSCARelationBaseTypes toscaRelationBaseType) {
+    RelationType(TOSCABaseTypes.TOSCABaseRelationTypes toscaRelationBaseType) {
         this.toscaRelationBaseType = toscaRelationBaseType;
     }
 
-    public TOSCABaseTypes.TOSCARelationBaseTypes toToscaRelationBaseType() {
+    public TOSCABaseTypes.TOSCABaseRelationTypes toToscaRelationBaseType() {
         return toscaRelationBaseType;
     }
 
