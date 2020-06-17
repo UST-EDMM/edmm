@@ -26,7 +26,7 @@ public enum ComponentType {
         this.toscaBaseNodeType = toscaBaseNodeTypes;
     }
 
-    TOSCABaseTypes.TOSCABaseNodeTypes toTOSCABaseNodeType() {
+    public TOSCABaseTypes.TOSCABaseNodeTypes toTOSCABaseNodeType() {
         return this.toscaBaseNodeType;
     }
 }
