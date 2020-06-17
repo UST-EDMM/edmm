@@ -13,6 +13,7 @@ import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
+import io.github.edmm.util.Constants;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -113,7 +114,9 @@ public class Master {
         componentInstance.setType(ComponentType.Compute);
         componentInstance.setState(this.state.toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
-        componentInstance.getInstanceProperties().add(new InstanceProperty("type", String.class.getSimpleName(), this.operatingSystem + this.operatingSystemRelease));
+        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), this.operatingSystem + this.operatingSystemRelease));
         return componentInstance;
     }
 }
+
+

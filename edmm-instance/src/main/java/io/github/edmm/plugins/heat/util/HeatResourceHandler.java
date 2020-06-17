@@ -10,13 +10,13 @@ import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.plugins.heat.model.StackStatus;
 import io.github.edmm.util.CastUtil;
+import io.github.edmm.util.Constants;
 
 import org.openstack4j.model.heat.Resource;
 
 public class HeatResourceHandler {
 
     private static final int firstEntryIndex = 0;
-    private static final String propertyKeyDelimiter = "::";
 
     public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
@@ -38,7 +38,7 @@ public class HeatResourceHandler {
         componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
         // set property with original type string in order to avoid losing this info since we map to EDMM types
-        componentInstance.getInstanceProperties().add(new InstanceProperty("type", String.class.getSimpleName(), resource.getType()));
+        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.DELIMITER, String.class.getSimpleName(), resource.getType()));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
 
@@ -83,7 +83,7 @@ public class HeatResourceHandler {
         if (value.get(firstEntryIndex) instanceof String) {
             value.forEach(entry -> instanceProperties.add(handleStringProperty(key, String.valueOf(entry))));
         } else if (value.get(firstEntryIndex) instanceof Map) {
-            value.forEach(entry -> CastUtil.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + propertyKeyDelimiter + pKey, pValue))));
+            value.forEach(entry -> CastUtil.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + Constants.DELIMITER + pKey, pValue))));
         }
         return instanceProperties;
     }

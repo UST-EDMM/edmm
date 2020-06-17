@@ -6,6 +6,7 @@ import java.util.List;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.InstanceProperty;
+import io.github.edmm.util.Constants;
 
 import io.kubernetes.client.models.V1Pod;
 
@@ -24,7 +25,7 @@ public class KubernetesPodsHandler {
             componentInstance.setMetadata(new KubernetesMetadataHandler(pod.getMetadata()).getMetadata(pod.getApiVersion(), pod.getKind()));
             componentInstance.setInstanceProperties(new KubernetesPodPropertiesHandler(pod.getStatus()).getComponentInstanceProperties());
             // set property with original type string in order to avoid losing this info since we map to EDMM types
-            componentInstance.getInstanceProperties().add(new InstanceProperty("type", String.class.getSimpleName(), pod.getMetadata().getLabels().get(KubernetesConstants.APP)));
+            componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), pod.getMetadata().getLabels().get(KubernetesConstants.APP)));
 
             componentInstances.add(componentInstance);
         });

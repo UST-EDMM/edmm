@@ -26,6 +26,7 @@ import io.github.edmm.plugins.heat.model.types.TaaSType;
 import io.github.edmm.plugins.heat.model.types.TroveType;
 import io.github.edmm.plugins.heat.model.types.ZaqarType;
 import io.github.edmm.plugins.heat.model.types.ZunType;
+import io.github.edmm.util.Constants;
 
 public class TypeMapperImplementation implements TypeMapper {
 
@@ -87,11 +88,11 @@ public class TypeMapperImplementation implements TypeMapper {
 
     @Override
     public String extractTopLevelType(String type) {
-        return type.substring(0, type.lastIndexOf(HeatConstants.DELIMITER) + 2);
+        return type.substring(0, type.lastIndexOf(Constants.DELIMITER) + 2);
     }
 
     @Override
     public String extractSpecificType(String type) {
-        return type.substring(type.lastIndexOf(HeatConstants.DELIMITER) + 2, type.length());
+        return type.substring(type.lastIndexOf(Constants.DELIMITER) + 2, type.length());
     }
 }
