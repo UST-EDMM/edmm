@@ -16,17 +16,16 @@ public class TOSCABaseTypes {
     }
 
     public enum TOSCABaseNodeTypes {
-        Root,
-        Compute,
-        ObjectStorage,
         BlockStorage,
-        Network,
-        Port,
-        SoftwareComponent,
-        WebApplication,
-        WebServer,
+        Compute,
+        ContainerApplication,
+        ContainerRuntime,
         DBMS,
         Database,
-        Container
+        LoadBalancer,
+        ObjectStorage,
+        SoftwareComponent,
+        WebApplication,
+        WebServer
     }
 }
