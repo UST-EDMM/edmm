@@ -89,8 +89,10 @@ public class DeploymentModelTest {
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         SoftwareComponent tomcat = (SoftwareComponent) model.getComponent("tomcat").orElseThrow(IllegalStateException::new);
         assertEquals(3, tomcat.getRelations().size());
-        assertEquals("hosted_on", tomcat.getRelations().get(1).getName());
-        RootRelation relation = tomcat.getRelations().get(0);
+        assertEquals("depends_on", tomcat.getRelations().get(0).getName());
+        assertEquals("depends_on", tomcat.getRelations().get(1).getName());
+        assertEquals("hosted_on", tomcat.getRelations().get(2).getName());
+        RootRelation relation = tomcat.getRelations().get(1);
         assertTrue(relation instanceof DependsOn);
         assertEquals("db", relation.getTarget());
         assertEquals(0, relation.getProperties().size());

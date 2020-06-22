@@ -84,16 +84,24 @@ public abstract class GraphNormalizer {
         for (Entity node : graph.getChildren(EntityGraph.COMPONENTS)) {
             Optional<Entity> relations = node.getChild(DefaultKeys.RELATIONS);
             if (relations.isPresent()) {
-                for (Entity entry : relations.get().getChildren()) {
-                    Entity relation = entry.getChildren().stream().findFirst().orElseThrow(IllegalStateException::new);
+                int relationIndex = 0;
+                for (Entity relation : relations.get().getChildren()) {
+
                     if (relation instanceof ScalarEntity) {
                         ScalarEntity scalarEntity = (ScalarEntity) relation;
-                        MappingEntity normalizedEntity = new MappingEntity(scalarEntity.getId(), graph);
+
+                        EntityId indexId = scalarEntity.getId().getParent().extend(String.valueOf(relationIndex));
+                        graph.replaceEntity(scalarEntity,new MappingEntity(indexId, graph));
+
+                        MappingEntity normalizedEntity = new MappingEntity(indexId.extend(scalarEntity.getId().getName()), graph);
                         ScalarEntity type = new ScalarEntity(scalarEntity.getName(), normalizedEntity.getId().extend(DefaultKeys.TYPE), graph);
                         ScalarEntity target = new ScalarEntity(scalarEntity.getValue(), normalizedEntity.getId().extend(DefaultKeys.TARGET), graph);
-                        graph.replaceEntity(scalarEntity, normalizedEntity);
+
+                        graph.addEntity(normalizedEntity);
                         graph.addEntity(type);
                         graph.addEntity(target);
+
+                        relationIndex += 1;
                     }
                 }
             }
