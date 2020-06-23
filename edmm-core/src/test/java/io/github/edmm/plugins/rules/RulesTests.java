@@ -35,8 +35,7 @@ public class RulesTests {
             .dependsOn(Saas.class)
             .dependsOn(Auth0.class)
             .component(Saas.class)
-            .component(Auth0.class)
-            .build();
+            .component(Auth0.class);
 
         DeploymentModel deploymentModel = DeploymentModel.of(yamlBuilder.build());
         Optional<RootComponent> currentComponent = deploymentModel.getComponent("WebApplication");
