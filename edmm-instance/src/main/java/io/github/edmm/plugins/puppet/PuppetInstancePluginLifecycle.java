@@ -16,7 +16,7 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     // puppet master info
     private String user = "ubuntu";
     private String ip = "master-ip";
-    private String privateKeyLocation = "master-private-key-location";
+    private String privateKeyLocation = "master-private-key";
     private Integer port = 22;
     private String operatingSystem = "Ubuntu";
     private String operatingSystemRelease = "18.04";
@@ -52,7 +52,6 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         this.deploymentInstance.setComponentInstances(PuppetNodeHandler.getComponentInstances(this.master));
         this.deploymentInstance.setState(PuppetState.getDeploymentInstanceState(this.master));
         // special case since master is deployment and component instance
-        this.deploymentInstance.getComponentInstances().add(this.master.toComponentInstance());
         // TODO metadata, instance properties, description? if any
     }
 
