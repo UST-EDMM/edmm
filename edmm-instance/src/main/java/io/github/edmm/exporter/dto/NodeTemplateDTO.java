@@ -10,14 +10,14 @@ import lombok.Setter;
 class NodeTemplateDTO {
     String id;
     String name;
-    QName type;
+    String type;
     // List<TOSCAProperty> properties;
 
     static NodeTemplateDTO ofNodeTemplateInstance(NodeTemplateInstance nodeTemplateInstance) {
         NodeTemplateDTO nodeTemplateDTO = new NodeTemplateDTO();
         nodeTemplateDTO.setId(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
         nodeTemplateDTO.setName(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
-        nodeTemplateDTO.setType(nodeTemplateInstance.getNodeType());
+        nodeTemplateDTO.setType(String.valueOf(nodeTemplateInstance.getNodeType()));
         // nodeTemplateDTO.setProperties(nodeTemplateInstance.getInstanceProperties());
 
         return nodeTemplateDTO;
