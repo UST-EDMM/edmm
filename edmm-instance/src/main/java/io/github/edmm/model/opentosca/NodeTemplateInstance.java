@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
+import io.github.edmm.core.transformation.TOSCATypeMapperImplementation;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
 
@@ -33,15 +34,22 @@ public class NodeTemplateInstance {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
 
         nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
-        nodeTemplateInstance.setNodeType(new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPE, String.valueOf(componentInstance.getType().toTOSCABaseNodeType())));
         nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL, componentInstance.getName()));
+        nodeTemplateInstance.setNodeType(tryNodeTypeRefinement(componentInstance.getType().toTOSCABaseNodeType(), componentInstance.getInstanceProperties()));
         nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
         nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL, deploymentInstanceName));
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
         nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
-
         return nodeTemplateInstance;
+    }
+
+    private static QName tryNodeTypeRefinement(TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType, List<InstanceProperty> instanceProperties) {
+        QName normativeNodeType = new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPE, String.valueOf(toscaBaseNodeType));
+        TOSCATypeMapperImplementation toscaRefiner = new TOSCATypeMapperImplementation();
+        QName refinedNodeType = toscaRefiner.refineTOSCAType(normativeNodeType, instanceProperties);
+
+        return refinedNodeType != null ? refinedNodeType : normativeNodeType;
     }
 
     private void createOutgoingRelationshipTemplateInstances() {
