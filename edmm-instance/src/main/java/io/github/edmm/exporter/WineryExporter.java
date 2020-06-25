@@ -35,7 +35,7 @@ public class WineryExporter {
 
     private static void createTopologyTemplateInWinery(ServiceTemplateInstance serviceTemplateInstance) {
         TopologyTemplateDTO topologyTemplateDTO = new TopologyTemplateDTO(serviceTemplateInstance);
-        //  putTopology(topologyTemplateDTO, serviceTemplateInstance.getServiceTemplateId());
+        putTopology(topologyTemplateDTO, serviceTemplateInstance.getServiceTemplateId());
     }
 
     private static void postServiceTemplate(ServiceTemplateCreationDTO creationDTO) {
