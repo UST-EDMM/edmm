@@ -29,7 +29,7 @@ public class CfnStackResourcesHandler {
             componentInstance.setName(stackResource.getLogicalResourceId());
             componentInstance.setId(stackResource.getPhysicalResourceId());
             componentInstance.setDescription(stackResource.getDescription());
-            componentInstance.setType(new TypeMapperImplementation().toComponentType(stackResource.getResourceType()));
+            componentInstance.setType(new EDMMTypeMapperImplementation().toComponentType(stackResource.getResourceType()));
             componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), stackResource.getResourceType())));
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
             componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());

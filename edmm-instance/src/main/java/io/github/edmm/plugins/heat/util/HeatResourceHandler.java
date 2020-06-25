@@ -31,7 +31,7 @@ public class HeatResourceHandler {
         ComponentInstance componentInstance = new ComponentInstance();
 
         // TODO: artifacts
-        componentInstance.setType(new TypeMapperImplementation().toComponentType(resource.getType()));
+        componentInstance.setType(new EDMMTypeMapperImplementation().toComponentType(resource.getType()));
         componentInstance.setId(resource.getPhysicalResourceId());
         componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
         componentInstance.setName(resource.getResourceName());

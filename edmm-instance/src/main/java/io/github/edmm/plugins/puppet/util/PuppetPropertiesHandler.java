@@ -29,43 +29,6 @@ public class PuppetPropertiesHandler {
         return instanceProperties;
     }
 
-    public static List<InstanceProperty> getComponentInstanceProperties(String hostName, String user, String ip, String privateKeyLocation, Integer sshPort) {
-        List<InstanceProperty> instanceProperties = new ArrayList<>();
-
-        instanceProperties.add(handleHostName(hostName));
-        instanceProperties.add(handleUser(user));
-        instanceProperties.add(handleIp(ip));
-        instanceProperties.add(handlePrivateKeyLocation(privateKeyLocation));
-        instanceProperties.add(handleSSHPort(sshPort));
-        instanceProperties.add(handlePublicKey(privateKeyLocation));
-
-        return instanceProperties;
-    }
-
-    private static InstanceProperty handleHostName(String hostName) {
-        return new InstanceProperty("hostname", hostName.getClass().getSimpleName(), hostName);
-    }
-
-    private static InstanceProperty handleUser(String user) {
-        return new InstanceProperty("user", user.getClass().getSimpleName(), user);
-    }
-
-    private static InstanceProperty handleIp(String ip) {
-        return new InstanceProperty(String.valueOf(PropertyKey.Compute.public_address), ip.getClass().getSimpleName(), ip);
-    }
-
-    private static InstanceProperty handlePrivateKeyLocation(String privateKeyLocation) {
-        return new InstanceProperty("privateKey", privateKeyLocation.getClass().getSimpleName(), readPrivateKeyFileIntoString(privateKeyLocation));
-    }
-
-    private static InstanceProperty handleSSHPort(Integer sshPort) {
-        return new InstanceProperty("SSHPort", sshPort.getClass().getSimpleName(), sshPort);
-    }
-
-    private static InstanceProperty handlePublicKey(String privateKeyLocation) {
-        return new InstanceProperty(String.valueOf(PropertyKey.Compute.public_key), String.class.getSimpleName(), generatePublicKeyFromPrivateKeyLocation(privateKeyLocation));
-    }
-
     private static String readPrivateKeyFileIntoString(String privateKeyLocation) {
         StringBuilder privateKey = new StringBuilder();
         try (Stream<String> stream = Files.lines(Paths.get(privateKeyLocation))) {

@@ -1,6 +1,6 @@
 package io.github.edmm.plugins.cfn.util;
 
-import io.github.edmm.core.plugin.TypeMapper;
+import io.github.edmm.core.plugin.EDMMTypeMapper;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.plugins.cfn.model.types.ACMPCAType;
 import io.github.edmm.plugins.cfn.model.types.AccessAnalyzerType;
@@ -116,7 +116,7 @@ import io.github.edmm.plugins.cfn.model.types.WAFType;
 import io.github.edmm.plugins.cfn.model.types.WAFv2Type;
 import io.github.edmm.plugins.cfn.model.types.WorkSpacesType;
 
-class TypeMapperImplementation implements TypeMapper {
+class EDMMTypeMapperImplementation implements EDMMTypeMapper {
     private static final String EC2_PREFIX = "AWS::EC2::";
     private static final String DELIMITER = "::";
 

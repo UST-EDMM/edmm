@@ -1,6 +1,6 @@
 package io.github.edmm.plugins.heat.util;
 
-import io.github.edmm.core.plugin.TypeMapper;
+import io.github.edmm.core.plugin.EDMMTypeMapper;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.plugins.heat.model.types.AodhType;
 import io.github.edmm.plugins.heat.model.types.BarbicanType;
@@ -28,7 +28,7 @@ import io.github.edmm.plugins.heat.model.types.ZaqarType;
 import io.github.edmm.plugins.heat.model.types.ZunType;
 import io.github.edmm.util.Constants;
 
-public class TypeMapperImplementation implements TypeMapper {
+public class EDMMTypeMapperImplementation implements EDMMTypeMapper {
 
     @Override
     public ComponentType toComponentType(String type) {

@@ -37,8 +37,8 @@ public class NodesHandler {
         facts.add(this.getFact(certName, FactType.IPAddress));
         facts.add(this.getFact(certName, FactType.OperatingSystem));
         facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
-        facts.add(new Fact(certName, "private_key", this.master.getGeneratedPrivateKey()));
-        facts.add(new Fact(certName, String.valueOf(PropertyKey.Compute.public_key), this.master.getGeneratedPublicKey()));
+        facts.add(new Fact(certName, "VMPrivateKey", this.master.getGeneratedPrivateKey()));
+        facts.add(new Fact(certName, "VMPublicKey", this.master.getGeneratedPublicKey()));
 
         return facts;
     }
@@ -49,7 +49,7 @@ public class NodesHandler {
 
     private Fact checkAndReplaceIPAddressKey(Fact fact) {
         if (fact.getName().equals(String.valueOf(FactType.IPAddress).toLowerCase())) {
-            fact.setName(String.valueOf(PropertyKey.Compute.public_address));
+            fact.setName("VMIP");
         }
         return fact;
     }
