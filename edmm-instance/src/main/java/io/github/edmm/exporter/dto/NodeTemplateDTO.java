@@ -1,6 +1,7 @@
 package io.github.edmm.exporter.dto;
 
-import javax.xml.namespace.QName;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import io.github.edmm.model.opentosca.NodeTemplateInstance;
 
@@ -11,14 +12,17 @@ class NodeTemplateDTO {
     String id;
     String name;
     String type;
-    // List<TOSCAProperty> properties;
+    Map<String, Map<String, String>> properties;
 
     static NodeTemplateDTO ofNodeTemplateInstance(NodeTemplateInstance nodeTemplateInstance) {
         NodeTemplateDTO nodeTemplateDTO = new NodeTemplateDTO();
         nodeTemplateDTO.setId(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
         nodeTemplateDTO.setName(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
         nodeTemplateDTO.setType(String.valueOf(nodeTemplateInstance.getNodeType()));
-        // nodeTemplateDTO.setProperties(nodeTemplateInstance.getInstanceProperties());
+        Map<String, Map<String, String>> propertyMap = new LinkedHashMap<>();
+        propertyMap.put("kvproperties", new LinkedHashMap<>());
+        nodeTemplateInstance.getInstanceProperties().forEach(instanceProp -> propertyMap.get("kvproperties").put(instanceProp.getName(), String.valueOf(instanceProp.getValue())));
+        nodeTemplateDTO.setProperties(propertyMap);
 
         return nodeTemplateDTO;
     }
