@@ -23,7 +23,7 @@ public class PuppetNodeHandler {
             componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(node.getFacts()));
             componentInstance.getInstanceProperties().add(new InstanceProperty(String.valueOf(PropertyKey.Compute.os_family), String.class.getSimpleName(), getTypeFromFacts(node.getFacts())));
             componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
-            componentInstance.setRelationInstances(PuppetRelationHandler.getRelationInstances(master, node));
+            // we neglect relations for now
             componentInstances.add(componentInstance);
         });
 

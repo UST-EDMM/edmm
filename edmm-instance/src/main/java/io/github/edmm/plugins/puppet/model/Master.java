@@ -104,19 +104,6 @@ public class Master {
             throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
     }
-
-    public ComponentInstance toComponentInstance() {
-        ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(this.id);
-        componentInstance.setName(this.hostName);
-        componentInstance.setCreatedAt(this.createdAtTimestamp);
-        // master is always of type compute
-        componentInstance.setType(ComponentType.Compute);
-        componentInstance.setState(this.state.toEDIMMComponentInstanceState());
-        componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(this.hostName, this.user, this.ip, this.privateKeyLocation, this.sshPort));
-        componentInstance.getInstanceProperties().add(new InstanceProperty(String.valueOf(PropertyKey.Compute.os_family), String.class.getSimpleName(), this.operatingSystem + this.operatingSystemRelease));
-        return componentInstance;
-    }
 }
 
 
