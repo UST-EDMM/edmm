@@ -11,12 +11,8 @@ components:
       - war: ./files/app.war
     relations:
       - hosted_on: pet_clinic_platform
-      - connects_to_db:
-          type: connects_to
-          target: db
-      - connects_to_auth:
-          type: connects_to
-          target: auth
+      - connects_to: db
+      - connects_to: auth
 
   pet_clinic_platform:
     type: aws_beanstalk

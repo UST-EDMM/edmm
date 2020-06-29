@@ -1,6 +1,7 @@
 package io.github.edmm.core.transformation.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import io.github.edmm.core.DeploymentTechnology;
@@ -8,6 +9,7 @@ import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 
 import lombok.NonNull;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +35,20 @@ public final class TransformationTask implements Callable<Void> {
         logger.info("Starting transformation for {}", deploymentTechnology.getName());
         context.setState(TRANSFORMING);
         File targetDirectory = context.getTargetDirectory();
+        if (targetDirectory.exists()) {
+            try {
+                FileUtils.deleteDirectory(targetDirectory);
+                logger.info("{} directory will be overwritten", targetDirectory.getName());
+            } catch (IOException e) {
+                logger.warn("Could not delete {} directory, content will be appended to files", targetDirectory.getName());
+            }
+        }
         if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
             logger.error("Could not create directory at '{}'", targetDirectory.getAbsolutePath());
             context.setState(ERROR);
             return null;
         }
+
         if (!targetDirectory.isDirectory() || !targetDirectory.canWrite()) {
             logger.error("Given value is not a directory or not writable: {}", targetDirectory.getAbsolutePath());
             context.setState(ERROR);
@@ -50,7 +61,7 @@ public final class TransformationTask implements Callable<Void> {
         } catch (Exception e) {
             logger.info("Transformation to {} failed", deploymentTechnology.getName());
             logger.error("Something went wrong while transforming", e);
-            context.setState(ERROR);
+            context.setErrorState(e);
         }
         return null;
     }

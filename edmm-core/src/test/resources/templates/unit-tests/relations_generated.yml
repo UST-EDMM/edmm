@@ -5,17 +5,17 @@ components:
   tomcat:
     relations:
     - '2':
-        depends_on:
-          type: depends_on
-          target: ubuntu
-    - '0':
         hosted_on:
           type: hosted_on
           target: ubuntu
-    - '1':
+    - '0':
         depends_on:
           type: depends_on
           target: db
+    - '1':
+        depends_on:
+          type: depends_on
+          target: ubuntu
     type: software_component
   db:
     type: software_component

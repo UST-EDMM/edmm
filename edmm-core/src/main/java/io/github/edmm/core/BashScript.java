@@ -29,14 +29,18 @@ public class BashScript {
     }
 
     private void init() {
-        logger.info("Creating bash script at '{}'", scriptPath);
-        fileAccess.delete(scriptPath);
         try {
-            fileAccess.append(scriptPath, SHEBANG);
-            fileAccess.append(scriptPath, IMMEDIATE_EXIT);
-        } catch (IOException e) {
-            logger.error("Failed to initialize bash script: {}", e.getMessage(), e);
-            throw new TransformationException(e);
+            fileAccess.getAbsolutePath(scriptPath);
+        } catch (FileNotFoundException fileException) {
+            // if the file doesn't exist, we create it
+            logger.info("Creating bash script at '{}'", scriptPath);
+            try {
+                fileAccess.append(scriptPath, SHEBANG);
+                fileAccess.append(scriptPath, IMMEDIATE_EXIT);
+            } catch (IOException e) {
+                logger.error("Failed to initialize bash script: {}", e.getMessage(), e);
+                throw new TransformationException(e);
+            }
         }
     }
 
