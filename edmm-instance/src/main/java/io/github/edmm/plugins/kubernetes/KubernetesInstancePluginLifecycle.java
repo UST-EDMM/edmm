@@ -69,8 +69,10 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
 
     @Override
     public void transformToTOSCA() {
-        InstancePluginLifecycle.performTOSCATransformation(this.deploymentInstance);
-
+        TOSCATransformer toscaTransformer = new TOSCATransformer();
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
+        WineryExporter.exportServiceTemplateInstanceToWinery(serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
     }
 
     @Override

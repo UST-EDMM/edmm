@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.puppet;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
-import io.github.edmm.core.plugin.InstancePluginLifecycle;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.yaml.YamlTransformer;
@@ -44,6 +43,7 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         this.master.setOperatingSystem(this.operatingSystem);
         this.master.setOperatingSystemRelease(this.operatingSystemRelease);
     }
+
     @Override
     public void transformToEDIMM() {
         this.deploymentInstance.setId(this.master.getId());
@@ -58,7 +58,10 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
 
     @Override
     public void transformToTOSCA() {
-        InstancePluginLifecycle.performTOSCATransformation(this.deploymentInstance);
+        TOSCATransformer toscaTransformer = new TOSCATransformer();
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
+        WineryExporter.exportServiceTemplateInstanceToWinery(serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
     }
 
     @Override

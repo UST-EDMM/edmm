@@ -1,7 +1,10 @@
 package io.github.edmm.exporter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.xml.namespace.QName;
@@ -11,6 +14,7 @@ import io.github.edmm.exporter.dto.TopologyTemplateDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import com.google.gson.Gson;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -23,9 +27,10 @@ public class WineryExporter {
     private static String serviceTemplatesPath = "servicetemplates";
     private static String topologyTemplatePath = "topologytemplate";
 
-    public static void exportServiceTemplateInstanceToWinery(ServiceTemplateInstance serviceTemplateInstance) {
+    public static void exportServiceTemplateInstanceToWinery(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
+        exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
     }
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
@@ -61,7 +66,16 @@ public class WineryExporter {
         } catch (IOException e) {
             System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDIMM YAML file.");
         }
+    }
 
+    private static void exportCSAR(QName serviceTemplateId, String outputPath) {
+        try {
+            FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/?csar"), new File(outputPath));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {
