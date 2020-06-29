@@ -3,6 +3,7 @@ package io.github.edmm.plugins.edimm;
 import java.io.File;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
+import io.github.edmm.core.plugin.InstancePluginLifecycle;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.yaml.YamlParser;
@@ -36,10 +37,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
 
     @Override
     public void transformToTOSCA() {
-        TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
-        WineryExporter.exportServiceTemplateInstanceToWinery(serviceTemplateInstance);
-        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
+        InstancePluginLifecycle.performTOSCATransformation(this.deploymentInstance);
     }
 
     @Override
