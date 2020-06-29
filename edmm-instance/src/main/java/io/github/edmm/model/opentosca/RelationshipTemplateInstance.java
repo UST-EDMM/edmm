@@ -31,8 +31,9 @@ public class RelationshipTemplateInstance {
         RelationshipTemplateInstance relationshipTemplateInstance = new RelationshipTemplateInstance();
         relationshipTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
         relationshipTemplateInstance.setRelationshipType(new QName(OpenTOSCANamespaces.OPENTOSCA_BASE_TYPES, String.valueOf(relationInstance.getType().toToscaRelationBaseType())));
-        relationshipTemplateInstance.setSourceNodeTemplateInstanceId(componentInstance.getId());
-        relationshipTemplateInstance.setTargetNodeTemplateInstanceId(relationInstance.getTargetInstanceId());
+        // TODO think about this one, maybe use id and map with id -> name or sth like that
+        relationshipTemplateInstance.setSourceNodeTemplateInstanceId(componentInstance.getName());
+        relationshipTemplateInstance.setTargetNodeTemplateInstanceId(relationInstance.getTargetInstance());
         relationshipTemplateInstance.setRelationshipTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_REL_TEMPL, relationInstance.getId()));
         relationshipTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState().convertToRelationshipTemplateInstanceState());
         relationshipTemplateInstance.setInstanceProperties(emptyIfNull(relationInstance.getInstanceProperties())

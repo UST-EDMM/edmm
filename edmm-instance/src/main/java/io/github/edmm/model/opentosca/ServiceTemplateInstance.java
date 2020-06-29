@@ -20,6 +20,7 @@ public class ServiceTemplateInstance {
     String csarId;
     TOSCAState.ServiceTemplateInstanceState state;
     List<NodeTemplateInstance> nodeTemplateInstances;
+    List<RelationshipTemplateInstance> relationshipTemplateInstances;
 
     public static ServiceTemplateInstance ofDeploymentInstance(DeploymentInstance deploymentInstance) {
         ServiceTemplateInstance serviceTemplateInstance = new ServiceTemplateInstance();

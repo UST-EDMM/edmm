@@ -68,7 +68,7 @@ class CfnStackRelationHandler {
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setId(this.generateIdOfRelation(relationCount));
         relationInstance.setType(RelationType.DependsOn);
-        relationInstance.setTargetInstanceId(this.getTargetInstanceIdOfRelation(dependsOnValue));
+        relationInstance.setTargetInstance(this.getTargetInstanceIdOfRelation(dependsOnValue));
         this.relationInstances.add(relationInstance);
     }
 
@@ -81,6 +81,6 @@ class CfnStackRelationHandler {
             .filter(res -> res.getLogicalResourceId().equals(String.valueOf(dependsOnValue)))
             .findFirst()
             .orElseThrow(InstanceTransformationException::new)
-            .getPhysicalResourceId();
+            .getLogicalResourceId();
     }
 }

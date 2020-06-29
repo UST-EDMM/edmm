@@ -58,7 +58,6 @@ public class WineryExporter {
             put.setEntity(getObjectAsJson(topologyTemplateDTO));
             put.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(put);
-            System.out.println("OK");
         } catch (IOException e) {
             System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDIMM YAML file.");
         }

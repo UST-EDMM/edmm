@@ -119,7 +119,6 @@ public class DeploymentInstanceTest {
         RelationInstance relationInstance = relationInstances.get(0);
 
         assertNotNull(relationInstance);
-        assertEquals("4aeb6497-90e8-4c68-99b4-dea09d4848da", relationInstance.getTargetInstanceId());
         assertEquals(RelationType.DependsOn, relationInstance.getType());
         assertEquals("DependsOn::0", relationInstance.getId());
     }

@@ -25,11 +25,11 @@ class HeatRelationHandler {
             // TODO: metadata, instance properties, description
             RelationInstance relationInstance = new RelationInstance();
             relationInstance.setType(RelationType.DependsOn);
-            relationInstance.setTargetInstanceId(resources.stream()
+            relationInstance.setTargetInstance(resources.stream()
                 .filter(res -> res.getResourceName().equals(dependsOnResource))
                 .findFirst()
                 .orElseThrow(InstanceTransformationException::new)
-                .getPhysicalResourceId());
+                .getResourceName());
             relationInstance.setId(RelationType.DependsOn + Constants.DELIMITER + String.valueOf(relationCount.getAndIncrement()));
             relationInstances.add(relationInstance);
         });

@@ -9,10 +9,10 @@ import lombok.Setter;
 
 @Setter
 class NodeTemplateDTO {
-    String id;
-    String name;
-    String type;
-    Map<String, Map<String, String>> properties;
+    private String id;
+    private String name;
+    private String type;
+    private Map<String, Map<String, String>> properties;
 
     static NodeTemplateDTO ofNodeTemplateInstance(NodeTemplateInstance nodeTemplateInstance) {
         NodeTemplateDTO nodeTemplateDTO = new NodeTemplateDTO();

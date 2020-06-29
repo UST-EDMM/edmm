@@ -1,6 +1,5 @@
 package io.github.edmm.model.opentosca;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +26,6 @@ public class NodeTemplateInstance {
     TOSCAState.NodeTemplateInstanceState state;
     QName serviceTemplateId;
     List<TOSCAProperty> instanceProperties;
-    private List<RelationshipTemplateInstance> outgoingRelationshipTemplateInstances;
-    private List<RelationshipTemplateInstance> ingoingRelationshipTemplateInstances;
 
     public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
@@ -50,31 +47,5 @@ public class NodeTemplateInstance {
         QName refinedNodeType = toscaRefiner.refineTOSCAType(normativeNodeType, instanceProperties);
 
         return refinedNodeType != null ? refinedNodeType : normativeNodeType;
-    }
-
-    private void createOutgoingRelationshipTemplateInstances() {
-        this.outgoingRelationshipTemplateInstances = new ArrayList<>();
-    }
-
-    private void createIngoingRelationshipTemplateInstances() {
-        this.ingoingRelationshipTemplateInstances = new ArrayList<>();
-    }
-
-    public void addToOutgoingRelationshipTemplateInstances(RelationshipTemplateInstance relationshipTemplateInstance) {
-        if (this.outgoingRelationshipTemplateInstances == null) {
-            this.createOutgoingRelationshipTemplateInstances();
-        }
-        if (relationshipTemplateInstance != null) {
-            this.outgoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
-        }
-    }
-
-    public void addToIngoingRelationshipTemplateInstances(RelationshipTemplateInstance relationshipTemplateInstance) {
-        if (this.ingoingRelationshipTemplateInstances == null) {
-            this.createIngoingRelationshipTemplateInstances();
-        }
-        if (relationshipTemplateInstance != null) {
-            this.ingoingRelationshipTemplateInstances.add(relationshipTemplateInstance);
-        }
     }
 }

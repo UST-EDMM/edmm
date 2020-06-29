@@ -94,9 +94,7 @@ class ServiceTemplateInstanceTest {
     }
 
     private void thenAssertRelationshipTemplateInstances() {
-        List<NodeTemplateInstance> nodeTemplateInstances = this.serviceTemplateInstance.getNodeTemplateInstances();
-        List<RelationshipTemplateInstance> relationshipTemplateInstances = nodeTemplateInstances.get(1).getOutgoingRelationshipTemplateInstances();
-        RelationshipTemplateInstance relationshipTemplateInstance = relationshipTemplateInstances.get(0);
+        RelationshipTemplateInstance relationshipTemplateInstance = this.serviceTemplateInstance.getRelationshipTemplateInstances().get(0);
 
         assertNotNull(relationshipTemplateInstance);
         assertEquals("DependsOn", relationshipTemplateInstance.getRelationshipType().getLocalPart());
