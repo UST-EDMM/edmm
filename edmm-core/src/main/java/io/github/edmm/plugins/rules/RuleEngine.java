@@ -20,7 +20,7 @@ public class RuleEngine {
         results = new ArrayList<>();
     }
 
-    public List<Rule.Result> fire(DeploymentModel model, @NonNull List<Rule> rules, RootComponent unsupportedComponent ) {
+    public List<Rule.Result> fire(DeploymentModel model, @NonNull List<Rule> rules, RootComponent currentComponent ) {
         // the rules are sorted by their priority
         Collections.sort(rules);
 
@@ -29,7 +29,7 @@ public class RuleEngine {
             String name = rule.getName();
             boolean evaluationResult = false;
             try {
-                evaluationResult = rule.evaluate(model,unsupportedComponent);
+                evaluationResult = rule.evaluate(model, currentComponent);
             } catch (IllegalArgumentException | NullPointerException e) {
                 log.error("Rule '" + name + "' evaluated with error", e);
             }
