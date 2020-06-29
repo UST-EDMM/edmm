@@ -14,15 +14,21 @@ import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 public class WineryExporter {
     private static String wineryEndpoint = "http://localhost:8080/winery/";
+    private static String containerEndpoint = "http://localhost:1337/csars";
     private static String serviceTemplatesPath = "servicetemplates";
     private static String topologyTemplatePath = "topologytemplate";
     private static String csarDownloadPath = "?csar";
@@ -31,6 +37,7 @@ public class WineryExporter {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
+        importCSARToContainer(outputPath);
     }
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
@@ -53,7 +60,6 @@ public class WineryExporter {
         } catch (IOException e) {
             System.out.println("Failed to create Service Template Instance in Winery. Continue with creation of EDIMM YAML file.");
         }
-
     }
 
     private static void putTopology(TopologyTemplateDTO topologyTemplateDTO, QName serviceTemplateId) {
@@ -74,6 +80,27 @@ public class WineryExporter {
         } catch (IOException e) {
             System.out.println("Failed to export CSAR from Winery. Continue with creation of EDIMM YAML file.");
         }
+    }
+
+    private static void importCSARToContainer(String outputPath) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(containerEndpoint);
+        try {
+            File file = new File(outputPath);
+            FileBody fileBody = new FileBody(file, ContentType.MULTIPART_FORM_DATA);
+            StringBody stringBody = new StringBody("true", ContentType.MULTIPART_FORM_DATA);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addPart("file", fileBody);
+            builder.addPart("enrichment", stringBody);
+            HttpEntity entity = builder.build();
+            post.setEntity(entity);
+
+            HttpResponse response = httpClient.execute(post);
+            System.out.println("OK");
+        } catch (IOException e) {
+            System.out.println("Failed to create Service Template Instance in Winery. Continue with creation of EDIMM YAML file.");
+        }
+
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {
