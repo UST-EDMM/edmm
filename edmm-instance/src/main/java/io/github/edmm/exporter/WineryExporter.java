@@ -3,7 +3,6 @@ package io.github.edmm.exporter;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -26,6 +25,7 @@ public class WineryExporter {
     private static String wineryEndpoint = "http://localhost:8080/winery/";
     private static String serviceTemplatesPath = "servicetemplates";
     private static String topologyTemplatePath = "topologytemplate";
+    private static String csarDownloadPath = "?csar";
 
     public static void exportServiceTemplateInstanceToWinery(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
@@ -58,7 +58,7 @@ public class WineryExporter {
 
     private static void putTopology(TopologyTemplateDTO topologyTemplateDTO, QName serviceTemplateId) {
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPut put = new HttpPut(wineryEndpoint + serviceTemplatesPath + "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/" + topologyTemplatePath);
+        HttpPut put = new HttpPut(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath);
         try {
             put.setEntity(getObjectAsJson(topologyTemplateDTO));
             put.setHeader("content-type", "application/json");
@@ -70,16 +70,18 @@ public class WineryExporter {
 
     private static void exportCSAR(QName serviceTemplateId, String outputPath) {
         try {
-            FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/?csar"), new File(outputPath));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Failed to export CSAR from Winery. Continue with creation of EDIMM YAML file.");
         }
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {
         Gson gson = new Gson();
         return new StringEntity(gson.toJson(entity));
+    }
+
+    private static String doubleEncodeNamespace(QName serviceTemplateId) {
+        return "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/";
     }
 }
