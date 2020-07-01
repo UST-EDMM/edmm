@@ -68,7 +68,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
         WineryExporter.exportServiceTemplateInstanceToWinery(serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
-        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.toString());
+        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.getCsarId());
     }
 
     @Override
@@ -80,6 +80,5 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
 
     @Override
     public void cleanup() {
-
     }
 }
