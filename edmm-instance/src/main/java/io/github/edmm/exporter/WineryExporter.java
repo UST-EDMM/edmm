@@ -41,7 +41,6 @@ public class WineryExporter {
     public static void exportServiceTemplateInstanceToWinery(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
-        // TODO
         applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()), serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
         importCSARToContainer(outputPath);
