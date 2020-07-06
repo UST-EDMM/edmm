@@ -38,7 +38,7 @@ public class HeatResourceHandler {
         componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
         componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent));
         // set property with original type string in order to avoid losing this info since we map to EDMM types
-        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.DELIMITER, String.class.getSimpleName(), resource.getType()));
+        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), resource.getType()));
         componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
 

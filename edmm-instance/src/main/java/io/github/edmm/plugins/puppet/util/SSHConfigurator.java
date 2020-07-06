@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.model.Master;
@@ -28,6 +26,7 @@ public class SSHConfigurator {
     }
 
     public void configurePuppetMaster() {
+        ModuleLoader.downloadPuppetArtifacts();
         this.copyPuppetModuleToMaster();
         this.unzipPuppetModule();
         this.deleteZip();
@@ -42,8 +41,8 @@ public class SSHConfigurator {
         try {
             ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
-            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.zip").toURI())), this.outputLocation);
-        } catch (JSchException | SftpException | URISyntaxException e) {
+            channelSftp.put("edimm_ssh.zip", this.outputLocation);
+        } catch (JSchException | SftpException e) {
             e.printStackTrace();
         }
     }
@@ -64,10 +63,10 @@ public class SSHConfigurator {
         try {
             ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
-            channelSftp.put(String.valueOf(Paths.get(ClassLoader.getSystemResource("edimm_ssh.sh").toURI())), this.outputLocation);
+            channelSftp.put("edimm_ssh.sh", this.outputLocation);
 
             this.executeSimpleCommand(Commands.EXECUTE_HELPER_SCRIPT);
-        } catch (JSchException | SftpException | URISyntaxException e) {
+        } catch (JSchException | SftpException e) {
             e.printStackTrace();
         }
     }
@@ -117,7 +116,7 @@ public class SSHConfigurator {
         }
     }
 
-    private void executeSimpleCommand(String command) {
+    public void executeSimpleCommand(String command) {
         try {
             ChannelExec channelExec = this.setupChannelExec();
 

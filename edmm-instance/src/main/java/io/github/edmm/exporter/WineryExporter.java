@@ -36,14 +36,16 @@ public class WineryExporter {
     private static String serviceTemplatesPath = "servicetemplates";
     private static String topologyTemplatePath = "topologytemplate";
     private static String availableFeaturesPath = "availablefeatures";
-    private static String csarDownloadPath = "?csar";
+    private static String csarPath = "csar";
+    private static String csarDownloadPath = "?" + csarPath;
 
-    public static void exportServiceTemplateInstanceToWinery(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
+
+    public static void processServiceTemplateInstanceToOpenTOSCA(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
         applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()), serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
-        importCSARToContainer(outputPath);
+        importCSARToContainerAndStartInstance(serviceTemplateInstance.getCsarId(), outputPath, serviceTemplateInstance.getServiceTemplateId());
     }
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
@@ -118,7 +120,13 @@ public class WineryExporter {
         }
     }
 
-    private static void importCSARToContainer(String outputPath) {
+    private static void importCSARToContainerAndStartInstance(String csarId, String outputPath, QName serviceTemplateId) {
+        if (importCSARToContainer(outputPath)) {
+            createCSARInstance(csarId, serviceTemplateId);
+        }
+    }
+
+    private static boolean importCSARToContainer(String outputPath) {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(containerEndpoint);
         try {
@@ -132,10 +140,23 @@ public class WineryExporter {
             post.setEntity(entity);
 
             HttpResponse response = httpClient.execute(post);
+
+            return true;
         } catch (IOException e) {
             System.out.println("Failed to import CSAR into Container. Continue with creation of EDIMM YAML file.");
+            return false;
         }
+    }
 
+    private static void createCSARInstance(String csarId, QName serviceTemplateId) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/" + serviceTemplatesPath + "/" + doubleEncodeNamespace(serviceTemplateId) + "/buildplans/" + csarId + "_buildPlan/instances");
+        try {
+            HttpResponse response = httpClient.execute(post);
+            System.out.println("OK");
+        } catch (IOException e) {
+            System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDIMM YAML file.");
+        }
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {

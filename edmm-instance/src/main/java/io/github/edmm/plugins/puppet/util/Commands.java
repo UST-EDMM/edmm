@@ -18,6 +18,7 @@ class Commands {
     private static final String SSH_KEY_GENERATION_PREFIX = "ssh-keygen -f ~/.ssh/";
     private static final String SSH_KEY_GENERATION_SUFFIX = " -t rsa -N ''";
     static final String GET_MASTER = BASE_COMMAND + "producers";
+    static final String GET_ALL_REPORTS = BASE_COMMAND + "reports";
     static final String GET_NODES = BASE_COMMAND + "nodes";
     static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
     static final String GET_CREATED_AT_TIMESTAMP = "stat -c %Z /proc/";
@@ -39,7 +40,7 @@ class Commands {
     }
 
     static String generateSSHKeyPairWithCertName(String certName) {
-        return Commands.SSH_KEY_GENERATION_PREFIX + certName + SSH_KEY_GENERATION_SUFFIX;
+        return SSH_KEY_GENERATION_PREFIX + certName + SSH_KEY_GENERATION_SUFFIX;
     }
 
     static String getFactCommandByFactType(String certName, FactType factType) {

@@ -38,7 +38,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        WineryExporter.exportServiceTemplateInstanceToWinery(serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
         System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.getCsarId());
     }
 
