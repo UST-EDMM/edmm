@@ -8,6 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
+import io.github.edmm.plugins.rules.Rule;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,5 +29,5 @@ public class PluginSupportResult {
     private final Double supports;
 
     @NotNull
-    private final List<String> unsupportedComponents;
+    private final List<Rule.Result> replacementRules;
 }

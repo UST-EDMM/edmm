@@ -6,6 +6,7 @@ import java.util.List;
 import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.transformation.TransformationContext;
+import io.github.edmm.plugins.rules.Rule;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -63,4 +64,12 @@ public abstract class TransformationPlugin<L extends AbstractLifecycle> {
     }
 
     public abstract L getLifecycle(TransformationContext context);
+
+    /**
+     * @return a list with the plugin specific rules.
+     * By default the function returns the list of 'default' rules.
+     * Override this function to specify the rules to be applied.
+     * If the plugin has no rules and accepts all the components, just return an empty list.
+     */
+    public @NonNull List<Rule> getRules() { return Rule.getDefault(); }
 }

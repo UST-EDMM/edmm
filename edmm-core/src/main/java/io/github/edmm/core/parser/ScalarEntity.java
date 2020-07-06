@@ -22,6 +22,6 @@ public class ScalarEntity extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ScalarEntity entity = (ScalarEntity) o;
-        return super.equals(o) && this.value.equals(entity.value);
+        return super.equals(o) && this.value == entity.value;
     }
 }

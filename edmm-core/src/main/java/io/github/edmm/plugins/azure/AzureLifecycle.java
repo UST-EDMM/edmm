@@ -8,12 +8,10 @@ import io.github.edmm.core.BashScript;
 import io.github.edmm.core.JsonHelper;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
-import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.azure.model.ResourceManagerTemplate;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.CustomScriptSettings;
 import io.github.edmm.plugins.azure.model.resource.compute.virtualmachines.extensions.EnvVarVirtualMachineExtension;
@@ -31,13 +29,6 @@ public class AzureLifecycle extends AbstractLifecycle {
 
     public AzureLifecycle(TransformationContext context) {
         super(context);
-    }
-
-    @Override
-    public CheckModelResult checkModel() {
-        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        return visitor.getResult();
     }
 
     private void populateAzureTemplateFile(ResourceManagerTemplate resultTemplate) {

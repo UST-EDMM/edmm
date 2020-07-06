@@ -11,7 +11,6 @@ import java.util.stream.StreamSupport;
 import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.PluginFileAccess;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.docker.Container;
 import io.github.edmm.docker.DependencyGraph;
@@ -20,8 +19,6 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
-import io.github.edmm.model.visitor.VisitorHelper;
-import io.github.edmm.plugins.ComputeSupportVisitor;
 import io.github.edmm.plugins.kubernetes.support.DockerfileBuildingVisitor;
 import io.github.edmm.plugins.kubernetes.support.ImageMappingVisitor;
 import io.github.edmm.plugins.kubernetes.support.KubernetesResourceBuilder;
@@ -45,13 +42,6 @@ public class KubernetesLifecycle extends AbstractLifecycle {
     public KubernetesLifecycle(TransformationContext context) {
         super(context);
         this.graph = context.getTopologyGraph();
-    }
-
-    @Override
-    public CheckModelResult checkModel() {
-        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        return visitor.getResult();
     }
 
     @Override

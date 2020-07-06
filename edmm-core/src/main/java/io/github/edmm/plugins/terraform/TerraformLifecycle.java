@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.terraform;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Platform;
@@ -17,13 +16,6 @@ public class TerraformLifecycle extends AbstractLifecycle {
 
     public TerraformLifecycle(TransformationContext context) {
         super(context);
-    }
-
-    @Override
-    public CheckModelResult checkModel() {
-        TerraformSupportVisitor visitor = new TerraformSupportVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        return visitor.getResult();
     }
 
     @Override

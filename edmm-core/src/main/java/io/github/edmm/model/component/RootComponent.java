@@ -9,6 +9,7 @@ import java.util.Set;
 import io.github.edmm.core.parser.Entity;
 import io.github.edmm.core.parser.EntityGraph;
 import io.github.edmm.core.parser.MappingEntity;
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.core.parser.support.GraphHelper;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.relation.RootRelation;
@@ -90,23 +91,30 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
         }
 
         public Optional<Operation> getCreate() {
-            return Optional.ofNullable(operations.get("create"));
+            return Optional.ofNullable(operations.get(DefaultKeys.CREATE));
         }
 
         public Optional<Operation> getConfigure() {
-            return Optional.ofNullable(operations.get("configure"));
+            return Optional.ofNullable(operations.get(DefaultKeys.CONFIGURE));
         }
 
         public Optional<Operation> getStart() {
-            return Optional.ofNullable(operations.get("start"));
+            return Optional.ofNullable(operations.get(DefaultKeys.START));
         }
 
         public Optional<Operation> getStop() {
-            return Optional.ofNullable(operations.get("stop"));
+            return Optional.ofNullable(operations.get(DefaultKeys.STOP));
         }
 
         public Optional<Operation> getDelete() {
-            return Optional.ofNullable(operations.get("delete"));
+            return Optional.ofNullable(operations.get(DefaultKeys.DELETE));
         }
+    }
+
+    @Override
+    public boolean equals(Object c) {
+        if (this == c) return true;
+        if (c == null || getClass() != c.getClass()) return false;
+        return this.entity.equals( ((RootComponent) c).entity);
     }
 }

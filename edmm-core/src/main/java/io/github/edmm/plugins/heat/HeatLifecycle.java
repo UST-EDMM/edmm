@@ -1,11 +1,9 @@
 package io.github.edmm.plugins.heat;
 
 import io.github.edmm.core.plugin.AbstractLifecycle;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.visitor.VisitorHelper;
-import io.github.edmm.plugins.ComputeSupportVisitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +14,6 @@ public class HeatLifecycle extends AbstractLifecycle {
 
     public HeatLifecycle(TransformationContext context) {
         super(context);
-    }
-
-    @Override
-    public CheckModelResult checkModel() {
-        ComputeSupportVisitor visitor = new ComputeSupportVisitor(context);
-        VisitorHelper.visit(context.getModel().getComponents(), visitor);
-        return visitor.getResult();
     }
 
     @Override
