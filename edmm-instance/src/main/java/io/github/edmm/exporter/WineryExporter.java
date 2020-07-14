@@ -153,7 +153,6 @@ public class WineryExporter {
         HttpPost post = new HttpPost(containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/" + serviceTemplatesPath + "/" + doubleEncodeNamespace(serviceTemplateId) + "/buildplans/" + csarId + "_buildPlan/instances");
         try {
             HttpResponse response = httpClient.execute(post);
-            System.out.println("OK");
         } catch (IOException e) {
             System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDIMM YAML file.");
         }
