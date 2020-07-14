@@ -63,12 +63,16 @@ public class PuppetNodeHandler {
                 continue;
             }
             for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
-                if (resourceEventEntry.getResource_type().equals(ResourceType.Package) && resourceEventEntry.getStatus().equals("success")) {
+                if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
                     componentInstances.add(generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName));
                 }
             }
         }
         return componentInstances;
+    }
+
+    private static boolean checkIfResourceEventEntryIsSuitable(ResourceEventEntry resourceEventEntry) {
+        return resourceEventEntry.getResource_type() != null && resourceEventEntry.getResource_type().equals(ResourceType.Package) && resourceEventEntry.getStatus() != null && resourceEventEntry.getStatus().equals("success");
     }
 
     private static ComponentInstance generateComponentInstanceFromResourceEventEntry(ResourceEventEntry entry, ComponentInstance componentInstance, String certName) {
@@ -88,13 +92,13 @@ public class PuppetNodeHandler {
     }
 
     private static ComponentType getComponentTypeForPuppetPackage(String resourceTitle) {
-        // this is bad, just hardcoded :/, maybe retrieve puppetlabs package list dynamically
+        // this is bad, just hardcoded :/, maybe retrieve puppetlabs officially supported package list dynamically
         switch (resourceTitle) {
             case "mysql-server":
                 return ComponentType.MySQL_DBMS;
             case "docker":
                 return ComponentType.Platform;
-            case "tomcat":
+            case "tomcat8":
                 return ComponentType.Web_Server;
             case "mongodb":
                 return ComponentType.DBMS;
