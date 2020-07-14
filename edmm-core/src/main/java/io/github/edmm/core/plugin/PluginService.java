@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.DeploymentTechnology;
-import io.github.edmm.core.plugin.support.CheckModelResult;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.model.PluginSupportResult;
-import io.github.edmm.model.component.RootComponent;
+import io.github.edmm.plugins.rules.Rule;
+import io.github.edmm.plugins.rules.RuleEngine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,23 +79,22 @@ public class PluginService {
         return Optional.empty();
     }
 
-    public CheckModelResult checkModel(TransformationContext context, TransformationPlugin<?> plugin) {
-        return plugin.getLifecycle(context).checkModel();
-    }
-
     public List<PluginSupportResult> checkModelSupport(DeploymentModel model) {
         List<PluginSupportResult> response = new ArrayList<>();
         for (TransformationPlugin<?> plugin : this.transformationPlugins) {
             TransformationContext context = new TransformationContext(model, plugin.getDeploymentTechnology());
-            CheckModelResult checkModelResult = this.checkModel(context, plugin);
-            List<String> unsupportedComponents = checkModelResult.getUnsupportedComponents().stream()
-                .map(RootComponent::getName)
-                .collect(Collectors.toList());
+
+            RuleEngine ruleEngine = new RuleEngine();
+            List<Rule.Result> ruleResults = ruleEngine.fire(context,plugin);
+
             PluginSupportResult.PluginSupportResultBuilder psr = PluginSupportResult.builder()
                 .id(plugin.getDeploymentTechnology().getId())
                 .name(plugin.getDeploymentTechnology().getName())
-                .unsupportedComponents(unsupportedComponents);
-            double s = 1 - (unsupportedComponents.size() / (double) model.getComponents().size());
+                .replacementRules(ruleResults);
+
+            double s = 1 - ( RuleEngine.countUnsupportedRules(ruleResults) / (double) model.getComponents().size());
+            // there is the rare possibility that s is less than 0, in this case is ok to put it at 0
+            s = ( s < 0) ? 0 : s;
             psr.supports(s);
             response.add(psr.build());
         }
