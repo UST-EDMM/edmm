@@ -23,7 +23,7 @@ public interface TOSCATypeMapper {
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "MySQL-DBMS_5.7-w1");
             case "docker":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "DockerEngine");
-            case "tomcat":
+            case "tomcat8":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Tomcat8");
             case "mongodb":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "MongoDB-Server_3.2");
