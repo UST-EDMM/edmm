@@ -64,7 +64,9 @@ public class PuppetNodeHandler {
             }
             for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
                 if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
-                    componentInstances.add(generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName));
+                    ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
+                    // TODO: jsch with private key if package is tomcat8 and check if WAR is in folder, then create WebAPp hosted on Tomcat component instance
+                    componentInstances.add(generatedComponentInstance);
                 }
             }
         }
@@ -72,7 +74,19 @@ public class PuppetNodeHandler {
     }
 
     private static boolean checkIfResourceEventEntryIsSuitable(ResourceEventEntry resourceEventEntry) {
-        return resourceEventEntry.getResource_type() != null && resourceEventEntry.getResource_type().equals(ResourceType.Package) && resourceEventEntry.getStatus() != null && resourceEventEntry.getStatus().equals("success");
+        return isNotNull(resourceEventEntry) && isPackageEntry(resourceEventEntry) && isSucceeded(resourceEventEntry.getStatus());
+    }
+
+    private static boolean isNotNull(ResourceEventEntry resourceEventEntry) {
+        return resourceEventEntry.getResource_title() != null && resourceEventEntry.getResource_type() != null && resourceEventEntry.getStatus() != null;
+    }
+
+    private static boolean isPackageEntry(ResourceEventEntry resourceEventEntry) {
+        return resourceEventEntry.getResource_type().equals(ResourceType.Package);
+    }
+
+    private static boolean isSucceeded(String status) {
+        return status.equals("success");
     }
 
     private static ComponentInstance generateComponentInstanceFromResourceEventEntry(ResourceEventEntry entry, ComponentInstance componentInstance, String certName) {
