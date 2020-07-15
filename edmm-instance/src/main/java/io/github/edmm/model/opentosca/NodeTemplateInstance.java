@@ -38,9 +38,7 @@ public class NodeTemplateInstance {
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
         nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
-        if (componentInstance.getType().toTOSCABaseNodeType().equals(TOSCABaseTypes.TOSCABaseNodeTypes.Compute)) {
-            nodeTemplateInstance.getInstanceProperties().add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty("State", String.class.getSimpleName(), "Running")));
-        }
+        nodeTemplateInstance.getInstanceProperties().add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty("State", String.class.getSimpleName(), "Running")));
         return nodeTemplateInstance;
     }
 
