@@ -26,14 +26,7 @@ import org.openstack4j.model.heat.Stack;
 
 public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
-    private static final String userName = "-";
-    private static final String password = "-";
-    private static final String projectId = "-";
-    private static final String domainName = "-";
-    private static final String authenticationEndpoint = "-";
 
-    private static final String stackName = "-";
-    private static final String stackId = "-";
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private Stack stack;
     private Map<String, Object> template;
@@ -74,7 +67,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         this.deploymentInstance.setVersion(String.valueOf(this.template.get(HeatConstants.VERSION)));
         this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
         this.deploymentInstance.setMetadata(HeatMetadataHandler.getDeploymentMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
-        this.deploymentInstance.setComponentInstances(HeatResourceHandler.getComponentInstances(this.resources, this.template));
+        this.deploymentInstance.setComponentInstances(HeatResourceHandler.getComponentInstances(this.resources, this.template, this.osClient));
     }
 
     @Override
