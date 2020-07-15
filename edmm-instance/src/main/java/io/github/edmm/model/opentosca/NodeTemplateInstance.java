@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 import io.github.edmm.core.transformation.TOSCATypeMapperImplementation;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.InstanceProperty;
+import io.github.edmm.util.Constants;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +39,7 @@ public class NodeTemplateInstance {
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
         nodeTemplateInstance.setInstanceProperties(emptyIfNull(componentInstance.getInstanceProperties())
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));
-        nodeTemplateInstance.getInstanceProperties().add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty("State", String.class.getSimpleName(), "Running")));
+        nodeTemplateInstance.getInstanceProperties().add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty(Constants.STATE, String.class.getSimpleName(), Constants.RUNNING)));
         return nodeTemplateInstance;
     }
 

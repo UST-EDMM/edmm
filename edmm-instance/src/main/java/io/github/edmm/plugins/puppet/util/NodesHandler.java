@@ -9,6 +9,7 @@ import io.github.edmm.plugins.puppet.model.FactType;
 import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.Node;
 import io.github.edmm.plugins.puppet.model.PuppetState;
+import io.github.edmm.util.Constants;
 
 public class NodesHandler {
     private Master master;
@@ -37,8 +38,8 @@ public class NodesHandler {
         facts.add(this.getFact(certName, FactType.IPAddress));
         facts.add(this.getFact(certName, FactType.OperatingSystem));
         facts.add(this.getFact(certName, FactType.OperatingSystemRelease));
-        facts.add(new Fact(certName, "VMPrivateKey", this.master.getGeneratedPrivateKey()));
-        facts.add(new Fact(certName, "VMPublicKey", this.master.getGeneratedPublicKey()));
+        facts.add(new Fact(certName, Constants.VM_PRIVATE_KEY, this.master.getGeneratedPrivateKey()));
+        facts.add(new Fact(certName, Constants.VM_PUBLIC_KEY, this.master.getGeneratedPublicKey()));
 
         return facts;
     }
@@ -49,7 +50,7 @@ public class NodesHandler {
 
     private Fact checkAndReplaceIPAddressKey(Fact fact) {
         if (fact.getName().equals(String.valueOf(FactType.IPAddress).toLowerCase())) {
-            fact.setName("VMIP");
+            fact.setName(Constants.VMIP);
         }
         return fact;
     }
