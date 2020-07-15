@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -102,7 +103,8 @@ public class PuppetNodeHandler {
         componentInstance.setName(webApp);
         componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
         componentInstance.setType(ComponentType.Web_Application);
-        componentInstance.setInstanceProperties(Collections.emptyList());
+        InstanceProperty runningProp = new InstanceProperty(Constants.STATE, String.class.getSimpleName(), Constants.RUNNING);
+        componentInstance.setInstanceProperties(Collections.singletonList(runningProp));
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setType(RelationType.HostedOn);
         relationInstance.setTargetInstance(tomcatInstance.getName());
@@ -163,7 +165,9 @@ public class PuppetNodeHandler {
         packageComponent.setId(String.valueOf(entry.getResource_title().hashCode()));
         packageComponent.setName(entry.getResource_title());
         packageComponent.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
-        packageComponent.setInstanceProperties(Collections.singletonList(new InstanceProperty("original_type", String.class.getSimpleName(), entry.getResource_title())));
+        InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), entry.getResource_title());
+        InstanceProperty runningProp = new InstanceProperty(Constants.STATE, String.class.getSimpleName(), Constants.RUNNING);
+        packageComponent.setInstanceProperties(Arrays.asList(typeProp, runningProp));
         packageComponent.setType(getComponentTypeForPuppetPackage(entry.getResource_title()));
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setType(RelationType.HostedOn);
