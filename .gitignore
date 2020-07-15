@@ -9,3 +9,7 @@ target
 
 ### VS Code ###
 .vscode/
+
+### Artifacts downloaded during runtime ###
+edimm_ssh.sh
+edimm_ssh.zip
