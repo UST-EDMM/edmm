@@ -22,6 +22,7 @@ class Commands {
     static final String GET_NODES = BASE_COMMAND + "nodes";
     static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
     static final String GET_CREATED_AT_TIMESTAMP = "stat -c %Z /proc/";
+    static final String SEARCH_FOR_WARS = "find /var/lib/tomcat8/webapps -type f -name \"*.war\"";
 
     private static String getIPAddressFact(String certName) {
         return buildNodeFactQuery(certName) + String.valueOf(FactType.IPAddress).toLowerCase();

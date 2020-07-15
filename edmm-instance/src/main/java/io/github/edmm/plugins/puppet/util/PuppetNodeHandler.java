@@ -1,5 +1,8 @@
 package io.github.edmm.plugins.puppet.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +23,10 @@ import io.github.edmm.util.Constants;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
 public class PuppetNodeHandler {
     public static List<ComponentInstance> getComponentInstances(Master master) {
@@ -65,12 +72,44 @@ public class PuppetNodeHandler {
             for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
                 if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
                     ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
-                    // TODO: jsch with private key if package is tomcat8 and check if WAR is in folder, then create WebAPp hosted on Tomcat component instance
+                    if (generatedComponentInstance.getType().equals(ComponentType.Web_Server)) {
+                        ComponentInstance webApp = searchForWebAppsInTomcatDirectory(componentInstance, generatedComponentInstance);
+                        if (webApp != null) {
+                            componentInstances.add(webApp);
+                        }
+                    }
                     componentInstances.add(generatedComponentInstance);
                 }
             }
         }
         return componentInstances;
+    }
+
+    private static ComponentInstance searchForWebAppsInTomcatDirectory(ComponentInstance inputComponentInstance, ComponentInstance tomcatInstance) {
+        Session session = buildSessionForPuppetAgent(inputComponentInstance);
+        if (session != null) {
+            String installedWebApp = executeCommand(session);
+            if (installedWebApp != null) {
+                return generateComponentInstanceFromWebApp(installedWebApp, tomcatInstance);
+            }
+        }
+        return null;
+    }
+
+    private static ComponentInstance generateComponentInstanceFromWebApp(String webApp, ComponentInstance tomcatInstance) {
+        ComponentInstance componentInstance = new ComponentInstance();
+        componentInstance.setId(String.valueOf(webApp.hashCode()));
+        componentInstance.setName(webApp);
+        componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
+        componentInstance.setType(ComponentType.Web_Application);
+        componentInstance.setInstanceProperties(Collections.emptyList());
+        RelationInstance relationInstance = new RelationInstance();
+        relationInstance.setType(RelationType.HostedOn);
+        relationInstance.setTargetInstance(tomcatInstance.getName());
+        relationInstance.setId(webApp + String.valueOf(RelationType.HostedOn));
+        componentInstance.setRelationInstances(Collections.singletonList(relationInstance));
+
+        return componentInstance;
     }
 
     private static boolean checkIfResourceEventEntryIsSuitable(ResourceEventEntry resourceEventEntry) {
@@ -87,6 +126,36 @@ public class PuppetNodeHandler {
 
     private static boolean isSucceeded(String status) {
         return status.equals("success");
+    }
+
+    private static Session buildSessionForPuppetAgent(ComponentInstance puppetAgentInstance) {
+        try {
+            JSch jsch = new JSch();
+            jsch.addIdentity(null, puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VM_PRIVATE_KEY)).findAny().get().getInstanceValue().toString().getBytes(), puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VM_PUBLIC_KEY)).findAny().get().getInstanceValue().toString().getBytes(), null);
+            Session session = jsch.getSession("ubuntu", puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VMIP)).findAny().get().getInstanceValue().toString(), 22);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+
+            return session;
+        } catch (JSchException e) {
+            System.out.println("Failed to connect to Puppet agent. Continue");
+        }
+        return null;
+    }
+
+    private static String executeCommand(Session session) {
+        try {
+            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
+
+            channelExec.setCommand(Commands.SEARCH_FOR_WARS);
+            channelExec.connect();
+
+            return reader.readLine();
+        } catch (IOException | JSchException e) {
+            System.out.println("Failed to retrieve installed WARs on Puppet agent. Continue");
+        }
+        return null;
     }
 
     private static ComponentInstance generateComponentInstanceFromResourceEventEntry(ResourceEventEntry entry, ComponentInstance componentInstance, String certName) {
@@ -121,6 +190,5 @@ public class PuppetNodeHandler {
             default:
                 return ComponentType.Software_Component;
         }
-
     }
 }
