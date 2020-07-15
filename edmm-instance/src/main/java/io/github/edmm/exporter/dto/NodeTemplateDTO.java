@@ -22,7 +22,6 @@ class NodeTemplateDTO {
         Map<String, Map<String, String>> propertyMap = new LinkedHashMap<>();
         propertyMap.put("kvproperties", new LinkedHashMap<>());
         nodeTemplateInstance.getInstanceProperties().forEach(instanceProp -> propertyMap.get("kvproperties").put(instanceProp.getName(), String.valueOf(instanceProp.getValue())));
-        propertyMap.get("kvproperties").put("State", "Running");
         nodeTemplateDTO.setProperties(propertyMap);
 
         return nodeTemplateDTO;

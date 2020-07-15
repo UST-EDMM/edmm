@@ -17,7 +17,7 @@ public class TOSCATypeMapperImplementation implements TOSCATypeMapper {
                 return TOSCATypeMapper.searchWineryRepositoryForType(String.valueOf(instanceProperty.getInstanceValue()));
             }
         }
-        return null;
+        return qName;
     }
 
     private boolean isOriginalTypeProperty(String propertyKey) {
