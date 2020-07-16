@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import io.github.edmm.core.plugin.TOSCATypeMapper;
 import io.github.edmm.model.edimm.InstanceProperty;
+import io.github.edmm.util.Constants;
 
 public class TOSCATypeMapperImplementation implements TOSCATypeMapper {
     @Override
@@ -21,6 +22,6 @@ public class TOSCATypeMapperImplementation implements TOSCATypeMapper {
     }
 
     private boolean isOriginalTypeProperty(String propertyKey) {
-        return propertyKey.equals("original_type");
+        return propertyKey.equals(Constants.TYPE);
     }
 }

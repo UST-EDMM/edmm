@@ -11,6 +11,7 @@ import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.edimm.InstanceState;
+import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.model.edimm.RelationInstance;
 import io.github.edmm.model.edimm.RelationType;
 import io.github.edmm.plugins.puppet.model.Fact;
@@ -37,15 +38,13 @@ public class PuppetNodeHandler {
             // node is always of type compute
             componentInstance.setType(ComponentType.Compute);
             componentInstance.setName(node.getCertname());
-            componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(node.getFacts()));
+            componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(componentInstance.getType(), node.getFacts()));
             componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), getTypeFromFacts(node.getFacts())));
             componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
             // we neglect relations for now
             componentInstances.add(componentInstance);
             componentInstances.addAll(identifyPackagesOnPuppetNode(master, componentInstance, node.getCertname()));
         });
-
-
         return componentInstances;
     }
 
@@ -131,8 +130,8 @@ public class PuppetNodeHandler {
     private static Session buildSessionForPuppetAgent(ComponentInstance puppetAgentInstance) {
         try {
             JSch jsch = new JSch();
-            jsch.addIdentity(null, puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VM_PRIVATE_KEY)).findAny().get().getInstanceValue().toString().getBytes(), puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VM_PUBLIC_KEY)).findAny().get().getInstanceValue().toString().getBytes(), null);
-            Session session = jsch.getSession("ubuntu", puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(Constants.VMIP)).findAny().get().getInstanceValue().toString(), 22);
+            jsch.addIdentity(null, puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.private_key))).findAny().get().getInstanceValue().toString().getBytes(), puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_key))).findAny().get().getInstanceValue().toString().getBytes(), null);
+            Session session = jsch.getSession("ubuntu", puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_address))).findAny().get().getInstanceValue().toString(), 22);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
 

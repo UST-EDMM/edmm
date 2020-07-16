@@ -8,6 +8,7 @@ public class HeatConstants {
     static final String PROPERTIES = "properties";
     static final String METADATA = "metadata";
     static final String TAGS = "tags";
+    static final String FLAVOR = "flavor";
     static final String DEPENDS_ON = "depends_on";
     static final String TIMEOUT = "timeout_time";
     static final String UPDATED_TIME = "updated_time";

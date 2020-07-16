@@ -16,16 +16,25 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
+import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.InstanceProperty;
-import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.plugins.puppet.model.Fact;
 
 import org.apache.commons.codec.binary.Base64;
 
 public class PuppetPropertiesHandler {
-    static List<InstanceProperty> getComponentInstanceProperties(List<Fact> facts) {
+    static List<InstanceProperty> getComponentInstanceProperties(ComponentType componentType, List<Fact> facts) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
         facts.forEach(fact -> instanceProperties.add(new InstanceProperty(fact.getName(), fact.getValue().getClass().getSimpleName(), fact.getValue())));
+        EDMMPropertyMapperImplementation propMapper = new EDMMPropertyMapperImplementation();
+        instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propMapper.mapToEDMMPropertyKey(componentType, instanceProperty.getKey())));
+        List<InstanceProperty> toBeRemoved = new ArrayList<>();
+        for (InstanceProperty instanceProperty : instanceProperties) {
+            if (instanceProperty.getKey() == null) {
+                toBeRemoved.add(instanceProperty);
+            }
+        }
+        instanceProperties.removeAll(toBeRemoved);
         return instanceProperties;
     }
 

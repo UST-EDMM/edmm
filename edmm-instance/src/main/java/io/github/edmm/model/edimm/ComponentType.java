@@ -3,8 +3,6 @@ package io.github.edmm.model.edimm;
 import io.github.edmm.model.opentosca.TOSCABaseTypes;
 
 public enum ComponentType {
-    AWS_Aurora(TOSCABaseTypes.TOSCABaseNodeTypes.Database),
-    AWS_Beanstalk(TOSCABaseTypes.TOSCABaseNodeTypes.WebApplication),
     Auth0(TOSCABaseTypes.TOSCABaseNodeTypes.SoftwareComponent),
     Compute(TOSCABaseTypes.TOSCABaseNodeTypes.Compute),
     DBMS(TOSCABaseTypes.TOSCABaseNodeTypes.DBMS),
