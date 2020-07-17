@@ -32,6 +32,8 @@ public interface TOSCATypeMapper {
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "MongoDB-Server_3.2");
             case "java":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Java8");
+            case "JavaApp":
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "JavaWebApp_w1-wip1");
             default:
                 return null;
         }

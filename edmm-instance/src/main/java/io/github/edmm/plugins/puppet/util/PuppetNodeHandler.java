@@ -101,7 +101,7 @@ public class PuppetNodeHandler {
         componentInstance.setName(webApp);
         componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
         componentInstance.setType(ComponentType.Web_Application);
-        componentInstance.setInstanceProperties(Collections.emptyList());
+        componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), "JavaApp")));
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setType(RelationType.HostedOn);
         relationInstance.setTargetInstance(tomcatInstance.getName());
