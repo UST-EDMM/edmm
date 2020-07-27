@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import io.github.edmm.exporter.dto.EnrichmentDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
+import io.github.edmm.exporter.dto.TagDTO;
 import io.github.edmm.exporter.dto.TopologyTemplateDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
@@ -40,8 +43,9 @@ public class WineryExporter {
     private static String csarDownloadPath = "?" + csarPath;
 
 
-    public static void processServiceTemplateInstanceToOpenTOSCA(ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
+    public static void processServiceTemplateInstanceToOpenTOSCA(String deploymentTechnology, ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
+        setServiceTemplateTag(deploymentTechnology, serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
         applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()), serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
@@ -79,6 +83,18 @@ public class WineryExporter {
             HttpResponse response = httpClient.execute(put);
         } catch (IOException e) {
             System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDIMM YAML file.");
+        }
+    }
+
+    private static void setServiceTemplateTag(String deploymentTechnology, QName serviceTemplateId) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "/tags");
+        try {
+            post.setEntity(getObjectAsJson(new TagDTO("retrievedDeploymentTechnology", deploymentTechnology)));
+            post.setHeader("content-type", "application/json");
+            HttpResponse response = httpClient.execute(post);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
