@@ -3,6 +3,7 @@ package io.github.edmm.plugins.heat.util;
 import io.github.edmm.util.Constants;
 
 public class HeatConstants {
+    public static final String VERSION = "heat_template_version";
     // keys to retrieve info from openstack stack result map
     static final String RESOURCES = "resources";
     static final String PROPERTIES = "properties";
@@ -12,7 +13,6 @@ public class HeatConstants {
     static final String DEPENDS_ON = "depends_on";
     static final String TIMEOUT = "timeout_time";
     static final String UPDATED_TIME = "updated_time";
-    public static final String VERSION = "heat_template_version";
 
     private static final String OS = "OS" + Constants.DELIMITER;
     static final String Aodh = OS + "Aodh" + Constants.DELIMITER;

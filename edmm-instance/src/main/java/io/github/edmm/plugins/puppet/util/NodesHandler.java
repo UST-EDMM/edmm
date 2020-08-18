@@ -3,7 +3,6 @@ package io.github.edmm.plugins.puppet.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.FactType;
 import io.github.edmm.plugins.puppet.model.Master;

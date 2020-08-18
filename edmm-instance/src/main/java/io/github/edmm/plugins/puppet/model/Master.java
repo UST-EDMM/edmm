@@ -6,13 +6,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
-import io.github.edmm.model.edimm.ComponentInstance;
-import io.github.edmm.model.edimm.ComponentType;
-import io.github.edmm.model.edimm.InstanceProperty;
-import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
-import io.github.edmm.plugins.puppet.util.PuppetPropertiesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 
 import com.jcraft.jsch.ChannelExec;

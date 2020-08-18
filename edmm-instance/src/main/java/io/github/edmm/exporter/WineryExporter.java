@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -41,7 +39,6 @@ public class WineryExporter {
     private static String availableFeaturesPath = "availablefeatures";
     private static String csarPath = "csar";
     private static String csarDownloadPath = "?" + csarPath;
-
 
     public static void processServiceTemplateInstanceToOpenTOSCA(String deploymentTechnology, ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());

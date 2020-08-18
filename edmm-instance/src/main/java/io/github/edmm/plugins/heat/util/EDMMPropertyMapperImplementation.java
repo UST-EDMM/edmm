@@ -114,7 +114,6 @@ public class EDMMPropertyMapperImplementation implements EDMMPropertyMapper {
         return null;
     }
 
-
     @Override
     public String toPaaSPropertyKey(String specificPropertyKey) {
         if (specificPropertyKey.equals(Constants.TYPE)) {

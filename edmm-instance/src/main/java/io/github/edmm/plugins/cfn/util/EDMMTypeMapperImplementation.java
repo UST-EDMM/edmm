@@ -367,6 +367,4 @@ class EDMMTypeMapperImplementation implements EDMMTypeMapper {
     public String extractSpecificType(String type) {
         return type.substring(type.lastIndexOf(DELIMITER) + 2, type.length());
     }
-
-
 }
