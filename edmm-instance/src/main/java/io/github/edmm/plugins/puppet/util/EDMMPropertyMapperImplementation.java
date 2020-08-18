@@ -64,8 +64,6 @@ public class EDMMPropertyMapperImplementation implements EDMMPropertyMapper {
             return String.valueOf(PropertyKey.Compute.private_key);
         } else if (specificPropertyKey.equals(Constants.KEY_NAME)) {
             return String.valueOf(PropertyKey.Compute.key_name);
-        } else if (specificPropertyKey.equals(PuppetConstants.OS)) {
-            return String.valueOf(PropertyKey.Compute.machine_image);
         }
         return null;
     }
@@ -114,7 +112,6 @@ public class EDMMPropertyMapperImplementation implements EDMMPropertyMapper {
         // TODO port, rootpassword
         return null;
     }
-
 
     @Override
     public String toPaaSPropertyKey(String specificPropertyKey) {

@@ -3,7 +3,7 @@ package io.github.edmm.plugins.cfn.model.types;
 import io.github.edmm.model.edimm.ComponentType;
 
 public enum ElasticBeanstalkType {
-    Application(ComponentType.Software_Component),
+    Application(ComponentType.Web_Application),
     ApplicationVersion(ComponentType.Software_Component),
     ApplicationConfigurationTemplate(ComponentType.Software_Component),
     Environment(ComponentType.Platform);

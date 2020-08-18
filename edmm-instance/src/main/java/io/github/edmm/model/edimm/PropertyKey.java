@@ -26,8 +26,6 @@ public class PropertyKey {
 
     public enum Compute {
         os_family(Constants.VMTYPE),
-        // TODO (not mappable?)
-        machine_image(""),
         instance_type(Constants.VMTYPE),
         key_name(Constants.VM_KEY_PAIR_NAME),
         public_key(Constants.VM_PUBLIC_KEY),

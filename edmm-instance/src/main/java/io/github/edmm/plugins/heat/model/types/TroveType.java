@@ -4,7 +4,7 @@ import io.github.edmm.model.edimm.ComponentType;
 
 public enum TroveType {
     Cluster(ComponentType.Database),
-    Instance(ComponentType.Database);
+    Instance(ComponentType.DBaaS);
 
     private ComponentType componentType;
 
