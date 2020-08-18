@@ -49,7 +49,6 @@ public class PuppetNodeHandler {
             componentInstance.setRelationInstances(Collections.singletonList(hostedOnHyperVisor));
             componentInstances.add(hyperVisor);
             componentInstances.add(componentInstance);
-            componentInstances.add(createHypervisorComponentInstance(componentInstance));
             componentInstances.addAll(identifyPackagesOnPuppetNode(master, componentInstance, node.getCertname()));
         });
         return componentInstances;
