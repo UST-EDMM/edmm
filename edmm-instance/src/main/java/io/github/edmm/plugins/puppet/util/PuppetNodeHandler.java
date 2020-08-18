@@ -41,11 +41,31 @@ public class PuppetNodeHandler {
             componentInstance.setInstanceProperties(PuppetPropertiesHandler.getComponentInstanceProperties(componentInstance.getType(), node.getFacts()));
             componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), getTypeFromFacts(node.getFacts())));
             componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
-            // we neglect relations for now
+            ComponentInstance hyperVisor = createHypervisorComponentInstance(componentInstance);
+            RelationInstance hostedOnHyperVisor = new RelationInstance();
+            hostedOnHyperVisor.setId(hyperVisor.getName() + componentInstance.getName() + String.valueOf(RelationType.HostedOn).hashCode());
+            hostedOnHyperVisor.setType(RelationType.HostedOn);
+            hostedOnHyperVisor.setTargetInstance(hyperVisor.getName());
+            componentInstance.setRelationInstances(Collections.singletonList(hostedOnHyperVisor));
+            componentInstances.add(hyperVisor);
             componentInstances.add(componentInstance);
+            componentInstances.add(createHypervisorComponentInstance(componentInstance));
             componentInstances.addAll(identifyPackagesOnPuppetNode(master, componentInstance, node.getCertname()));
         });
         return componentInstances;
+    }
+
+    private static ComponentInstance createHypervisorComponentInstance(ComponentInstance inputComponentInstance) {
+        String hyperVisorname = retrieveHypervisorName(inputComponentInstance);
+        ComponentInstance componentInstance = new ComponentInstance();
+        componentInstance.setId(String.valueOf(hyperVisorname + inputComponentInstance.getName().hashCode()));
+        componentInstance.setName(inputComponentInstance.getName() + hyperVisorname + inputComponentInstance.getId());
+        componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
+        InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorname);
+        componentInstance.setInstanceProperties(Collections.singletonList(typeProp));
+        componentInstance.setType(ComponentType.Compute);
+
+        return componentInstance;
     }
 
     private static List<ComponentInstance> identifyPackagesOnPuppetNode(Master master, ComponentInstance componentInstance, String certName) {
@@ -87,12 +107,27 @@ public class PuppetNodeHandler {
     private static ComponentInstance searchForWebAppsInTomcatDirectory(ComponentInstance inputComponentInstance, ComponentInstance tomcatInstance) {
         Session session = buildSessionForPuppetAgent(inputComponentInstance);
         if (session != null) {
-            String installedWebApp = executeCommand(session);
+            String installedWebApp = executeCommand(session, Commands.SEARCH_FOR_WARS);
             if (installedWebApp != null) {
                 return generateComponentInstanceFromWebApp(installedWebApp, tomcatInstance);
             }
         }
         return null;
+    }
+
+    private static String retrieveHypervisorName(ComponentInstance inputComponentInstance) {
+        Session session = buildSessionForPuppetAgent(inputComponentInstance);
+        if (session != null) {
+            String hypervisorKeyValuePair = executeCommand(session, Commands.GET_HYPERVISOR);
+            if (hypervisorKeyValuePair != null) {
+                return generateHypervisorName(hypervisorKeyValuePair);
+            }
+        }
+        return null;
+    }
+
+    private static String generateHypervisorName(String hypervisorKeyValuePair) {
+        return hypervisorKeyValuePair.substring(hypervisorKeyValuePair.indexOf(":") + 1).trim();
     }
 
     private static ComponentInstance generateComponentInstanceFromWebApp(String webApp, ComponentInstance tomcatInstance) {
@@ -142,12 +177,12 @@ public class PuppetNodeHandler {
         return null;
     }
 
-    private static String executeCommand(Session session) {
+    private static String executeCommand(Session session, String command) {
         try {
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             BufferedReader reader = new BufferedReader(new InputStreamReader(channelExec.getInputStream()));
 
-            channelExec.setCommand(Commands.SEARCH_FOR_WARS);
+            channelExec.setCommand(command);
             channelExec.connect();
 
             return reader.readLine();
