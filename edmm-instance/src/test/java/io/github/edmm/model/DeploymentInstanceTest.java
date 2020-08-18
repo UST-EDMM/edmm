@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.github.edmm.core.yaml.YamlParser;
+import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
 import io.github.edmm.model.edimm.RelationInstance;
@@ -84,16 +85,12 @@ public class DeploymentInstanceTest {
     private void thenAssertComponentInstances() {
         assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getId());
         assertEquals("nginx-deployment-6b474476c4-22gtg", this.deploymentInstance.getComponentInstances().get(0).getName());
-        assertEquals("nginx", this.deploymentInstance.getComponentInstances().get(0).getType());
+        assertEquals(ComponentType.Compute, this.deploymentInstance.getComponentInstances().get(0).getType());
         assertEquals(InstanceState.InstanceStateForComponentInstance.CREATED, this.deploymentInstance.getComponentInstances().get(0).getState());
         assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getCreatedAt());
-        assertEquals(10, this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().size());
-        assertEquals("docker://56be2e934c89cb5667ee0674a596d116c8987fe1f06b5f83bc107bccec1c08a3", this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(1).getInstanceValue());
-        assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(2).getType());
-        assertEquals("containerStatus::nginx::restartCount", this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().get(4).getKey());
+        assertEquals(0, this.deploymentInstance.getComponentInstances().get(0).getInstanceProperties().size());
         assertEquals(this.deploymentInstance.getComponentInstances().get(1).getState().toTOSCANodeTemplateInstanceState(), TOSCAState.NodeTemplateInstanceState.CREATED);
         assertEquals(Collections.emptyList(), this.deploymentInstance.getComponentInstances().get(0).getRelationInstances());
-        assertEquals("containerStatus::nginx::image", this.deploymentInstance.getComponentInstances().get(2).getInstanceProperties().get(2).getKey());
         assertTrue(this.deploymentInstance.getComponentInstances().get(0).getMetadata().containsKey("app"));
         assertTrue(this.deploymentInstance.getComponentInstances().get(0).getMetadata().containsValue("default"));
         assertNotNull(this.deploymentInstance.getComponentInstances().get(0).getMetadata().get("pod-template-hash"));
