@@ -57,8 +57,8 @@ public class PuppetNodeHandler {
     private static ComponentInstance createHypervisorComponentInstance(ComponentInstance inputComponentInstance) {
         String hyperVisorName = retrieveHypervisorName(inputComponentInstance);
         ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(String.valueOf(hyperVisorName + inputComponentInstance.getName().hashCode()));
-        componentInstance.setName(inputComponentInstance.getName() + hyperVisorName + inputComponentInstance.getId());
+        componentInstance.setId(String.valueOf(hyperVisorName.hashCode()));
+        componentInstance.setName(hyperVisorName.replace(" ", ""));
         componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
         InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorName);
         componentInstance.setInstanceProperties(Collections.singletonList(typeProp));
