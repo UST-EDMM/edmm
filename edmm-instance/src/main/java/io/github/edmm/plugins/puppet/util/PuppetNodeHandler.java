@@ -96,7 +96,7 @@ public class PuppetNodeHandler {
             for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
                 if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
                     ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
-                    if (generatedComponentInstance.getType().equals(ComponentType.Web_Server)) {
+                    if (generatedComponentInstance.getType().equals(ComponentType.Tomcat)) {
                         ComponentInstance webApp = searchForWebAppsInTomcatDirectory(componentInstance, generatedComponentInstance);
                         if (webApp != null) {
                             componentInstances.add(webApp);
@@ -222,7 +222,9 @@ public class PuppetNodeHandler {
             case "docker":
                 return ComponentType.Platform;
             case "tomcat8":
-                return ComponentType.Web_Server;
+                return ComponentType.Tomcat;
+            case "tomcat":
+                return ComponentType.Tomcat;
             case "mongodb":
                 return ComponentType.DBMS;
             case "java":

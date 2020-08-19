@@ -22,7 +22,7 @@ class Commands {
     static final String GET_NODES = BASE_COMMAND + "nodes";
     static final String GET_VERSION = "/opt/puppetlabs/bin/puppet --version";
     static final String GET_CREATED_AT_TIMESTAMP = "stat -c %Z /proc/";
-    static final String SEARCH_FOR_WARS = "find /var/lib/tomcat8/webapps -type f -name \"*.war\"";
+    static final String SEARCH_FOR_WARS = "sudo find /var/lib/tomcat8/webapps -type f -name \"*.war\"";
     static final String GET_HYPERVISOR = "sudo dmidecode | grep -i -e product";
 
     private static String getIPAddressFact(String certName) {
