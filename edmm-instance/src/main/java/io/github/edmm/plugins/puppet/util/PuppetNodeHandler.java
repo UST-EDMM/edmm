@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
@@ -47,7 +48,11 @@ public class PuppetNodeHandler {
             hostedOnHyperVisor.setType(RelationType.HostedOn);
             hostedOnHyperVisor.setTargetInstance(hyperVisor.getName());
             componentInstance.setRelationInstances(Collections.singletonList(hostedOnHyperVisor));
-            componentInstances.add(hyperVisor);
+            // check if hypervisor already exists, only add to list if not
+            if (componentInstances.stream().filter(componentInstance1 -> componentInstance1.getId().equals(hyperVisor.getId())).collect(Collectors.toList()).isEmpty()) {
+                componentInstances.add(hyperVisor);
+
+            }
             componentInstances.add(componentInstance);
             componentInstances.addAll(identifyPackagesOnPuppetNode(master, componentInstance, node.getCertname()));
         });
