@@ -55,12 +55,12 @@ public class PuppetNodeHandler {
     }
 
     private static ComponentInstance createHypervisorComponentInstance(ComponentInstance inputComponentInstance) {
-        String hyperVisorname = retrieveHypervisorName(inputComponentInstance);
+        String hyperVisorName = retrieveHypervisorName(inputComponentInstance);
         ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(String.valueOf(hyperVisorname + inputComponentInstance.getName().hashCode()));
-        componentInstance.setName(inputComponentInstance.getName() + hyperVisorname + inputComponentInstance.getId());
+        componentInstance.setId(String.valueOf(hyperVisorName + inputComponentInstance.getName().hashCode()));
+        componentInstance.setName(inputComponentInstance.getName() + hyperVisorName + inputComponentInstance.getId());
         componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
-        InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorname);
+        InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorName);
         componentInstance.setInstanceProperties(Collections.singletonList(typeProp));
         componentInstance.setType(ComponentType.Compute);
 
@@ -70,6 +70,7 @@ public class PuppetNodeHandler {
     private static List<ComponentInstance> identifyPackagesOnPuppetNode(Master master, ComponentInstance componentInstance, String certName) {
         List<Report> allReports = new Gson().fromJson(master.executeCommandAndHandleResult(Commands.GET_ALL_REPORTS), new TypeToken<List<Report>>() {
         }.getType());
+
         return identifyRelevantResourceEventEntries(allReports, componentInstance, certName);
 
     }

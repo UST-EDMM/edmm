@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import io.github.edmm.exporter.dto.EnrichmentDTO;
+import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
 import io.github.edmm.exporter.dto.TagDTO;
 import io.github.edmm.exporter.dto.TopologyTemplateDTO;
@@ -33,7 +35,7 @@ import org.apache.http.util.EntityUtils;
 
 public class WineryExporter {
     private static String wineryEndpoint = "http://localhost:8080/winery/";
-    private static String containerEndpoint = "http://localhost:1337/csars";
+    private static String containerEndpoint = "http://localhost:1337/csars/";
     private static String serviceTemplatesPath = "servicetemplates";
     private static String topologyTemplatePath = "topologytemplate";
     private static String availableFeaturesPath = "availablefeatures";
@@ -163,8 +165,11 @@ public class WineryExporter {
 
     private static void createCSARInstance(String csarId, QName serviceTemplateId) {
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/" + serviceTemplatesPath + "/" + doubleEncodeNamespace(serviceTemplateId) + "/buildplans/" + csarId + "_buildPlan/instances");
+        HttpPost post = new HttpPost(containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/" + serviceTemplatesPath + doubleEncodeNamespaceForInstance(serviceTemplateId) + "buildplans/" + csarId.replace(".", "_") + "_buildPlan/instances");
         try {
+            post.setEntity(generateInstancePayload());
+            post.setHeader("content-type", "application/json");
+
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
             System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDIMM YAML file.");
@@ -176,6 +181,16 @@ public class WineryExporter {
         return new StringEntity(gson.toJson(entity));
     }
 
+    private static StringEntity generateInstancePayload() throws UnsupportedEncodingException {
+        InstanceDTO instanceDataAPIUrl = new InstanceDTO("instanceDataAPIUrl", "String", "YES");
+        InstanceDTO correlationID = new InstanceDTO("CorrelationID", "String", "YES");
+        List<InstanceDTO> instanceDTOs = new ArrayList<>();
+        instanceDTOs.add(instanceDataAPIUrl);
+        instanceDTOs.add(correlationID);
+
+        return getObjectAsJson(instanceDTOs);
+    }
+
     private static List<EnrichmentDTO> getJsonStringAsEnrichmentDTOs(String jsonString) {
         Gson gson = new Gson();
         return gson.fromJson(jsonString, List.class);
@@ -183,5 +198,11 @@ public class WineryExporter {
 
     private static String doubleEncodeNamespace(QName serviceTemplateId) {
         return "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/";
+    }
+
+    private static String doubleEncodeNamespaceForInstance(QName serviceTemplateId) {
+        String encodedString = "/" + URLEncoder.encode(URLEncoder.encode("{" + serviceTemplateId.getNamespaceURI() + "}")) + serviceTemplateId.getLocalPart() + "/";
+        encodedString = encodedString.replace("%253A", ":");
+        return encodedString;
     }
 }
