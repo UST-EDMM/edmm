@@ -16,8 +16,8 @@ import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     // puppet master info
     private String user = "ubuntu";
-    private String ip = "master-ip";
-    private String privateKeyLocation = "master-private-key";
+    private String ip = "193.196.54.103";
+    private String privateKeyLocation = "/Users/tobi/Downloads/TobiasMathonyMA.pem";
     private Integer port = 22;
     private String operatingSystem = "Ubuntu";
     private String operatingSystemRelease = "18.04";
