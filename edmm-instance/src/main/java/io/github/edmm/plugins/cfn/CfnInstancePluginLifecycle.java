@@ -23,10 +23,10 @@ import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
-    private final String inputStackName = "edimm-aws-cfn-test";
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private AmazonCloudFormation cloudFormation;
     private Stack stack;
+    private String inputStackName;
     private Template template;
     private List<StackResourceDetail> stackResources;
 
@@ -36,6 +36,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
 
     @Override
     public void prepare() {
+        this.inputStackName = context.getId();
         AuthenticatorImpl authenticator = new AuthenticatorImpl();
         authenticator.authenticate();
 

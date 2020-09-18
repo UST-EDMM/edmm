@@ -18,7 +18,7 @@ import picocli.CommandLine;
     name = "transform",
     descriptionHeading = "%n",
     description = "Starts a transformation from a source technology to EDiMM and saves to output path.",
-    customSynopsis = "@|bold edimm transform|@ @|yellow <source technology>|@ @|yellow <output path>|@"
+    customSynopsis = "@|bold edimm transform|@ @|yellow <source technology>|@ @|yellow <output path>|@ @|yellow <application id/name>|@"
 )
 public class TransformCommand implements Callable<Integer> {
 
@@ -27,6 +27,7 @@ public class TransformCommand implements Callable<Integer> {
 
     private String source;
     private String outputPath;
+    private String applicationId;
 
     private InstanceTransformationService instanceTransformationService;
     private InstancePluginService instancePluginService;
@@ -51,9 +52,18 @@ public class TransformCommand implements Callable<Integer> {
         this.outputPath = path;
     }
 
+    @CommandLine.Parameters(arity = "1..1", index = "2", description = "The identifier of the application to be transformed and enriched")
+    public void setApplicationId(String applicationId) {
+        if (applicationId == null) {
+            String message = String.format("Please specify an identifier for the application to be transformed.");
+            throw new CommandLine.ParameterException(spec.commandLine(), message);
+        }
+        this.applicationId = applicationId;
+    }
+
     @Override
     public Integer call() {
-        InstanceTransformationContext context = instanceTransformationService.createContext(source, outputPath);
+        InstanceTransformationContext context = instanceTransformationService.createContext(source, outputPath, applicationId);
         instanceTransformationService.startTransformation(context);
         return 42;
     }

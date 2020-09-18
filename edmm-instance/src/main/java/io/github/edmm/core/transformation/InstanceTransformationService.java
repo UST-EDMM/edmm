@@ -42,6 +42,14 @@ public class InstanceTransformationService {
         }
     }
 
+    public InstanceTransformationContext createContext(String source, String path, String applicationId) {
+        SourceTechnology sourceTechnology = instancePluginService.getSupportedSourceTechnologies().stream()
+            .filter(p -> p.getId().equals(source))
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
+        return new InstanceTransformationContext(applicationId, sourceTechnology, path);
+    }
+
     public InstanceTransformationContext createContext(String source, String path) {
         SourceTechnology sourceTechnology = instancePluginService.getSupportedSourceTechnologies().stream()
             .filter(p -> p.getId().equals(source))

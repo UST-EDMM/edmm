@@ -22,7 +22,7 @@ public final class InstanceTransformationContext {
         this(UUID.randomUUID().toString(), sourceTechnology, path);
     }
 
-    private InstanceTransformationContext(@NonNull String id, @NonNull SourceTechnology sourceTechnology, @NonNull String path) {
+    public InstanceTransformationContext(@NonNull String id, @NonNull SourceTechnology sourceTechnology, @NonNull String path) {
         this.id = id;
         this.sourceTechnology = sourceTechnology;
         this.path = path;

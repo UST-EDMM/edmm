@@ -25,13 +25,13 @@ import io.kubernetes.client.models.V1Pod;
 public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
-    // hardcoded for testing purposes
-    private final String inputDeploymentName = "nginx-deployment";
-    private final String kubeConfigPath = "/Users/tobi/.kube/config";
+
+    private final String kubeConfigPath = "path-to-your-kube-config";
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
     private V1Deployment kubernetesDeploymentInstance;
     private List<V1Pod> podsOfDeploymentInstance;
+    private String inputDeploymentName;
 
     KubernetesInstancePluginLifecycle(InstanceTransformationContext context) {
         super(context);
@@ -39,6 +39,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
 
     @Override
     public void prepare() {
+        this.inputDeploymentName = context.getId();
         AuthenticatorImpl authenticator = new AuthenticatorImpl(kubeConfigPath, inputDeploymentName);
         authenticator.authenticate();
 

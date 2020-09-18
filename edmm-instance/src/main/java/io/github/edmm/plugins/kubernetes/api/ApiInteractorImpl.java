@@ -57,6 +57,7 @@ public class ApiInteractorImpl implements ApiInteractor {
                     && pod.getMetadata().getLabels().get(KubernetesConstants.APP)
                     .equals(this.deployment.getMetadata().getLabels().get(KubernetesConstants.APP)))
                 .collect(Collectors.toList());
+
         } catch (ApiException e) {
             e.printStackTrace();
         }
