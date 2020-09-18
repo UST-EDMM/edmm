@@ -45,6 +45,7 @@ public class KubernetesConstants {
     static final String MESSAGE = "message";
     static final String REASON = "reason";
     static final String POD_IP = "podIP";
+    static final String PORTS = "ports";
     static final String NOMINATED_NODE_NAME = "nominatedNodeName";
     static final String PHASE = "phase";
     static final String QOS_CLASS = "qosClass";

@@ -5,79 +5,35 @@ import java.util.List;
 
 import io.github.edmm.model.edimm.InstanceProperty;
 
-import io.kubernetes.client.models.V1ContainerStatus;
+import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1PodStatus;
 
 class KubernetesPodPropertiesHandler {
 
     private final List<InstanceProperty> instanceProperties = new ArrayList<>();
     private final V1PodStatus podStatus;
+    private final V1Container container;
 
-    KubernetesPodPropertiesHandler(V1PodStatus podStatus) {
+    KubernetesPodPropertiesHandler(V1PodStatus podStatus, V1Container container) {
         this.podStatus = podStatus;
+        this.container = container;
     }
 
     List<InstanceProperty> getComponentInstanceProperties() {
-        handleHostIP();
-        handleMessage();
-        handleReason();
-        handleNominatedNodeName();
-        handlePhase();
-        handlePodIP();
-        handleQoSClass();
-        handleContainerStatuses();
+        handleProperties();
+        setPropertyKeys();
 
         return this.instanceProperties;
     }
 
-    private void handleHostIP() {
-        if (this.podStatus.getHostIP() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.HOST_IP,
-                this.podStatus.getHostIP().getClass().getSimpleName(),
-                this.podStatus.getHostIP())
-            );
-        }
+    private void handleProperties() {
+        handlePodIP();
+        handleImage();
     }
 
-    private void handleMessage() {
-        if (this.podStatus.getMessage() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.MESSAGE,
-                this.podStatus.getMessage().getClass().getSimpleName(),
-                this.podStatus.getMessage())
-            );
-        }
-    }
-
-    private void handleReason() {
-        if (this.podStatus.getReason() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.REASON,
-                this.podStatus.getReason().getClass().getSimpleName(),
-                this.podStatus.getReason())
-            );
-        }
-    }
-
-    private void handleNominatedNodeName() {
-        if (this.podStatus.getNominatedNodeName() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.NOMINATED_NODE_NAME,
-                this.podStatus.getNominatedNodeName().getClass().getSimpleName(),
-                this.podStatus.getNominatedNodeName())
-            );
-        }
-    }
-
-    private void handlePhase() {
-        if (this.podStatus.getPhase() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.PHASE,
-                this.podStatus.getPhase().getClass().getSimpleName(),
-                this.podStatus.getPhase())
-            );
-        }
+    private void setPropertyKeys() {
+        EDMMPropertyMapperImplementation propertyKeyMapper = new EDMMPropertyMapperImplementation();
+        this.instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propertyKeyMapper.toComputePropertyKey(instanceProperty.getKey())));
     }
 
     private void handlePodIP() {
@@ -90,121 +46,13 @@ class KubernetesPodPropertiesHandler {
         }
     }
 
-    private void handleQoSClass() {
-        if (this.podStatus.getQosClass() != null) {
+    private void handleImage() {
+        if (this.container.getImage() != null) {
             this.instanceProperties.add(new InstanceProperty(
-                KubernetesConstants.QOS_CLASS,
-                this.podStatus.getQosClass().getClass().getSimpleName(),
-                this.podStatus.getQosClass())
-            );
-        }
-    }
-
-    private void handleContainerStatuses() {
-        if (this.podStatus.getContainerStatuses() != null) {
-            this.podStatus.getContainerStatuses().forEach(this::handleContainerStatus);
-        }
-    }
-
-    private void handleContainerStatus(V1ContainerStatus containerStatus) {
-        handleContainerStatusName(containerStatus);
-        handleContainerStatusID(containerStatus);
-        handleContainerStatusImage(containerStatus);
-        handleContainerStatusImageID(containerStatus);
-        handleContainerStatusRestartCount(containerStatus);
-        handleContainerStatusState(containerStatus);
-    }
-
-    private void handleContainerStatusName(V1ContainerStatus containerStatus) {
-        if (containerStatus.getName() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.NAME),
-                containerStatus.getName().getClass().getSimpleName(),
-                containerStatus.getName())
-            );
-        }
-    }
-
-    private void handleContainerStatusID(V1ContainerStatus containerStatus) {
-        if (containerStatus.getContainerID() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.CONTAINER_ID),
-                containerStatus.getContainerID().getClass().getSimpleName(),
-                containerStatus.getContainerID())
-            );
-        }
-    }
-
-    private void handleContainerStatusImage(V1ContainerStatus containerStatus) {
-        if (containerStatus.getImage() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.IMAGE),
-                containerStatus.getImage().getClass().getSimpleName(),
-                containerStatus.getImage())
-            );
-        }
-    }
-
-    private void handleContainerStatusImageID(V1ContainerStatus containerStatus) {
-        if (containerStatus.getImageID() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.IMAGE_ID),
-                containerStatus.getImageID().getClass().getSimpleName(),
-                containerStatus.getImageID())
-            );
-        }
-    }
-
-    private void handleContainerStatusRestartCount(V1ContainerStatus containerStatus) {
-        if (containerStatus.getRestartCount() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.RESTART_COUNT),
-                containerStatus.getRestartCount().getClass().getSimpleName(),
-                containerStatus.getRestartCount())
-            );
-        }
-    }
-
-    private void handleContainerStatusState(V1ContainerStatus containerStatus) {
-        if (containerStatus.getState() != null) {
-            handleRunningState(containerStatus);
-            handleWaitingState(containerStatus);
-            handleTerminatedState(containerStatus);
-        }
-    }
-
-    private void handleRunningState(V1ContainerStatus containerStatus) {
-        if (containerStatus.getState().getRunning() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.STATE),
+                KubernetesConstants.IMAGE,
                 String.class.getSimpleName(),
-                KubernetesConstants.RUNNING)
-            );
+                this.container.getImage()
+            ));
         }
-    }
-
-    private void handleWaitingState(V1ContainerStatus containerStatus) {
-        if (containerStatus.getState().getWaiting() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.STATE),
-                String.class.getSimpleName(),
-                KubernetesConstants.WAITING)
-            );
-        }
-    }
-
-    private void handleTerminatedState(V1ContainerStatus containerStatus) {
-        if (containerStatus.getState().getTerminated() != null) {
-            this.instanceProperties.add(new InstanceProperty(
-                generatePropertyKey(containerStatus.getName(), KubernetesConstants.STATE),
-                String.class.getSimpleName(),
-                KubernetesConstants.TERMINATED)
-            );
-        }
-    }
-
-    private String generatePropertyKey(String containerStatusName, String key) {
-        return KubernetesConstants.CONTAINER_STATUS + KubernetesConstants.KEY_DELIMITER + containerStatusName
-            + KubernetesConstants.KEY_DELIMITER + key;
     }
 }

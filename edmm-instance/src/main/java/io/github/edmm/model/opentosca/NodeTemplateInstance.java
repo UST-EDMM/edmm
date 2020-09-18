@@ -55,8 +55,10 @@ public class NodeTemplateInstance {
         for (InstanceProperty property : instanceProperties) {
             String mappedKey = getTOSCAPropertyMapping(property.getKey(), unrefinedType);
             if (mappedKey != null) {
+                String normativeKey = property.getKey();
                 property.setKey(mappedKey);
                 toscaProperties.add(InstanceProperty.convertToTOSCAProperty(property));
+                property.setKey(normativeKey);
             }
         }
         return toscaProperties;
