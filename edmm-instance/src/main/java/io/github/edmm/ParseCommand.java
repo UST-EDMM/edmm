@@ -17,8 +17,8 @@ import picocli.CommandLine;
 @CommandLine.Command(
     name = "parse",
     descriptionHeading = "%n",
-    description = "Starts a transformation from EDiMM yaml file to OpenTOSCA.",
-    customSynopsis = "@|bold edimm parse|@ @|yellow <source technology>|@ @|yellow <path to edimm yaml file>|@"
+    description = "Starts a transformation from EDMMi yaml file to OpenTOSCA.",
+    customSynopsis = "@|bold edmmi parse|@ @|yellow <source technology>|@ @|yellow <path to edmmi yaml file>|@"
 )
 public class ParseCommand implements Callable<Integer> {
 
@@ -31,7 +31,7 @@ public class ParseCommand implements Callable<Integer> {
     private InstanceTransformationService instanceTransformationService;
     private InstancePluginService instancePluginService;
 
-    @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation source, i.e. edimm")
+    @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation source, i.e. edmmi")
     public void setSource(String source) {
         List<String> availableSources = instancePluginService.getInstancePlugins().stream()
             .map(p -> p.getSourceTechnology().getId()).collect(Collectors.toList());

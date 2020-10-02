@@ -12,11 +12,11 @@ import picocli.CommandLine;
 import static picocli.CommandLine.usage;
 
 @CommandLine.Command(
-    name = "edimm",
-    header = "@|bold,green Essential Deployment Instance Metamodel Command Line Interface%n|@",
-    customSynopsis = "@|bold edimm|@ [@|yellow <command>|@] [@|yellow <subcommand>|@]",
+    name = "edmmi",
+    header = "@|bold,green Essential Deployment Metamodel instance Command Line Interface%n|@",
+    customSynopsis = "@|bold edmmi|@ [@|yellow <command>|@] [@|yellow <subcommand>|@]",
     footer = {
-        "%nSee 'edimm help [@|yellow <command>|@]' for detailed help information"
+        "%nSee 'edmmi help [@|yellow <command>|@]' for detailed help information"
     },
     subcommands = {
         CommandLine.HelpCommand.class,

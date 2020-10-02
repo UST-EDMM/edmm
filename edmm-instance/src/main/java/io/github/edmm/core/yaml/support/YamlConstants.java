@@ -3,7 +3,7 @@ package io.github.edmm.core.yaml.support;
 public class YamlConstants {
     // Constants for filename of output yaml
     public static final String YAML_FILE_SUFFIX = ".yaml";
-    public static final String EDIMM = "_EDiMM_";
+    public static final String EDMMi = "_EDMMi_";
 
     // Constants for keys of output yaml content
     public static final String NAME = "name";
@@ -18,6 +18,7 @@ public class YamlConstants {
     public static final String TYPE = "type";
     public static final String RELATION_INSTANCES = "relationInstances";
     public static final String RELATION_TARGET_INSTANCE = "targetInstance";
+
     // Constants for keys of input yaml content
     static final String KEY = "key";
     static final String INSTANCE_VALUE = "instanceValue";

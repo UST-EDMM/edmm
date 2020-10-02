@@ -8,7 +8,7 @@ import io.github.edmm.model.opentosca.RelationshipTemplateInstance;
 import lombok.Setter;
 
 @Setter
-public class RelationshipTemplateDTO {
+class RelationshipTemplateDTO {
     private String id;
     private String name;
     private String type;

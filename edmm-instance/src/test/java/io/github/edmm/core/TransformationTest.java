@@ -34,7 +34,7 @@ public class TransformationTest {
     }
 
     private void givenYamlOfNginxResource() throws Exception {
-        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
+        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
         this.deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
         this.yamlTransformer = new YamlTransformer();
     }

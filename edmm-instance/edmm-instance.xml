@@ -11,10 +11,10 @@
             <destName>edmm-instance.jar</destName>
         </file>
         <file>
-            <source>edimm</source>
+            <source>edmmi</source>
         </file>
         <file>
-            <source>edimm.cmd</source>
+            <source>edmmi.cmd</source>
         </file>
     </files>
 </assembly>

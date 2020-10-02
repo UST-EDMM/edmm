@@ -19,9 +19,9 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
 
     protected InstancePlugin(@NonNull SourceTechnology sourceTechnology) {
         this.sourceTechnology = sourceTechnology;
-        logger.debug("Initializing plugin '{}'", sourceTechnology.getName());
+        logger.debug("Initializing instance transformation plugin '{}'", sourceTechnology.getName());
         this.init();
-        logger.debug("Initialized plugin '{}'", sourceTechnology.getName());
+        logger.debug("Initialized instance transformation plugin '{}'", sourceTechnology.getName());
     }
 
     private void init() {
@@ -32,21 +32,17 @@ public abstract class InstancePlugin<L extends AbstractLifecycleInstancePlugin> 
         long time = System.currentTimeMillis();
         L lifecycle = getLifecycle(context);
         List<InstanceLifecyclePhase> phases = lifecycle.getInstanceLifecyclePhases();
-        int taskCount = countExecutionPhases(context, phases);
-        logger.debug("This transformation has {} phases", taskCount);
-        for (int i = 0; i < phases.size(); i++) {
+        for (InstanceLifecyclePhase phase1 : phases) {
             @SuppressWarnings("unchecked")
-            InstanceLifecyclePhase<L> phase = (InstanceLifecyclePhase<L>) phases.get(i);
+            InstanceLifecyclePhase<L> phase = (InstanceLifecyclePhase<L>) phase1;
             if (phase.shouldExecute(context)) {
-                logger.debug("Executing phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
                 phase.execute(lifecycle);
             } else {
                 phase.skip();
-                logger.debug("Skipping phase '{}' ({} of {})", phase.getName(), (i + 1), taskCount);
             }
         }
         time = System.currentTimeMillis() - time;
-        logger.info("Transformation finished after {} ms", time);
+        logger.info("EDMMi Transformation finished after {} ms", time);
     }
 
     private int countExecutionPhases(InstanceTransformationContext context, List<? extends InstanceLifecyclePhase> phases) {

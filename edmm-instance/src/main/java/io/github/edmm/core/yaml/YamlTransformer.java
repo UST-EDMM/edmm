@@ -53,7 +53,7 @@ public class YamlTransformer {
     }
 
     private void generateOutputLocation(String location) {
-        this.fileOutputLocation = location + this.deploymentInstance.getName() + YamlConstants.EDIMM
+        this.fileOutputLocation = location + this.deploymentInstance.getName() + YamlConstants.EDMMi
             + Instant.now().getEpochSecond() + YamlConstants.YAML_FILE_SUFFIX;
     }
 

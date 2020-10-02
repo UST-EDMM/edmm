@@ -29,13 +29,13 @@ public class InstanceExecutionTask implements Callable<Void> {
     public Void call() {
         boolean failed = false;
         SourceTechnology sourceTechnology = plugin.getSourceTechnology();
-        logger.info("Starting transformation from {}", sourceTechnology.getName());
+        logger.info("Starting instance transformation from {}", sourceTechnology.getName());
         context.setState(TRANSFORMING);
         try {
             plugin.execute(context);
             context.setState(DONE);
         } catch (Exception e) {
-            logger.info("Transformation from {} failed", sourceTechnology.getName());
+            logger.info("Instance transformation from {} failed", sourceTechnology.getName());
             logger.error("Something went wrong while transforming", e);
             failed = true;
         }

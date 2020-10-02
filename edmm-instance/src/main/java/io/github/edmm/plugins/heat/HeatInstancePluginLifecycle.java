@@ -64,7 +64,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     }
 
     @Override
-    public void transformToEDIMM() {
+    public void transformToEDMMi() {
         // mapping complete
         this.deploymentInstance.setId(this.stack.getId());
         this.deploymentInstance.setCreatedAt(this.stack.getCreationTime());
@@ -89,7 +89,7 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
+        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

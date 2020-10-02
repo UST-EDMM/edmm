@@ -3,6 +3,7 @@ package io.github.edmm.core.transformation;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.NodeTemplateInstance;
 import io.github.edmm.model.opentosca.RelationshipTemplateInstance;
@@ -41,7 +42,7 @@ public class TOSCATransformer {
     private void createRelationshipTemplateInstances() {
         if (isComponentInstancesExisting()) {
             this.deploymentInstance.getComponentInstances().forEach(componentInstance -> {
-                if (componentInstance.getRelationInstances() != null && !componentInstance.getRelationInstances().isEmpty()) {
+                if (hasRelationshipInstances(componentInstance)) {
                     componentInstance.getRelationInstances().forEach(relationInstance -> {
                         RelationshipTemplateInstance relationshipTemplateInstance = RelationshipTemplateInstance.ofRelationInstance(this.deploymentInstance.getId(), relationInstance, componentInstance);
                         this.relationshipTemplateInstances.add(relationshipTemplateInstance);
@@ -49,5 +50,9 @@ public class TOSCATransformer {
                 }
             });
         }
+    }
+
+    private boolean hasRelationshipInstances(ComponentInstance componentInstance) {
+        return componentInstance.getRelationInstances() != null && !componentInstance.getRelationInstances().isEmpty();
     }
 }

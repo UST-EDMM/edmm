@@ -36,7 +36,7 @@ public class DeploymentInstanceTest {
     }
 
     private void givenYamlOfNginxResource() {
-        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDiMM.yaml");
+        this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
         this.yamlParser = new YamlParser();
     }
 
@@ -107,7 +107,7 @@ public class DeploymentInstanceTest {
     }
 
     private void givenYamlOfTestStackResource() {
-        this.resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDiMM.yaml");
+        this.resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDMMi.yaml");
         this.yamlParser = new YamlParser();
     }
 

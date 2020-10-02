@@ -17,8 +17,8 @@ import picocli.CommandLine;
 @CommandLine.Command(
     name = "transform",
     descriptionHeading = "%n",
-    description = "Starts a transformation from a source technology to EDiMM and saves to output path.",
-    customSynopsis = "@|bold edimm transform|@ @|yellow <source technology>|@ @|yellow <output path>|@ @|yellow <application id/name>|@"
+    description = "Starts a transformation from a source technology to EDMMi and saves to output path.",
+    customSynopsis = "@|bold edmmi transform|@ @|yellow <source technology>|@ @|yellow <output path>|@ @|yellow <application id/name>|@"
 )
 public class TransformCommand implements Callable<Integer> {
 

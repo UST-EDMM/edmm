@@ -3,7 +3,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="heatPlugin" class="io.github.edmm.plugins.heat.HeatInstancePlugin"/>
     <bean id="kubernetesPlugin" class="io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin"/>
-    <bean id="edimmPlugin" class="io.github.edmm.plugins.edimm.EDiMMPlugin"/>
+    <bean id="edmmiPlugin" class="io.github.edmm.plugins.edmmi.EDMMiPlugin"/>
     <bean id="cfnPlugin" class="io.github.edmm.plugins.cfn.CfnInstancePlugin"/>
     <bean id="puppetPlugin" class="io.github.edmm.plugins.puppet.PuppetInstancePlugin"/>
 </beans>

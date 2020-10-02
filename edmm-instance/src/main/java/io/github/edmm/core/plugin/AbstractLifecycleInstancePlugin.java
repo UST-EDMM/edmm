@@ -23,7 +23,7 @@ public abstract class AbstractLifecycleInstancePlugin implements InstancePluginL
         List<InstanceLifecyclePhase> phases = new ArrayList<>();
         phases.add(new InstanceLifecyclePhase<>(Phases.PREPARE, this, InstancePluginLifecycle::prepare));
         phases.add(new InstanceLifecyclePhase<>(Phases.GET_MODELS, this, InstancePluginLifecycle::getModels));
-        phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_EDIMM, this, InstancePluginLifecycle::transformToEDIMM));
+        phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_EDMMi, this, InstancePluginLifecycle::transformToEDMMi));
         phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_TOSCA, this, InstancePluginLifecycle::transformToTOSCA));
         phases.add(new InstanceLifecyclePhase<>(Phases.CREATE_YAML, this, InstancePluginLifecycle::createYAML));
         phases.add(new InstanceLifecyclePhase<>(Phases.CLEANUP, this, InstancePluginLifecycle::cleanup));

@@ -28,12 +28,12 @@ public class InstancePluginService {
         Map<String, InstancePlugin<?>> pluginMap = new HashMap<>();
         for (InstancePlugin<?> instancePlugin : instancePlugins) {
             if (pluginMap.get(instancePlugin.getSourceTechnology().getId()) != null) {
-                logger.error("Found duplicate instancePlugin identifier '{}'", instancePlugin.getSourceTechnology().getId());
+                logger.error("Found duplicate instance transformation plugin identifier '{}'", instancePlugin.getSourceTechnology().getId());
                 throw new IllegalArgumentException("The id '" + instancePlugin.getSourceTechnology().getId() + "' is not unique");
             }
             pluginMap.put(instancePlugin.getSourceTechnology().getId(), instancePlugin);
         }
-        logger.debug("Loaded {} instancePlugins", instancePlugins.size());
+        logger.debug("Loaded {} instance transformation plugins", instancePlugins.size());
     }
 
     public List<InstancePlugin<?>> getInstancePlugins() {

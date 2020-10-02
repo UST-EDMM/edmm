@@ -55,8 +55,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     }
 
     @Override
-    public void transformToEDIMM() {
-        // TODO description
+    public void transformToEDMMi() {
         this.deploymentInstance.setName(this.kubernetesDeploymentInstance.getMetadata().getName());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata().getCreationTimestamp()));
         this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata().getAnnotations().get(KubernetesConstants.VERSION));
@@ -79,7 +78,7 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
+        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

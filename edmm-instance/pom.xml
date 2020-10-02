@@ -36,7 +36,7 @@
                     <descriptors>
                         <descriptor>edmm-instance.xml</descriptor>
                     </descriptors>
-                    <finalName>edimm</finalName>
+                    <finalName>edmmi</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

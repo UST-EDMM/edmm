@@ -52,7 +52,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
     }
 
     @Override
-    public void transformToEDIMM() {
+    public void transformToEDMMi() {
         this.deploymentInstance.setName(this.stack.getStackName());
         this.deploymentInstance.setId(this.stack.getStackId());
         this.deploymentInstance.setVersion(this.template.getAWSTemplateFormatVersion());
@@ -76,7 +76,7 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
+        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

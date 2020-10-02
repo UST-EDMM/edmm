@@ -7,7 +7,7 @@ public interface InstancePluginLifecycle extends InstanceLifecyclePhaseAccess {
 
     void getModels();
 
-    void transformToEDIMM();
+    void transformToEDMMi();
 
     void transformToTOSCA();
 

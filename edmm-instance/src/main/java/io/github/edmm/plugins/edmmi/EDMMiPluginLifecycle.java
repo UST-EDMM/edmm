@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.edimm;
+package io.github.edmm.plugins.edmmi;
 
 import java.io.File;
 
@@ -11,12 +11,12 @@ import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
-public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
+public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin {
 
     private static final String directorySuffix = "/";
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
 
-    EDiMMPluginLifecycle(InstanceTransformationContext context) {
+    EDMMiPluginLifecycle(InstanceTransformationContext context) {
         super(context);
     }
 
@@ -29,7 +29,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     }
 
     @Override
-    public void transformToEDIMM() {
+    public void transformToEDMMi() {
         YamlParser yamlParser = new YamlParser();
         this.deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(context.getPath());
     }
@@ -46,7 +46,7 @@ public class EDiMMPluginLifecycle extends AbstractLifecycleInstancePlugin {
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
-        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
+        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

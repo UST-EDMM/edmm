@@ -10,8 +10,6 @@ import lombok.NonNull;
 @Builder
 public final class SourceTechnology {
 
-    public static final SourceTechnology NOOP = SourceTechnology.builder().id("noop").name("noop").build();
-
     private final String id;
     private final String name;
 

@@ -10,7 +10,7 @@ import io.github.edmm.model.opentosca.OpenTOSCANamespaces;
 public interface TOSCATypeMapper {
     QName refineTOSCAType(QName qName, List<InstanceProperty> instanceProperties);
 
-    // TODO: replace this with actual repository search that returns derived QName
+    // TODO: replace this with actual repository search, currently this is hardcoded for demo purposes
     static QName searchWineryRepositoryForType(String type) {
         switch (type) {
             case "Ubuntu 18.04":

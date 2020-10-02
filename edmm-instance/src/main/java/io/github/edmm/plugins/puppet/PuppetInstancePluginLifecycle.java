@@ -15,12 +15,12 @@ import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     // puppet master info
-    private String user = "ubuntu";
-    private String ip = "193.196.54.103";
-    private String privateKeyLocation = "/Users/tobi/Downloads/TobiasMathonyMA.pem";
+    private String user = "master-user";
+    private String ip = "master-ip";
+    private String privateKeyLocation = "pk-location";
     private Integer port = 22;
-    private String operatingSystem = "Ubuntu";
-    private String operatingSystemRelease = "18.04";
+    private String operatingSystem = "os";
+    private String operatingSystemRelease = "os-release";
 
     private Master master;
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
@@ -45,15 +45,13 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     }
 
     @Override
-    public void transformToEDIMM() {
+    public void transformToEDMMi() {
         this.deploymentInstance.setId(this.master.getId());
         this.deploymentInstance.setCreatedAt(this.master.getCreatedAtTimestamp());
         this.deploymentInstance.setName(this.master.getHostName());
         this.deploymentInstance.setVersion(this.master.getPuppetVersion());
         this.deploymentInstance.setComponentInstances(PuppetNodeHandler.getComponentInstances(this.master));
         this.deploymentInstance.setState(PuppetState.getDeploymentInstanceState(this.master));
-        // special case since master is deployment and component instance
-        // TODO metadata, instance properties, description? if any
     }
 
     @Override
@@ -68,7 +66,7 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     public void createYAML() {
         YamlTransformer yamlTransformer = new YamlTransformer();
         yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDiMM to " + yamlTransformer.getFileOutputLocation());
+        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
     }
 
     @Override

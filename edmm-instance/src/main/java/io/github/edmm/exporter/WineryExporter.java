@@ -18,6 +18,7 @@ import io.github.edmm.exporter.dto.TopologyTemplateDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,6 +35,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 public class WineryExporter {
+    // TODO: retrieve such info from a config or sth like that
     private static String wineryEndpoint = "http://localhost:8080/winery/";
     private static String containerEndpoint = "http://localhost:1337/csars/";
     private static String serviceTemplatesPath = "servicetemplates";
@@ -69,7 +71,7 @@ public class WineryExporter {
             post.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
-            System.out.println("Failed to create Service Template Instance in Winery. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to create Service Template Instance in Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -81,7 +83,7 @@ public class WineryExporter {
             put.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(put);
         } catch (IOException e) {
-            System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -103,11 +105,10 @@ public class WineryExporter {
         try {
             get.setHeader("accept", "application/json");
             HttpResponse response = httpClient.execute(get);
-
             List<EnrichmentDTO> enrichmentDTOs = getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
             return enrichmentDTOs;
-        } catch (IOException e) {
-            System.out.println("Failed to get available features from Winery. Continue with creation of EDIMM YAML file.");
+        } catch (IOException | JsonSyntaxException e) {
+            System.out.println("Failed to get available features from Winery. Continue with creation of EDMMi YAML file.");
         }
         return null;
     }
@@ -123,7 +124,7 @@ public class WineryExporter {
             put.setEntity(getObjectAsJson(selectedFeatures));
             HttpResponse response = httpClient.execute(put);
         } catch (IOException e) {
-            System.out.println("Failed to apply available features to Winery. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to apply available features to Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -131,7 +132,7 @@ public class WineryExporter {
         try {
             FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
-            System.out.println("Failed to export CSAR from Winery. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to export CSAR from Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -158,7 +159,7 @@ public class WineryExporter {
 
             return true;
         } catch (IOException e) {
-            System.out.println("Failed to import CSAR into Container. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to import CSAR into Container. Continue with creation of EDMMi YAML file.");
             return false;
         }
     }
@@ -172,7 +173,7 @@ public class WineryExporter {
 
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
-            System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDIMM YAML file.");
+            System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDMMi YAML file.");
         }
     }
 
