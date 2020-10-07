@@ -4,15 +4,15 @@ components:
     type: compute
   tomcat:
     relations:
-    - '2':
+    - '0':
         hosted_on:
           type: hosted_on
           target: ubuntu
-    - '0':
+    - '1':
         depends_on:
           type: depends_on
           target: db
-    - '1':
+    - '2':
         depends_on:
           type: depends_on
           target: ubuntu
@@ -54,7 +54,6 @@ relation_types:
   connects_to:
     extends: depends_on
 description: Very simple example
-version: edm_1_0
 component_types:
   compute:
     operations:
@@ -89,6 +88,7 @@ component_types:
         - cmd: null
     extends: null
     description: The base type
+version: edm_1_0
 properties:
   bar:
     type: integer

@@ -162,23 +162,25 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     private Map<String, Object> createMapFromGraph(Entity entity) {
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         entity.getDirectChildren().forEach(child -> {
             if (child instanceof MappingEntity) {
                 Map<String, Object> childMap = createMapFromGraph(child);
                 map.put(child.getName(), childMap.isEmpty() ? null : childMap);
             } else if (child instanceof SequenceEntity) {
                 List<Map> list = new ArrayList<>();
-                child.getDirectChildren().forEach(grandChild -> {
-                    HashMap<String, Object> localMap = new HashMap<>();
-                    if (grandChild instanceof ScalarEntity) {
-                        localMap.put(grandChild.getName(), ((ScalarEntity) grandChild).getValue());
-                    } else {
-                        Map<String, Object> grandChildMap = createMapFromGraph(grandChild);
-                        localMap.put(grandChild.getName(), grandChildMap.isEmpty() ? null : grandChildMap);
-                    }
-                    list.add(localMap);
-                });
+                child.getDirectChildren().stream()
+                    .sorted()
+                    .forEach(grandChild -> {
+                        Map<String, Object> localMap = new HashMap<>();
+                        if (grandChild instanceof ScalarEntity) {
+                            localMap.put(grandChild.getName(), ((ScalarEntity) grandChild).getValue());
+                        } else {
+                            Map<String, Object> grandChildMap = createMapFromGraph(grandChild);
+                            localMap.put(grandChild.getName(), grandChildMap.isEmpty() ? null : grandChildMap);
+                        }
+                        list.add(localMap);
+                    });
                 if (!list.isEmpty()) {
                     map.put(child.getName(), list);
                 }
