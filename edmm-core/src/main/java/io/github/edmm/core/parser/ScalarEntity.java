@@ -1,5 +1,7 @@
 package io.github.edmm.core.parser;
 
+import java.util.Objects;
+
 import lombok.Getter;
 
 @Getter
@@ -20,8 +22,14 @@ public class ScalarEntity extends Entity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ScalarEntity entity = (ScalarEntity) o;
-        return super.equals(o) && this.value == entity.value;
+        if (!(o instanceof ScalarEntity)) return false;
+        if (!super.equals(o)) return false;
+        ScalarEntity that = (ScalarEntity) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
     }
 }
