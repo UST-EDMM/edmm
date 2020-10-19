@@ -15,7 +15,8 @@ public class TOSCATypeMapperImplementation implements TOSCATypeMapper {
         for (InstanceProperty instanceProperty : instanceProperties) {
             if (isOriginalTypeProperty(instanceProperty.getKey())) {
                 // we found original type property, now try to refine based on that
-                return TOSCATypeMapper.searchWineryRepositoryForType(String.valueOf(instanceProperty.getInstanceValue()));
+                return TOSCATypeMapper.searchWineryRepositoryForType(
+                    String.valueOf(instanceProperty.getInstanceValue()).replaceAll("\\s+", ""));
             }
         }
         return qName;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CastUtil {
+public abstract class CastUtil {
 
     public static Map<String, Object> safelyCastToStringObjectMap(Object objectToCast) {
         Optional<Map> mapOptional = checkMapForCast(objectToCast);

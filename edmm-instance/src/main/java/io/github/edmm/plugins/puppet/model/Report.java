@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class Report {
-    String certname;
-    ResourceEvent resource_events;
+    private String certname;
+    private ResourceEvent resource_events;
 }

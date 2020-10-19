@@ -1,6 +1,6 @@
 package io.github.edmm.plugins.kubernetes.util;
 
-public class KubernetesConstants {
+public abstract class KubernetesConstants {
 
     // metadata key constants
     public static final String VERSION = "deployment.kubernetes.io/revision";

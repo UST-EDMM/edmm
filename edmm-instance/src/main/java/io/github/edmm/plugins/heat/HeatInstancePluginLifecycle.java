@@ -7,7 +7,7 @@ import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.core.yaml.YamlTransformer;
+import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
@@ -26,14 +26,15 @@ import org.openstack4j.model.heat.Stack;
 
 public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
 
-    private static final String userName = "user";
-    private static final String password = "password";
-    private static final String projectId = "magic";
-    private static final String domainName = "default";
-    private static final String authenticationEndpoint = "auth";
+    private static String userName = "";
+    private static String password = "";
+    private static String projectId = "";
+    private static String domainName = "";
+    private static String authenticationEndpoint = "";
 
-    private static final String stackName = "test";
-    private static final String stackId = "magic";
+    private static String stackName = "";
+    private static String stackId = "";
+
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private Stack stack;
     private Map<String, Object> template;
@@ -87,9 +88,9 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
 
     @Override
     public void createYAML() {
-        YamlTransformer yamlTransformer = new YamlTransformer();
-        yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
+        EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

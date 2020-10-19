@@ -18,7 +18,7 @@ public enum ComponentType {
     Web_Application(TOSCABaseTypes.TOSCABaseNodeTypes.WebApplication),
     Web_Server(TOSCABaseTypes.TOSCABaseNodeTypes.WebServer);
 
-    private TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType;
+    private final TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType;
 
     ComponentType(TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeTypes) {
         this.toscaBaseNodeType = toscaBaseNodeTypes;

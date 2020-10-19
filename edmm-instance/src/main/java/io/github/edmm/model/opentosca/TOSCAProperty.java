@@ -8,6 +8,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class TOSCAProperty {
-    String name;
-    Object value;
+    private String name;
+    private Object value;
 }

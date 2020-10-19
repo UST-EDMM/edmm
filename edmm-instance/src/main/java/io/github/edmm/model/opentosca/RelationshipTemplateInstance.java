@@ -19,13 +19,13 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 @Setter
 @ToString
 public class RelationshipTemplateInstance {
-    String serviceTemplateInstanceId;
-    QName relationshipTemplateId;
-    QName relationshipType;
-    TOSCAState.RelationshipTemplateInstanceState state;
-    String sourceNodeTemplateInstanceId;
-    String targetNodeTemplateInstanceId;
-    List<TOSCAProperty> instanceProperties;
+    private String serviceTemplateInstanceId;
+    private QName relationshipTemplateId;
+    private QName relationshipType;
+    private TOSCAState.RelationshipTemplateInstanceState state;
+    private String sourceNodeTemplateInstanceId;
+    private String targetNodeTemplateInstanceId;
+    private List<TOSCAProperty> instanceProperties;
 
     public static RelationshipTemplateInstance ofRelationInstance(String deploymentInstanceId, RelationInstance relationInstance, ComponentInstance componentInstance) {
         RelationshipTemplateInstance relationshipTemplateInstance = new RelationshipTemplateInstance();

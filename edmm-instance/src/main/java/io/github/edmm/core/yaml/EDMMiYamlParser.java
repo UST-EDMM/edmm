@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import io.github.edmm.core.yaml.support.YamlConstants;
 import io.github.edmm.core.yaml.support.YamlSupport;
@@ -16,7 +18,8 @@ import io.github.edmm.util.CastUtil;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class YamlParser {
+public class EDMMiYamlParser {
+    private final static Logger LOGGER = Logger.getLogger(EDMMiYamlParser.class.getName());
 
     private Map<String, Object> yamlData;
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
@@ -35,7 +38,7 @@ public class YamlParser {
         try {
             input = new FileInputStream(new File(fileInput));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage());
         }
         this.yamlData = yaml.load(input);
     }

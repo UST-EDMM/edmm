@@ -7,6 +7,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -34,15 +36,17 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
-public class WineryExporter {
+public abstract class WineryExporter {
+    private final static Logger LOGGER = Logger.getLogger(WineryExporter.class.getName());
+
     // TODO: retrieve such info from a config or sth like that
-    private static String wineryEndpoint = "http://localhost:8080/winery/";
-    private static String containerEndpoint = "http://localhost:1337/csars/";
-    private static String serviceTemplatesPath = "servicetemplates";
-    private static String topologyTemplatePath = "topologytemplate";
-    private static String availableFeaturesPath = "availablefeatures";
-    private static String csarPath = "csar";
-    private static String csarDownloadPath = "?" + csarPath;
+    private static final String wineryEndpoint = "http://localhost:8080/winery/";
+    private static final String containerEndpoint = "http://localhost:1337/csars/";
+    private static final String serviceTemplatesPath = "servicetemplates";
+    private static final String topologyTemplatePath = "topologytemplate";
+    private static final String availableFeaturesPath = "availablefeatures";
+    private static final String csarPath = "csar";
+    private static final String csarDownloadPath = "?" + csarPath;
 
     public static void processServiceTemplateInstanceToOpenTOSCA(String deploymentTechnology, ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
@@ -71,7 +75,7 @@ public class WineryExporter {
             post.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
-            System.out.println("Failed to create Service Template Instance in Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to create Service Template Instance in Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -83,7 +87,7 @@ public class WineryExporter {
             put.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(put);
         } catch (IOException e) {
-            System.out.println("Failed to post Topology Template Instance to Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to post Topology Template Instance to Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -95,7 +99,7 @@ public class WineryExporter {
             post.setHeader("content-type", "application/json");
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to set Tag for Service Template in Winery.");
         }
     }
 
@@ -108,7 +112,7 @@ public class WineryExporter {
             List<EnrichmentDTO> enrichmentDTOs = getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
             return enrichmentDTOs;
         } catch (IOException | JsonSyntaxException e) {
-            System.out.println("Failed to get available features from Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to get available features from Winery. Continue with creation of EDMMi YAML file.");
         }
         return null;
     }
@@ -124,7 +128,7 @@ public class WineryExporter {
             put.setEntity(getObjectAsJson(selectedFeatures));
             HttpResponse response = httpClient.execute(put);
         } catch (IOException e) {
-            System.out.println("Failed to apply available features to Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to apply available features to Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -132,7 +136,7 @@ public class WineryExporter {
         try {
             FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
-            System.out.println("Failed to export CSAR from Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to export CSAR from Winery. Continue with creation of EDMMi YAML file.");
         }
     }
 
@@ -159,7 +163,7 @@ public class WineryExporter {
 
             return true;
         } catch (IOException e) {
-            System.out.println("Failed to import CSAR into Container. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to import CSAR into Container. Continue with creation of EDMMi YAML file.");
             return false;
         }
     }
@@ -173,7 +177,7 @@ public class WineryExporter {
 
             HttpResponse response = httpClient.execute(post);
         } catch (IOException e) {
-            System.out.println("Failed to start CSAR instance in Container. Continue with creation of EDMMi YAML file.");
+            LOGGER.log(Level.SEVERE, "Failed to start CSAR instance in Container. Continue with creation of EDMMi YAML file.");
         }
     }
 

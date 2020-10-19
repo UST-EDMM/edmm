@@ -1,47 +1,10 @@
 package io.github.edmm.plugins.puppet.util;
 
 import io.github.edmm.core.plugin.EDMMPropertyMapper;
-import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.PropertyKey;
 import io.github.edmm.util.Constants;
 
 public class EDMMPropertyMapperImplementation implements EDMMPropertyMapper {
-
-    String mapToEDMMPropertyKey(ComponentType componentType, String specificPropertyKey) {
-        switch (componentType) {
-            case Auth0:
-                return toAuth0PropertyKey(specificPropertyKey);
-            case Compute:
-                return toComputePropertyKey(specificPropertyKey);
-            case Database:
-                return toDatabasePropertyKey(specificPropertyKey);
-            case DBaaS:
-                return toDBaaSPropertyKey(specificPropertyKey);
-            case DBMS:
-                return toDBMSPropertyKey(specificPropertyKey);
-            case MySQL_Database:
-                return toMySQL_DatabasePropertyKey(specificPropertyKey);
-            case MySQL_DBMS:
-                return toMySQL_DBMSPropertyKey(specificPropertyKey);
-            case PaaS:
-                return toPaaSPropertyKey(specificPropertyKey);
-            case Platform:
-                return toPlatformPropertyKey(specificPropertyKey);
-            case SaaS:
-                return toSaaSPropertyKey(specificPropertyKey);
-            case Software_Component:
-                toSoftware_ComponentPropertyKey(specificPropertyKey);
-            case Tomcat:
-                toTomcatPropertyKey(specificPropertyKey);
-            case Web_Application:
-                toWeb_ApplicationPropertyKey(specificPropertyKey);
-            case Web_Server:
-                toWeb_ServerPropertyKey(specificPropertyKey);
-                // this is not possible :-)
-            default:
-                return null;
-        }
-    }
 
     @Override
     public String toAuth0PropertyKey(String specificPropertyKey) {

@@ -3,7 +3,7 @@ package io.github.edmm.plugins.puppet.util;
 import io.github.edmm.plugins.puppet.model.FactType;
 
 // TODO make commands less brittle by actively searching for location of things like puppet executable
-class Commands {
+abstract class Commands {
     static final String SSH_KEY_GENERATION_PREFIX = "ssh-keygen -f ~/.ssh/";
     static final String SSH_KEY_GENERATION_SUFFIX = " -t rsa -N ''";
     static final String CURL_COMMAND = "curl ";

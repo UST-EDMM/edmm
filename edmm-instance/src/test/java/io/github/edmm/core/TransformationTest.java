@@ -4,8 +4,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import io.github.edmm.core.yaml.YamlParser;
-import io.github.edmm.core.yaml.YamlTransformer;
+import io.github.edmm.core.yaml.EDMMiYamlParser;
+import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.model.edimm.DeploymentInstance;
 
 import org.apache.commons.io.FileUtils;
@@ -22,7 +22,7 @@ public class TransformationTest {
     private File file;
     private ClassPathResource resource;
     private DeploymentInstance deploymentInstance;
-    private YamlTransformer yamlTransformer;
+    private EDMMiYamlTransformer EDMMiYamlTransformer;
 
     @Test
     public void testCreateYamlForEDiMM() throws Exception {
@@ -35,13 +35,13 @@ public class TransformationTest {
 
     private void givenYamlOfNginxResource() throws Exception {
         this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
-        this.deploymentInstance = new YamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
-        this.yamlTransformer = new YamlTransformer();
+        this.deploymentInstance = new EDMMiYamlParser().parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
+        this.EDMMiYamlTransformer = new EDMMiYamlTransformer();
     }
 
     private void whenTransformationIsDone() throws Exception {
-        yamlTransformer.createYamlforEDiMM(deploymentInstance, Files.createTempDirectory("kubernetes-").toFile().getAbsolutePath());
-        this.file = new File(yamlTransformer.getFileOutputLocation());
+        EDMMiYamlTransformer.createYamlforEDiMM(deploymentInstance, Files.createTempDirectory("kubernetes-").toFile().getAbsolutePath());
+        this.file = new File(EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     private void thenAssertTransformationFile() throws Exception {

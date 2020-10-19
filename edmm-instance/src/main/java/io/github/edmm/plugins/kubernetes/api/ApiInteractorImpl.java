@@ -59,7 +59,7 @@ public class ApiInteractorImpl implements ApiInteractor {
                 .collect(Collectors.toList());
 
         } catch (ApiException e) {
-            e.printStackTrace();
+            throw new InstanceTransformationException("Unable to retrieve components of deployment.", e.getCause());
         }
 
         return podsOfDeployment;

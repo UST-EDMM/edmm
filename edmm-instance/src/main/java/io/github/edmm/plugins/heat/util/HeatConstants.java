@@ -2,7 +2,7 @@ package io.github.edmm.plugins.heat.util;
 
 import io.github.edmm.util.Constants;
 
-public class HeatConstants {
+public abstract class HeatConstants {
     public static final String VERSION = "heat_template_version";
     // keys to retrieve info from openstack stack result map
     static final String RESOURCES = "resources";

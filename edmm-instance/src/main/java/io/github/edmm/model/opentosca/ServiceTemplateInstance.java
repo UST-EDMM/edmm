@@ -14,13 +14,13 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ServiceTemplateInstance {
-    QName serviceTemplateId;
-    String serviceTemplateInstanceId;
-    String createdAt;
-    String csarId;
-    TOSCAState.ServiceTemplateInstanceState state;
-    List<NodeTemplateInstance> nodeTemplateInstances;
-    List<RelationshipTemplateInstance> relationshipTemplateInstances;
+    private QName serviceTemplateId;
+    private String serviceTemplateInstanceId;
+    private String createdAt;
+    private String csarId;
+    private TOSCAState.ServiceTemplateInstanceState state;
+    private List<NodeTemplateInstance> nodeTemplateInstances;
+    private List<RelationshipTemplateInstance> relationshipTemplateInstances;
 
     public static ServiceTemplateInstance ofDeploymentInstance(DeploymentInstance deploymentInstance) {
         ServiceTemplateInstance serviceTemplateInstance = new ServiceTemplateInstance();

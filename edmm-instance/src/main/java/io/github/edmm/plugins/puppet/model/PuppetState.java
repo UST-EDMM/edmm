@@ -2,7 +2,7 @@ package io.github.edmm.plugins.puppet.model;
 
 import io.github.edmm.model.edimm.InstanceState;
 
-public class PuppetState {
+public abstract class PuppetState {
     public enum NodeState {
         unchanged(InstanceState.InstanceStateForComponentInstance.CREATED),
         changed(InstanceState.InstanceStateForComponentInstance.UPDATED),

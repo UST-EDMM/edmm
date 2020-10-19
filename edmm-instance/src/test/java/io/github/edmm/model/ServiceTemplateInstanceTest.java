@@ -5,7 +5,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.core.yaml.YamlParser;
+import io.github.edmm.core.yaml.EDMMiYamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.NodeTemplateInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 class ServiceTemplateInstanceTest {
 
     private ClassPathResource resource;
-    private YamlParser yamlParser;
+    private EDMMiYamlParser EDMMiYamlParser;
     private ServiceTemplateInstance serviceTemplateInstance;
     private DeploymentInstance deploymentInstance;
 
@@ -36,11 +36,11 @@ class ServiceTemplateInstanceTest {
 
     private void givenYamlOfNginxResource() {
         this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
-        this.yamlParser = new YamlParser();
+        this.EDMMiYamlParser = new EDMMiYamlParser();
     }
 
     private void whenServiceTemplateInstanceCreated() throws Exception {
-        this.deploymentInstance = this.yamlParser.parseYamlAndTransformToDeploymentInstance(this.resource.getFile().getAbsolutePath());
+        this.deploymentInstance = this.EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(this.resource.getFile().getAbsolutePath());
         this.serviceTemplateInstance = new TOSCATransformer().transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
     }
 
@@ -78,7 +78,7 @@ class ServiceTemplateInstanceTest {
 
     private void givenYamlOfTestStackResource() {
         this.resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDMMi.yaml");
-        this.yamlParser = new YamlParser();
+        this.EDMMiYamlParser = new EDMMiYamlParser();
     }
 
 }

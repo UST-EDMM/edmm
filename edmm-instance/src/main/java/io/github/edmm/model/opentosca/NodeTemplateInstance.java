@@ -20,13 +20,13 @@ import lombok.ToString;
 @Getter
 @ToString
 public class NodeTemplateInstance {
-    String nodeTemplateInstanceId;
-    String serviceTemplateInstanceId;
-    QName nodeTemplateId;
-    QName nodeType;
-    TOSCAState.NodeTemplateInstanceState state;
-    QName serviceTemplateId;
-    List<TOSCAProperty> instanceProperties;
+    private String nodeTemplateInstanceId;
+    private String serviceTemplateInstanceId;
+    private QName nodeTemplateId;
+    private QName nodeType;
+    private TOSCAState.NodeTemplateInstanceState state;
+    private QName serviceTemplateId;
+    private List<TOSCAProperty> instanceProperties;
 
     public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();

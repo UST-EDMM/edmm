@@ -8,7 +8,7 @@ import io.kubernetes.client.models.V1DeploymentStatus;
 import io.kubernetes.client.models.V1PodCondition;
 import io.kubernetes.client.models.V1PodStatus;
 
-public class KubernetesStateHandler {
+public abstract class KubernetesStateHandler {
 
     public static InstanceState.InstanceStateForDeploymentInstance getDeploymentInstanceState(V1DeploymentStatus status) {
 

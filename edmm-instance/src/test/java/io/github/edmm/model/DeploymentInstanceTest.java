@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import io.github.edmm.core.yaml.YamlParser;
+import io.github.edmm.core.yaml.EDMMiYamlParser;
 import io.github.edmm.model.edimm.ComponentType;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.edimm.InstanceState;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 public class DeploymentInstanceTest {
 
     private ClassPathResource resource;
-    private YamlParser yamlParser;
+    private EDMMiYamlParser EDMMiYamlParser;
     private DeploymentInstance deploymentInstance;
 
     @Test
@@ -37,11 +37,11 @@ public class DeploymentInstanceTest {
 
     private void givenYamlOfNginxResource() {
         this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
-        this.yamlParser = new YamlParser();
+        this.EDMMiYamlParser = new EDMMiYamlParser();
     }
 
     private void whenDeploymentInstanceCreated() throws IOException {
-        this.deploymentInstance = this.yamlParser.parseYamlAndTransformToDeploymentInstance(this.resource.getFile().getAbsolutePath());
+        this.deploymentInstance = this.EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(this.resource.getFile().getAbsolutePath());
     }
 
     private void thenAssertDeploymentInstance() {
@@ -108,7 +108,7 @@ public class DeploymentInstanceTest {
 
     private void givenYamlOfTestStackResource() {
         this.resource = new ClassPathResource("deployments/unit-tests/teststackmore_EDMMi.yaml");
-        this.yamlParser = new YamlParser();
+        this.EDMMiYamlParser = new EDMMiYamlParser();
     }
 
     private void thenAssertRelationInstances() {

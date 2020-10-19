@@ -15,7 +15,7 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class YamlTransformer {
+public class EDMMiYamlTransformer {
 
     private final Map<String, Object> yamlContent = new LinkedHashMap<>();
     private Yaml yaml;

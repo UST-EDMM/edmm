@@ -13,13 +13,10 @@ public interface TOSCATypeMapper {
     // TODO: replace this with actual repository search, currently this is hardcoded for demo purposes
     static QName searchWineryRepositoryForType(String type) {
         switch (type) {
-            case "Ubuntu 18.04":
             case "Ubuntu18.04":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Ubuntu-VM_18.04-w1");
-            case "Ubuntu 16.04":
             case "Ubuntu16.04":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Ubuntu-VM_16.04-w1");
-            case "Ubuntu 14.04":
             case "Ubuntu14.04":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Ubuntu-VM_14.04-w1");
             case "mysql-server":
@@ -36,7 +33,7 @@ public interface TOSCATypeMapper {
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Java8");
             case "JavaApp":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "JavaWebApp_w1");
-            case "OpenStack Compute":
+            case "OpenStackCompute":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_Train-w1");
             default:
                 return null;

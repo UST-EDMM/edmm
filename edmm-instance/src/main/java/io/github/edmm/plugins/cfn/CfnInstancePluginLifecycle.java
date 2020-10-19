@@ -5,7 +5,7 @@ import java.util.List;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.core.yaml.YamlTransformer;
+import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
@@ -74,9 +74,9 @@ public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin 
 
     @Override
     public void createYAML() {
-        YamlTransformer yamlTransformer = new YamlTransformer();
-        yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
+        EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

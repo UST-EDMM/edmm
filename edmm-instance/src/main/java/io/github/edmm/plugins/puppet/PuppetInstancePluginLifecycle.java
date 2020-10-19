@@ -3,7 +3,7 @@ package io.github.edmm.plugins.puppet;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.core.yaml.YamlTransformer;
+import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
@@ -15,12 +15,12 @@ import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
     // puppet master info
-    private String user = "master-user";
-    private String ip = "master-ip";
-    private String privateKeyLocation = "pk-location";
+    private String user = "";
+    private String ip = "";
+    private String privateKeyLocation = "";
     private Integer port = 22;
-    private String operatingSystem = "os";
-    private String operatingSystemRelease = "os-release";
+    private String operatingSystem = "";
+    private String operatingSystemRelease = "";
 
     private Master master;
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
@@ -64,9 +64,9 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
 
     @Override
     public void createYAML() {
-        YamlTransformer yamlTransformer = new YamlTransformer();
-        yamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDMMi to " + yamlTransformer.getFileOutputLocation());
+        EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

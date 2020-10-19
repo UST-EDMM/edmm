@@ -1,6 +1,6 @@
 package io.github.edmm.core;
 
-import io.github.edmm.core.yaml.YamlParser;
+import io.github.edmm.core.yaml.EDMMiYamlParser;
 import io.github.edmm.model.edimm.DeploymentInstance;
 
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class ParsingTest {
     private ClassPathResource resource;
-    private YamlParser yamlParser;
+    private EDMMiYamlParser EDMMiYamlParser;
     private DeploymentInstance deploymentInstance;
 
     @Test
@@ -24,11 +24,11 @@ public class ParsingTest {
 
     private void givenYamlOfNginxResource() {
         this.resource = new ClassPathResource("deployments/unit-tests/nginx-deployment_EDMMi.yaml");
-        this.yamlParser = new YamlParser();
+        this.EDMMiYamlParser = new EDMMiYamlParser();
     }
 
     private void whenDeploymentInstanceCreated() throws Exception {
-        this.deploymentInstance = yamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
+        this.deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(resource.getFile().getAbsolutePath());
     }
 
     private void thenAssertDeploymentInstance() {
