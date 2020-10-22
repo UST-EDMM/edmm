@@ -31,17 +31,31 @@ Following is the /etc/hosts file of the agent:
 ![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
 
 Now, we can start to setup Puppet on the master. To do this, enter following command on the Puppet master:
+
 ```wget https://apt.puppetlabs.com/puppet6-release-bionic.deb```
+
 Afterwards, execute following command to add and configure the Puppet repository:
+
 ```sudo dpkg -i puppet6-release-bionic.deb```
+
 Followed by an update of the repository list:
+
 ```sudo apt update```
+
 Now to actually install the Puppet master, we execute following command:
+
 ```sudo apt install -y puppetserver```
+
 Puppet is installed now! Now we are going to configure the Puppet master. To do this, make following changes to the puppet.conf file (located in /etc/puppetlabs/puppet/):
+
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf.png)
+
 Now, we setup the certificate authority by running:
+
 ```sudo /opt/puppetlabs/bin/puppetserver ca setup```
+
 Once this is finished, we can start the Puppet master with following two commands:
+
 ```sudo systemctl start puppetserver```
+
 ```sudo systemctl enable puppetserver```
