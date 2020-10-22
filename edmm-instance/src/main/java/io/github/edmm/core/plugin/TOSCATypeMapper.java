@@ -8,10 +8,12 @@ import io.github.edmm.model.edimm.InstanceProperty;
 import io.github.edmm.model.opentosca.OpenTOSCANamespaces;
 
 public interface TOSCATypeMapper {
+
     QName refineTOSCAType(QName qName, List<InstanceProperty> instanceProperties);
 
     // TODO: replace this with actual repository search, currently this is hardcoded for demo purposes
     static QName searchWineryRepositoryForType(String type) {
+        type = type.replaceAll("\\s+", "");
         switch (type) {
             case "Ubuntu18.04":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Ubuntu-VM_18.04-w1");
@@ -35,6 +37,8 @@ public interface TOSCATypeMapper {
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "JavaWebApp_w1");
             case "OpenStackCompute":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_Train-w1");
+            case "nginx":
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "NGINX_latest-w1");
             default:
                 return null;
         }
