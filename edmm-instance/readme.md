@@ -23,9 +23,11 @@ Before Puppet is installed, a modification to the /etc/hosts file on both the ma
 So, for example my master's hostname is 'puppet-master', while my agent's hostname is 'puppet-agent'.
 
 Following is the /etc/hosts file of the master:
+
 ![/etc/hosts file of the master](./doc/img/hosts_master.png)
 
 Following is the /etc/hosts file of the agent:
+
 ![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
 
 Now, we can start to setup Puppet on the master. To do this, enter following command on the Puppet master:
