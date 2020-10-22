@@ -1,5 +1,7 @@
 package io.github.edmm.plugins.puppet;
 
+import java.net.URL;
+
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;

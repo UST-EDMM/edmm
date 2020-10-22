@@ -1,5 +1,7 @@
 package io.github.edmm;
 
+import java.io.File;
+
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -49,7 +51,8 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
 
     @Override
     public void run(String... args) {
-        exitCode = new CommandLine(this, factory).execute(args);
+        //exitCode = new CommandLine(this, factory).execute(args);
+        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "/", ".");
     }
 
     @Override
