@@ -1,7 +1,5 @@
 package io.github.edmm;
 
-import java.io.File;
-
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -27,7 +25,7 @@ import static picocli.CommandLine.usage;
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource({"classpath*:instancePluginContext.xml"})
+@ImportResource( {"classpath*:instancePluginContext.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
     private static final String PICOCLI_ANSI = "picocli.ansi";
@@ -52,7 +50,7 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
     @Override
     public void run(String... args) {
         //exitCode = new CommandLine(this, factory).execute(args);
-        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "/", ".");
+        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "./", ".");
     }
 
     @Override

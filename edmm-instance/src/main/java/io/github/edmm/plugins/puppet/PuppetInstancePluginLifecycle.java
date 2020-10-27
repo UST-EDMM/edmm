@@ -1,7 +1,5 @@
 package io.github.edmm.plugins.puppet;
 
-import java.net.URL;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
@@ -15,7 +13,13 @@ import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.PuppetState;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 
-public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<PuppetInstancePluginLifecycle> {
+
+    private final static Logger logger = LoggerFactory.getLogger(PuppetInstancePluginLifecycle.class);
+
     // puppet master info
     private String user = "";
     private String ip = "";
@@ -61,14 +65,14 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
         WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
-        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.getCsarId());
+        logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
         EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
+        logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

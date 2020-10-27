@@ -11,7 +11,7 @@ import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
-public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin {
+public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin<EDMMiPluginLifecycle> {
 
     private static final String directorySuffix = "/";
     private DeploymentInstance deploymentInstance = new DeploymentInstance();

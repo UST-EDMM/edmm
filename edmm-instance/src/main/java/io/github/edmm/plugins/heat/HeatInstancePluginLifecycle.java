@@ -24,7 +24,7 @@ import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
 import org.openstack4j.model.heat.Stack;
 
-public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
+public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<HeatInstancePluginLifecycle> {
 
     private static String userName = "";
     private static String password = "";

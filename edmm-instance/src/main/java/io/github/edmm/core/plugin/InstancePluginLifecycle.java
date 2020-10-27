@@ -1,8 +1,6 @@
 package io.github.edmm.core.plugin;
 
-import io.github.edmm.core.plugin.support.InstanceLifecyclePhaseAccess;
-
-public interface InstancePluginLifecycle extends InstanceLifecyclePhaseAccess {
+public interface InstancePluginLifecycle {
     void prepare();
 
     void getModels();

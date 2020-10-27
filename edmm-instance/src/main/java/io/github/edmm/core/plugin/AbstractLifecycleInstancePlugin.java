@@ -4,23 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.github.edmm.core.plugin.support.InstanceLifecyclePhaseAccess;
-import io.github.edmm.core.plugin.support.Phases;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 
-public abstract class AbstractLifecycleInstancePlugin implements InstancePluginLifecycle, InstanceLifecyclePhaseAccess {
+import lombok.Getter;
+
+public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLifecycle> implements InstancePluginLifecycle {
 
     protected final InstanceTransformationContext context;
 
-    private final List<InstanceLifecyclePhase> phases;
+    @Getter
+    private final List<InstanceLifecyclePhase<L>> phases;
 
     protected AbstractLifecycleInstancePlugin(InstanceTransformationContext context) {
         this.context = context;
         this.phases = populatePhases();
     }
 
-    private List<InstanceLifecyclePhase> populatePhases() {
-        List<InstanceLifecyclePhase> phases = new ArrayList<>();
+    private List<InstanceLifecyclePhase<L>> populatePhases() {
+        List<InstanceLifecyclePhase<L>> phases = new ArrayList<>();
         phases.add(new InstanceLifecyclePhase<>(Phases.PREPARE, this, InstancePluginLifecycle::prepare));
         phases.add(new InstanceLifecyclePhase<>(Phases.GET_MODELS, this, InstancePluginLifecycle::getModels));
         phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_EDMMi, this, InstancePluginLifecycle::transformToEDMMi));
@@ -28,10 +29,5 @@ public abstract class AbstractLifecycleInstancePlugin implements InstancePluginL
         phases.add(new InstanceLifecyclePhase<>(Phases.CREATE_YAML, this, InstancePluginLifecycle::createYAML));
         phases.add(new InstanceLifecyclePhase<>(Phases.CLEANUP, this, InstancePluginLifecycle::cleanup));
         return Collections.unmodifiableList(phases);
-    }
-
-    @Override
-    public List<InstanceLifecyclePhase> getInstanceLifecyclePhases() {
-        return phases;
     }
 }

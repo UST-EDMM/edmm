@@ -3,7 +3,6 @@ package io.github.edmm.core.plugin;
 import java.util.function.Predicate;
 
 import io.github.edmm.core.plugin.support.ExecutionFunction;
-import io.github.edmm.core.plugin.support.InstanceLifecyclePhaseAccess;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 
 import lombok.Getter;
@@ -16,23 +15,23 @@ public class InstanceLifecyclePhase<L extends InstancePluginLifecycle> {
 
     private static final Logger logger = LoggerFactory.getLogger(InstanceLifecyclePhase.class);
 
-    private final String name;
-    private final InstanceLifecyclePhaseAccess phaseAccess;
+    private final Phases phase;
+    private final AbstractLifecycleInstancePlugin<L> phaseAccess;
     private final ExecutionFunction<L> function;
 
     private State state = State.PENDING;
     private final Predicate<InstanceTransformationContext> predicate = (c) -> true;
 
-    InstanceLifecyclePhase(@NonNull String name, @NonNull InstanceLifecyclePhaseAccess phaseAccess, @NonNull ExecutionFunction<L> function) {
-        this.name = name;
+    InstanceLifecyclePhase(@NonNull Phases phase, @NonNull AbstractLifecycleInstancePlugin<L> phaseAccess, @NonNull ExecutionFunction<L> function) {
+        this.phase = phase;
         this.phaseAccess = phaseAccess;
         this.function = function;
     }
 
     private void setState(State state) {
         if (this.state == state) return;
-        logger.debug(String.format("%-20s  %-10s ==> %s", "Phase '" + this.name + "':", this.state, state));
         this.state = state;
+        logger.info(String.format("%-25s  %-10s", "Phase '" + this.phase + "'", this.state));
     }
 
     void skip() {

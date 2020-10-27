@@ -29,8 +29,13 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PuppetNodeHandler {
+
+    private static Logger logger = LoggerFactory.getLogger(PuppetNodeHandler.class);
+
     public static List<ComponentInstance> getComponentInstances(Master master) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         master.getNodes().forEach(node -> {
@@ -96,6 +101,7 @@ public class PuppetNodeHandler {
             for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
                 if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
                     ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
+                    logger.info("Identified component instance {}", generatedComponentInstance.getName());
                     if (generatedComponentInstance.getType().equals(ComponentType.Tomcat)) {
                         ComponentInstance webApp = searchForWebAppsInTomcatDirectory(componentInstance, generatedComponentInstance);
                         if (webApp != null) {

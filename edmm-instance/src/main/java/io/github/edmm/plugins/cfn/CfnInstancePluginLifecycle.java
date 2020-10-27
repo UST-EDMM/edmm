@@ -21,7 +21,7 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
-public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
+public class CfnInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<CfnInstancePluginLifecycle> {
 
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private AmazonCloudFormation cloudFormation;
