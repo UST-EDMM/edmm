@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
@@ -34,13 +34,13 @@ import org.slf4j.LoggerFactory;
 
 public class PuppetNodeHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(PuppetNodeHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(PuppetNodeHandler.class);
 
     public static List<ComponentInstance> getComponentInstances(Master master) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         master.getNodes().forEach(node -> {
             ComponentInstance componentInstance = new ComponentInstance();
-            componentInstance.setId(String.valueOf(node.getCertname().hashCode()));
+            componentInstance.setId(UUID.randomUUID().toString());
             // node is always of type compute
             componentInstance.setType(ComponentType.Compute);
             componentInstance.setName(node.getCertname());
@@ -48,16 +48,19 @@ public class PuppetNodeHandler {
             componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), getTypeFromFacts(node.getFacts())));
             componentInstance.setState(node.getState().toEDIMMComponentInstanceState());
             ComponentInstance hyperVisor = createHypervisorComponentInstance(componentInstance);
-            RelationInstance hostedOnHyperVisor = new RelationInstance();
-            hostedOnHyperVisor.setId(hyperVisor.getName() + componentInstance.getName() + String.valueOf(RelationType.HostedOn).hashCode());
-            hostedOnHyperVisor.setType(RelationType.HostedOn);
-            hostedOnHyperVisor.setTargetInstance(hyperVisor.getName());
-            componentInstance.setRelationInstances(Collections.singletonList(hostedOnHyperVisor));
-            // check if hypervisor already exists, only add to list if not
-            if (componentInstances.stream().filter(componentInstance1 -> componentInstance1.getId().equals(hyperVisor.getId())).collect(Collectors.toList()).isEmpty()) {
-                componentInstances.add(hyperVisor);
 
+            if (hyperVisor != null) {
+                RelationInstance hostedOnHyperVisor = new RelationInstance();
+                hostedOnHyperVisor.setId(UUID.randomUUID().toString());
+                hostedOnHyperVisor.setType(RelationType.HostedOn);
+                hostedOnHyperVisor.setTargetInstance(hyperVisor.getId());
+                componentInstance.setRelationInstances(Collections.singletonList(hostedOnHyperVisor));
+                // check if hypervisor already exists, only add to list if not
+                if (componentInstances.stream().noneMatch(componentInstance1 -> componentInstance1.getId().equals(hyperVisor.getId()))) {
+                    componentInstances.add(hyperVisor);
+                }
             }
+
             componentInstances.add(componentInstance);
             componentInstances.addAll(identifyPackagesOnPuppetNode(master, componentInstance, node.getCertname()));
         });
@@ -66,15 +69,20 @@ public class PuppetNodeHandler {
 
     private static ComponentInstance createHypervisorComponentInstance(ComponentInstance inputComponentInstance) {
         String hyperVisorName = retrieveHypervisorName(inputComponentInstance);
-        ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(String.valueOf(hyperVisorName.hashCode()));
-        componentInstance.setName(hyperVisorName.replace(" ", ""));
-        componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
-        InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorName);
-        componentInstance.setInstanceProperties(Collections.singletonList(typeProp));
-        componentInstance.setType(ComponentType.Compute);
 
-        return componentInstance;
+        if (hyperVisorName != null) {
+            ComponentInstance componentInstance = new ComponentInstance();
+            componentInstance.setId(UUID.randomUUID().toString());
+            componentInstance.setName(hyperVisorName.replace(" ", ""));
+            componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
+            InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), hyperVisorName);
+            componentInstance.setInstanceProperties(Collections.singletonList(typeProp));
+            componentInstance.setType(ComponentType.Compute);
+
+            return componentInstance;
+        }
+
+        return null;
     }
 
     private static List<ComponentInstance> identifyPackagesOnPuppetNode(Master master, ComponentInstance componentInstance, String certName) {
@@ -82,14 +90,15 @@ public class PuppetNodeHandler {
         }.getType());
 
         return identifyRelevantResourceEventEntries(allReports, componentInstance, certName);
-
     }
 
     private static String getTypeFromFacts(List<Fact> facts) {
         Fact operatingSystemFact = facts.stream().filter(fact -> fact.getName().equals(FactType.OperatingSystem.toString().toLowerCase())).findFirst().orElse(null);
         Fact operatingSystemReleaseFact = facts.stream().filter(fact -> fact.getName().equals(FactType.OperatingSystemRelease.toString().toLowerCase())).findFirst().orElse(null);
 
-        return operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue();
+        return operatingSystemFact != null && operatingSystemReleaseFact != null
+            ? operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue()
+            : "";
     }
 
     private static List<ComponentInstance> identifyRelevantResourceEventEntries(List<Report> allReports, ComponentInstance componentInstance, String certName) {
@@ -143,15 +152,15 @@ public class PuppetNodeHandler {
 
     private static ComponentInstance generateComponentInstanceFromWebApp(String webApp, ComponentInstance tomcatInstance) {
         ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setId(String.valueOf(webApp.hashCode()));
+        componentInstance.setId(UUID.randomUUID().toString());
         componentInstance.setName(webApp);
         componentInstance.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
         componentInstance.setType(ComponentType.Web_Application);
         componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), "JavaApp")));
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setType(RelationType.HostedOn);
-        relationInstance.setTargetInstance(tomcatInstance.getName());
-        relationInstance.setId(webApp + String.valueOf(RelationType.HostedOn));
+        relationInstance.setTargetInstance(tomcatInstance.getId());
+        relationInstance.setId(UUID.randomUUID().toString());
         componentInstance.setRelationInstances(Collections.singletonList(relationInstance));
 
         return componentInstance;
@@ -176,14 +185,32 @@ public class PuppetNodeHandler {
     private static Session buildSessionForPuppetAgent(ComponentInstance puppetAgentInstance) {
         try {
             JSch jsch = new JSch();
-            jsch.addIdentity(null, puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.private_key))).findAny().get().getInstanceValue().toString().getBytes(), puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_key))).findAny().get().getInstanceValue().toString().getBytes(), null);
-            Session session = jsch.getSession("ubuntu", puppetAgentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_address))).findAny().get().getInstanceValue().toString(), 22);
+            jsch.addIdentity(null, puppetAgentInstance.getInstanceProperties().stream()
+                    .filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.private_key)))
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException("No private key found!"))
+                    .getInstanceValue().toString().getBytes(),
+                puppetAgentInstance.getInstanceProperties().stream()
+                    .filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_key)))
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException("No public key found!"))
+                    .getInstanceValue().toString().getBytes(),
+                null
+            );
+            Session session = jsch.getSession(
+                "ubuntu",
+                puppetAgentInstance.getInstanceProperties().stream()
+                    .filter(prop -> prop.getKey().equals(String.valueOf(PropertyKey.Compute.public_address)))
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException("No public address found!"))
+                    .getInstanceValue().toString(),
+                22);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
 
             return session;
-        } catch (JSchException e) {
-            System.out.println("Failed to connect to Puppet agent. Continue");
+        } catch (JSchException | RuntimeException e) {
+            logger.error("Failed to connect to Puppet agent. Continue", e);
         }
         return null;
     }
@@ -198,14 +225,14 @@ public class PuppetNodeHandler {
 
             return reader.readLine();
         } catch (IOException | JSchException e) {
-            System.out.println("Failed to retrieve installed WARs on Puppet agent. Continue");
+            logger.error("Failed to retrieve installed WARs on Puppet agent. Continue", e);
         }
         return null;
     }
 
     private static ComponentInstance generateComponentInstanceFromResourceEventEntry(ResourceEventEntry entry, ComponentInstance componentInstance, String certName) {
         ComponentInstance packageComponent = new ComponentInstance();
-        packageComponent.setId(String.valueOf(entry.getResource_title().hashCode()));
+        packageComponent.setId(UUID.randomUUID().toString());
         packageComponent.setName(entry.getResource_title());
         packageComponent.setState(InstanceState.InstanceStateForComponentInstance.CREATED);
         InstanceProperty typeProp = new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), entry.getResource_title());
@@ -213,8 +240,8 @@ public class PuppetNodeHandler {
         packageComponent.setType(getComponentTypeForPuppetPackage(entry.getResource_title()));
         RelationInstance relationInstance = new RelationInstance();
         relationInstance.setType(RelationType.HostedOn);
-        relationInstance.setTargetInstance(componentInstance.getName());
-        relationInstance.setId(entry.getResource_title() + String.valueOf(RelationType.HostedOn));
+        relationInstance.setTargetInstance(componentInstance.getId());
+        relationInstance.setId(UUID.randomUUID().toString());
         packageComponent.setRelationInstances(Collections.singletonList(relationInstance));
 
         return packageComponent;
@@ -228,13 +255,11 @@ public class PuppetNodeHandler {
             case "docker":
                 return ComponentType.Platform;
             case "tomcat8":
-                return ComponentType.Tomcat;
             case "tomcat":
                 return ComponentType.Tomcat;
             case "mongodb":
                 return ComponentType.DBMS;
             case "java":
-                return ComponentType.Software_Component;
             default:
                 return ComponentType.Software_Component;
         }

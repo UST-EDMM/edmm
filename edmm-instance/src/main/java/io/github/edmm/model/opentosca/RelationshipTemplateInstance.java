@@ -20,7 +20,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 @ToString
 public class RelationshipTemplateInstance {
     private String serviceTemplateInstanceId;
-    private QName relationshipTemplateId;
+    private String id;
     private QName relationshipType;
     private TOSCAState.RelationshipTemplateInstanceState state;
     private String sourceNodeTemplateInstanceId;
@@ -32,9 +32,9 @@ public class RelationshipTemplateInstance {
         relationshipTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
         relationshipTemplateInstance.setRelationshipType(new QName(OpenTOSCANamespaces.OPENTOSCA_BASE_TYPES, String.valueOf(relationInstance.getType().toToscaRelationBaseType())));
         // TODO think about this one, maybe use id and map with id -> name or sth like that
-        relationshipTemplateInstance.setSourceNodeTemplateInstanceId(componentInstance.getName());
+        relationshipTemplateInstance.setSourceNodeTemplateInstanceId(componentInstance.getId());
         relationshipTemplateInstance.setTargetNodeTemplateInstanceId(relationInstance.getTargetInstance());
-        relationshipTemplateInstance.setRelationshipTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_REL_TEMPL, relationInstance.getId()));
+        relationshipTemplateInstance.setId("con_" + relationInstance.getId());
         relationshipTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState().convertToRelationshipTemplateInstanceState());
         relationshipTemplateInstance.setInstanceProperties(emptyIfNull(relationInstance.getInstanceProperties())
             .stream().map(InstanceProperty::convertToTOSCAProperty).collect(Collectors.toList()));

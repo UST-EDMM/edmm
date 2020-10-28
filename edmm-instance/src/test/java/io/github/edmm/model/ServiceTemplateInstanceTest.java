@@ -68,7 +68,7 @@ class ServiceTemplateInstanceTest {
 
         assertNotNull(nodeTemplateInstances);
         assertFalse(nodeTemplateInstances.isEmpty());
-        assertEquals(new QName("http://opentosca.org/nodetemplates", "nginx-deployment-6b474476c4-22gtg"), nodeTemplateInstances.get(0).getNodeTemplateId());
+        assertEquals("nginx-deployment-6b474476c4-22gtg", nodeTemplateInstances.get(0).getId());
         assertEquals(new QName("http://docs.oasis-open.org/tosca/ToscaNormativeTypes", "Compute"), nodeTemplateInstances.get(0).getNodeType());
         assertEquals("a3ec9267-aff0-4484-ad5e-785502c9d2d5", nodeTemplateInstances.get(0).getNodeTemplateInstanceId());
         assertEquals("92d76709-1fca-4d77-9865-c9cbf0dc7106", nodeTemplateInstances.get(0).getServiceTemplateInstanceId());

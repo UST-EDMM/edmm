@@ -22,7 +22,8 @@ import lombok.ToString;
 public class NodeTemplateInstance {
     private String nodeTemplateInstanceId;
     private String serviceTemplateInstanceId;
-    private QName nodeTemplateId;
+    private String id;
+    private String name;
     private QName nodeType;
     private TOSCAState.NodeTemplateInstanceState state;
     private QName serviceTemplateId;
@@ -32,7 +33,8 @@ public class NodeTemplateInstance {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
 
         nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
-        nodeTemplateInstance.setNodeTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TEMPL, componentInstance.getName() + componentInstance.getId()));
+        nodeTemplateInstance.setId(componentInstance.getId());
+        nodeTemplateInstance.setName(componentInstance.getName());
         nodeTemplateInstance.setNodeType(tryNodeTypeRefinement(componentInstance.getType().toTOSCABaseNodeType(), componentInstance.getInstanceProperties()));
         nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
         nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL, deploymentInstanceName));

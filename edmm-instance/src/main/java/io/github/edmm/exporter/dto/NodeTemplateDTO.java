@@ -16,8 +16,8 @@ class NodeTemplateDTO {
 
     static NodeTemplateDTO ofNodeTemplateInstance(NodeTemplateInstance nodeTemplateInstance) {
         NodeTemplateDTO nodeTemplateDTO = new NodeTemplateDTO();
-        nodeTemplateDTO.setId(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
-        nodeTemplateDTO.setName(nodeTemplateInstance.getNodeTemplateId().getLocalPart());
+        nodeTemplateDTO.setId(nodeTemplateInstance.getId());
+        nodeTemplateDTO.setName(nodeTemplateInstance.getName());
         nodeTemplateDTO.setType(String.valueOf(nodeTemplateInstance.getNodeType()));
         Map<String, Map<String, String>> propertyMap = new LinkedHashMap<>();
         propertyMap.put("kvproperties", new LinkedHashMap<>());
