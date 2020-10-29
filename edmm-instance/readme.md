@@ -59,3 +59,66 @@ Once this is finished, we can start the Puppet master with following two command
 ```sudo systemctl start puppetserver```
 
 ```sudo systemctl enable puppetserver```
+
+### Step 3 - Setup the Puppet Agent
+
+Enter the following commands on the Puppet Agent to install and setup Puppet.
+First, download Puppet by following command:
+
+```wget https://apt.puppetlabs.com/puppet6-release-bionic.deb```
+
+Then install the package by executing following command:
+
+```sudo dpkg -i puppet6-release-bionic.deb```
+
+After this, execute this obligatory command:
+
+```sudo apt update```
+
+Then, we setup the VM such that it acts as a Puppet Agent.
+This process is started by following command:
+
+```sudo apt install -y puppet-agent```
+
+Now, the Puppet Agent needs to be configured.
+To do this, we edit the configuration file by running following command:
+
+```sudo vim /etc/puppetlabs/puppet/puppet.conf```
+
+Edit the file such that it looks like this:
+
+![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf_agent.png)
+
+Now it's time to start the Puppet Agent service by running this command:
+
+```sudo /opt/puppetlabs/bin/puppet resource service puppet ensure=running enable=true```
+
+The output should look as shown below:
+
+![Output of starting the Puppet Agent](./doc/img/output.png)
+
+### Step 4 - Connect the Puppet Agent to the Puppet Master
+Once all previous steps are finished, we need to enable the communication between the Puppet Agent and the Puppet Master we just set up.
+Enter following command on the Puppet Master, to check if a certificate request from the Puppet Agent was already received:
+
+```sudo /opt/puppetlabs/bin/puppetserver ca list```
+
+The output should be similar to this:
+
+![Output of listing received certificates](./doc/img/output__.png)
+
+The certificate request can then be signed by running following command:
+
+```sudo /opt/puppetlabs/bin/puppetserver ca sign --certname puppet-agent```
+
+The output should state that the certificate was signed successfully.
+To check, run the following command on the Puppet Agent:
+
+```sudo /opt/puppetlabs/bin/puppet agent --test```
+
+The output should be as shown below:
+
+![Output of testing the signing of the certificate](./doc/img/output___.png)
+
+That's it! The Puppet Master and the Agent are now up and running, and connected.
+Now, it is possible to manage the Puppet Agent via the Master.
