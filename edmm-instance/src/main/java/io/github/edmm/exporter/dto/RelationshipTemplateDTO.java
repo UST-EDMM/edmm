@@ -17,8 +17,8 @@ class RelationshipTemplateDTO {
 
     static RelationshipTemplateDTO ofRelationshipTemplateInstance(RelationshipTemplateInstance relationshipTemplateInstance) {
         RelationshipTemplateDTO relationshipTemplateDTO = new RelationshipTemplateDTO();
-        relationshipTemplateDTO.setId(relationshipTemplateInstance.getRelationshipTemplateId().getLocalPart());
-        relationshipTemplateDTO.setName(relationshipTemplateInstance.getRelationshipTemplateId().getLocalPart());
+        relationshipTemplateDTO.setId(relationshipTemplateInstance.getId());
+        relationshipTemplateDTO.setName(relationshipTemplateInstance.getId());
         relationshipTemplateDTO.setType(String.valueOf(relationshipTemplateInstance.getRelationshipType()));
         Map<String, String> sourceElementMap = new LinkedHashMap<>();
         sourceElementMap.put("ref", relationshipTemplateInstance.getSourceNodeTemplateInstanceId());

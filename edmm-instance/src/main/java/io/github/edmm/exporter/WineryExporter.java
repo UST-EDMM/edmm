@@ -7,27 +7,25 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
 import io.github.edmm.exporter.dto.EnrichmentDTO;
 import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
-import io.github.edmm.exporter.dto.TagDTO;
 import io.github.edmm.exporter.dto.TopologyTemplateDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -35,9 +33,12 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class WineryExporter {
-    private final static Logger LOGGER = Logger.getLogger(WineryExporter.class.getName());
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(WineryExporter.class.getName());
 
     // TODO: retrieve such info from a config or sth like that
     private static final String wineryEndpoint = "http://localhost:8080/winery/";
@@ -68,38 +69,32 @@ public abstract class WineryExporter {
     }
 
     private static void postServiceTemplate(ServiceTemplateCreationDTO creationDTO) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(wineryEndpoint + serviceTemplatesPath);
         try {
-            post.setEntity(getObjectAsJson(creationDTO));
-            post.setHeader("content-type", "application/json");
-            HttpResponse response = httpClient.execute(post);
+            performPostRequest(wineryEndpoint + serviceTemplatesPath, creationDTO);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to create Service Template Instance in Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.error("Failed to create Service Template Instance in Winery.", e);
         }
     }
 
     private static void putTopology(TopologyTemplateDTO topologyTemplateDTO, QName serviceTemplateId) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPut put = new HttpPut(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath);
         try {
-            put.setEntity(getObjectAsJson(topologyTemplateDTO));
-            put.setHeader("content-type", "application/json");
-            HttpResponse response = httpClient.execute(put);
+            performPutRequest(
+                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath,
+                topologyTemplateDTO
+            );
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to post Topology Template Instance to Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.debug("Failed to post Topology Template Instance to Winery.", e);
         }
     }
 
     private static void setServiceTemplateTag(String deploymentTechnology, QName serviceTemplateId) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "/tags");
         try {
-            post.setEntity(getObjectAsJson(new TagDTO("retrievedDeploymentTechnology", deploymentTechnology)));
-            post.setHeader("content-type", "application/json");
-            HttpResponse response = httpClient.execute(post);
+            performPostRequest(
+                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "tags",
+                deploymentTechnology
+            );
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set Tag for Service Template in Winery.");
+            LOGGER.error("Failed to set Tag for Service Template in Winery.", e);
         }
     }
 
@@ -109,10 +104,9 @@ public abstract class WineryExporter {
         try {
             get.setHeader("accept", "application/json");
             HttpResponse response = httpClient.execute(get);
-            List<EnrichmentDTO> enrichmentDTOs = getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
-            return enrichmentDTOs;
+            return getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
         } catch (IOException | JsonSyntaxException e) {
-            LOGGER.log(Level.SEVERE, "Failed to get available features from Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.error("Failed to get available features from Winery.", e);
         }
         return null;
     }
@@ -121,14 +115,13 @@ public abstract class WineryExporter {
         if (selectedFeatures == null) {
             return;
         }
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPut put = new HttpPut(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath);
         try {
-            put.setHeader("content-type", "application/json");
-            put.setEntity(getObjectAsJson(selectedFeatures));
-            HttpResponse response = httpClient.execute(put);
+            performPutRequest(
+                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
+                selectedFeatures
+            );
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to apply available features to Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.error("Failed to apply available features to Winery.", e);
         }
     }
 
@@ -136,7 +129,7 @@ public abstract class WineryExporter {
         try {
             FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to export CSAR from Winery. Continue with creation of EDMMi YAML file.");
+            LOGGER.error("Failed to export CSAR from Winery.", e);
         }
     }
 
@@ -147,38 +140,63 @@ public abstract class WineryExporter {
     }
 
     private static boolean importCSARToContainer(String outputPath) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(containerEndpoint);
         try {
-            File file = new File(outputPath);
-            FileBody fileBody = new FileBody(file, ContentType.MULTIPART_FORM_DATA);
-            StringBody stringBody = new StringBody("true", ContentType.MULTIPART_FORM_DATA);
+            FileBody fileBody = new FileBody(new File(outputPath), ContentType.MULTIPART_FORM_DATA);
+            StringBody stringBody = new StringBody("false", ContentType.MULTIPART_FORM_DATA);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.addPart("file", fileBody);
             builder.addPart("enrichment", stringBody);
-            HttpEntity entity = builder.build();
-            post.setEntity(entity);
 
-            HttpResponse response = httpClient.execute(post);
+            HttpPost post = new HttpPost(containerEndpoint);
+            post.setEntity(builder.build());
 
-            return true;
+            return executeHttpRequest(post);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to import CSAR into Container. Continue with creation of EDMMi YAML file.");
-            return false;
+            LOGGER.error("Failed to import CSAR into Container.", e);
         }
+        return false;
     }
 
     private static void createCSARInstance(String csarId, QName serviceTemplateId) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/" + serviceTemplatesPath + doubleEncodeNamespaceForInstance(serviceTemplateId) + "buildplans/" + csarId.replace(".", "_") + "_buildPlan/instances");
         try {
-            post.setEntity(generateInstancePayload());
-            post.setHeader("content-type", "application/json");
-
-            HttpResponse response = httpClient.execute(post);
+            performPostRequest(
+                containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/"
+                    + serviceTemplatesPath + doubleEncodeNamespaceForInstance(serviceTemplateId)
+                    + "buildplans/" + csarId.replace(".", "_") + "_buildPlan/instances",
+                generateInstancePayload()
+            );
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to start CSAR instance in Container. Continue with creation of EDMMi YAML file.");
+            LOGGER.error("Failed to start CSAR instance in Container.", e);
         }
+    }
+
+    private static boolean performPostRequest(String url, Object payload) throws IOException {
+        HttpPost post = new HttpPost(url);
+        post.setEntity(getObjectAsJson(payload));
+        post.setHeader("content-type", "application/json");
+        return executeHttpRequest(post);
+    }
+
+    private static boolean performPutRequest(String url, Object payload) throws IOException {
+        HttpPut put = new HttpPut(url);
+        put.setEntity(getObjectAsJson(payload));
+        put.setHeader("content-type", "application/json");
+        return executeHttpRequest(put);
+    }
+
+    private static boolean executeHttpRequest(HttpUriRequest request) throws IOException {
+        LOGGER.info("Executing {} request {}", request.getMethod(), request.getURI());
+
+        HttpResponse response = HttpClientBuilder.create()
+            .build()
+            .execute(request);
+
+        LOGGER.info("Request returned Status {}({}) for {} request {}",
+            response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode(),
+            request.getMethod(), request.getURI());
+
+        return Response.Status.Family.familyOf(response.getStatusLine().getStatusCode())
+            == Response.Status.Family.SUCCESSFUL;
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {

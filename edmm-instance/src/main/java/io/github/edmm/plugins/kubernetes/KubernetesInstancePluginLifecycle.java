@@ -22,7 +22,7 @@ import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1Pod;
 
-public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstancePlugin {
+public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<KubernetesInstancePluginLifecycle> {
 
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
