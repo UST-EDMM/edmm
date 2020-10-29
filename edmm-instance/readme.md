@@ -8,7 +8,7 @@ In the first section, an explanation is given how to set up a simple Puppet depl
 In the second section, it is shown which settings are required to run this prototype, and how to build and run it eventually.
 In the third section, it is shown how to manage the Puppet deployment with additional management functionality using the OpenTOSCA ecosystem which is used in this prototype.
 
-## Setup Puppet deployment
+## Section 1 - Setup Puppet deployment
 To test this prototype, this section explains how to setup a simple deployment consisting of a Puppet master, and a Puppet agent which is managed by the master.
 Further, a declarative deployment model is provided that installs a simple piece of software on the Puppet agent.
 
@@ -122,3 +122,41 @@ The output should be as shown below:
 
 That's it! The Puppet Master and the Agent are now up and running, and connected.
 Now, it is possible to manage the Puppet Agent via the Master.
+
+### Step 5 - Install software on the Puppet Agent using the Puppet Master
+In this step, an example is shown how to deploy a simple application using the Puppet Master and its managed agent that we just set up.
+The simple application consists of a Tomcat web server that hosts a static website.
+
+To run Tomcat, we need to install Java first.
+Simply install the existing PuppetLabs module for Java by running this command:
+
+```sudo /opt/puppetlabs/bin/puppet module install puppetlabs-java```
+
+Now, we need to create a manifest on the Puppet Master to actually install Java on the Puppet Agent using the module we just installed.
+A manifest declares the resources to be deployed to a certain (or to all) agents managed by a Puppet Master.
+To do this, create a "site.pp" file in following location on the Puppet Master: /etc/puppetlabs/code/environment/production/manifests/ and edit it such that it looks like this:
+
+![site.pp file to install Java on the Puppet Agent](./doc/img/manifest_1_.png)
+
+To apply the configuration, run following command on the Puppet Agent:
+
+```sudo /opt/puppetlabs/bin/puppet agent --test```
+
+Once this was successful, we can install Tomcat.
+To install Tomcat, we simply re-use the existing Tomcat module provided in PuppetForge.
+To install said module, run following command on the Puppet Master:
+
+```sudo /opt/puppetlabs/bin/puppet module install puppetlabs-tomcat --version 4.2.0```
+
+Once finished, go to the site.pp file we created in the previous step and edit it such that it looks like this:
+
+![site.pp file to install Java & Tomcat on a Puppet Agent](./doc/img/main_manifest.png)
+
+Make sure that the Tomcat Version exists under the provided URL in the site.pp file.
+Now, run following command on the Puppet Agent to retrieve the newest configuration we just declared:
+
+```sudo /opt/puppetlabs/bin/puppet agent --test```
+
+Once this is done, we successfully installed and started a Tomcat server on the Puppet Agent. To verify, run following command on the Agent:
+
+```ps -ef | grep tomcat```
