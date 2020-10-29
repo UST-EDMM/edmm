@@ -118,7 +118,7 @@ To check, run the following command on the Puppet Agent:
 
 The output should be as shown below:
 
-![Output of testing the signing of the certificate](./doc/img/output___.png)
+![Output of testing the signing of the certificate](./doc/img/output_ok_.png)
 
 That's it! The Puppet Master and the Agent are now up and running, and connected.
 Now, it is possible to manage the Puppet Agent via the Master.
