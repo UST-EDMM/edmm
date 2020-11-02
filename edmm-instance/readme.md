@@ -15,7 +15,7 @@ Further, a declarative deployment model is provided that installs a simple piece
 ### Step 1 - Setup two VMs
 To setup a Puppet master, and a Puppet agent, respectively one machine is required that is able to run the Puppet master, respectively the Puppet agent.
 Puppet currently only supports *nix machines as master.
-For the simplicity of this guide, i am going to use simply two VMs running on OpenStack: Ooe to run the Puppet master, and one to run the Puppet agent.
+For the simplicity of this guide, i am going to use simply two VMs running on OpenStack: One to run the Puppet master, and one to run the Puppet agent.
 
 ### Step 2 - Setup the Puppet Master
 Now that we have a running VM with a *nix OS, this step shows how to setup the Puppet master on top of it.
@@ -46,7 +46,8 @@ Now to actually install the Puppet master, we execute following command:
 
 ```sudo apt install -y puppetserver```
 
-Puppet is installed now! Now we are going to configure the Puppet master. To do this, make following changes to the puppet.conf file (located in /etc/puppetlabs/puppet/):
+Puppet is installed now! Now we are going to configure the Puppet master. To do this, make following changes to the puppet.conf file:
+ `sudo nano /etc/puppetlabs/puppet/puppet.conf`.
 
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf.png)
 
@@ -68,18 +69,21 @@ sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)
 
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 
-sudo apt-get update
+sudo apt update
 
-sudo apt-get -y install postgresql
+sudo apt -y install postgresql
 ```
 
-Then, we are able to install PuppetDB. First, run this command:
+Then, we are able to install PuppetDB. First, run these commands:
 
-```sudo /opt/puppetlabs/bin/puppet resource package puppetdb ensure=latest```
+```
+sudo /opt/puppetlabs/bin/puppet resource package puppetdb ensure=latest
+sudo /opt/puppetlabs/bin/puppet resource package puppetdb-termini ensure=latest
+```
 
 Now, it is required to configure PuppetDB. To do this, run the following command to create the first config file that is required:
 
-```sudo vim /etc/puppetlabs/puppet/puppetdb.conf```
+```sudo nano /etc/puppetlabs/puppet/puppetdb.conf```
 
 and edit it such that it looks like this:
 
@@ -87,17 +91,17 @@ and edit it such that it looks like this:
 
 Then, enter following command to create the next config file:
 
-```sudo vim /etc/puppetlabs/puppetdb/conf.d/database.ini```
+```sudo nano /etc/puppetlabs/puppetdb/conf.d/database.ini```
 
 and make it look like this:
 
 ![/etc/puppetlabs/puppetdb/conf.d/database.ini file](./doc/img/databaseini.png)
 
-Now, edit the /etc/puppetlabs/puppet/puppet.conf file such that it looks like this:
+Now, edit the `/etc/puppetlabs/puppet/puppet.conf` file such that it looks like this:
 
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconffinal.png)
 
-Further, create a routes.yaml file in the same directory with the following content:
+Further, create a `routes.yaml` file in the same directory (`sudo nano /etc/puppetlabs/puppet/routes.yaml`) with the following content:
 
 ```
 ---
@@ -128,7 +132,7 @@ Now, restart the database:
 
 And, finally, start the PuppetDB up by firing this command:
 
-```sudo puppet resource service puppetdb ensure=running enable=true```
+```sudo /opt/puppetlabs/bin/puppet resource service puppetdb ensure=running enable=true```
 
 As a last step, we need to restart the Puppet server on the Puppet Master. This can be done for example by following commands:
 
@@ -160,7 +164,7 @@ This process is started by following command:
 Now, the Puppet Agent needs to be configured.
 To do this, we edit the configuration file by running following command:
 
-```sudo vim /etc/puppetlabs/puppet/puppet.conf```
+```sudo nano /etc/puppetlabs/puppet/puppet.conf```
 
 Edit the file such that it looks like this:
 
@@ -201,7 +205,7 @@ That's it! The Puppet Master and the Agent are now up and running, and connected
 Now, it is possible to manage the Puppet Agent via the Master.
 
 ### Step 5 - Install software on the Puppet Agent using the Puppet Master
-In this step, an example is shown how to deploy a simple application using the Puppet Master and its managed agent that we just set up.
+In this step, an example is shown how to deploy a simple application using the *Puppet Master* and its managed agent that we just set up.
 The simple application consists of a Tomcat web server that hosts a static website.
 
 To run Tomcat, we need to install Java first.
@@ -209,25 +213,27 @@ Simply install the existing PuppetLabs module for Java by running this command:
 
 ```sudo /opt/puppetlabs/bin/puppet module install puppetlabs-java```
 
-Now, we need to create a manifest on the Puppet Master to actually install Java on the Puppet Agent using the module we just installed.
+Now, we need to create a manifest on the *Puppet Master* to actually install Java on the Puppet Agent using the module we just installed.
 A manifest declares the resources to be deployed to a certain (or to all) agents managed by a Puppet Master.
-To do this, create a "site.pp" file in following location on the Puppet Master: /etc/puppetlabs/code/environment/production/manifests/ and edit it such that it looks like this:
+To do this, create a `site.pp` file in following location on the Puppet Master:
+ `sudo nano /etc/puppetlabs/code/environments/production/manifests/site.pp`
+  and edit it such that it looks like this:
 
-![site.pp file to install Java on the Puppet Agent](./doc/img/manifest_1.png)
+![`site.pp` file to install Java on the Puppet Agent](./doc/img/manifest_1.png)
 
-To apply the configuration, run following command on the Puppet Agent:
+To apply the configuration, run following command on the *Puppet Agent*:
 
 ```sudo /opt/puppetlabs/bin/puppet agent --test```
 
 Once this was successful, we can install Tomcat.
 To install Tomcat, we simply re-use the existing Tomcat module provided in PuppetForge.
-To install said module, run following command on the Puppet Master:
+To install the tomcat module, run following command on the *Puppet Master*:
 
 ```sudo /opt/puppetlabs/bin/puppet module install puppetlabs-tomcat --version 4.2.0```
 
-Once finished, go to the site.pp file we created in the previous step and edit it such that it looks like this:
+Once finished, go to the `site.pp` file we created in the previous step and edit it such that it looks like this:
 
-![site.pp file to install Java & Tomcat on a Puppet Agent](doc/img/main_manifest.png)
+![`site.pp` file to install Java & Tomcat on a Puppet Agent](doc/img/main_manifest.png)
 
 Make sure that the Tomcat Version exists under the provided URL in the site.pp file.
 Now, run following command on the Puppet Agent to retrieve the newest configuration we just declared:
@@ -239,7 +245,7 @@ Once this is done, we successfully installed and started a Tomcat server on the 
 ```ps -ef | grep tomcat```
 
 Now we are going to deploy a simple Hello-World HTML web page to the Tomcat using Puppet.
-As a first step, create a "index.html" file on the Puppet Master in /etc/puppetlabs/code/environments/production/modules/hello_world/files/ that looks, for example, like this:
+As a first step, create a html-file on the Puppet Master in `/etc/puppetlabs/code/environments/production/modules/hello_world/files/index.html` that looks, for example, like this:
 
 ![Hello World HTML file](./doc/img/index.png)
 
