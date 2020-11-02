@@ -213,7 +213,7 @@ Now, we need to create a manifest on the Puppet Master to actually install Java 
 A manifest declares the resources to be deployed to a certain (or to all) agents managed by a Puppet Master.
 To do this, create a "site.pp" file in following location on the Puppet Master: /etc/puppetlabs/code/environment/production/manifests/ and edit it such that it looks like this:
 
-![site.pp file to install Java on the Puppet Agent](./doc/img/manifest_1_.png)
+![site.pp file to install Java on the Puppet Agent](./doc/img/manifest_1.png)
 
 To apply the configuration, run following command on the Puppet Agent:
 
@@ -227,7 +227,7 @@ To install said module, run following command on the Puppet Master:
 
 Once finished, go to the site.pp file we created in the previous step and edit it such that it looks like this:
 
-![site.pp file to install Java & Tomcat on a Puppet Agent](./doc/img/main_manifest.png)
+![site.pp file to install Java & Tomcat on a Puppet Agent](doc/img/main_manifest.png)
 
 Make sure that the Tomcat Version exists under the provided URL in the site.pp file.
 Now, run following command on the Puppet Agent to retrieve the newest configuration we just declared:
