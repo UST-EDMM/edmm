@@ -1,0 +1,62 @@
+name: nginx-deployment
+version: deployment.kubernetes.io/revision1
+state: CREATED
+id: 92d76709-1fca-4d77-9865-c9cbf0dc7106
+createdAt: '2020-04-20T11:32:44.000+02:00'
+description: null
+metadata:
+  deployment.kubernetes.io/revision: '1'
+  generation: 1
+  app: nginx
+  namespace: default
+  resourceVersion: '4687'
+instanceProperties:
+- key: availableReplicas
+  type: Integer
+  instanceValue: 3
+- key: observedGeneration
+  type: Long
+  instanceValue: 1
+- key: readyReplicas
+  type: Integer
+  instanceValue: 3
+- key: replicas
+  type: Integer
+  instanceValue: 3
+- key: updatedReplicas
+  type: Integer
+  instanceValue: 3
+componentInstances:
+- id: a3ec9267-aff0-4484-ad5e-785502c9d2d5
+  name: nginx-deployment-6b474476c4-22gtg
+  type: Compute
+  state: CREATED
+  createdAt: '2020-04-20T11:32:44.000+02:00'
+  metadata:
+    generateName: nginx-deployment-6b474476c4-
+    app: nginx
+    pod-template-hash: 6b474476c4
+    namespace: default
+    resourceVersion: '63910'
+- id: c5d52030-9ff4-412f-80b8-26731099968d
+  name: nginx-deployment-6b474476c4-5p98h
+  type: Compute
+  state: CREATED
+  createdAt: '2020-04-20T11:32:44.000+02:00'
+  metadata:
+    generateName: nginx-deployment-6b474476c4-
+    app: nginx
+    pod-template-hash: 6b474476c4
+    namespace: default
+    resourceVersion: '63913'
+- id: 1e79131b-bc53-44fb-bd1b-53c06d13e566
+  name: nginx-deployment-6b474476c4-cwmms
+  type: Compute
+  state: CREATED
+  createdAt: '2020-04-20T11:32:44.000+02:00'
+  metadata:
+    generateName: nginx-deployment-6b474476c4-
+    app: nginx
+    pod-template-hash: 6b474476c4
+    namespace: default
+    resourceVersion: '63907'

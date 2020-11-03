@@ -1,0 +1,20 @@
+<assembly>
+    <id>dist</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <files>
+        <file>
+            <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
+            <outputDirectory>lib</outputDirectory>
+            <destName>edmm-instance.jar</destName>
+        </file>
+        <file>
+            <source>edmmi</source>
+        </file>
+        <file>
+            <source>edmmi.cmd</source>
+        </file>
+    </files>
+</assembly>
