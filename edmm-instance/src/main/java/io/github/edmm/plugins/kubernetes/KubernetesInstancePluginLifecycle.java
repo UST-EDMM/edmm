@@ -73,14 +73,14 @@ public class KubernetesInstancePluginLifecycle extends AbstractLifecycleInstance
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
-        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
-        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getOutputPath());
         logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 

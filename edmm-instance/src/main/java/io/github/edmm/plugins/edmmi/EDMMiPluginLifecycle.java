@@ -36,21 +36,21 @@ public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin<EDMMiP
     @Override
     public void transformToEDMMi() {
         EDMMiYamlParser EDMMiYamlParser = new EDMMiYamlParser();
-        this.deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(context.getPath());
+        this.deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(context.getOutputPath());
     }
 
     @Override
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
-        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getOutputPath()).getParent() + directorySuffix);
         logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 

@@ -1,4 +1,4 @@
-package io.github.edmm;
+package io.github.edmm.cli;
 
 import java.io.File;
 import java.util.List;
@@ -15,24 +15,23 @@ import picocli.CommandLine;
 
 @Component
 @CommandLine.Command(
-    name = "transform",
+    name = "parse",
     descriptionHeading = "%n",
-    description = "Starts a transformation from a source technology to EDMMi and saves to output path.",
-    customSynopsis = "@|bold edmmi transform|@ @|yellow <source technology>|@ @|yellow <output path>|@ @|yellow <application id/name>|@"
+    description = "Starts a transformation from EDMMi yaml file to OpenTOSCA.",
+    customSynopsis = "@|bold edmmi parse|@ @|yellow <source technology>|@ @|yellow <path to edmmi yaml file>|@"
 )
-public class TransformCommand implements Callable<Integer> {
+public class ParseCommand implements Callable<Integer> {
 
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec spec;
 
     private String source;
-    private String outputPath;
-    private String applicationId;
+    private String inputPath;
 
     private InstanceTransformationService instanceTransformationService;
     private InstancePluginService instancePluginService;
 
-    @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation source")
+    @CommandLine.Parameters(arity = "1..1", index = "0", description = "The name of the transformation source, i.e. edmmi")
     public void setSource(String source) {
         List<String> availableSources = instancePluginService.getInstancePlugins().stream()
             .map(p -> p.getSourceTechnology().getId()).collect(Collectors.toList());
@@ -43,27 +42,18 @@ public class TransformCommand implements Callable<Integer> {
         this.source = source;
     }
 
-    @CommandLine.Parameters(arity = "1..1", index = "1", description = "The path where output is to be saved")
-    public void setOutputPath(String path) {
-        if (!new File(path).isDirectory()) {
-            String message = String.format("Specified output directory does not exist: %s", path);
+    @CommandLine.Parameters(arity = "1..1", index = "1", description = "The path of the YAML input file")
+    public void setInputPath(String path) {
+        if (!new File(path).exists()) {
+            String message = String.format("Specified input file does not exist: %s", path);
             throw new CommandLine.ParameterException(spec.commandLine(), message);
         }
-        this.outputPath = path;
-    }
-
-    @CommandLine.Parameters(arity = "1..1", index = "2", description = "The identifier of the application to be transformed and enriched")
-    public void setApplicationId(String applicationId) {
-        if (applicationId == null) {
-            String message = String.format("Please specify an identifier for the application to be transformed.");
-            throw new CommandLine.ParameterException(spec.commandLine(), message);
-        }
-        this.applicationId = applicationId;
+        this.inputPath = path;
     }
 
     @Override
     public Integer call() {
-        InstanceTransformationContext context = instanceTransformationService.createContext(source, outputPath, applicationId);
+        InstanceTransformationContext context = instanceTransformationService.createContext(source, inputPath);
         instanceTransformationService.startTransformation(context);
         return 42;
     }

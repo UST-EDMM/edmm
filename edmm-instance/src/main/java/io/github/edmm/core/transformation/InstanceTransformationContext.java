@@ -12,20 +12,20 @@ public final class InstanceTransformationContext {
 
     private final String id;
     private final SourceTechnology sourceTechnology;
-    private final String path;
+    private final String outputPath;
     private final Timestamp timestamp;
 
     @Setter
     private State state = State.READY;
 
-    public InstanceTransformationContext(@NonNull SourceTechnology sourceTechnology, @NonNull String path) {
-        this(UUID.randomUUID().toString(), sourceTechnology, path);
+    public InstanceTransformationContext(@NonNull SourceTechnology sourceTechnology, @NonNull String outputPath) {
+        this(UUID.randomUUID().toString(), sourceTechnology, outputPath);
     }
 
-    public InstanceTransformationContext(@NonNull String id, @NonNull SourceTechnology sourceTechnology, @NonNull String path) {
+    public InstanceTransformationContext(@NonNull String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath) {
         this.id = id;
         this.sourceTechnology = sourceTechnology;
-        this.path = path;
+        this.outputPath = outputPath;
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 

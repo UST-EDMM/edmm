@@ -7,13 +7,15 @@ import io.github.edmm.core.transformation.SourceTechnology;
 public class PuppetInstancePlugin extends InstancePlugin<PuppetInstancePluginLifecycle> {
 
     private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
+    private final InstanceTransformationContext context;
 
-    public PuppetInstancePlugin() {
+    public PuppetInstancePlugin(InstanceTransformationContext context) {
         super(PUPPET);
+        this.context = context;
     }
 
     @Override
     public PuppetInstancePluginLifecycle getLifecycle(InstanceTransformationContext context) {
-        return new PuppetInstancePluginLifecycle(context);
+        return null;
     }
 }

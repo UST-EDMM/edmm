@@ -1,12 +1,14 @@
 package io.github.edmm;
 
+import io.github.edmm.cli.ParseCommand;
+import io.github.edmm.cli.PuppetCommand;
+
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.usage;
@@ -20,12 +22,11 @@ import static picocli.CommandLine.usage;
     },
     subcommands = {
         CommandLine.HelpCommand.class,
-        TransformCommand.class,
+        PuppetCommand.class,
         ParseCommand.class
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource( {"classpath*:instancePluginContext.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
     private static final String PICOCLI_ANSI = "picocli.ansi";
@@ -49,8 +50,8 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
 
     @Override
     public void run(String... args) {
-        //exitCode = new CommandLine(this, factory).execute(args);
-        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "./", ".");
+        exitCode = new CommandLine(this, factory).execute(args);
+//        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "./", ".");
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.github.edmm.plugins.puppet;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.WineryExporter;
@@ -19,20 +20,27 @@ import org.slf4j.LoggerFactory;
 public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<PuppetInstancePluginLifecycle> {
 
     private final static Logger logger = LoggerFactory.getLogger(PuppetInstancePluginLifecycle.class);
+    private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
 
     // puppet master info
-    private String user = "";
-    private String ip = "";
-    private String privateKeyLocation = "";
-    private Integer port = 22;
-    private String operatingSystem = "";
-    private String operatingSystemRelease = "";
+    private final String user;
+    private final String ip;
+    private final String privateKeyLocation;
+    private final Integer port;
+    private final String operatingSystem;
+    private final String operatingSystemRelease;
 
     private Master master;
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
 
-    PuppetInstancePluginLifecycle(InstanceTransformationContext context) {
+    public PuppetInstancePluginLifecycle(InstanceTransformationContext context, String user, String ip, String privateKeyLocation, Integer port, String operatingSystem, String operatingSystemRelease) {
         super(context);
+        this.user = user;
+        this.ip = ip;
+        this.privateKeyLocation = privateKeyLocation;
+        this.port = port;
+        this.operatingSystem = operatingSystem;
+        this.operatingSystemRelease = operatingSystemRelease;
     }
 
     @Override
@@ -64,14 +72,14 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     public void transformToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
+        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
-        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getOutputPath());
         logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 
