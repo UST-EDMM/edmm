@@ -11,7 +11,12 @@ import io.github.edmm.exporter.WineryExporter;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin<EDMMiPluginLifecycle> {
+
+    private static final Logger logger = LoggerFactory.getLogger(EDMMiPluginLifecycle.class);
 
     private static final String directorySuffix = "/";
     private DeploymentInstance deploymentInstance = new DeploymentInstance();
@@ -39,14 +44,14 @@ public class EDMMiPluginLifecycle extends AbstractLifecycleInstancePlugin<EDMMiP
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
         WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
-        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.getCsarId());
+        logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
         EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getPath()).getParent() + directorySuffix);
-        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
+        logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

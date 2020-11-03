@@ -26,17 +26,16 @@ public interface TOSCATypeMapper {
             case "docker":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "DockerEngine");
             case "tomcat8":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Tomcat8");
             case "tomcat":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Tomcat8");
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Tomcat_8-w1");
             case "mongodb":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "MongoDB-Server_3.2");
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "MongoDB-Server_3.2-w1");
             case "java":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Java8");
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "Java_8-w1");
             case "JavaApp":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "SpringWebApp_w1");
             case "OpenStackCompute":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_Train-w1");
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_15-Train-w1");
             case "nginx":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "NGINX_latest-w1");
             default:

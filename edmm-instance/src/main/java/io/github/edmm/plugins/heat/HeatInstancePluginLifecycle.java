@@ -23,8 +23,12 @@ import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
 import org.openstack4j.model.heat.Stack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin<HeatInstancePluginLifecycle> {
+
+    private static final Logger logger = LoggerFactory.getLogger(HeatInstancePluginLifecycle.class);
 
     private static String userName = "";
     private static String password = "";
@@ -83,14 +87,14 @@ public class HeatInstancePluginLifecycle extends AbstractLifecycleInstancePlugin
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
         WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getPath() + deploymentInstance.getName() + ".csar");
-        System.out.println("Transformed to OpenTOSCA Service Template Instance: " + serviceTemplateInstance.getCsarId());
+        logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
         EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, context.getPath());
-        System.out.println("Saved YAML for EDMMi to " + EDMMiYamlTransformer.getFileOutputLocation());
+        logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override
