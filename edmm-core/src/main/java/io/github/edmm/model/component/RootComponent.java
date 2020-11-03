@@ -1,6 +1,7 @@
 package io.github.edmm.model.component;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +20,6 @@ import io.github.edmm.model.support.TypeWrapper;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.VisitableComponent;
 
-import com.google.common.collect.Lists;
 import lombok.ToString;
 
 @ToString
@@ -28,7 +28,7 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static final Attribute<RootRelation> RELATIONS = new Attribute<>("relations", RootRelation.class);
 
-    private final List<RootRelation> relationCache = new ArrayList<>();
+    private final List<RootRelation> relationCache = new LinkedList<>();
 
     public RootComponent(MappingEntity mappingEntity) {
         super(mappingEntity);
@@ -49,7 +49,7 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
             List<RootRelation> result = new ArrayList<>();
             Optional<Entity> artifactsEntity = getEntity().getChild(RELATIONS);
             artifactsEntity.ifPresent(value -> populateRelations(result, value));
-            relationCache.addAll(Lists.reverse(result));
+            relationCache.addAll(result);
         }
         return relationCache;
     }
@@ -115,6 +115,6 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
     public boolean equals(Object c) {
         if (this == c) return true;
         if (c == null || getClass() != c.getClass()) return false;
-        return this.entity.equals( ((RootComponent) c).entity);
+        return this.entity.equals(((RootComponent) c).entity);
     }
 }

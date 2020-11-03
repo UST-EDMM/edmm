@@ -2,13 +2,14 @@ package io.github.edmm.model;
 
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.SoftwareComponent;
 import io.github.edmm.model.relation.DependsOn;
-import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -74,13 +75,19 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/operations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         Compute ubuntu = (Compute) model.getComponent("ubuntu").orElseThrow(IllegalStateException::new);
-        assertEquals(3, ubuntu.getArtifacts().size());
-        assertEquals("test", ubuntu.getArtifacts().get(0).getName());
-        assertEquals("test.sh", ubuntu.getArtifacts().get(0).getValue());
-        assertEquals("iso", ubuntu.getArtifacts().get(1).getName());
-        assertEquals("ubuntu.iso", ubuntu.getArtifacts().get(1).getValue());
-        assertEquals("war", ubuntu.getArtifacts().get(2).getName());
-        assertEquals("app.war", ubuntu.getArtifacts().get(2).getValue());
+
+        List<Artifact> artifacts = ubuntu.getArtifacts();
+        assertEquals(3, artifacts.size());
+
+        assertTrue(artifacts.removeIf(artifact ->
+            artifact.getName().equals("test") && artifact.getValue().equals("test.sh")
+        ));
+        assertTrue(artifacts.removeIf(artifact ->
+            artifact.getName().equals("iso") && artifact.getValue().equals("ubuntu.iso")
+        ));
+        assertTrue(artifacts.removeIf(artifact ->
+            artifact.getName().equals("war") && artifact.getValue().equals("app.war")
+        ));
     }
 
     @Test
@@ -88,11 +95,14 @@ public class DeploymentModelTest {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/relations.yml");
         DeploymentModel model = DeploymentModel.of(resource.getFile());
         SoftwareComponent tomcat = (SoftwareComponent) model.getComponent("tomcat").orElseThrow(IllegalStateException::new);
+
+        List<RootRelation> relations = tomcat.getRelations();
         assertEquals(3, tomcat.getRelations().size());
-        assertEquals("depends_on", tomcat.getRelations().get(0).getName());
-        assertEquals("depends_on", tomcat.getRelations().get(1).getName());
-        assertEquals("hosted_on", tomcat.getRelations().get(2).getName());
-        RootRelation relation = tomcat.getRelations().get(1);
+        assertTrue(relations.removeIf(artifact -> artifact.getName().equals("depends_on")));
+        assertTrue(relations.removeIf(artifact -> artifact.getName().equals("hosted_on")));
+        assertEquals(0, relations.size());
+
+        RootRelation relation = tomcat.getRelations().get(2);
         assertTrue(relation instanceof DependsOn);
         assertEquals("db", relation.getTarget());
         assertEquals(0, relation.getProperties().size());
