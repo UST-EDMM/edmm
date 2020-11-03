@@ -14,6 +14,7 @@ import javax.xml.namespace.QName;
 import io.github.edmm.exporter.dto.EnrichmentDTO;
 import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
+import io.github.edmm.exporter.dto.TagDTO;
 import io.github.edmm.exporter.dto.TopologyTemplateDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
@@ -40,9 +41,9 @@ public abstract class WineryExporter {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WineryExporter.class.getName());
 
-    // TODO: retrieve such info from a config or sth like that
+    // TODO: retrieve such info from\overline{} a config or sth like that
     private static final String wineryEndpoint = "http://localhost:8080/winery/";
-    private static final String containerEndpoint = "http://localhost:1337/csars/";
+    private static final String containerEndpoint = "http://192.168.2.108:1337/csars/";
     private static final String serviceTemplatesPath = "servicetemplates";
     private static final String topologyTemplatePath = "topologytemplate";
     private static final String availableFeaturesPath = "availablefeatures";
@@ -91,7 +92,7 @@ public abstract class WineryExporter {
         try {
             performPostRequest(
                 wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "tags",
-                deploymentTechnology
+                new TagDTO("deploymentTechnology", deploymentTechnology)
             );
         } catch (IOException e) {
             LOGGER.error("Failed to set Tag for Service Template in Winery.", e);
@@ -100,8 +101,8 @@ public abstract class WineryExporter {
 
     private static List<EnrichmentDTO> getAvailableFeatures(QName serviceTemplateId) {
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath);
         try {
+            HttpGet get = new HttpGet(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath);
             get.setHeader("accept", "application/json");
             HttpResponse response = httpClient.execute(get);
             return getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
@@ -161,8 +162,11 @@ public abstract class WineryExporter {
         try {
             performPostRequest(
                 containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/"
-                    + serviceTemplatesPath + doubleEncodeNamespaceForInstance(serviceTemplateId)
-                    + "buildplans/" + csarId.replace(".", "_") + "_buildPlan/instances",
+                    + serviceTemplatesPath
+                    + "/" + serviceTemplateId.getLocalPart() + "/"
+                    + "buildplans/"
+                    + serviceTemplateId.getLocalPart().replace(".", "_")
+                    + "_buildPlan/instances",
                 generateInstancePayload()
             );
         } catch (IOException e) {
@@ -219,13 +223,7 @@ public abstract class WineryExporter {
         return gson.fromJson(jsonString, List.class);
     }
 
-    private static String doubleEncodeNamespace(QName serviceTemplateId) {
-        return "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI())) + "/" + serviceTemplateId.getLocalPart() + "/";
-    }
-
-    private static String doubleEncodeNamespaceForInstance(QName serviceTemplateId) {
-        String encodedString = "/" + URLEncoder.encode(URLEncoder.encode("{" + serviceTemplateId.getNamespaceURI() + "}")) + serviceTemplateId.getLocalPart() + "/";
-        encodedString = encodedString.replace("%253A", ":");
-        return encodedString;
+    private static String doubleEncodeNamespace(QName serviceTemplateId) throws UnsupportedEncodingException {
+        return "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI(), "UTF-8"), "UTF-8") + "/" + serviceTemplateId.getLocalPart() + "/";
     }
 }
