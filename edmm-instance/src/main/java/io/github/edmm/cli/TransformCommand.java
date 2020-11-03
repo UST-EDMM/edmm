@@ -11,7 +11,6 @@ import picocli.CommandLine;
 public abstract class TransformCommand implements Runnable {
 
     protected String outputPath;
-//    protected String applicationId;
     protected InstanceTransformationService instanceTransformationService;
 
     @CommandLine.Spec
@@ -27,15 +26,6 @@ public abstract class TransformCommand implements Runnable {
         }
         this.outputPath = path;
     }
-
-//    @CommandLine.Option(names = {"-a", "--applicationId"}, description = "The identifier of the application to be transformed and enriched")
-//    public void setApplicationId(String applicationId) {
-//        if (applicationId == null) {
-//            String message = "Please specify an identifier for the application to be transformed.";
-//            throw new CommandLine.ParameterException(spec.commandLine(), message);
-//        }
-//        this.applicationId = applicationId;
-//    }
 
     @Autowired
     public void setInstanceTransformationService(InstanceTransformationService instanceTransformationService) {

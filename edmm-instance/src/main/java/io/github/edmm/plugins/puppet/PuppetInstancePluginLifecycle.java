@@ -30,8 +30,8 @@ public class PuppetInstancePluginLifecycle extends AbstractLifecycleInstancePlug
     private final String operatingSystem;
     private final String operatingSystemRelease;
 
+    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
     private Master master;
-    private DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     public PuppetInstancePluginLifecycle(InstanceTransformationContext context, String user, String ip, String privateKeyLocation, Integer port, String operatingSystem, String operatingSystemRelease) {
         super(context);
