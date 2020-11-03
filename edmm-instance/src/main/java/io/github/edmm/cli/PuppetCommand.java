@@ -3,7 +3,7 @@ package io.github.edmm.cli;
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
-import io.github.edmm.plugins.puppet.PuppetInstancePluginLifecycle;
+import io.github.edmm.plugins.puppet.PuppetInstancePlugin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import picocli.CommandLine;
 
 @Component
 @CommandLine.Command(
-    name = "transform_puppet",
+    name = "puppet",
     descriptionHeading = "%n",
     description = "Starts a transformation from Puppet to OpenTOSCA.",
     customSynopsis = "@|bold edmmi transform_puppet|@ @|yellow <path to edmmi yaml file>|@"
@@ -38,8 +38,8 @@ public class PuppetCommand extends TransformCommand {
     @Override
     public void run() {
         InstanceTransformationContext context = new InstanceTransformationContext(PUPPET, outputPath);
-        PuppetInstancePluginLifecycle pluginLifecycle = new PuppetInstancePluginLifecycle(context, user, ip, privateKeyLocation, port, operatingSystem, operatingSystemRelease);
-        InstancePlugin<PuppetInstancePluginLifecycle> plugin = new InstancePlugin<>(PUPPET, pluginLifecycle);
+        PuppetInstancePlugin pluginLifecycle = new PuppetInstancePlugin(context, user, ip, privateKeyLocation, port, operatingSystem, operatingSystemRelease);
+        InstancePlugin<PuppetInstancePlugin> plugin = new InstancePlugin<>(PUPPET, pluginLifecycle);
         try {
             plugin.execute();
         } catch (Exception e) {

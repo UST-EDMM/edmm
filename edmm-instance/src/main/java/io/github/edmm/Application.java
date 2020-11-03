@@ -1,5 +1,8 @@
 package io.github.edmm;
 
+import io.github.edmm.cli.CfnCommand;
+import io.github.edmm.cli.HeatCommand;
+import io.github.edmm.cli.KubernetesCommand;
 import io.github.edmm.cli.ParseCommand;
 import io.github.edmm.cli.PuppetCommand;
 
@@ -22,8 +25,11 @@ import static picocli.CommandLine.usage;
     },
     subcommands = {
         CommandLine.HelpCommand.class,
+        CfnCommand.class,
+        HeatCommand.class,
+        KubernetesCommand.class,
+        ParseCommand.class,
         PuppetCommand.class,
-        ParseCommand.class
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
@@ -51,7 +57,6 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
     @Override
     public void run(String... args) {
         exitCode = new CommandLine(this, factory).execute(args);
-//        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "./", ".");
     }
 
     @Override
