@@ -6,10 +6,10 @@ import io.github.edmm.core.plugin.ApiInteractor;
 import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.Node;
 
-public class ApiInteractorImpl implements ApiInteractor {
+public class PuppetApiInteractor implements ApiInteractor {
     private Master master;
 
-    public ApiInteractorImpl(Master master) {
+    public PuppetApiInteractor(Master master) {
         this.master = master;
     }
 

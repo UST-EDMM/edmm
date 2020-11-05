@@ -7,7 +7,9 @@ public interface InstancePluginLifecycle {
 
     void transformToEDMMi();
 
-    void transformToTOSCA();
+    void transformEdmmiToTOSCA();
+
+    void transformDirectlyToTOSCA();
 
     void createYAML();
 

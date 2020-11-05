@@ -97,7 +97,7 @@ public class PuppetNodeHandler {
         Fact operatingSystemReleaseFact = facts.stream().filter(fact -> fact.getName().equals(FactType.OperatingSystemRelease.toString().toLowerCase())).findFirst().orElse(null);
 
         return operatingSystemFact != null && operatingSystemReleaseFact != null
-            ? operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue()
+            ? operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue().toString()
             : "";
     }
 

@@ -2,6 +2,7 @@ package io.github.edmm.plugins.puppet.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.FactType;
@@ -24,11 +25,15 @@ public class NodesHandler {
     }
 
     private void setNodes() {
-        this.master.setNodes(this.buildNodesFromString(this.master.executeCommandAndHandleResult(Commands.GET_NODES)));
+        List<Node> nodes = this.buildNodesFromString(this.master.executeCommandAndHandleResult(Commands.GET_NODES))
+            .stream()
+            .filter(node -> !node.getCertname().equals(this.master.getHostName()))
+            .collect(Collectors.toList());
+        this.master.setNodes(nodes);
     }
 
     private void setNodeFacts() {
-        this.master.getNodes().forEach(node -> node.setFacts(this.getFactsForNodeByCertName(node.getCertname())));
+        this.master.getNodes().forEach(node -> node.setFacts(this.getAllFactsForNode(node.getCertname())));
     }
 
     private List<Fact> getFactsForNodeByCertName(String certName) {
@@ -41,6 +46,11 @@ public class NodesHandler {
         facts.add(new Fact(certName, Constants.VM_PUBLIC_KEY, this.master.getGeneratedPublicKey()));
 
         return facts;
+    }
+
+    private List<Fact> getAllFactsForNode(String certName) {
+        String s = this.master.executeCommandAndHandleResult(Commands.factQuery(certName));
+        return GsonHelper.parseJsonStringToParameterizedList(s, Fact.class);
     }
 
     private Fact getFact(String certName, FactType factType) {

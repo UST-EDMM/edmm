@@ -7,7 +7,7 @@ import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.yaml.EDMMiYamlParser;
 import io.github.edmm.core.yaml.EDMMiYamlTransformer;
-import io.github.edmm.exporter.WineryExporter;
+import io.github.edmm.exporter.OpenTOSCAConnector;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
@@ -40,11 +40,16 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     }
 
     @Override
-    public void transformToTOSCA() {
+    public void transformEdmmiToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        WineryExporter.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
+    }
+
+    @Override
+    public void transformDirectlyToTOSCA() {
+        this.transformEdmmiToTOSCA();
     }
 
     @Override

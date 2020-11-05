@@ -26,19 +26,19 @@ abstract class Commands {
     static final String GET_HYPERVISOR = "sudo dmidecode | grep -i -e product";
 
     private static String getIPAddressFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.IPAddress).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.IPAddress).toLowerCase();
     }
 
     private static String getOperatingSystemFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.OperatingSystem).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.OperatingSystem).toLowerCase();
     }
 
     private static String getOperatingSystemReleaseFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.OperatingSystemRelease).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.OperatingSystemRelease).toLowerCase();
     }
 
-    private static String buildNodeFactQuery(String certName) {
-        return GET_NODES + "/" + certName + "/facts/";
+    public static String factQuery(String certName) {
+        return GET_NODES + "/" + certName + "/facts";
     }
 
     static String generateSSHKeyPairWithCertName(String certName) {
