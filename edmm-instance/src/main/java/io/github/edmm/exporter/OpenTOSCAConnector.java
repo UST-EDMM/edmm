@@ -20,6 +20,8 @@ import io.github.edmm.exporter.dto.TypesDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.puppet.util.GsonHelper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
@@ -68,7 +70,7 @@ public abstract class OpenTOSCAConnector {
 
     public static TNodeType getNodeType(QName qName) {
         try {
-            return performGet(wineryEndpoint + "nodeyptes" + doubleEncodeNamespace(qName), TNodeType.class);
+            return performGet(wineryEndpoint + "nodetypes" + doubleEncodeNamespace(qName), TNodeType.class);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Error while encoding namespace.", e);
         }
@@ -235,14 +237,21 @@ public abstract class OpenTOSCAConnector {
     }
 
     private static <T> List<T> performGetList(String url, Class<T> clazz) {
-        return GsonHelper.parseJsonStringToParameterizedList(performGetList(url), clazz);
+        return GsonHelper.parseJsonStringToParameterizedList(performGet(url), clazz);
     }
 
     private static <T> T performGet(String url, Class<T> clazz) {
-        return GsonHelper.parseJsonStringToObjectType(performGetList(url), clazz);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(performGet(url), clazz);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+return null;
+//        return GsonHelper.parseJsonStringToObjectType(performGetList(url), clazz);
     }
 
-    private static String performGetList(String url) {
+    private static String performGet(String url) {
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet get = new HttpGet(url);

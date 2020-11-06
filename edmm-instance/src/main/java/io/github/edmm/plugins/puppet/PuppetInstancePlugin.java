@@ -1,5 +1,7 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.LinkedHashMap;
+
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -14,7 +16,9 @@ import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.PuppetState;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
+import io.github.edmm.util.Constants;
 
+import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
@@ -85,8 +89,20 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             Fact nodeOSRelease = node.getFactByName("operatingsystemrelease");
 
             TNodeType nodeType = toscaTransformer.getNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
-
             TNodeTemplate nodeTemplate = ModelUtilities.instantiateNodeTemplate(nodeType);
+
+            TEntityTemplate.Properties properties = nodeTemplate.getProperties();
+            if (properties != null && properties.getKVProperties() != null) {
+                LinkedHashMap<String, String> kvProperties = properties.getKVProperties();
+                kvProperties.put(Constants.VMIP, node.getFactByName("ipaddress").getValue().toString());
+                kvProperties.put(Constants.VM_INSTANCE_ID, node.getCertname());
+                kvProperties.put(Constants.VM_PRIVATE_KEY, this.master.getGeneratedPrivateKey());
+                kvProperties.put(Constants.VM_PUBLIC_KEY, this.master.getGeneratedPublicKey());
+                kvProperties.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
+                properties.setKVProperties(kvProperties);
+            }
+
+            topologyTemplate.addNodeTemplate(nodeTemplate);
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
             .addTags(new TTags.Builder()

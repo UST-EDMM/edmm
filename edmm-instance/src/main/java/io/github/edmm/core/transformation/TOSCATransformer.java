@@ -6,8 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
-import io.github.edmm.exporter.OpenTOSCAConnector;
-import io.github.edmm.exporter.dto.TypesDTO;
+import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.NodeTemplateInstance;
@@ -28,20 +27,11 @@ public class TOSCATransformer {
 
     private final List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
     private final List<RelationshipTemplateInstance> relationshipTemplateInstances = new ArrayList<>();
-    private final List<TypesDTO> allNodeTypes;
+    private final WineryConnector wineryConnector;
     private DeploymentInstance deploymentInstance;
 
     public TOSCATransformer() {
-        this.allNodeTypes = OpenTOSCAConnector.getAllNodeTypes();
-        this.allNodeTypes.forEach(typesDTO -> {
-            typesDTO.setVersion(VersionUtils.getVersion(typesDTO.getId()));
-            typesDTO.setNormalizedName(
-                VersionUtils.getNameWithoutVersion(typesDTO.getId())
-                    .toLowerCase()
-                    .replaceAll("\\s|-|_|\\.", "")
-            );
-            typesDTO.setXmlQName(QName.valueOf(typesDTO.getQName()));
-        });
+        this.wineryConnector = new WineryConnector();
     }
 
     public ServiceTemplateInstance transformEDiMMToServiceTemplateInstance(DeploymentInstance deploymentInstance) {
@@ -86,44 +76,54 @@ public class TOSCATransformer {
     }
 
     public TNodeType getNodeType(String name, String version) {
-        QName nodeTypeQName = getNodeTypeQName(name, version);
-        return OpenTOSCAConnector.getNodeType(nodeTypeQName);
+        return wineryConnector.getNodeType(identifyNodeTypeByNameAndVersion(name, version));
     }
 
-    public QName getNodeTypeQName(String name, String version) {
-        List<TypesDTO> types = this.allNodeTypes.stream()
-            .filter(nodeType -> nodeType.getNormalizedName().startsWith(
-                name.toLowerCase()
-                    .replaceAll("\\s|-|_|\\.", "")
-            ))
+    private QName identifyNodeTypeByNameAndVersion(String name, String version) {
+        String normalizeName = normalizeName(name);
+        List<QName> candidates = this.wineryConnector.getBaseNodeTypesQNames().stream()
+            .filter(qName ->
+                normalizeName(VersionUtils.getNameWithoutVersion(qName.getLocalPart())).startsWith(normalizeName)
+            )
             .peek(nodeType -> logger.info("Found matching NodeType {} for component {}", nodeType, name))
             .collect(Collectors.toList());
 
-        if (types.size() > 0) {
-            List<TypesDTO> filtered = types.stream()
-                .filter(nodeType -> nodeType.getVersion().getComponentVersion().toLowerCase().equals(version.toLowerCase()))
-                .peek(nodeType -> logger.info("Found matching NodeType after filtering for version {} for component {}", nodeType.getQName(), name))
+        if (candidates.size() > 1) {
+            List<QName> filteredCandidates = candidates.stream()
+                .filter(qName -> VersionUtils.getVersion(qName.getLocalPart()).getComponentVersion().toLowerCase()
+                    .startsWith(version.toLowerCase()))
+                .peek(qName -> logger.info("Found matching NodeType after filtering for version {} for component {}", qName, name))
                 .collect(Collectors.toList());
 
-            if (filtered.size() > 0) {
-                types = filtered;
+            if (filteredCandidates.size() > 0) {
+                candidates = filteredCandidates;
             }
         }
 
-        if (types.size() > 1) {
-            List<TypesDTO> filtered = types.stream()
-                .filter(nodeType -> nodeType.getNamespace().startsWith(OPENTOSCA_BASE))
-                .peek(nodeType -> logger.info("Found matching NodeType after filtering for OT namesapce {} for component {}", nodeType.getQName(), name))
+        if (candidates.size() > 1) {
+            List<QName> filteredCandidates = candidates.stream()
+                .filter(qName -> qName.getNamespaceURI().startsWith(OPENTOSCA_BASE))
+                .peek(qName -> logger.info("Found matching NodeType after filtering for OT namesapce {} for component {}", qName, name))
                 .collect(Collectors.toList());
-            if (filtered.size() > 0) {
-                types = filtered;
+
+            if (filteredCandidates.size() > 0) {
+                candidates = filteredCandidates;
             }
         }
 
-        if (types.size() > 0) {
-            return types.get(0).getXmlQName();
+        if (candidates.size() > 0) {
+            logger.info("Identified NodeType {}", candidates.get(0));
+            return candidates.get(0);
         }
 
-        return QName.valueOf("{" + OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE + "}SoftwareComponent");
+        QName softwareComponent = QName.valueOf("{" + OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE + "}SoftwareComponent");
+        logger.info("Fallback to the generic SoftwareComponent NodeType {}", softwareComponent);
+
+        return softwareComponent;
+    }
+
+    private String normalizeName(String name) {
+        return name.toLowerCase()
+            .replaceAll("\\s|-|_|\\.", "");
     }
 }

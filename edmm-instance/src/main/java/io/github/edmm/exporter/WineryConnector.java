@@ -1,0 +1,46 @@
+package io.github.edmm.exporter;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.xml.namespace.QName;
+
+import org.eclipse.winery.common.ids.definitions.NodeTypeId;
+import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.repository.backend.IRepository;
+import org.eclipse.winery.repository.backend.RepositoryFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class WineryConnector {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WineryConnector.class);
+
+    private final IRepository repository;
+    private Map<QName, TNodeType> nodeTypes;
+
+    public WineryConnector() {
+        repository = RepositoryFactory.getRepository();
+    }
+
+    public TNodeType getNodeType(QName qName) {
+        return repository.getElement(new NodeTypeId(qName));
+    }
+
+    public List<QName> getBaseNodeTypesQNames() {
+        getNodeTypes();
+        return this.nodeTypes.entrySet().stream()
+            .filter(entry -> entry.getValue().getTags() == null
+                || entry.getValue().getTags().getTag().stream().anyMatch(tag -> "feature".equals(tag.getName())))
+            .filter(entry -> !repository.getNamespaceManager().isGeneratedNamespace(entry.getKey().getNamespaceURI()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+    private void getNodeTypes() {
+        if (this.nodeTypes == null) {
+            this.nodeTypes = repository.getQNameToElementMapping(NodeTypeId.class);
+        }
+    }
+}

@@ -186,6 +186,11 @@
             <artifactId>org.eclipse.winery.common</artifactId>
             <version>854673caed</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.opentosca.winery</groupId>
+            <artifactId>org.eclipse.winery.repository</artifactId>
+            <version>854673caed</version>
+        </dependency>
     </dependencies>
 
 </project>
