@@ -1,5 +1,6 @@
 package io.github.edmm.core.transformation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,8 @@ import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import org.eclipse.winery.common.version.VersionUtils;
 import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TRelationshipType;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,11 +78,48 @@ public class TOSCATransformer {
         return componentInstance.getRelationInstances() != null && !componentInstance.getRelationInstances().isEmpty();
     }
 
-    public TNodeType getNodeType(String name, String version) {
-        return wineryConnector.getNodeType(identifyNodeTypeByNameAndVersion(name, version));
+    public TNodeType getSoftwareNodeType(String name, String version) {
+        return wineryConnector.getNodeType(identifySoftwareNodeTypeByNameAndVersion(name, version));
     }
 
-    private QName identifyNodeTypeByNameAndVersion(String name, String version) {
+    public TRelationshipType getRelationshipType(QName qName) {
+        return wineryConnector.getRelationshipType(qName);
+    }
+
+    public TNodeType getComputeNodeType(String name, String version) {
+        return wineryConnector.getNodeType(identifyComputeNodeType(name, version));
+    }
+
+    private QName identifyComputeNodeType(String name, String version) {
+        String normalizedName = normalizeName(name);
+        QName qName;
+
+        if (normalizedName.contains("OpenStack".toLowerCase())) {
+            normalizedName = normalizedName.replace("compute", "");
+        }
+
+        qName = identifyType(normalizedName, version);
+
+        if (qName == null) {
+            qName = QName.valueOf("{" + OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE + "}Compute");
+            logger.info("Fallback to the generic Compute NodeType {}", qName);
+        }
+
+        return qName;
+    }
+
+    private QName identifySoftwareNodeTypeByNameAndVersion(String name, String version) {
+        QName softwareComponent = identifyType(name, version);
+
+        if (softwareComponent == null) {
+            softwareComponent = QName.valueOf("{" + OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE + "}SoftwareComponent");
+            logger.info("Fallback to the generic SoftwareComponent NodeType {}", softwareComponent);
+        }
+
+        return softwareComponent;
+    }
+
+    private QName identifyType(String name, String version) {
         String normalizeName = normalizeName(name);
         List<QName> candidates = this.wineryConnector.getBaseNodeTypesQNames().stream()
             .filter(qName ->
@@ -116,14 +156,19 @@ public class TOSCATransformer {
             return candidates.get(0);
         }
 
-        QName softwareComponent = QName.valueOf("{" + OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE + "}SoftwareComponent");
-        logger.info("Fallback to the generic SoftwareComponent NodeType {}", softwareComponent);
-
-        return softwareComponent;
+        return null;
     }
 
     private String normalizeName(String name) {
         return name.toLowerCase()
             .replaceAll("\\s|-|_|\\.", "");
+    }
+
+    public void save(TServiceTemplate serviceTemplate) {
+        try {
+            wineryConnector.save(serviceTemplate);
+        } catch (IOException e) {
+            logger.error("Error while persisting Service Template", e);
+        }
     }
 }

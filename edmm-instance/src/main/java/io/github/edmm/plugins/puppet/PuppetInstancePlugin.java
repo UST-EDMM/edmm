@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.puppet;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -21,9 +22,11 @@ import io.github.edmm.util.Constants;
 import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TRelationshipType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTags;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
+import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,14 +87,17 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     @Override
     public void transformDirectlyToTOSCA() {
         TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+
+        TRelationshipType hostedOn = toscaTransformer.getRelationshipType(ToscaBaseTypes.hostedOnRelationshipType);
+
         master.getNodes().forEach(node -> {
-            Fact nodeOS = node.getFactByName("operatingsystem");
-            Fact nodeOSRelease = node.getFactByName("operatingsystemrelease");
+            Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
+            Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
 
-            TNodeType nodeType = toscaTransformer.getNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
-            TNodeTemplate nodeTemplate = ModelUtilities.instantiateNodeTemplate(nodeType);
+            TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
+            TNodeTemplate vm = ModelUtilities.instantiateNodeTemplate(vmType);
 
-            TEntityTemplate.Properties properties = nodeTemplate.getProperties();
+            TEntityTemplate.Properties properties = vm.getProperties();
             if (properties != null && properties.getKVProperties() != null) {
                 LinkedHashMap<String, String> kvProperties = properties.getKVProperties();
                 kvProperties.put(Constants.VMIP, node.getFactByName("ipaddress").getValue().toString());
@@ -99,16 +105,40 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 kvProperties.put(Constants.VM_PRIVATE_KEY, this.master.getGeneratedPrivateKey());
                 kvProperties.put(Constants.VM_PUBLIC_KEY, this.master.getGeneratedPublicKey());
                 kvProperties.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
+                kvProperties.put(Constants.STATE, Constants.RUNNING);
+
+                Fact ec2_metadata = node.getFactByName("ec2_metadata");
+                if (ec2_metadata != null) {
+                    Map<String, Object> values = (Map<String, Object>) ec2_metadata.getValue();
+                    if (values.get("instance-type") != null) {
+                        kvProperties.put(Constants.VMTYPE, values.get("instance-type").toString());
+                    }
+                }
+
                 properties.setKVProperties(kvProperties);
             }
 
-            topologyTemplate.addNodeTemplate(nodeTemplate);
+            topologyTemplate.addNodeTemplate(vm);
+
+            if (node.getFactByName("productName".toLowerCase()) != null) {
+                Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
+                TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(), "");
+                TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
+
+                topologyTemplate.addNodeTemplate(hypervisor);
+                topologyTemplate.addRelationshipTemplate(
+                    ModelUtilities.instantiateRelationshipTemplate(hostedOn, vm, hypervisor)
+                );
+            }
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
+            .setTargetNamespace("http://opentosca.org/retrieved/instances")
             .addTags(new TTags.Builder()
                 .addTag("deploymentTechnology", PUPPET.getName())
                 .build()
             ).build();
+
+        toscaTransformer.save(serviceTemplate);
     }
 
     @Override
