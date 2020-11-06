@@ -11,12 +11,14 @@ import io.github.edmm.model.Metadata;
 import io.github.edmm.util.CastUtil;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class ComponentInstance extends BasicInstance {
     private String name;
     private String createdAt;
@@ -24,6 +26,10 @@ public class ComponentInstance extends BasicInstance {
     private ComponentType type;
     private List<Artifact> artifacts;
     private List<RelationInstance> relationInstances;
+
+    public ComponentInstance(String id) {
+        this.setId(id);
+    }
 
     public static ComponentInstance ofYamlContent(Map<String, Object> yamlContent) {
         ComponentInstance componentInstance = new ComponentInstance();

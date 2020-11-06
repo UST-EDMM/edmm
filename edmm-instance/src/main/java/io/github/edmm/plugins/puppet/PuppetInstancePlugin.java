@@ -1,7 +1,9 @@
 package io.github.edmm.plugins.puppet;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -16,6 +18,7 @@ import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.PuppetState;
+import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.Constants;
 
@@ -130,6 +133,13 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     ModelUtilities.instantiateRelationshipTemplate(hostedOn, vm, hypervisor)
                 );
             }
+
+            List<List<ResourceEventEntry>> test = PuppetNodeHandler.identifyRelevantReports(this.master, node.getCertname());
+            test.forEach(entry -> {
+                if (!(entry.size() == 1 && entry.get(0).getStatus().equals("failure"))) {
+                    String componentName = this.identifyComponentName(entry);
+                }
+            });
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
@@ -139,6 +149,28 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             ).build();
 
         toscaTransformer.save(serviceTemplate);
+    }
+
+    private String identifyComponentName(List<ResourceEventEntry> entry) {
+        String componentName = "";
+
+        for (ResourceEventEntry resourceEventEntry : entry) {
+            String local = resourceEventEntry.getResource_title();
+            if (componentName.isEmpty()) {
+                componentName = local;
+            }
+            if (local.length() < componentName.length()
+                && componentName.contains(local)) {
+                componentName = local;
+            }
+        }
+
+        logger.info("identified component name \"{}\" for resources [ {} ]",
+            componentName,
+            entry.stream().map(ResourceEventEntry::getResource_title).collect(Collectors.joining(", "))
+        );
+
+        return componentName;
     }
 
     @Override
