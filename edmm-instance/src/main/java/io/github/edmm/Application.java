@@ -49,8 +49,7 @@ public class Application implements CommandLineRunner, Runnable, ExitCodeGenerat
 
     @Override
     public void run(String... args) {
-        //exitCode = new CommandLine(this, factory).execute(args);
-        exitCode = new CommandLine(this, factory).execute("transform", "puppet", "./", ".");
+        exitCode = new CommandLine(this, factory).execute(args);
     }
 
     @Override
