@@ -284,7 +284,7 @@ Once these variables are set, import this project in IntelliJ as Maven project a
 Depending on the application that is to be transformed and enriched with management functionalities, enter the program arguments.
 For example, to transform the deployment we set up in the first section, enter the program arguments as shown in the picture above, i.e.:
 
-```transform puppet /your/output/directory/ .
+```transform puppet /your/output/directory/ .```
 
 To transform, for example, a Kubernetes deployment, it is required to set the respective variables in *io.github.edmm.plugins.kubernetes.KubernetesInstancePluginLifecycle.java* and change the run configuration by replacing *puppet* with *kubernetes*. 
 Same applies to the usage of the AWS CloudFormation and OpenStack Heat plugins.
@@ -299,7 +299,3 @@ If everything worked, the application that was transformed using the prototype s
 Click on it, to see further details, like the current state.
 If the application was enriched with additional management features, they appear at the bottom of the page, e.g. "test".
 To run the management operations, simply click the "Play" button.
-
-
-
-
