@@ -37,7 +37,7 @@ public abstract class TemplateHelper {
         return cfg;
     }
 
-    public static Configuration forClasspath(Class clazz, String basePath) {
+    public static Configuration forClasspath(Class<?> clazz, String basePath) {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
         cfg.setClassForTemplateLoading(clazz, basePath);
         cfg.setDefaultEncoding("UTF-8");

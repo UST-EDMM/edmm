@@ -6,8 +6,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.TopologyGraphHelper;
@@ -28,10 +31,12 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFESTS_FOLDER;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_EXTENSION;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_MAIN;
+import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULES_FOLDER;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULE_FILES_FOLDER;
-import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULE_MANIFESTS_FOLDER;
+import static io.github.edmm.plugins.puppet.PuppetLifecycle.NODES_FILE;
 
 public class PuppetTransformer {
 
@@ -46,19 +51,24 @@ public class PuppetTransformer {
 
     public void populateManifest() {
         try {
+            LinkedHashMap<String, Object> nodes = new LinkedHashMap<>();
+
             context.getModel().findComponentStacks().forEach(stack -> {
                 try {
-                    // TODO check if compute node is present in the stack
-                    String stackName = stack.vertexSet()
+                    Optional<RootComponent> isComputeInStack = stack.vertexSet()
                         .stream()
                         .filter(v -> v instanceof Compute)
-                        .findFirst()
-                        .get()
-                        .getNormalizedName();
+                        .findFirst();
+
+                    String stackName = isComputeInStack.isPresent()
+                        ? isComputeInStack.get().getNormalizedName()
+                        // generate placeholder node to correctly represent stack in puppet
+                        : UUID.randomUUID().toString();
                     logger.info("Generate a repository structure for application stack '{}'", stackName);
 
                     // Sort the reversed topology topologically to have a global order
                     TopologicalOrderIterator<RootComponent, RootRelation> iterator = new TopologicalOrderIterator<>(stack);
+                    List<String> components = new ArrayList<>();
 
                     while (iterator.hasNext()) {
                         RootComponent component = iterator.next();
@@ -68,12 +78,29 @@ public class PuppetTransformer {
                         } else {
                             logger.info("Generate task modules for component '{}'", component.getName());
                             generateComponentModule(component);
+                            components.add(component.getName());
                         }
                     }
+
+                    nodes.put(stackName, components);
                 } catch (IOException e) {
                     logger.error("Failed to generate stacks: {}", e.getMessage(), e);
                 }
             });
+
+            Map<String, Object> nodsList = new HashMap<>();
+            nodsList.put("nodes", nodes);
+
+            Template siteTemplate = cfg.getTemplate("site_template.pp");
+            context.getFileAccess().append(
+                Paths.get(MANIFESTS_FOLDER, NODES_FILE + MANIFEST_EXTENSION).toString(),
+                TemplateHelper.toString(siteTemplate, nodsList)
+            );
+
+            context.getFileAccess().write(
+                "README.md",
+                TemplateHelper.toString(cfg.getTemplate("readme_template.md"), null)
+            );
         } catch (Exception e) {
             logger.error("Failed to generate Puppet files: {}", e.getMessage(), e);
         }
@@ -102,8 +129,8 @@ public class PuppetTransformer {
     private void generateComponentModule(RootComponent component) throws IOException {
         Template componentTemplate = cfg.getTemplate("component_template.pp");
         Template taskTemplate = cfg.getTemplate("task_template.pp");
-        Path componentManifestsFolder = Paths.get(component.getNormalizedName(), MODULE_MANIFESTS_FOLDER);
-        Path componentFilesFolder = Paths.get(component.getNormalizedName(), MODULE_FILES_FOLDER);
+        Path componentManifestsFolder = Paths.get(MODULES_FOLDER, component.getNormalizedName(), MANIFESTS_FOLDER);
+        Path componentFilesFolder = Paths.get(MODULES_FOLDER, component.getNormalizedName(), MODULE_FILES_FOLDER);
 
         Path componentClassPath = componentManifestsFolder.resolve(MANIFEST_MAIN.concat(MANIFEST_EXTENSION));
 
@@ -121,20 +148,20 @@ public class PuppetTransformer {
                 Map<String, Object> taskData = new HashMap<>();
                 Path taskClassPath = componentManifestsFolder.resolve(o.getNormalizedName().concat(MANIFEST_EXTENSION));
                 taskData.put("component", component.getNormalizedName());
-                Artifact a = o.getArtifacts().get(0);
-                Path p = Paths.get(a.getValue());
+                Artifact artifact = o.getArtifacts().get(0);
+                Path scriptPath = generateUniqueScriptName(component, artifact);
 
                 Task t = Task.builder()
                     .name(o.getNormalizedName())
                     .envVars(envVars)
-                    .scriptFileName(p.getFileName().toString())
+                    .scriptFileName(scriptPath.getFileName().toString())
                     .build();
 
                 tasks.add(t);
                 taskData.put("task", t);
 
                 try {
-                    context.getFileAccess().copy(a.getValue(), componentFilesFolder.resolve(p.getFileName().toString()).toString());
+                    context.getFileAccess().copy(artifact.getValue(), componentFilesFolder.resolve(scriptPath.getFileName().toString()).toString());
                     context.getFileAccess().append(taskClassPath.toString(), TemplateHelper.toString(taskTemplate, taskData));
                 } catch (IOException e) {
                     logger.error("Failed to create modules", e);
@@ -144,5 +171,18 @@ public class PuppetTransformer {
         });
         componentData.put("tasks", tasks);
         context.getFileAccess().append(componentClassPath.toString(), TemplateHelper.toString(componentTemplate, componentData));
+    }
+
+    private Path generateUniqueScriptName(RootComponent component, Artifact artifact) {
+        int indexOfFileType = artifact.getValue().lastIndexOf(".");
+
+        String fileType = "";
+        if (indexOfFileType > 0 && indexOfFileType < artifact.getValue().length() - 2) {
+            fileType = artifact.getValue().substring(indexOfFileType);
+        }
+
+        String uniqueFileName = artifact.getValue().substring(0, indexOfFileType) + "-" + component.getNormalizedName() + fileType;
+
+        return Paths.get(uniqueFileName);
     }
 }

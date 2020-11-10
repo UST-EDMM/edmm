@@ -4,4 +4,7 @@
 !edmm-cli/edmm*
 !edmm-core/src/**/*
 !edmm-web/src/**/*
+!edmm-instance/src/**/*
+!edmm-instance/edmmi*
+!edmm-instance/edmm-instance.xml
 !**/*.xml
