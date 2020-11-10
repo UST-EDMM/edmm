@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.TopologyGraphHelper;
@@ -22,7 +23,9 @@ import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
+import io.github.edmm.plugins.TransformType;
 import io.github.edmm.plugins.puppet.model.Task;
+import io.github.edmm.plugins.puppet.typetransformers.MySQLDBMSonPuppet;
 
 import com.google.common.collect.Lists;
 import freemarker.template.Configuration;
@@ -44,9 +47,20 @@ public class PuppetTransformer {
 
     private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(PuppetPlugin.class, "/plugins/puppet");
+    private final ArrayList<TransformType<String>> typePlugins;
 
     public PuppetTransformer(TransformationContext context) {
         this.context = context;
+
+        this.typePlugins = new ArrayList<>();
+        this.typePlugins.add(new MySQLDBMSonPuppet(context, cfg));
+
+        logger.info(
+            "Registered type plugins [ {} ]",
+            typePlugins.stream()
+                .map(plugin -> plugin.getClass().toString())
+                .collect(Collectors.joining(", "))
+        );
     }
 
     public void populateManifest() {
@@ -76,9 +90,19 @@ public class PuppetTransformer {
                         if (component instanceof Compute) {
                             logger.info("Ignore generating a module for compute component '{}'", component.getName());
                         } else {
-                            logger.info("Generate task modules for component '{}'", component.getName());
-                            generateComponentModule(component);
-                            components.add(component.getName());
+                            Optional<TransformType<String>> firstTypeHandler = this.typePlugins.stream()
+                                .filter(plugin -> plugin.canHandle(component))
+                                .findFirst();
+
+                            if (firstTypeHandler.isPresent()) {
+                                String componentName = firstTypeHandler.get()
+                                    .performTransformation(component);
+                                components.add(componentName);
+                            } else {
+                                logger.info("Generate task modules for component '{}'", component.getName());
+                                generateComponentModule(component);
+                                components.add(component.getName());
+                            }
                         }
                     }
 
