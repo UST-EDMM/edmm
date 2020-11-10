@@ -25,7 +25,6 @@ import io.github.edmm.util.Constants;
 import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
-import org.eclipse.winery.model.tosca.TRelationshipType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTags;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
@@ -91,8 +90,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     public void transformDirectlyToTOSCA() {
         TTopologyTemplate topologyTemplate = new TTopologyTemplate();
 
-        TRelationshipType hostedOn = toscaTransformer.getRelationshipType(ToscaBaseTypes.hostedOnRelationshipType);
-
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -129,15 +126,21 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
 
                 topologyTemplate.addNodeTemplate(hypervisor);
-                topologyTemplate.addRelationshipTemplate(
-                    ModelUtilities.instantiateRelationshipTemplate(hostedOn, vm, hypervisor)
-                );
+                ModelUtilities.createRelationshipTemplateAndAddToTopology(vm, hypervisor,
+                    ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
             }
 
             List<List<ResourceEventEntry>> test = PuppetNodeHandler.identifyRelevantReports(this.master, node.getCertname());
             test.forEach(entry -> {
                 if (!(entry.size() == 1 && entry.get(0).getStatus().equals("failure"))) {
                     String componentName = this.identifyComponentName(entry);
+                    TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(componentName, "");
+
+                    TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
+
+                    topologyTemplate.addNodeTemplate(softwareNode);
+                    ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
+                        ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
                 }
             });
         });

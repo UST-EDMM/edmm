@@ -26,9 +26,25 @@ Following is the /etc/hosts file of the master:
 
 ![/etc/hosts file of the master](./doc/img/hosts_master.png)
 
+```
+# Puppet                                    
+                                            
+127.0.1.1 localhost                                          
+[MASTER_IP] puppet puppet-master.test.com
+```
+
+
 Following is the /etc/hosts file of the agent:
 
 ![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
+
+```
+# Puppet                                    
+                                            
+127.0.1.1 localhost                         
+[AGENT_IP] puppet-agent                 
+[MASTER_IP] puppet puppet-master.test.com
+```
 
 Now, we can start to setup Puppet on the master. To do this, enter following command on the Puppet master:
 
@@ -50,6 +66,14 @@ Puppet is installed now! Now we are going to configure the Puppet master. To do 
  `sudo nano /etc/puppetlabs/puppet/puppet.conf`.
 
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf.png)
+
+```
+[main]
+certname    = puppet-master.test.com
+server      = puppet-master.test.com
+environment = production
+runinterval = 15m
+```
 
 Now, we setup the certificate authority by running:
 
@@ -89,6 +113,11 @@ and edit it such that it looks like this:
 
 ![/etc/puppetlabs/puppet/puppetdb.conf file](./doc/img/puppetdbconf.png)
 
+```
+[main]
+server_urls = https://puppet:8081
+```
+
 Then, enter following command to create the next config file:
 
 ```sudo nano /etc/puppetlabs/puppetdb/conf.d/database.ini```
@@ -97,9 +126,32 @@ and make it look like this:
 
 ![/etc/puppetlabs/puppetdb/conf.d/database.ini file](./doc/img/databaseini.png)
 
-Now, edit the `/etc/puppetlabs/puppet/puppet.conf` file such that it looks like this:
+```
+[database]
+
+# The database address, i.e. //HOST:PORT/DATABASE_NAME
+subname = //localhost:5432/puppetdb
+
+# Connect as a specific user
+username = puppetdb
+
+# Use a specific password
+password = puppetdb
+
+# How often (in minutes) to compact the database
+# gc-interval = 60
+```
+
+Now, edit the `sudo nano /etc/puppetlabs/puppet/puppet.conf` file such that it looks like this:
 
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconffinal.png)
+
+```
+dns_alt_names        = puppet,puppet-master.test.com
+storeconfigs         = true
+storeconfigs_backend = puppetdb
+reports              = store,puppetdb
+```
 
 Further, create a `routes.yaml` file in the same directory (`sudo nano /etc/puppetlabs/puppet/routes.yaml`) with the following content:
 
@@ -137,7 +189,7 @@ And, finally, start the PuppetDB up by firing this command:
 As a last step, we need to restart the Puppet server on the Puppet Master. This can be done for example by following commands:
 
 ```
-sudo kill -HUP `pgrep -f puppet-server
+sudo kill -HUP `pgrep -f puppet-server`
 sudo service puppetserver reload
 ```
 
@@ -169,6 +221,14 @@ To do this, we edit the configuration file by running following command:
 Edit the file such that it looks like this:
 
 ![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf_agent.png)
+
+```
+[main]
+certname    = puppet-agent
+server      = puppet-master.test.com
+environment = production
+runinterval = 15m
+```
 
 Now it's time to start the Puppet Agent service by running this command:
 
