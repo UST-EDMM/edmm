@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class PuppetLifecycle extends AbstractLifecycle {
 
+    public static final String NODES_FILE = "site";
     public static final String MODULE_FILES_FOLDER = "files";
     public static final String MODULE_MANIFESTS_FOLDER = "manifests";
     public static final String MANIFEST_MAIN = "init";
