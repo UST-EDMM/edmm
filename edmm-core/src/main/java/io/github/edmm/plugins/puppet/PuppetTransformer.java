@@ -30,10 +30,11 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFESTS_FOLDER;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_EXTENSION;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MANIFEST_MAIN;
+import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULES_FOLDER;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULE_FILES_FOLDER;
-import static io.github.edmm.plugins.puppet.PuppetLifecycle.MODULE_MANIFESTS_FOLDER;
 import static io.github.edmm.plugins.puppet.PuppetLifecycle.NODES_FILE;
 
 public class PuppetTransformer {
@@ -61,7 +62,7 @@ public class PuppetTransformer {
                     String stackName = isComputeInStack.isPresent()
                         ? isComputeInStack.get().getNormalizedName()
                         // generate placeholder node to correctly represent stack in puppet
-                        : UUID.randomUUID().toString() ;
+                        : UUID.randomUUID().toString();
                     logger.info("Generate a repository structure for application stack '{}'", stackName);
 
                     // Sort the reversed topology topologically to have a global order
@@ -90,7 +91,15 @@ public class PuppetTransformer {
             nodsList.put("nodes", nodes);
 
             Template siteTemplate = cfg.getTemplate("site_template.pp");
-            context.getFileAccess().append(NODES_FILE + MANIFEST_EXTENSION, TemplateHelper.toString(siteTemplate, nodsList));
+            context.getFileAccess().append(
+                Paths.get(MANIFESTS_FOLDER, NODES_FILE + MANIFEST_EXTENSION).toString(),
+                TemplateHelper.toString(siteTemplate, nodsList)
+            );
+
+            context.getFileAccess().write(
+                "readme_template.md",
+                TemplateHelper.toString(cfg.getTemplate("readme_template.md"), null)
+            );
         } catch (Exception e) {
             logger.error("Failed to generate Puppet files: {}", e.getMessage(), e);
         }
@@ -119,8 +128,8 @@ public class PuppetTransformer {
     private void generateComponentModule(RootComponent component) throws IOException {
         Template componentTemplate = cfg.getTemplate("component_template.pp");
         Template taskTemplate = cfg.getTemplate("task_template.pp");
-        Path componentManifestsFolder = Paths.get(component.getNormalizedName(), MODULE_MANIFESTS_FOLDER);
-        Path componentFilesFolder = Paths.get(component.getNormalizedName(), MODULE_FILES_FOLDER);
+        Path componentManifestsFolder = Paths.get(MODULES_FOLDER, component.getNormalizedName(), MANIFESTS_FOLDER);
+        Path componentFilesFolder = Paths.get(MODULES_FOLDER, component.getNormalizedName(), MODULE_FILES_FOLDER);
 
         Path componentClassPath = componentManifestsFolder.resolve(MANIFEST_MAIN.concat(MANIFEST_EXTENSION));
 
@@ -171,7 +180,7 @@ public class PuppetTransformer {
             fileType = artifact.getValue().substring(indexOfFileType);
         }
 
-        String uniqueFileName = artifact.getValue().substring(0, indexOfFileType) + "-" + component.getNormalizedName()  + fileType;
+        String uniqueFileName = artifact.getValue().substring(0, indexOfFileType) + "-" + component.getNormalizedName() + fileType;
 
         return Paths.get(uniqueFileName);
     }
