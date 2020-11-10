@@ -3,8 +3,8 @@ class ${component}::${task.name} {
     ensure => 'file',
     source => 'puppet:///modules/${component}/${task.scriptFileName}',
     path => '/usr/local/bin/${task.scriptFileName}',
-    owner => 'root'
-    group => 'root'
+    owner => 'root',
+    group => 'root',
     mode  => '0744', # Use 0700 if it is sensitive
     notify => Exec['run_${task.scriptFileName}'],
   }
