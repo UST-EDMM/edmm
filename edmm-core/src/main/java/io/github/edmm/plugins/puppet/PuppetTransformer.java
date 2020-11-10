@@ -97,7 +97,7 @@ public class PuppetTransformer {
             );
 
             context.getFileAccess().write(
-                "readme_template.md",
+                "README.md",
                 TemplateHelper.toString(cfg.getTemplate("readme_template.md"), null)
             );
         } catch (Exception e) {
