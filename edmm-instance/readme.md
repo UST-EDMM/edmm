@@ -266,16 +266,21 @@ Tadaa, it is served on the Tomcat server.
 
 ## Section 2 - Run this prototype
 Since this prototype uses the OpenTOSCA ecosystem to function properly, it is required to set it up.
-The easiest way to achieve this is to run the OpenTOSCA ecosystem via Docker as described in [their documentation](https://www.github.com/opentosca/opentosca-docker/)
+The easiest way to achieve this is to run the OpenTOSCA ecosystem via Docker as described in [their documentation](https://github.com/opentosca/opentosca-docker/)
 
 Once the OpenTOSCA ecosystem is up and running, we can run this prototype.
 For example, to enrich the Puppet deployment described in the first section, it is required to edit the *io.github.edmm.plugins.puppet.PuppetInstancePluginLifecycle.java* file with the respective settings to access the Puppet master that was setup during the first section.
 Following variables need to be set:
-- user: the username of the VM of the Puppet Master, e.g. ubuntu
-- ip: the public ipv4 address of the Puppet Master
-- privateKeyLocation: the location of a private key valid to access the Puppet Master
-- operationgSystem: the operation system of the Puppet Master, e.g. ubuntu
-- operatingSystemRelease: the full release version name of the operating system of the Puppet Master, e.g. ubuntu-18.04
+
+```user: the username of the VM of the Puppet Master, e.g. ubuntu```
+
+```ip: the public ipv4 address of the Puppet Master```
+
+```privateKeyLocation: the location of a private key valid to access the Puppet Master```
+
+```operationgSystem: the operation system of the Puppet Master, e.g. ubuntu```
+
+```operatingSystemRelease: the full release version name of the operating system of the Puppet Master, e.g. ubuntu-18.04```
 
 Once these variables are set, import this project in IntelliJ as Maven project and create a Spring Boot Run Configuration as follows:
 
@@ -294,8 +299,12 @@ Simply run the run configuration that was created previously to start the protot
 
 
 ## Section 3 - Apply enriched management feature
-Once the prototype ran successfully, open localhost:8088 in your browser to see the OpenTOSCA Management dashboard.
+Once the prototype ran successfully, open [localhost:8088](http://localhost:8088) in your browser to see the OpenTOSCA Management dashboard.
 If everything worked, the application that was transformed using the prototype should appear there and be registered as running application.
 Click on it, to see further details, like the current state.
 If the application was enriched with additional management features, they appear at the bottom of the page, e.g. "test".
 To run the management operations, simply click the "Play" button.
+
+
+
+
