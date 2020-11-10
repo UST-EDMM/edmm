@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
+import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.utils.Consts;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
-import io.github.edmm.core.transformation.TransformationException;
-import io.github.edmm.utils.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

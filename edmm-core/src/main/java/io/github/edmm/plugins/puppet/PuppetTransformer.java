@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.google.common.collect.Lists;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.transformation.TransformationContext;
@@ -26,6 +23,10 @@ import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.puppet.model.Task;
+
+import com.google.common.collect.Lists;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
