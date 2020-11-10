@@ -138,20 +138,20 @@ public class PuppetTransformer {
                 Map<String, Object> taskData = new HashMap<>();
                 Path taskClassPath = componentManifestsFolder.resolve(o.getNormalizedName().concat(MANIFEST_EXTENSION));
                 taskData.put("component", component.getNormalizedName());
-                Artifact a = o.getArtifacts().get(0);
-                Path p = Paths.get(a.getValue());
+                Artifact artifact = o.getArtifacts().get(0);
+                Path scriptPath = generateUniqueScriptName(component, artifact);
 
                 Task t = Task.builder()
                     .name(o.getNormalizedName())
                     .envVars(envVars)
-                    .scriptFileName(p.getFileName().toString())
+                    .scriptFileName(scriptPath.getFileName().toString())
                     .build();
 
                 tasks.add(t);
                 taskData.put("task", t);
 
                 try {
-                    context.getFileAccess().copy(a.getValue(), componentFilesFolder.resolve(p.getFileName().toString()).toString());
+                    context.getFileAccess().copy(artifact.getValue(), componentFilesFolder.resolve(scriptPath.getFileName().toString()).toString());
                     context.getFileAccess().append(taskClassPath.toString(), TemplateHelper.toString(taskTemplate, taskData));
                 } catch (IOException e) {
                     logger.error("Failed to create modules", e);
@@ -161,5 +161,18 @@ public class PuppetTransformer {
         });
         componentData.put("tasks", tasks);
         context.getFileAccess().append(componentClassPath.toString(), TemplateHelper.toString(componentTemplate, componentData));
+    }
+
+    private Path generateUniqueScriptName(RootComponent component, Artifact artifact) {
+        int indexOfFileType = artifact.getValue().lastIndexOf(".");
+
+        String fileType = "";
+        if (indexOfFileType > 0 && indexOfFileType < artifact.getValue().length() - 2) {
+            fileType = artifact.getValue().substring(indexOfFileType);
+        }
+
+        String uniqueFileName = artifact.getValue().substring(0, indexOfFileType) + "-" + component.getNormalizedName()  + fileType;
+
+        return Paths.get(uniqueFileName);
     }
 }
