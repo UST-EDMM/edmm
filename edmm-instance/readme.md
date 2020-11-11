@@ -272,15 +272,15 @@ Once the OpenTOSCA ecosystem is up and running, we can run this prototype.
 For example, to enrich the Puppet deployment described in the first section, it is required to edit the *io.github.edmm.plugins.puppet.PuppetInstancePluginLifecycle.java* file with the respective settings to access the Puppet master that was setup during the first section.
 Following variables need to be set:
 
-```user```: the username of the VM of the Puppet Master, e.g. ubuntu
+- ```user```: the username of the VM of the Puppet Master, e.g. ubuntu
 
-```ip```: the public ipv4 address of the Puppet Master
+- ```ip```: the public ipv4 address of the Puppet Master
 
-```privateKeyLocation```: the location of a private key valid to access the Puppet Master
+- ```privateKeyLocation```: the location of a private key valid to access the Puppet Master
 
-```operationgSystem```: the operation system of the Puppet Master, e.g. ubuntu
+- ```operationgSystem```: the operation system of the Puppet Master, e.g. ubuntu
 
-```operatingSystemRelease```: the full release version name of the operating system of the Puppet Master, e.g. ubuntu-18.04
+- ```operatingSystemRelease```: the full release version name of the operating system of the Puppet Master, e.g. ubuntu-18.04
 
 Once these variables are set, import this project in IntelliJ as Maven project and create a Spring Boot Run Configuration as follows:
 
