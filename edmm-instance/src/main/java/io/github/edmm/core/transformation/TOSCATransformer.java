@@ -3,6 +3,7 @@ package io.github.edmm.core.transformation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
@@ -26,15 +27,22 @@ import static io.github.edmm.model.opentosca.OpenTOSCANamespaces.OPENTOSCA_NORMA
 
 public class TOSCATransformer {
 
+    protected WineryConnector wineryConnector;
+    protected final List<TypeTransformer> transformTypePlugins = new ArrayList<>();
+    protected DeploymentInstance deploymentInstance;
+
     private final Logger logger = LoggerFactory.getLogger(TOSCATransformer.class);
 
     private final List<NodeTemplateInstance> nodeTemplateInstances = new ArrayList<>();
     private final List<RelationshipTemplateInstance> relationshipTemplateInstances = new ArrayList<>();
-    private final WineryConnector wineryConnector;
-    private DeploymentInstance deploymentInstance;
 
     public TOSCATransformer() {
-        this.wineryConnector = new WineryConnector();
+        this.wineryConnector = WineryConnector.getInstance();
+    }
+
+    public TOSCATransformer(List<TypeTransformer> transformTypePlugins) {
+        this();
+        this.transformTypePlugins.addAll(transformTypePlugins);
     }
 
     public ServiceTemplateInstance transformEDiMMToServiceTemplateInstance(DeploymentInstance deploymentInstance) {
@@ -108,7 +116,7 @@ public class TOSCATransformer {
         return qName;
     }
 
-    private QName identifySoftwareNodeTypeByNameAndVersion(String name, String version) {
+    protected QName identifySoftwareNodeTypeByNameAndVersion(String name, String version) {
         QName softwareComponent = identifyType(name, version);
 
         if (softwareComponent == null) {
@@ -119,8 +127,17 @@ public class TOSCATransformer {
         return softwareComponent;
     }
 
-    private QName identifyType(String name, String version) {
+    protected QName identifyType(String name, String version) {
         String normalizeName = normalizeName(name);
+
+        Optional<TypeTransformer> transformer = transformTypePlugins.stream()
+            .filter(transformType -> transformType.canHandle(name, version))
+            .findFirst();
+
+        if (transformer.isPresent()) {
+            return transformer.get().performTransformation(name, version);
+        }
+
         List<QName> candidates = this.wineryConnector.getBaseNodeTypesQNames().stream()
             .filter(qName ->
                 normalizeName(VersionUtils.getNameWithoutVersion(qName.getLocalPart())).startsWith(normalizeName)
@@ -156,10 +173,14 @@ public class TOSCATransformer {
             return candidates.get(0);
         }
 
+        return performTechnologySpecificMapping(name, version);
+    }
+
+    protected QName performTechnologySpecificMapping(String name, String version) {
         return null;
     }
 
-    private String normalizeName(String name) {
+    protected String normalizeName(String name) {
         return name.toLowerCase()
             .replaceAll("\\s|-|_|\\.", "");
     }

@@ -17,8 +17,10 @@ import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
 import io.github.edmm.plugins.puppet.model.PuppetState;
 import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
+import io.github.edmm.plugins.puppet.typemapper.MySQLMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.Constants;
 
@@ -58,7 +60,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         this.port = port;
         this.operatingSystem = operatingSystem;
         this.operatingSystemRelease = operatingSystemRelease;
-        this.toscaTransformer = new TOSCATransformer();
+
+        this.toscaTransformer = new PuppetToscaTransformer(new MySQLMapper());
     }
 
     @Override
@@ -96,6 +99,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
             TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
             TNodeTemplate vm = ModelUtilities.instantiateNodeTemplate(vmType);
+            vm.setId(node.getCertname());
+            vm.setName(node.getCertname());
 
             TEntityTemplate.Properties properties = vm.getProperties();
             if (properties != null && properties.getKVProperties() != null) {
@@ -131,18 +136,26 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             List<List<ResourceEventEntry>> test = PuppetNodeHandler.identifyRelevantReports(this.master, node.getCertname());
-            test.forEach(entry -> {
-                if (!(entry.size() == 1 && entry.get(0).getStatus().equals("failure"))) {
-                    String componentName = this.identifyComponentName(entry);
-                    TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(componentName, "");
+            test.forEach(entry -> entry.stream()
+                .filter(event -> event.getStatus() == PuppetResourceStatus.success)
+                .map(event -> {
+                    // :: separates class and operation
+                    int index = event.getContaining_class().lastIndexOf("::");
+                    return index > 0
+                        ? event.getContaining_class().substring(0, index)
+                        : event.getContaining_class();
+                })
+                .distinct()
+                .forEach(identifiedComponent -> {
+                    TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
                     TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
                         ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
-                }
-            });
+                })
+            );
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
@@ -158,7 +171,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         String componentName = "";
 
         for (ResourceEventEntry resourceEventEntry : entry) {
-            String local = resourceEventEntry.getResource_title();
+            int lastIndexOfDoubleColon = resourceEventEntry.getContaining_class().lastIndexOf("::");
+            String local = resourceEventEntry.getContaining_class().substring(0, lastIndexOfDoubleColon);
+
             if (componentName.isEmpty()) {
                 componentName = local;
             }

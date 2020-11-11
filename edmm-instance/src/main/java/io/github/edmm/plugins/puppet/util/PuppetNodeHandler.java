@@ -19,6 +19,7 @@ import io.github.edmm.model.edimm.RelationType;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.FactType;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
 import io.github.edmm.plugins.puppet.model.Report;
 import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 import io.github.edmm.plugins.puppet.model.ResourceType;
@@ -180,7 +181,7 @@ public class PuppetNodeHandler {
     }
 
     private static boolean checkIfResourceEventEntryIsSuitable(ResourceEventEntry resourceEventEntry) {
-        return isNotNull(resourceEventEntry) && isPackageEntry(resourceEventEntry) && isSucceeded(resourceEventEntry.getStatus());
+        return isNotNull(resourceEventEntry) && isPackageEntry(resourceEventEntry) && resourceEventEntry.getStatus() == PuppetResourceStatus.success;
     }
 
     private static boolean isNotNull(ResourceEventEntry resourceEventEntry) {

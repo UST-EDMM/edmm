@@ -22,12 +22,20 @@ import org.slf4j.LoggerFactory;
 public class WineryConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WineryConnector.class);
+    private static WineryConnector INSTANCE;
 
     private final IRepository repository;
     private Map<QName, TNodeType> nodeTypes;
 
-    public WineryConnector() {
+    private WineryConnector() {
         repository = RepositoryFactory.getRepository();
+    }
+
+    public static synchronized WineryConnector getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new WineryConnector();
+        }
+        return INSTANCE;
     }
 
     public TNodeType getNodeType(QName qName) {
