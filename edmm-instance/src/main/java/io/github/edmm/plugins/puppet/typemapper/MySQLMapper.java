@@ -14,14 +14,16 @@ public class MySQLMapper implements TypeTransformer {
         return component.toLowerCase().equals("MySQL::Server".toLowerCase())
             || component.toLowerCase().equals("MySQL::DBMS".toLowerCase())
             || component.toLowerCase().equals("MySQL::DB".toLowerCase())
-            || component.toLowerCase().equals("MySQL".toLowerCase());
+            || component.toLowerCase().equals("MySQL".toLowerCase())
+            || component.toLowerCase().equals("DB".toLowerCase());
     }
 
     @Override
     public QName performTransformation(String component, String version) {
         String[] type = {"MySQL-DBMS"};
 
-        if (component.toLowerCase().equals("MySQL::DB".toLowerCase())) {
+        if (component.toLowerCase().equals("MySQL::DB".toLowerCase())
+            || component.toLowerCase().equals("DB".toLowerCase())) {
             type[0] = "MySQL-DB";
         }
 

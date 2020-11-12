@@ -136,16 +136,18 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             List<List<ResourceEventEntry>> test = PuppetNodeHandler.identifyRelevantReports(this.master, node.getCertname());
-            test.forEach(entry -> entry.stream()
-                .filter(event -> event.getStatus() == PuppetResourceStatus.success)
-                .map(event -> {
-                    // :: separates class and operation
-                    int index = event.getContaining_class().lastIndexOf("::");
-                    return index > 0
-                        ? event.getContaining_class().substring(0, index)
-                        : event.getContaining_class();
-                })
+            test.stream()
+                .flatMap(entry -> entry.stream()
+                    .filter(event -> event.getStatus() == PuppetResourceStatus.success)
+                    .map(event -> {
+                        // :: separates class and operation
+                        int index = event.getContaining_class().lastIndexOf("::");
+                        return index > 0
+                            ? event.getContaining_class().substring(0, index)
+                            : event.getContaining_class();
+                    }))
                 .distinct()
+                .peek(identifiedComponent -> logger.info("Identified component {} on stack {}", identifiedComponent, node.getCertname()))
                 .forEach(identifiedComponent -> {
                     TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
@@ -154,8 +156,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     topologyTemplate.addNodeTemplate(softwareNode);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
                         ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
-                })
-            );
+                });
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
             .setTargetNamespace("http://opentosca.org/retrieved/instances")

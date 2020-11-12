@@ -187,6 +187,7 @@ public class TOSCATransformer {
 
     public void save(TServiceTemplate serviceTemplate) {
         try {
+            logger.info("Saving Service Template [{}]{}", serviceTemplate.getTargetNamespace(), serviceTemplate.getId());
             wineryConnector.save(serviceTemplate);
         } catch (IOException e) {
             logger.error("Error while persisting Service Template", e);
