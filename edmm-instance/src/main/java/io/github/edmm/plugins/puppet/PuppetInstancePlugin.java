@@ -1,9 +1,9 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -147,15 +147,32 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                             : event.getContaining_class();
                     }))
                 .distinct()
-                .peek(identifiedComponent -> logger.info("Identified component {} on stack {}", identifiedComponent, node.getCertname()))
+                .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'", identifiedComponent, node.getCertname()))
                 .forEach(identifiedComponent -> {
                     TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
                     TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
 
+                    Map<String, String> kvProperties = new HashMap<>();
+                    if (softwareNode.getProperties() != null && softwareNode.getProperties().getKVProperties() != null) {
+                        softwareNode.getProperties().getKVProperties()
+                            .forEach((key, value) ->
+                                kvProperties.put(key, value != null && !value.isEmpty() ? value : "get_input: " + key)
+                            );
+                    } else {
+                        softwareNode.setProperties(new TEntityTemplate.Properties());
+                    }
+                    kvProperties.put("puppetInstanceType", identifiedComponent);
+                    softwareNode.getProperties().setKVProperties(kvProperties);
+
                     topologyTemplate.addNodeTemplate(softwareNode);
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
-                        ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
+
+                    if (this.toscaTransformer.getTransformTypePlugins().stream()
+                        .noneMatch(typeTransformer -> typeTransformer.refineHost(softwareNode, vm, topologyTemplate))
+                    ) {
+                        ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
+                            ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
+                    }
                 });
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
@@ -166,30 +183,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             ).build();
 
         toscaTransformer.save(serviceTemplate);
-    }
-
-    private String identifyComponentName(List<ResourceEventEntry> entry) {
-        String componentName = "";
-
-        for (ResourceEventEntry resourceEventEntry : entry) {
-            int lastIndexOfDoubleColon = resourceEventEntry.getContaining_class().lastIndexOf("::");
-            String local = resourceEventEntry.getContaining_class().substring(0, lastIndexOfDoubleColon);
-
-            if (componentName.isEmpty()) {
-                componentName = local;
-            }
-            if (local.length() < componentName.length()
-                && componentName.contains(local)) {
-                componentName = local;
-            }
-        }
-
-        logger.info("identified component name \"{}\" for resources [ {} ]",
-            componentName,
-            entry.stream().map(ResourceEventEntry::getResource_title).collect(Collectors.joining(", "))
-        );
-
-        return componentName;
     }
 
     @Override

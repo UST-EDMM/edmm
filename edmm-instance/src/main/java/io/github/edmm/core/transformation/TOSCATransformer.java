@@ -15,6 +15,7 @@ import io.github.edmm.model.opentosca.NodeTemplateInstance;
 import io.github.edmm.model.opentosca.RelationshipTemplateInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
+import lombok.Getter;
 import org.eclipse.winery.common.version.VersionUtils;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TRelationshipType;
@@ -28,6 +29,7 @@ import static io.github.edmm.model.opentosca.OpenTOSCANamespaces.OPENTOSCA_NORMA
 public class TOSCATransformer {
 
     protected WineryConnector wineryConnector;
+    @Getter
     protected final List<TypeTransformer> transformTypePlugins = new ArrayList<>();
     protected DeploymentInstance deploymentInstance;
 
@@ -160,7 +162,7 @@ public class TOSCATransformer {
         if (candidates.size() > 1) {
             List<QName> filteredCandidates = candidates.stream()
                 .filter(qName -> qName.getNamespaceURI().startsWith(OPENTOSCA_BASE))
-                .peek(qName -> logger.info("Found matching NodeType after filtering for OT namesapce {} for component {}", qName, name))
+                .peek(qName -> logger.info("Found matching NodeType after filtering for OT namespace {} for component {}", qName, name))
                 .collect(Collectors.toList());
 
             if (filteredCandidates.size() > 0) {
