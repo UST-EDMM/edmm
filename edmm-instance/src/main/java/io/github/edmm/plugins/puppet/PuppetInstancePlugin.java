@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -129,7 +130,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
                 TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(), "");
                 TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
-
+                this.populateNodeTemplateProperties(hypervisor);
                 topologyTemplate.addNodeTemplate(hypervisor);
                 ModelUtilities.createRelationshipTemplateAndAddToTopology(vm, hypervisor,
                     ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
@@ -139,6 +140,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             test.stream()
                 .flatMap(entry -> entry.stream()
                     .filter(event -> event.getStatus() == PuppetResourceStatus.success)
+                    .sorted(Comparator.comparing(ResourceEventEntry::getTimestamp))
                     .map(event -> {
                         // :: separates class and operation
                         int index = event.getContaining_class().lastIndexOf("::");
@@ -153,17 +155,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                     TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
 
-                    Map<String, String> kvProperties = new HashMap<>();
-                    if (softwareNode.getProperties() != null && softwareNode.getProperties().getKVProperties() != null) {
-                        softwareNode.getProperties().getKVProperties()
-                            .forEach((key, value) ->
-                                kvProperties.put(key, value != null && !value.isEmpty() ? value : "get_input: " + key)
-                            );
-                    } else {
-                        softwareNode.setProperties(new TEntityTemplate.Properties());
-                    }
-                    kvProperties.put("puppetInstanceType", identifiedComponent);
-                    softwareNode.getProperties().setKVProperties(kvProperties);
+                    Map<String, String> additionalProperties = new HashMap<>();
+                    additionalProperties.put("puppetInstanceType", identifiedComponent);
+                    this.populateNodeTemplateProperties(softwareNode, additionalProperties);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
 
@@ -175,7 +169,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     }
                 });
         });
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(this.master.getId(), topologyTemplate)
+        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("puppet-" + this.master.getId(), topologyTemplate)
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
             .addTags(new TTags.Builder()
                 .addTag("deploymentTechnology", PUPPET.getName())
@@ -183,6 +177,22 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             ).build();
 
         toscaTransformer.save(serviceTemplate);
+    }
+
+    private void populateNodeTemplateProperties(TNodeTemplate softwareNode) {
+        this.populateNodeTemplateProperties(softwareNode, new HashMap<>());
+    }
+
+    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
+        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
+            nodeTemplate.getProperties().getKVProperties()
+                .forEach((key, value) ->
+                    additionalProperties.put(key, value != null && !value.isEmpty() ? value : "get_input: " + key)
+                );
+        } else {
+            nodeTemplate.setProperties(new TEntityTemplate.Properties());
+        }
+        nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 
     @Override
