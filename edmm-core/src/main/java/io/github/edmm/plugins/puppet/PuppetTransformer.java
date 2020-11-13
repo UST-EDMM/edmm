@@ -92,6 +92,7 @@ public class PuppetTransformer {
                         } else {
                             Optional<TransformType<String>> firstTypeHandler = this.typePlugins.stream()
                                 .filter(plugin -> plugin.canHandle(component))
+                                .filter(plugin -> plugin.canHandle(component))
                                 .findFirst();
 
                             if (firstTypeHandler.isPresent()) {
@@ -165,18 +166,32 @@ public class PuppetTransformer {
         List<String> envVars = prepareProperties(stack);
 
         componentData.put("component", component.getNormalizedName());
-        List<Task> tasks = new ArrayList<>();
 
-        collectOperations(component).forEach(o -> {
-            if (!o.getArtifacts().isEmpty()) {
+        ArrayList<String> artifacts = new ArrayList<>();
+        componentData.put("artifacts", artifacts);
+        component.getArtifacts().forEach(artifact -> {
+            Path scriptPath = generateUniqueScriptName(component, artifact);
+            artifacts.add(scriptPath.getFileName().toString());
+            try {
+                context.getFileAccess().copy(artifact.getValue(), componentFilesFolder.resolve(scriptPath.getFileName().toString()).toString());
+            } catch (IOException e) {
+                logger.error("Filed to copy artifact {}", artifact.getName());
+                throw new TransformationException(e);
+            }
+        });
+
+        List<Task> tasks = new ArrayList<>();
+        componentData.put("tasks", tasks);
+        collectOperations(component).forEach(operation -> {
+            if (!operation.getArtifacts().isEmpty()) {
                 Map<String, Object> taskData = new HashMap<>();
-                Path taskClassPath = componentManifestsFolder.resolve(o.getNormalizedName().concat(MANIFEST_EXTENSION));
+                Path taskClassPath = componentManifestsFolder.resolve(operation.getNormalizedName().concat(MANIFEST_EXTENSION));
                 taskData.put("component", component.getNormalizedName());
-                Artifact artifact = o.getArtifacts().get(0);
+                Artifact artifact = operation.getArtifacts().get(0);
                 Path scriptPath = generateUniqueScriptName(component, artifact);
 
                 Task t = Task.builder()
-                    .name(o.getNormalizedName())
+                    .name(operation.getNormalizedName())
                     .envVars(envVars)
                     .scriptFileName(scriptPath.getFileName().toString())
                     .build();
@@ -193,7 +208,7 @@ public class PuppetTransformer {
                 }
             }
         });
-        componentData.put("tasks", tasks);
+
         context.getFileAccess().append(componentClassPath.toString(), TemplateHelper.toString(componentTemplate, componentData));
     }
 
