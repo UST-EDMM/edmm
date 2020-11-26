@@ -22,6 +22,7 @@ import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
 import io.github.edmm.plugins.puppet.model.PuppetState;
 import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 import io.github.edmm.plugins.puppet.typemapper.MySQLMapper;
+import io.github.edmm.plugins.puppet.typemapper.WebApplicationMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.Constants;
 
@@ -62,7 +63,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         this.operatingSystem = operatingSystem;
         this.operatingSystemRelease = operatingSystemRelease;
 
-        this.toscaTransformer = new PuppetToscaTransformer(new MySQLMapper());
+        this.toscaTransformer = new PuppetToscaTransformer(
+            new MySQLMapper(), new WebApplicationMapper()
+        );
     }
 
     @Override

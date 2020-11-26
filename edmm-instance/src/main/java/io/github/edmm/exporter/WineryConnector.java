@@ -52,10 +52,11 @@ public class WineryConnector {
             .collect(Collectors.toList());
     }
 
-    private void getNodeTypes() {
+    public Map<QName, TNodeType> getNodeTypes() {
         if (this.nodeTypes == null) {
             this.nodeTypes = repository.getQNameToElementMapping(NodeTypeId.class);
         }
+        return nodeTypes;
     }
 
     public TRelationshipType getRelationshipType(QName qName) {

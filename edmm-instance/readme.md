@@ -33,19 +33,6 @@ Following is the /etc/hosts file of the master:
 [MASTER_IP] puppet puppet-master.test.com
 ```
 
-
-Following is the /etc/hosts file of the agent:
-
-![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
-
-```
-# Puppet                                    
-                                            
-127.0.1.1 localhost                         
-[AGENT_IP] puppet-agent                 
-[MASTER_IP] puppet puppet-master.test.com
-```
-
 Now, we can start to setup Puppet on the master. To do this, enter following command on the Puppet master:
 
 ```wget https://apt.puppetlabs.com/puppet6-release-bionic.deb```
@@ -197,7 +184,20 @@ sudo service puppetserver reload
 ### Step 3 - Setup the Puppet Agent
 
 Enter the following commands on the Puppet Agent to install and setup Puppet.
-First, download Puppet by following command:
+
+First, edit the /etc/hosts file of the agent:
+
+![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
+
+```
+# Puppet                                    
+                                            
+127.0.1.1 localhost                         
+[AGENT_IP] puppet-agent                 
+[MASTER_IP] puppet puppet-master.test.com
+```
+
+Next, download Puppet by following command:
 
 ```shell script
 wget https://apt.puppetlabs.com/puppet6-release-bionic.deb
