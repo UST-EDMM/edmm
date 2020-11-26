@@ -133,6 +133,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
                 TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(), "");
                 TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
+                hypervisor.setName(hypervisorFacts.getValue().toString());
                 this.populateNodeTemplateProperties(hypervisor);
                 topologyTemplate.addNodeTemplate(hypervisor);
                 ModelUtilities.createRelationshipTemplateAndAddToTopology(vm, hypervisor,
@@ -158,10 +159,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                     TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
                     softwareNode.setName(identifiedComponent);
-
-                    Map<String, String> additionalProperties = new HashMap<>();
-                    additionalProperties.put("puppetInstanceType", identifiedComponent);
-                    this.populateNodeTemplateProperties(softwareNode, additionalProperties);
+                    this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
 
@@ -183,8 +181,11 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         toscaTransformer.save(serviceTemplate);
     }
 
-    private void populateNodeTemplateProperties(TNodeTemplate softwareNode) {
-        this.populateNodeTemplateProperties(softwareNode, new HashMap<>());
+    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate) {
+        Map<String, String> additionalProperties = new HashMap<>();
+        additionalProperties.put("puppetInstanceType", nodeTemplate.getName());
+        additionalProperties.put("State", "Running");
+        this.populateNodeTemplateProperties(nodeTemplate, additionalProperties);
     }
 
     private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
@@ -193,9 +194,10 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 .forEach((key, value) ->
                     additionalProperties.put(key, value != null && !value.isEmpty() ? value : "get_input: " + key)
                 );
-        } else {
-            nodeTemplate.setProperties(new TEntityTemplate.Properties());
         }
+
+        // workaround to set new properties
+        nodeTemplate.setProperties(new TEntityTemplate.Properties());
         nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 
