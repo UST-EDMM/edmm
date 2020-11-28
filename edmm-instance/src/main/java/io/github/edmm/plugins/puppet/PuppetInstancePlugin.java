@@ -172,6 +172,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 });
         });
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("puppet-" + this.master.getId(), topologyTemplate)
+            .setName("puppet-" + this.master.getId())
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
             .addTags(new TTags.Builder()
                 .addTag("deploymentTechnology", PUPPET.getName())

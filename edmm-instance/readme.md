@@ -33,26 +33,19 @@ Following is the /etc/hosts file of the master:
 [MASTER_IP] puppet puppet-master.test.com
 ```
 
-Now, we can start to setup Puppet on the master. To do this, enter following command on the Puppet master:
+Now, we can start to setup Puppet and PostgreSQL on the master. To do this, enter following command on the Puppet master:
 
-```wget https://apt.puppetlabs.com/puppet6-release-bionic.deb```
-
-Afterwards, execute following command to add and configure the Puppet repository:
-
-```sudo dpkg -i puppet6-release-bionic.deb```
-
-Followed by an update of the repository list:
-
-```sudo apt update```
-
-Now to actually install the Puppet master, we execute following command:
-
-```sudo apt install -y puppetserver```
+```shell script
+wget https://apt.puppetlabs.com/puppet6-release-bionic.deb
+sudo dpkg -i puppet6-release-bionic.deb
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt update
+sudo apt -y install postgresql puppetserver
+```
 
 Puppet is installed now! Now we are going to configure the Puppet master. To do this, make following changes to the puppet.conf file:
  `sudo nano /etc/puppetlabs/puppet/puppet.conf`.
-
-![/etc/puppetlabs/puppet/puppet.conf file](./doc/img/puppetconf.png)
 
 ```
 [main]
@@ -68,19 +61,11 @@ Now, we setup the certificate authority by running:
 
 Once this is finished, we can start the Puppet master with following two commands:
 
-```sudo systemctl start puppetserver```
-
-```sudo systemctl enable puppetserver```
-
-Now, we setup PuppetDB on the Puppet Master.
-To do this, we install a PostgreSQL server fist by running these commands:
-
 ```shell script
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-sudo apt update
-sudo apt -y install postgresql
+sudo systemctl enable puppetserver
+sudo systemctl start puppetserver
 ```
+
 
 Then, we are able to install PuppetDB. First, run these commands:
 
@@ -95,22 +80,16 @@ Now, it is required to configure PuppetDB. To do this, run the following command
 sudo nano /etc/puppetlabs/puppet/puppetdb.conf
 ```
 
-and edit it such that it looks like this:
-
-![/etc/puppetlabs/puppet/puppetdb.conf file](./doc/img/puppetdbconf.png)
+and add the following content:
 
 ```puppet
 [main]
 server_urls = https://puppet:8081
 ```
 
-Then, enter following command to create the next config file:
+Then, configure the puppetDB config file:
 
 ```sudo nano /etc/puppetlabs/puppetdb/conf.d/database.ini```
-
-and make it look like this:
-
-![/etc/puppetlabs/puppetdb/conf.d/database.ini file](./doc/img/databaseini.png)
 
 ```puppet
 [database]
@@ -150,7 +129,8 @@ master:
 ```
 
 
-Now, run the following four commands to configure the PostgreSQL database to use it with PuppetDB:
+Now, run the following four commands to configure the PostgreSQL database to use it with PuppetDB. 
+When prompted, enter `puppetdb` as password.
 
 ```shell script
 sudo -u postgres sh
@@ -185,7 +165,7 @@ sudo service puppetserver reload
 
 Enter the following commands on the Puppet Agent to install and setup Puppet.
 
-First, edit the /etc/hosts file of the agent:
+First, edit the `sudo nano /etc/hosts` file of the agent:
 
 ![/etc/hosts file of the agent](./doc/img/hosts_agent.png)
 
@@ -201,24 +181,8 @@ Next, download Puppet by following command:
 
 ```shell script
 wget https://apt.puppetlabs.com/puppet6-release-bionic.deb
-```
-
-Then install the package by executing following command:
-
-```shell script
 sudo dpkg -i puppet6-release-bionic.deb
-```
-
-After this, execute this obligatory command:
-
-```shell script
 sudo apt update
-```
-
-Then, we setup the VM such that it acts as a Puppet Agent.
-This process is started by following command:
-
-```shell script
 sudo apt install -y puppet-agent
 ```
 
@@ -238,7 +202,7 @@ Edit the file such that it looks like this:
 certname    = puppet-agent
 server      = puppet-master.test.com
 environment = production
-runinterval = 15m
+runinterval = 1y
 ```
 
 Now it's time to start the Puppet Agent service by running this command:
