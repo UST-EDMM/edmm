@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.puppet.model;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -10,6 +9,7 @@ import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
+import io.github.edmm.util.Util;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -94,17 +94,7 @@ public class Master {
     }
 
     public String getPrivateKey() {
-        try (FileInputStream fileInputStream = new FileInputStream(this.privateKeyLocation)) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-            StringBuilder stringBuilder = new StringBuilder();
-
-            bufferedReader.lines().forEach(str -> stringBuilder.append(str).append("\n"));
-
-            return stringBuilder.toString();
-        } catch (IOException e) {
-            logger.error("Error while retrieving contents of the private key file located at: {}", this.privateKeyLocation);
-        }
-        return "";
+        return Util.readFromFile(this.privateKeyLocation);
     }
 
     public String executeCommandAndHandleResult(String command) {
