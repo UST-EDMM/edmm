@@ -1,6 +1,7 @@
 package io.github.edmm.plugins.puppet.model;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -16,10 +17,15 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 public class Master {
+
+    private final static Logger logger = LoggerFactory.getLogger(Master.class);
+
     private String id;
     private String hostName;
     private String user;
@@ -57,7 +63,8 @@ public class Master {
             this.session.setConfig("StrictHostKeyChecking", "no");
             this.session.connect();
         } catch (JSchException e) {
-            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the correct user, host, sshPort and private key location of the Puppet Master is set.");
+            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the " +
+                "correct user, host, sshPort, and private key location of the Puppet Master is set.");
         }
     }
 
@@ -84,6 +91,20 @@ public class Master {
 
     private ChannelExec setupChannelExec() throws JSchException {
         return (ChannelExec) this.session.openChannel("exec");
+    }
+
+    public String getPrivateKey() {
+        try (FileInputStream fileInputStream = new FileInputStream(this.privateKeyLocation)) {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+            StringBuilder stringBuilder = new StringBuilder();
+
+            bufferedReader.lines().forEach(str -> stringBuilder.append(str).append("\n"));
+
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            logger.error("Error while retrieving contents of the private key file located at: {}", this.privateKeyLocation);
+        }
+        return "";
     }
 
     public String executeCommandAndHandleResult(String command) {

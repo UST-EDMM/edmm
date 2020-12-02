@@ -44,6 +44,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OpenTOSCAConnector {
 
+    public final static QName ManagedBy = QName.valueOf("{http://opentosca.org/relationshiptypes}ManagedBy");
+
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenTOSCAConnector.class.getName());
 
     // TODO: retrieve such info from\overline{} a config or sth like that
@@ -247,7 +249,7 @@ public abstract class OpenTOSCAConnector {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-return null;
+        return null;
 //        return GsonHelper.parseJsonStringToObjectType(performGetList(url), clazz);
     }
 

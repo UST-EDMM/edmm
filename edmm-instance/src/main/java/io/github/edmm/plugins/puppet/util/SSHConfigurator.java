@@ -16,6 +16,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class SSHConfigurator {
+
     private Master master;
     private Session session;
     private String outputLocation;

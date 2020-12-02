@@ -87,12 +87,12 @@ public class PuppetNodeHandler {
         return null;
     }
 
-    public static List<List<ResourceEventEntry>> identifyRelevantReports(Master master, String certName) {
+    public static List<Report> identifyRelevantReports(Master master, String certName) {
         List<Report> allReports = new Gson()
             .fromJson(master.executeCommandAndHandleResult(Commands.GET_ALL_REPORTS), new TypeToken<List<Report>>() { }.getType());
         return allReports.stream()
+            .filter(report -> report.getStatus() == Report.State.changed)
             .filter(report -> report.getResource_events().getData() != null && report.getCertname().equals(certName))
-            .map(report -> report.getResource_events().getData())
             .collect(Collectors.toList());
     }
 
