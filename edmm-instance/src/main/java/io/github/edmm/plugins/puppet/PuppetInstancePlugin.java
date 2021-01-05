@@ -99,31 +99,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     public void transformDirectlyToTOSCA() {
         TTopologyTemplate topologyTemplate = new TTopologyTemplate();
 
-        TNodeType masterNodeType = toscaTransformer.getComputeNodeType(this.master.getOperatingSystem(), this.master.getOperatingSystemRelease());
-        TNodeTemplate masterNode = ModelUtilities.instantiateNodeTemplate(masterNodeType);
-        masterNode.setId(this.master.getHostName() + "-" + this.master.getId());
-        masterNode.setName(this.master.getHostName());
-
-        TEntityTemplate.Properties masterNodeProperties = masterNode.getProperties();
-        if (masterNodeProperties != null) {
-            Map<String, String> masterProps = masterNodeProperties.getKVProperties();
-
-            if (masterProps == null) {
-                masterProps = new HashMap<>();
-            }
-
-            masterProps.put(Constants.VMIP, this.master.getIp());
-            masterProps.put(Constants.VM_INSTANCE_ID, this.master.getHostName());
-            masterProps.put(Constants.VM_PRIVATE_KEY, this.master.getPrivateKey());
-            masterProps.put(Constants.VM_USER_NAME, this.master.getUser());
-            masterProps.put(Constants.STATE, Constants.RUNNING);
-
-            masterNode.setProperties(new TEntityTemplate.Properties());
-            masterNode.getProperties().setKVProperties(masterProps);
-        }
-
-        topologyTemplate.addNodeTemplate(masterNode);
-
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -143,6 +118,13 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 vmProps.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
                 vmProps.put(Constants.STATE, Constants.RUNNING);
 
+                Map<String, String> masterProps = new HashMap<>();
+                masterProps.put(Constants.PUPPET_ENV, node.getReport_environment());
+                masterProps.put(Constants.PUPPET_MASTER, this.master.getIp());
+                masterProps.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
+                masterProps.put(Constants.PUPPET_MASTER_USER, this.master.getUser());
+                populateNodeTemplateProperties(vm, masterProps);
+
                 Fact ec2_metadata = node.getFactByName("ec2_metadata");
                 if (ec2_metadata != null) {
                     Map<String, Object> values = (Map<String, Object>) ec2_metadata.getValue();
@@ -152,9 +134,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 }
 
                 properties.setKVProperties(vmProps);
-
-                ModelUtilities.createRelationshipTemplateAndAddToTopology(vm, masterNode,
-                    OpenTOSCAConnector.ManagedBy, topologyTemplate);
             }
 
             topologyTemplate.addNodeTemplate(vm);
@@ -204,9 +183,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                         ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, vm,
                             ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
                     }
-
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode, masterNode,
-                        OpenTOSCAConnector.ManagedBy, topologyTemplate);
                 });
 
             if (environments.size() > 0) {

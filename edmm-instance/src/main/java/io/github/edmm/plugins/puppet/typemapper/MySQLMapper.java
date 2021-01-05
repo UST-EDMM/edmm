@@ -17,24 +17,24 @@ public class MySQLMapper implements TypeTransformer {
 
     @Override
     public boolean canHandle(String component, String version) {
-        return component.toLowerCase().equals("MySQL::Server".toLowerCase())
-            || component.toLowerCase().equals("MySQL::DBMS".toLowerCase())
-            || component.toLowerCase().equals("MySQL::DB".toLowerCase())
-            || component.toLowerCase().equals("MySQL".toLowerCase())
-            || component.toLowerCase().equals("DB".toLowerCase());
+        return component.equalsIgnoreCase("MySQL::Server")
+            || component.equalsIgnoreCase("MySQL::DBMS")
+            || component.equalsIgnoreCase("MySQL::DB")
+            || component.equalsIgnoreCase("MySQL")
+            || component.equalsIgnoreCase("DB");
     }
 
     @Override
     public QName performTransformation(String component, String version) {
         String[] type = {"MySQL-DBMS"};
 
-        if (component.toLowerCase().equals("MySQL::DB".toLowerCase())
-            || component.toLowerCase().equals("DB".toLowerCase())) {
+        if (component.equalsIgnoreCase("MySQL::DB")
+            || component.equalsIgnoreCase("DB")) {
             type[0] = "MySQL-DB";
         }
 
         return WineryConnector.getInstance().getBaseNodeTypesQNames().stream()
-            .filter(qName -> VersionUtils.getNameWithoutVersion(qName.getLocalPart()).toLowerCase().equals(type[0].toLowerCase()))
+            .filter(qName -> VersionUtils.getNameWithoutVersion(qName.getLocalPart()).equalsIgnoreCase(type[0]))
             .findFirst()
             .orElse(null);
     }
