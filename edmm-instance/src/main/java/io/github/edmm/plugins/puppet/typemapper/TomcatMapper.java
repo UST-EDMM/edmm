@@ -19,7 +19,13 @@ public class TomcatMapper implements TypeTransformer {
     public QName performTransformation(String component, String version) {
         return WineryConnector.getInstance().getBaseNodeTypesQNames().stream()
             .filter(qName -> qName.getLocalPart().startsWith("Tomcat"))
-            .findFirst()
+            .min((o1, o2) -> {
+                int compareTo = o1.getNamespaceURI().compareTo(o2.getNamespaceURI());
+                if (compareTo == 0) {
+                    return o1.getLocalPart().compareTo(o2.getLocalPart());
+                }
+                return compareTo;
+            })
             .orElse(null);
     }
 

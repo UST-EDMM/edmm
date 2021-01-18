@@ -114,8 +114,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 Map<String, String> vmProps = properties.getKVProperties();
                 vmProps.put(Constants.VMIP, node.getFactByName("ipaddress").getValue().toString());
                 vmProps.put(Constants.VM_INSTANCE_ID, node.getCertname());
-                vmProps.put(Constants.VM_PRIVATE_KEY, this.master.getGeneratedPrivateKey());
-                vmProps.put(Constants.VM_PUBLIC_KEY, this.master.getGeneratedPublicKey());
+                vmProps.put(Constants.VM_PRIVATE_KEY, this.master.getPrivateKey());
                 vmProps.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
                 vmProps.put(Constants.STATE, Constants.RUNNING);
 
