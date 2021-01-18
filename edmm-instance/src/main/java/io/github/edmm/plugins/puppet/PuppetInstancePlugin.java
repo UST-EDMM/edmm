@@ -124,7 +124,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 masterProps.put(Constants.PUPPET_MASTER, this.master.getIp());
                 masterProps.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
                 masterProps.put(Constants.PUPPET_MASTER_USER, this.master.getUser());
-                populateNodeTemplateProperties(vm, masterProps);
+                vmProps.putAll(masterProps);
+                populateNodeTemplateProperties(vm, vmProps);
 
                 Fact ec2_metadata = node.getFactByName("ec2_metadata");
                 if (ec2_metadata != null) {
