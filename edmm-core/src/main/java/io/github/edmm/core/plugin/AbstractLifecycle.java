@@ -30,7 +30,6 @@ public abstract class AbstractLifecycle implements PluginLifecycle, LifecyclePha
 
     private List<LifecyclePhase<?>> populatePhases() {
         List<LifecyclePhase<?>> phases = new ArrayList<>();
-
         phases.add(new LifecyclePhase<>("prepare", this, PluginLifecycle::prepare));
         phases.add(new LifecyclePhase<>("transformation", this, PluginLifecycle::transform));
         phases.add(new LifecyclePhase<>("cleanup", this, PluginLifecycle::cleanup));

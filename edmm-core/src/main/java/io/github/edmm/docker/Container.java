@@ -3,6 +3,7 @@ package io.github.edmm.docker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.github.edmm.model.component.RootComponent;
@@ -47,7 +48,7 @@ public final class Container {
     }
 
     public String getLabel() {
-        return getName().replace("_", "-");
+        return getName().replace("_", "-").toLowerCase(Locale.ROOT);
     }
 
     public String getServiceName() {

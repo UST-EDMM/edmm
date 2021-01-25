@@ -31,7 +31,7 @@ public class LifecyclePhase<L extends PluginLifecycle> {
 
     public void setState(State state) {
         if (this.state == state) return;
-        logger.debug(String.format("%-20s  %-10s ==> %s", "Phase '" + this.name + "':", this.state, state));
+        logger.debug("Phase '{}: {} ==> {}", this.name, this.state, state);
         this.state = state;
         if (state == State.FAILED) {
             skipSuccessors();
@@ -63,7 +63,7 @@ public class LifecyclePhase<L extends PluginLifecycle> {
 
     private void skipSuccessors() {
         boolean skip = true;
-        for (LifecyclePhase phase : phaseAccess.getLifecyclePhases()) {
+        for (LifecyclePhase<?> phase : phaseAccess.getLifecyclePhases()) {
             if (phase == this) {
                 skip = false;
             }
