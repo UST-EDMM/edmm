@@ -1,7 +1,7 @@
 # EDMM Transformation and Deployment Framework
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.org/UST-EDMM/edmm.svg?branch=master)](https://travis-ci.org/UST-EDMM/edmm)
+![build](https://github.com/UST-EDMM/edmm/workflows/build/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d46d2287b3084689be0247e1aed91bc9)](https://www.codacy.com/manual/miwurster/edmm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UST-EDMM/edmm&amp;utm_campaign=Badge_Grade)
 [![JitPack](https://jitpack.io/v/UST-EDMM/transformation-framework.svg)](https://jitpack.io/#UST-EDMM/edmm)
 
