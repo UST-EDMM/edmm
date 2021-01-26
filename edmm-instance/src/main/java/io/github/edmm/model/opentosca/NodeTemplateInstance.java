@@ -45,7 +45,7 @@ public class NodeTemplateInstance {
     }
 
     private static QName tryNodeTypeRefinement(TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType, List<InstanceProperty> instanceProperties) {
-        QName normativeNodeType = new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPE, String.valueOf(toscaBaseNodeType));
+        QName normativeNodeType = new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE, String.valueOf(toscaBaseNodeType));
         TOSCATypeMapperImplementation toscaRefiner = new TOSCATypeMapperImplementation();
         QName refinedNodeType = toscaRefiner.refineTOSCAType(normativeNodeType, instanceProperties);
 

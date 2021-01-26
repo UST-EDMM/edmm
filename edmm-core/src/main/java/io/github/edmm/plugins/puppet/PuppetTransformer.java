@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.TopologyGraphHelper;
@@ -22,7 +23,9 @@ import io.github.edmm.model.Property;
 import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
+import io.github.edmm.plugins.TransformType;
 import io.github.edmm.plugins.puppet.model.Task;
+import io.github.edmm.plugins.puppet.typetransformers.MySQLDBMSonPuppet;
 
 import com.google.common.collect.Lists;
 import freemarker.template.Configuration;
@@ -44,9 +47,20 @@ public class PuppetTransformer {
 
     private final TransformationContext context;
     private final Configuration cfg = TemplateHelper.forClasspath(PuppetPlugin.class, "/plugins/puppet");
+    private final ArrayList<TransformType<String>> typePlugins;
 
     public PuppetTransformer(TransformationContext context) {
         this.context = context;
+
+        this.typePlugins = new ArrayList<>();
+        this.typePlugins.add(new MySQLDBMSonPuppet(context, cfg));
+
+        logger.info(
+            "Registered type plugins [ {} ]",
+            typePlugins.stream()
+                .map(plugin -> plugin.getClass().toString())
+                .collect(Collectors.joining(", "))
+        );
     }
 
     public void populateManifest() {
@@ -76,9 +90,20 @@ public class PuppetTransformer {
                         if (component instanceof Compute) {
                             logger.info("Ignore generating a module for compute component '{}'", component.getName());
                         } else {
-                            logger.info("Generate task modules for component '{}'", component.getName());
-                            generateComponentModule(component);
-                            components.add(component.getName());
+                            Optional<TransformType<String>> firstTypeHandler = this.typePlugins.stream()
+                                .filter(plugin -> plugin.canHandle(component))
+                                .filter(plugin -> plugin.canHandle(component))
+                                .findFirst();
+
+                            if (firstTypeHandler.isPresent()) {
+                                String componentName = firstTypeHandler.get()
+                                    .performTransformation(component);
+                                components.add(componentName);
+                            } else {
+                                logger.info("Generate task modules for component '{}'", component.getName());
+                                generateComponentModule(component);
+                                components.add(component.getName());
+                            }
                         }
                     }
 
@@ -141,18 +166,32 @@ public class PuppetTransformer {
         List<String> envVars = prepareProperties(stack);
 
         componentData.put("component", component.getNormalizedName());
-        List<Task> tasks = new ArrayList<>();
 
-        collectOperations(component).forEach(o -> {
-            if (!o.getArtifacts().isEmpty()) {
+        ArrayList<String> artifacts = new ArrayList<>();
+        componentData.put("artifacts", artifacts);
+        component.getArtifacts().forEach(artifact -> {
+            Path scriptPath = generateUniqueScriptName(component, artifact);
+            artifacts.add(scriptPath.getFileName().toString());
+            try {
+                context.getFileAccess().copy(artifact.getValue(), componentFilesFolder.resolve(scriptPath.getFileName().toString()).toString());
+            } catch (IOException e) {
+                logger.error("Filed to copy artifact {}", artifact.getName());
+                throw new TransformationException(e);
+            }
+        });
+
+        List<Task> tasks = new ArrayList<>();
+        componentData.put("tasks", tasks);
+        collectOperations(component).forEach(operation -> {
+            if (!operation.getArtifacts().isEmpty()) {
                 Map<String, Object> taskData = new HashMap<>();
-                Path taskClassPath = componentManifestsFolder.resolve(o.getNormalizedName().concat(MANIFEST_EXTENSION));
+                Path taskClassPath = componentManifestsFolder.resolve(operation.getNormalizedName().concat(MANIFEST_EXTENSION));
                 taskData.put("component", component.getNormalizedName());
-                Artifact artifact = o.getArtifacts().get(0);
+                Artifact artifact = operation.getArtifacts().get(0);
                 Path scriptPath = generateUniqueScriptName(component, artifact);
 
                 Task t = Task.builder()
-                    .name(o.getNormalizedName())
+                    .name(operation.getNormalizedName())
                     .envVars(envVars)
                     .scriptFileName(scriptPath.getFileName().toString())
                     .build();
@@ -169,7 +208,7 @@ public class PuppetTransformer {
                 }
             }
         });
-        componentData.put("tasks", tasks);
+
         context.getFileAccess().append(componentClassPath.toString(), TemplateHelper.toString(componentTemplate, componentData));
     }
 

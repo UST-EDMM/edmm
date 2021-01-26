@@ -12,10 +12,12 @@ abstract class Commands {
     static final String EDIMM_ZIP_FILE = "edimm_ssh.zip";
 
     static final String COPY_PUBLIC_KEY = "sudo cp ~/.ssh/puppet.pub /etc/puppetlabs/code/environments/production/modules/edimm_ssh/files/puppet.pub";
+    static final String INSTALL_UNZIP = "sudo apt install unzip";
     static final String UNZIP_PUPPET_MODULE = "unzip " + EDIMM_ZIP_FILE;
     static final String DELETE_ZIP = "rm " + EDIMM_ZIP_FILE;
     static final String MOVE_PUPPET_MODULE = "sudo mv edimm_ssh /etc/puppetlabs/code/environments/production/modules/edimm_ssh";
     static final String EXECUTE_HELPER_SCRIPT = "sudo chmod +x edimm_ssh.sh; sudo ./edimm_ssh.sh";
+    static final String TRANSFER_KEYS_TO_NODES = "sudo /opt/puppetlabs/bin/puppet job --query 'nodes[certname] {deactivated is null and expired is null}'";
 
     static final String GET_MASTER = BASE_COMMAND + "producers";
     static final String GET_ALL_REPORTS = BASE_COMMAND + "reports";
@@ -26,19 +28,19 @@ abstract class Commands {
     static final String GET_HYPERVISOR = "sudo dmidecode | grep -i -e product";
 
     private static String getIPAddressFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.IPAddress).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.IPAddress).toLowerCase();
     }
 
     private static String getOperatingSystemFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.OperatingSystem).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.OperatingSystem).toLowerCase();
     }
 
     private static String getOperatingSystemReleaseFact(String certName) {
-        return buildNodeFactQuery(certName) + String.valueOf(FactType.OperatingSystemRelease).toLowerCase();
+        return factQuery(certName) + "/" + String.valueOf(FactType.OperatingSystemRelease).toLowerCase();
     }
 
-    private static String buildNodeFactQuery(String certName) {
-        return GET_NODES + "/" + certName + "/facts/";
+    public static String factQuery(String certName) {
+        return GET_NODES + "/" + certName + "/facts";
     }
 
     static String generateSSHKeyPairWithCertName(String certName) {

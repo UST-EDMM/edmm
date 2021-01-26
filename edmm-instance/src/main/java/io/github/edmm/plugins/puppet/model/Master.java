@@ -9,6 +9,7 @@ import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
+import io.github.edmm.util.Util;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -16,10 +17,15 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 public class Master {
+
+    private final static Logger logger = LoggerFactory.getLogger(Master.class);
+
     private String id;
     private String hostName;
     private String user;
@@ -57,7 +63,8 @@ public class Master {
             this.session.setConfig("StrictHostKeyChecking", "no");
             this.session.connect();
         } catch (JSchException e) {
-            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the correct user, host, sshPort and private key location of the Puppet Master is set.");
+            throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the " +
+                "correct user, host, sshPort, and private key location of the Puppet Master is set.");
         }
     }
 
@@ -84,6 +91,10 @@ public class Master {
 
     private ChannelExec setupChannelExec() throws JSchException {
         return (ChannelExec) this.session.openChannel("exec");
+    }
+
+    public String getPrivateKey() {
+        return Util.readFromFile(this.privateKeyLocation);
     }
 
     public String executeCommandAndHandleResult(String command) {
