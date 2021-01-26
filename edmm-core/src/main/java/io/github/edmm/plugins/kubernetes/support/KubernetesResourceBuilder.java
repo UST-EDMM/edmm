@@ -45,7 +45,7 @@ public class KubernetesResourceBuilder {
         resources.add(new ConfigMapResource(stack, TopologyGraphHelper.resolveComputedProperties(graph, stack.getRoot())));
         resources.forEach(KubernetesResource::build);
         try {
-            String targetDirectory = stack.getName();
+            String targetDirectory = stack.getLabel();
             for (KubernetesResource resource : resources) {
                 fileAccess.write(targetDirectory + "/" + resource.getName() + ".yaml", resource.toYaml());
             }

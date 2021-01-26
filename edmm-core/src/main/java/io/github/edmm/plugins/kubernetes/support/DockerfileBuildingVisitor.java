@@ -38,11 +38,11 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
         this.fileAccess = fileAccess;
         this.builder = new DockerfileBuilder().compress();
         this.builder.from(stack.getBaseImage());
-        this.builder.workdir("/opt/" + stack.getName());
+        this.builder.workdir("/opt/edmm");
     }
 
     public void populateDockerfile() {
-        String targetDirectory = stack.getName();
+        String targetDirectory = stack.getLabel();
         stack.getComponents().forEach(component -> component.accept(this));
         try {
             for (FileMapping mapping : stack.getArtifacts()) {
