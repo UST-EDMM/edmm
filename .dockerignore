@@ -7,4 +7,5 @@
 !edmm-instance/src/**/*
 !edmm-instance/edmmi*
 !edmm-instance/edmm-instance.xml
+!edmm-orchestration/src/**/*
 !**/*.xml
