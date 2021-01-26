@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![build](https://github.com/UST-EDMM/edmm/workflows/build/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d46d2287b3084689be0247e1aed91bc9)](https://www.codacy.com/manual/miwurster/edmm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UST-EDMM/edmm&amp;utm_campaign=Badge_Grade)
-[![JitPack](https://jitpack.io/v/UST-EDMM/transformation-framework.svg)](https://jitpack.io/#UST-EDMM/edmm)
+[![](https://jitpack.io/v/UST-EDMM/edmm.svg)](https://jitpack.io/#UST-EDMM/edmm)
 
 EDMM provides a declarative model describing the components to be deployed, their configurations, required artifacts, and relations among them.
 The resulting EDMM model is independent of any specific deployment technology and can be exported from an EDMM-enabled modeling tool or created directly using a text editor according to the respective YAML specification.
@@ -38,7 +38,7 @@ By building the Docker images (`docker build -t <name> .`) one can apply the Kub
 
 ## Usage
 
-The final distribution package can be downloaded form the [releases](https://github.com/UST-EDMM/transformation-framework/releases) page.
+The final distribution package can be downloaded form the [releases](https://github.com/UST-EDMM/edmm/releases) page.
 Extract the files to a location on your filesystem and add it to your path variable (Linux: `$PATH`, Windows: `%PATH%`).
 Afterwards you can invoke the `edmm` command from a command prompt.
 
@@ -94,6 +94,6 @@ We use Maven as our build tool:
 Build the `edmm-web` Docker image:
 
 ```shell
-docker build -t edmm-web -f .\edmm-web\Dockerfile .
+docker build -t edmm-web .
 docker run -it -p 5000:5000 edmm-web
 ```
