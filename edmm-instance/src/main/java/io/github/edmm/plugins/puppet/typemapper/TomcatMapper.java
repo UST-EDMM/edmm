@@ -2,11 +2,11 @@ package io.github.edmm.plugins.puppet.typemapper;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.winery.model.tosca.TNodeTemplate;
-import org.eclipse.winery.model.tosca.TTopologyTemplate;
-
 import io.github.edmm.core.transformation.TypeTransformer;
 import io.github.edmm.exporter.WineryConnector;
+
+import org.eclipse.winery.model.tosca.TNodeTemplate;
+import org.eclipse.winery.model.tosca.TTopologyTemplate;
 
 public class TomcatMapper implements TypeTransformer {
 

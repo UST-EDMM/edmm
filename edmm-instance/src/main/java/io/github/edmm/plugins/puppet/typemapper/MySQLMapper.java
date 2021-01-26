@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
+import io.github.edmm.core.transformation.TypeTransformer;
+import io.github.edmm.exporter.WineryConnector;
+
 import org.eclipse.winery.common.version.VersionUtils;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
-
-import io.github.edmm.core.transformation.TypeTransformer;
-import io.github.edmm.exporter.WineryConnector;
 
 public class MySQLMapper implements TypeTransformer {
 
