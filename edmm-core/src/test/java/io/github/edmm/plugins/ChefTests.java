@@ -8,6 +8,7 @@ import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.DeploymentModel;
 import io.github.edmm.plugins.chef.ChefPlugin;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class ChefTests extends PluginTest {
     }
 
     @Test
+    @Ignore
     public void testLifecycleExecution() {
         executeLifecycle(new ChefPlugin(), context);
     }

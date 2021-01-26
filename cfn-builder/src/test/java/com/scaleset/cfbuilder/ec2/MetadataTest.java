@@ -35,7 +35,7 @@ public class MetadataTest {
         new MetadataModule().id("").template(lampTemplate).build();
 
         assertNotNull(lampTemplate);
-        System.err.println(lampTemplate.toString(true));
+        // System.err.println(lampTemplate.toString(true));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class MetadataTest {
         Assert.assertThat(templateString, containsString("source:"));
         Assert.assertThat(templateString, not(containsString("content:")));
 
-        System.err.println(templateString);
+        // System.err.println(templateString);
     }
 
     class MetadataModule extends Module {

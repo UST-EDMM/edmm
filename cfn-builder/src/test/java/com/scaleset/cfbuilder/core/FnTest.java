@@ -9,7 +9,7 @@ public class FnTest {
     public void testFn() {
         Fn fn = Fn.fnGetAtt("mydb", "Endpoint.Address");
         String yaml = fn.toString(true);
-        System.out.println(yaml);
+        // System.out.println(yaml);
         String expected = "Fn::GetAtt:\n" +
                 "- \"mydb\"\n" +
                 "- \"Endpoint.Address\"";

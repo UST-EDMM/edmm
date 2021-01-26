@@ -20,6 +20,7 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.plugins.ansible.model.AnsiblePlay;
 import io.github.edmm.plugins.ansible.model.AnsibleTask;
+import io.github.edmm.utils.Consts;
 
 import com.google.common.collect.Lists;
 import freemarker.template.Configuration;
@@ -80,12 +81,13 @@ public class AnsibleTransformer implements ComponentVisitor {
                     .hosts(hosts)
                     .vars(properties)
                     .tasks(tasks)
+                    .files(new ArrayList<>())
                     .build();
-
                 plays.add(play);
             }
 
             templateData.put("plays", plays);
+            templateData.put("hosts", new HashMap<>());
             fileAccess.append(FILE_NAME, TemplateHelper.toString(baseTemplate, templateData));
         } catch (IOException e) {
             logger.error("Failed to write Ansible file: {}", e.getMessage(), e);
@@ -98,7 +100,11 @@ public class AnsibleTransformer implements ComponentVisitor {
             Map<String, Property> properties = component.getProperties();
             properties.values().stream()
                 .filter(p -> !Arrays.asList(blacklist).contains(p.getName()))
-                .forEach(p -> envVars.put(component.getNormalizedName() + "_" + p.getNormalizedName(), p.getValue()));
+                .forEach(p -> {
+                    String key = component.getNormalizedName() + "_" + p.getNormalizedName();
+                    String value = p.getValue() == null ? Consts.EMPTY : p.getValue();
+                    envVars.put(key, value);
+                });
         }
     }
 

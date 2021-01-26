@@ -17,7 +17,7 @@ public class NetworkInterfaceTest {
         String testNetworkInterfaceTemplateString = testNetworkInterfaceTemplate.toString(true);
 
         assertNotNull(testNetworkInterfaceTemplate);
-        System.err.println(testNetworkInterfaceTemplateString);
+        // System.err.println(testNetworkInterfaceTemplateString);
     }
 
     class TestNetworkInterfaceModule extends Module {

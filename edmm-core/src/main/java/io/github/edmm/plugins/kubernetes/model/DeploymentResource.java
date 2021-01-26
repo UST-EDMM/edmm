@@ -36,21 +36,17 @@ public final class DeploymentResource implements KubernetesResource {
             .withImage(stack.getLabel() + ":latest")
             .withName(stack.getLabel())
             .withImagePullPolicy("Never")
-            .addAllToPorts(stack.getPorts().stream()
-                .map(PortMapping::toContainerPort)
-                .collect(Collectors.toList()))
-            .addAllToEnv(stack.getEnvVars().entrySet().stream()
-                .map(e -> new EnvVar(e.getKey(), e.getValue(), null))
-                .collect(Collectors.toSet()))
+            .addAllToPorts(stack.getPorts().stream().map(PortMapping::toContainerPort).collect(Collectors.toList()))
+            .addAllToEnv(stack.getEnvVars().entrySet().stream().map(e -> new EnvVar(e.getKey(), e.getValue(), null)).collect(Collectors.toSet()))
             .addAllToEnv(stack.getRuntimeEnvVars().stream().map(name -> {
                 var source = new EnvVarSourceBuilder().withNewConfigMapKeyRef().withNewKey(name)
                     .withNewName(stack.getConfigMapName()).endConfigMapKeyRef().build();
                 return new EnvVarBuilder().withName(name).withValueFrom(source).build();
-            }).collect(Collectors.toSet()))
-            .build();
+            }).collect(Collectors.toSet())).build();
         deployment = new DeploymentBuilder()
             .withNewMetadata()
             .withName(stack.getLabel())
+            .withNamespace("default")
             .addToLabels("app", stack.getLabel())
             .endMetadata()
             .withNewSpec()
@@ -67,7 +63,8 @@ public final class DeploymentResource implements KubernetesResource {
             .addAllToContainers(Lists.newArrayList(container))
             .endSpec()
             .endTemplate()
-            .endSpec().build();
+            .endSpec()
+            .build();
     }
 
     @Override

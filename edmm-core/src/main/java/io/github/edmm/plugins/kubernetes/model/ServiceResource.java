@@ -33,6 +33,7 @@ public final class ServiceResource implements KubernetesResource {
             .withNewMetadata()
             .withName(stack.getServiceName())
             .addToLabels("app", stack.getServiceName())
+            .withNamespace("default")
             .endMetadata()
             .withNewSpec()
             .addAllToPorts(ports)

@@ -25,7 +25,7 @@ import static picocli.CommandLine.usage;
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource( {"classpath*:pluginContext.xml"})
+@ImportResource( {"classpath*:pluginContext.xml", "classpath*:pluginContextOrchestration.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
     public static final String PICOCLI_ANSI = "picocli.ansi";

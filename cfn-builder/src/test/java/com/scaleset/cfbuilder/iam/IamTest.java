@@ -17,7 +17,7 @@ public class IamTest {
         String testIamTemplateString = testIamTemplate.toString(true);
 
         assertNotNull(testIamTemplate);
-        System.err.println(testIamTemplateString);
+        // System.err.println(testIamTemplateString);
     }
 
     class TestIamModule extends Module {

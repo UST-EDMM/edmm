@@ -15,7 +15,7 @@ public class BeanstalkTest {
         String beanstalkTemplateString = beanstalkTemplate.toString(true);
 
         assertNotNull(beanstalkTemplateString);
-        System.err.println(beanstalkTemplateString);
+        // System.err.println(beanstalkTemplateString);
     }
 
     class BeanstalkModule extends Module {

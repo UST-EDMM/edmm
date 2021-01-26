@@ -54,7 +54,7 @@ public class VolumeTest {
 
         assertNotNull(EncEbsSnapTemplate);
         assertEquals(expectedEncEbsSnapTemplateString, EncEbsSnapTemplateString);
-        System.err.println(EncEbsSnapTemplateString);
+        // System.err.println(EncEbsSnapTemplateString);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class VolumeTest {
 
         assertNotNull(Ebs100IopsTemplate);
         assertEquals(expectedEbs100IopsTemplateString, Ebs100IopsTemplateString);
-        System.err.println(Ebs100IopsTemplateString);
+        // System.err.println(Ebs100IopsTemplateString);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class VolumeTest {
         String volumeTestTemplateString = volumeTestTemplate.toString(true);
 
         assertNotNull(volumeTestTemplate);
-        System.err.println(volumeTestTemplateString);
+        // System.err.println(volumeTestTemplateString);
     }
 
     class EncEbsSnapModule extends Module {

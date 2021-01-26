@@ -19,8 +19,7 @@ public class CloudFormationBuilderTest extends Module {
         new CloudFormationBuilderTest.TestModule().id("").template(lampTemplate).build();
 
         assertNotNull(lampTemplate);
-
-        System.err.println(lampTemplate.toString(true));
+        // System.err.println(lampTemplate.toString(true));
     }
 
     class TestModule extends Module {

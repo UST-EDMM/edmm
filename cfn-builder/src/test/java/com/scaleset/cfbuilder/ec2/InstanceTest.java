@@ -69,7 +69,7 @@ public class InstanceTest {
 
         assertNotNull(ec2withEbsTemplate);
         assertEquals(expectedEc2withEbsTemplateString, ec2withEbsTemplateString);
-        System.err.println(ec2withEbsTemplateString);
+        // System.err.println(ec2withEbsTemplateString);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class InstanceTest {
 
         assertNotNull(autoPubIPTemplate);
         assertEquals(expectedAutoPubIPTemplateString, autoPubIPTemplateString);
-        System.err.println(autoPubIPTemplateString);
+        // System.err.println(autoPubIPTemplateString);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class InstanceTest {
         String autoPubIPTemplateString = testPropertiesTemplate.toString(true);
 
         assertNotNull(testPropertiesTemplate);
-        System.err.println(autoPubIPTemplateString);
+        // System.err.println(autoPubIPTemplateString);
     }
 
     class Ec2withEbsModule extends Module {

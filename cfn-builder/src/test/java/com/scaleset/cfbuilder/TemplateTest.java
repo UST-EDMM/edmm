@@ -24,14 +24,14 @@ public class TemplateTest extends Assert {
         new TestModule().id("Test").template(t).build();
         new TestModule().id("Test2").template(t).build();
 
-        System.err.println(t.toString(false));
+        // System.err.println(t.toString(false));
 
         ObjectMapper mapper = new ObjectMapper().registerModule(new CloudFormationJsonModule().scanTypes());
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
 
         Template template = mapper.readValue(t.toString(false), Template.class);
         assertNotNull(template);
-        System.err.println(template.toString(false));
+        // System.err.println(template.toString(false));
     }
 
     class TestModule extends Module {

@@ -136,7 +136,7 @@ public class Ec2Test {
 
         assertNotNull(vpcInstanceWithEniTemplate);
         assertEquals(expectedVpcInstanceWithEniTemplateString, vpcInstanceWithEniTemplateString);
-        System.err.println(vpcInstanceWithEniTemplateString);
+        // System.err.println(vpcInstanceWithEniTemplateString);
     }
 
     class VpcInstanceWithEniModule extends Module {

@@ -22,6 +22,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <requiresUnpack>
+                        <dependency>
+                            <groupId>io.kubernetes</groupId>
+                            <artifactId>client-java-api</artifactId>
+                        </dependency>
+                    </requiresUnpack>
                     <executable>true</executable>
                 </configuration>
             </plugin>
@@ -56,6 +62,11 @@
         <dependency>
             <groupId>io.github.ust.edmm</groupId>
             <artifactId>edmm-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.ust.edmm</groupId>
+            <artifactId>edmm-orchestration</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
