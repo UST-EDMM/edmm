@@ -51,7 +51,7 @@ public class DeployCommand implements Callable<Integer> {
     public Integer call() {
         ExecutionContext context = new ExecutionContext(TransformationContext.of(directory), userInputs);
         executionService.start(context);
-        return 42;
+        return 0;
     }
 
     @Autowired

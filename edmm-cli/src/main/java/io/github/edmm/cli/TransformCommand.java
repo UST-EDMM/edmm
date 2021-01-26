@@ -58,7 +58,7 @@ public class TransformCommand implements Callable<Integer> {
         DeploymentModel model = DeploymentModel.of(input);
         TransformationContext context = transformationService.createContext(model, target, sourceDirectory, targetDirectory);
         transformationService.start(context);
-        return 42;
+        return 0;
     }
 
     @Autowired
