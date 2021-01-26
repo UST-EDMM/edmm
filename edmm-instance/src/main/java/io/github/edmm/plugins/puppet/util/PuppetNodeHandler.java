@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
@@ -18,6 +19,7 @@ import io.github.edmm.model.edimm.RelationType;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.FactType;
 import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
 import io.github.edmm.plugins.puppet.model.Report;
 import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 import io.github.edmm.plugins.puppet.model.ResourceType;
@@ -85,7 +87,16 @@ public class PuppetNodeHandler {
         return null;
     }
 
-    private static List<ComponentInstance> identifyPackagesOnPuppetNode(Master master, ComponentInstance componentInstance, String certName) {
+    public static List<Report> identifyRelevantReports(Master master, String certName) {
+        List<Report> allReports = new Gson()
+            .fromJson(master.executeCommandAndHandleResult(Commands.GET_ALL_REPORTS), new TypeToken<List<Report>>() { }.getType());
+        return allReports.stream()
+            .filter(report -> report.getStatus() == Report.State.changed)
+            .filter(report -> report.getResource_events().getData() != null && report.getCertname().equals(certName))
+            .collect(Collectors.toList());
+    }
+
+    public static List<ComponentInstance> identifyPackagesOnPuppetNode(Master master, ComponentInstance componentInstance, String certName) {
         List<Report> allReports = new Gson().fromJson(master.executeCommandAndHandleResult(Commands.GET_ALL_REPORTS), new TypeToken<List<Report>>() {
         }.getType());
 
@@ -97,30 +108,33 @@ public class PuppetNodeHandler {
         Fact operatingSystemReleaseFact = facts.stream().filter(fact -> fact.getName().equals(FactType.OperatingSystemRelease.toString().toLowerCase())).findFirst().orElse(null);
 
         return operatingSystemFact != null && operatingSystemReleaseFact != null
-            ? operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue()
+            ? operatingSystemFact.getValue() + operatingSystemReleaseFact.getValue().toString()
             : "";
     }
 
     private static List<ComponentInstance> identifyRelevantResourceEventEntries(List<Report> allReports, ComponentInstance componentInstance, String certName) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
-        for (Report report : allReports) {
-            if (report.getResource_events().getData() == null || !report.getCertname().equals(certName)) {
-                continue;
-            }
-            for (ResourceEventEntry resourceEventEntry : report.getResource_events().getData()) {
-                if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
-                    ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
-                    logger.info("Identified component instance {}", generatedComponentInstance.getName());
-                    if (generatedComponentInstance.getType().equals(ComponentType.Tomcat)) {
-                        ComponentInstance webApp = searchForWebAppsInTomcatDirectory(componentInstance, generatedComponentInstance);
-                        if (webApp != null) {
-                            componentInstances.add(webApp);
+        List<List<ResourceEventEntry>> collect = allReports.stream()
+            .filter(report -> report.getResource_events().getData() != null && report.getCertname().equals(certName))
+            .map(report -> report.getResource_events().getData())
+            .collect(Collectors.toList());
+
+            collect.forEach(resourceEventEntries -> {
+                for (ResourceEventEntry resourceEventEntry : resourceEventEntries) {
+                    if (checkIfResourceEventEntryIsSuitable(resourceEventEntry)) {
+                        ComponentInstance generatedComponentInstance = generateComponentInstanceFromResourceEventEntry(resourceEventEntry, componentInstance, certName);
+                        logger.info("Identified component instance {}", generatedComponentInstance.getName());
+                        if (generatedComponentInstance.getType().equals(ComponentType.Tomcat)) {
+                            ComponentInstance webApp = searchForWebAppsInTomcatDirectory(componentInstance, generatedComponentInstance);
+                            if (webApp != null) {
+                                componentInstances.add(webApp);
+                            }
                         }
+                        componentInstances.add(generatedComponentInstance);
                     }
-                    componentInstances.add(generatedComponentInstance);
                 }
-            }
-        }
+            });
+
         return componentInstances;
     }
 
@@ -167,7 +181,7 @@ public class PuppetNodeHandler {
     }
 
     private static boolean checkIfResourceEventEntryIsSuitable(ResourceEventEntry resourceEventEntry) {
-        return isNotNull(resourceEventEntry) && isPackageEntry(resourceEventEntry) && isSucceeded(resourceEventEntry.getStatus());
+        return isNotNull(resourceEventEntry) && isPackageEntry(resourceEventEntry) && resourceEventEntry.getStatus() == PuppetResourceStatus.success;
     }
 
     private static boolean isNotNull(ResourceEventEntry resourceEventEntry) {

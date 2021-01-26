@@ -8,7 +8,7 @@ public class Fact {
     private String certname;
     @Setter
     private String name;
-    private String value;
+    private Object value;
 
     public Fact(String certname, String name, String value) {
         this.certname = certname;

@@ -2,7 +2,7 @@ class ${component}::${task.name} {
   file { '${task.scriptFileName}':
     ensure => 'file',
     source => 'puppet:///modules/${component}/${task.scriptFileName}',
-    path => '/usr/local/bin/${task.scriptFileName}',
+    path => '/usr/local/etc/${task.scriptFileName}',
     owner => 'root',
     group => 'root',
     mode  => '0744', # Use 0700 if it is sensitive
@@ -16,7 +16,7 @@ class ${component}::${task.name} {
         </#list>
     ],
     </#if>
-    command => '/usr/local/bin/${task.scriptFileName}',
+    command => '/usr/local/etc/${task.scriptFileName}',
     refreshonly => true
   }
 }

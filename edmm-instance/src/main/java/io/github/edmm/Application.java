@@ -1,12 +1,17 @@
 package io.github.edmm;
 
+import io.github.edmm.cli.CfnCommand;
+import io.github.edmm.cli.HeatCommand;
+import io.github.edmm.cli.KubernetesCommand;
+import io.github.edmm.cli.ParseCommand;
+import io.github.edmm.cli.PuppetCommand;
+
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.usage;
@@ -20,12 +25,14 @@ import static picocli.CommandLine.usage;
     },
     subcommands = {
         CommandLine.HelpCommand.class,
-        TransformCommand.class,
-        ParseCommand.class
+        CfnCommand.class,
+        HeatCommand.class,
+        KubernetesCommand.class,
+        ParseCommand.class,
+        PuppetCommand.class,
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource( {"classpath*:instancePluginContext.xml"})
 public class Application implements CommandLineRunner, Runnable, ExitCodeGenerator {
 
     private static final String PICOCLI_ANSI = "picocli.ansi";

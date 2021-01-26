@@ -16,6 +16,13 @@
         <checkstyle.config.location>../checkstyle.xml</checkstyle.config.location>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -167,6 +174,21 @@
             <artifactId>openstack4j</artifactId>
             <version>3.3</version>
             <classifier>withdeps</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.github.opentosca.winery</groupId>
+            <artifactId>org.eclipse.winery.model.tosca</artifactId>
+            <version>846fd4657d</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.opentosca.winery</groupId>
+            <artifactId>org.eclipse.winery.common</artifactId>
+            <version>846fd4657d</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.opentosca.winery</groupId>
+            <artifactId>org.eclipse.winery.repository</artifactId>
+            <version>846fd4657d</version>
         </dependency>
     </dependencies>
 

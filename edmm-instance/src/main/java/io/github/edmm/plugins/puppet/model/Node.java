@@ -9,8 +9,16 @@ import lombok.Setter;
 @Setter
 public class Node {
     private String certname;
+    private String report_environment;
     private String latest_report_hash;
     private String latest_report_status;
     private List<Fact> facts;
     private PuppetState.NodeState state;
+
+    public Fact getFactByName(String name) {
+        return facts.stream()
+            .filter(fact -> fact.getName().equals(name))
+            .findFirst()
+            .orElse(null);
+    }
 }

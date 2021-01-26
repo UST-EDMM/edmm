@@ -13,4 +13,10 @@ public abstract class Constants {
     public static final String VM_KEY_PAIR_NAME = "VMKeyPairName";
     public static final String STATE = "State";
     public static final String RUNNING = "Running";
+    public static final String VM_INSTANCE_ID = "VMInstanceID";
+    public static final String VM_USER_NAME = "VMUserName";
+    public static final String PUPPET_ENV = "PuppetEnvironments";
+    public static final String PUPPET_MASTER = "MasterIP";
+    public static final String PUPPET_MASTER_KEY = "MasterPrivateKey";
+    public static final String PUPPET_MASTER_USER = "MasterUserName";
 }

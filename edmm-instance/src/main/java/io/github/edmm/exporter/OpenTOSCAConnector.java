@@ -16,8 +16,12 @@ import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
 import io.github.edmm.exporter.dto.TagDTO;
 import io.github.edmm.exporter.dto.TopologyTemplateDTO;
+import io.github.edmm.exporter.dto.TypesDTO;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
+import io.github.edmm.plugins.puppet.util.GsonHelper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
@@ -34,12 +38,15 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.winery.model.tosca.TNodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class WineryExporter {
+public abstract class OpenTOSCAConnector {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(WineryExporter.class.getName());
+    public final static QName ManagedBy = QName.valueOf("{http://opentosca.org/relationshiptypes}ManagedBy");
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(OpenTOSCAConnector.class.getName());
 
     // TODO: retrieve such info from\overline{} a config or sth like that
     private static final String wineryEndpoint = "http://localhost:8080/winery/";
@@ -57,6 +64,19 @@ public abstract class WineryExporter {
         applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()), serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
         importCSARToContainerAndStartInstance(serviceTemplateInstance.getCsarId(), outputPath, serviceTemplateInstance.getServiceTemplateId());
+    }
+
+    public static List<TypesDTO> getAllNodeTypes() {
+        return performGetList(wineryEndpoint + "nodetypes", TypesDTO.class);
+    }
+
+    public static TNodeType getNodeType(QName qName) {
+        try {
+            return performGet(wineryEndpoint + "nodetypes" + doubleEncodeNamespace(qName), TNodeType.class);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Error while encoding namespace.", e);
+        }
+        return null;
     }
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
@@ -100,15 +120,15 @@ public abstract class WineryExporter {
     }
 
     private static List<EnrichmentDTO> getAvailableFeatures(QName serviceTemplateId) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
         try {
-            HttpGet get = new HttpGet(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath);
-            get.setHeader("accept", "application/json");
-            HttpResponse response = httpClient.execute(get);
-            return getJsonStringAsEnrichmentDTOs(EntityUtils.toString(response.getEntity()));
-        } catch (IOException | JsonSyntaxException e) {
-            LOGGER.error("Failed to get available features from Winery.", e);
+            return performGetList(
+                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
+                EnrichmentDTO.class
+            );
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Error while encoding Namespace...", e);
         }
+
         return null;
     }
 
@@ -218,12 +238,39 @@ public abstract class WineryExporter {
         return getObjectAsJson(instanceDTOs);
     }
 
+    private static <T> List<T> performGetList(String url, Class<T> clazz) {
+        return GsonHelper.parseJsonStringToParameterizedList(performGet(url), clazz);
+    }
+
+    private static <T> T performGet(String url, Class<T> clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(performGet(url), clazz);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+//        return GsonHelper.parseJsonStringToObjectType(performGetList(url), clazz);
+    }
+
+    private static String performGet(String url) {
+        try {
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpGet get = new HttpGet(url);
+            get.setHeader("accept", "application/json");
+            return EntityUtils.toString(httpClient.execute(get).getEntity());
+        } catch (IOException | JsonSyntaxException e) {
+            LOGGER.error("Failed to get available features from Winery.", e);
+        }
+        return null;
+    }
+
     private static List<EnrichmentDTO> getJsonStringAsEnrichmentDTOs(String jsonString) {
         Gson gson = new Gson();
         return gson.fromJson(jsonString, List.class);
     }
 
-    private static String doubleEncodeNamespace(QName serviceTemplateId) throws UnsupportedEncodingException {
-        return "/" + URLEncoder.encode(URLEncoder.encode(serviceTemplateId.getNamespaceURI(), "UTF-8"), "UTF-8") + "/" + serviceTemplateId.getLocalPart() + "/";
+    private static String doubleEncodeNamespace(QName qName) throws UnsupportedEncodingException {
+        return "/" + URLEncoder.encode(URLEncoder.encode(qName.getNamespaceURI(), "UTF-8"), "UTF-8") + "/" + qName.getLocalPart() + "/";
     }
 }
