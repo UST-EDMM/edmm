@@ -11,3 +11,4 @@ target
 .vscode/
 
 .gradle
+edmm-core/src/test/resources/templates/multi

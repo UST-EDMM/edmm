@@ -19,9 +19,9 @@ components:
   pet_clinic:
     type: web_application
     artifacts:
-      - war: ./files/petclinic/petclinic.war
+      - war: ./files/app.war
     operations:
-      configure: ./files/petclinic/configure.sh
+      configure: ./files/configure.sh
     relations:
       - hosted_on: pet_clinic_tomcat
       - connects_to: db
@@ -34,8 +34,8 @@ components:
   pet_clinic_tomcat:
     type: tomcat
     operations:
-      create: ./files/tomcat/create.sh
-      start: ./files/tomcat/start.sh
+      create: ./files/create.sh
+      start: ./files/start.sh
     relations:
       - hosted_on: ubuntu_app
 
@@ -48,9 +48,9 @@ components:
       user: pc
       password: petclinic
     artifacts:
-      - sql: ./files/petclinic/schema.sql
+      - sql: ./files/app.sql
     operations:
-      configure: ./files/mysql_database/configure.sh
+      configure: ./files/configure.sh
     relations:
       - hosted_on: dbms
 
@@ -59,8 +59,8 @@ components:
     properties:
       root_password: petclinic
     operations:
-      create: ./files/mysql_dbms/create.sh
-      start: ./files/mysql_dbms/start.sh
+      create: ./files/create.sh
+      start: ./files/start.sh
     relations:
       - hosted_on: ubuntu_db
 
@@ -72,9 +72,9 @@ components:
       machine_image: ubuntu
       instance_type: large
       key_name: win10key
-      private_key_path: ./files/ubuntu/key.pem
+      private_key_path: ./files/key.pem
     artifacts:
-      - provider: ./files/ubuntu/openstack.json
+      - provider: ./files/openstack.json
 
   ubuntu_db:
     type: compute
@@ -82,9 +82,9 @@ components:
       machine_image: ubuntu
       instance_type: large
       key_name: win10key
-      private_key_path: ./files/ubuntu/key.pem
+      private_key_path: ./files/key.pem
     artifacts:
-      - provider: ./files/ubuntu/openstack.json
+      - provider: ./files/openstack.json
 
 ###############################################
 ## Component Types

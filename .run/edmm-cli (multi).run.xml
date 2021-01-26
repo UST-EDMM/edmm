@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="edmm-cli (multi)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="edmm-cli" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="io.github.edmm.cli.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.cli.Application" />
+    <option name="PROGRAM_PARAMETERS" value="transform multi ./edmm-core/src/test/resources/templates/multi-deployment.yml" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
