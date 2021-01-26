@@ -38,7 +38,13 @@ public class MySQLMapper implements TypeTransformer {
 
         return WineryConnector.getInstance().getBaseNodeTypesQNames().stream()
             .filter(qName -> VersionUtils.getNameWithoutVersion(qName.getLocalPart()).equalsIgnoreCase(type[0]))
-            .findFirst()
+            .min((o1, o2) -> {
+                int compareTo = o1.getNamespaceURI().compareTo(o2.getNamespaceURI());
+                if (compareTo == 0) {
+                    return o1.getLocalPart().compareTo(o2.getLocalPart());
+                }
+                return compareTo;
+            })
             .orElse(null);
     }
 

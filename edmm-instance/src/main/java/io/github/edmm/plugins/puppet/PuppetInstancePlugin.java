@@ -171,9 +171,10 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
                     TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
+                    String normalizedName = identifiedComponent.replaceAll("(\\s)|(:)|(\\.)", "_");
                     softwareNode.setId(node.getCertname() + "-" +
-                        identifiedComponent.replaceAll("(\\s)|(:)|(\\.)", "_"));
-                    softwareNode.setName(identifiedComponent);
+                        normalizedName);
+                    softwareNode.setName(normalizedName);
                     this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
