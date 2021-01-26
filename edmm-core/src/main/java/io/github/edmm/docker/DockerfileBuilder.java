@@ -17,12 +17,22 @@ import io.github.edmm.docker.support.RunEntry;
 import io.github.edmm.docker.support.VolumeEntry;
 import io.github.edmm.docker.support.WorkdirEntry;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public final class DockerfileBuilder {
 
     private boolean compress = false;
     private final List<AddEntry> addEntries = new ArrayList<>();
     private final List<EnvEntry> envEntries = new ArrayList<>();
     private int workdirIndex = -1;
+
+    @Setter
+    @Getter
+    private boolean skipCreateOperation = false;
+    @Setter
+    @Getter
+    private boolean skipStartOperation = false;
 
     private final List<DockerfileEntry> entries = new ArrayList<>();
 

@@ -36,9 +36,7 @@ public class ImageMappingVisitor implements ComponentVisitor {
 
     @Override
     public void visit(MysqlDbms component) {
-        if (!hasComputeScripts && !hasCreateScript(component)) {
-            baseImage = "library/mysql:8";
-        }
+        baseImage = "library/mysql:8";
     }
 
     @Override

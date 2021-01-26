@@ -3,6 +3,7 @@ package io.github.edmm.plugins.kubernetes.support;
 import java.util.Map;
 
 import io.github.edmm.core.TransformationHelper;
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.docker.Container;
@@ -53,6 +54,10 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
                 builder.add("./" + filename, filename);
             }
             for (FileMapping mapping : stack.getOperations()) {
+                if (builder.isSkipCreateOperation()
+                    && mapping.getOperation().getName().equalsIgnoreCase(DefaultKeys.CREATE)) {
+                    continue;
+                }
                 String sourcePath = mapping.getArtifact().getValue();
                 String filename = mapping.getComponent().getNormalizedName() +
                     "_" + determineFilename(mapping.getArtifact());
@@ -64,7 +69,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
             // Expose ports
             stack.getPorts().forEach(port -> builder.expose(port.getValue()));
             // Add final CMD statement
-            if (!stack.getStartOperations().isEmpty()) {
+            if (!builder.isSkipStartOperation() && !stack.getStartOperations().isEmpty()) {
                 FileMapping mapping = stack.getStartOperations().get(stack.getStartOperations().size() - 1);
                 String sourcePath = mapping.getArtifact().getValue();
                 String filename = mapping.getComponent().getNormalizedName() +
@@ -132,9 +137,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     @Override
     public void visit(Compute component) {
         visit((RootComponent) component);
-        component.getProperty(PUBLIC_ADDRESS.getName()).ifPresent(p -> {
-            p.setValue(stack.getPublicAddress());
-        });
+        component.addProperty(PUBLIC_ADDRESS.getName(), stack.getPublicAddress());
     }
 
     @Override
@@ -150,6 +153,8 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     public void visit(MysqlDbms component) {
         visit((RootComponent) component);
         component.getRootPassword().ifPresent(value -> builder.env("MYSQL_ROOT_PASSWORD", value));
+        builder.setSkipStartOperation(true);
+        builder.setSkipCreateOperation(true);
     }
 
     @Override
