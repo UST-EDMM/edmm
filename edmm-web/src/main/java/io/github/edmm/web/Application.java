@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.RedirectView;
 ))
 @Controller
 @SpringBootApplication(scanBasePackages = "io.github.edmm")
-@ImportResource( {"classpath*:pluginContext.xml"})
+@ImportResource( {"classpath*:pluginContext.xml", "classpath*:pluginContextOrchestration.xml"})
 public class Application extends SpringBootServletInitializer {
 
     @GetMapping("/")
