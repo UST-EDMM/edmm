@@ -42,5 +42,4 @@ public class OrchestrationController {
     public ResponseEntity<DeployResult> deploy(@Valid @RequestBody DeployRequest deployRequest) {
         return ResponseEntity.ok().body(orchestrationHandler.prepareExecution(deployRequest));
     }
-
 }
