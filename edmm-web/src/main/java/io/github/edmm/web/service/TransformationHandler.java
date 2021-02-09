@@ -50,12 +50,13 @@ public class TransformationHandler {
             byte[] decodedBytes = Base64.getDecoder().decode(model.getInput());
             String input = new String(decodedBytes);
             DeploymentModel deploymentModel = DeploymentModel.of(input);
-            Path sourceDirectory = Paths.get("/Users/nakhadon/Projects/MA-Merge/edmm/repository");
-            System.out.println(sourceDirectory);
+            Path sourceDirectory = Paths.get(repositoryPath);
             Path targetDirectory = Files.createTempDirectory(id + "-");
+
             context = transformationService.createContext(deploymentModel, model.getTarget(), sourceDirectory.toFile(), targetDirectory.toFile());
             context.setId(id);
             store.put(id, context);
+
         } catch (Exception e) {
             throw new IllegalStateException("Could not create transformation context", e);
         }
