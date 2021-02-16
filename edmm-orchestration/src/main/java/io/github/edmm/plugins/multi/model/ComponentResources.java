@@ -3,6 +3,11 @@ package io.github.edmm.plugins.multi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ComponentResources {
 
     private List<String> runtimePropsOutput;
@@ -22,17 +27,5 @@ public class ComponentResources {
         this.runtimeInputParams = runtimeInputParams;
         this.runtimePropsOutput = runtimeOutput;
 
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getRuntimePropsOutput() {
-        return runtimePropsOutput;
-    }
-
-    public List<String> getRuntimeInputParams() {
-        return runtimeInputParams;
     }
 }

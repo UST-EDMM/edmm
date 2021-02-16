@@ -106,11 +106,6 @@ public class TerraformExecutor extends DeploymentExecutor {
                 this.properties.add(propertiess);
             }
         }
-
-        System.out.println(properties);
-        System.out.println(properties.get(0).getComponent());
-        System.out.println(properties.get(0).getProperties());
-
     }
 
     public List<ComponentProperties> executeWithOutputProperty() throws Exception {

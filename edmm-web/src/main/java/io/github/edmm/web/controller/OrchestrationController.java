@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import io.github.edmm.web.model.DeployRequest;
 import io.github.edmm.web.model.DeployResult;
+import io.github.edmm.web.model.TransferRequest;
 import io.github.edmm.web.model.TransformationRequest;
 import io.github.edmm.web.service.OrchestrationHandler;
 
@@ -41,5 +42,17 @@ public class OrchestrationController {
     @PostMapping(value = "/deploy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DeployResult> deploy(@Valid @RequestBody DeployRequest deployRequest) {
         return ResponseEntity.ok().body(orchestrationHandler.prepareExecution(deployRequest));
+    }
+
+    @PostMapping(value = "/transfer")
+    public ResponseEntity<String> transferBPMNtoEngine(@Valid @RequestBody TransferRequest transferRequest) {
+        String s = orchestrationHandler.transferBPMNtoEngine(transferRequest.getEndpoint(), transferRequest.getMultiId());
+        return ResponseEntity.ok().body(s);
+    }
+
+    @PostMapping(value = "/initiate")
+    public ResponseEntity<String> initiateDeployment(@Valid @RequestBody TransferRequest transferRequest) {
+       String s = orchestrationHandler.initiateDeployment(transferRequest.getEndpoint(), transferRequest.getMultiId());
+       return ResponseEntity.ok().body(s);
     }
 }

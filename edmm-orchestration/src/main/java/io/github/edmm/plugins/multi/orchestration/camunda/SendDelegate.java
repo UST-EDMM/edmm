@@ -75,7 +75,6 @@ public class SendDelegate implements JavaDelegate {
 
         do {
             logger.info("Starting REST call with following JSON body:");
-            System.out.println(DelegateHelper.parseObjectToJSON(camundaMessage));
             startRESTCall(camundaMessage, delegateExecution);
             Thread.sleep(10000);
         } while (!this.successfulStatusCode);

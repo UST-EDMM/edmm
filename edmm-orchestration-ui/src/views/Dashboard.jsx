@@ -14,13 +14,9 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from '@material-ui/core/Typography';
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
 import CardContent from "@material-ui/core/CardContent";
-import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import yaml from "js-yaml"
+import {postUploadModel} from "../api/TransformationFrameworkAPI";
 
 const rows = [
     /*
@@ -29,8 +25,8 @@ const rows = [
     createData('Participant C', 12345, "NOT UPLOADED")*/
 ];
 
-function createData(deploymentName, edmmID, uploadStatus, startedStatus, endpoint) {
-    return { deploymentName, edmmID, uploadStatus, startedStatus, endpoint };
+function createData(deploymentName, edmmID, uploadStatus, startedStatus, endpoint, content) {
+    return { deploymentName, edmmID, uploadStatus, startedStatus, endpoint, content };
 }
 
 class Dashboard extends React.Component {
@@ -46,41 +42,31 @@ class Dashboard extends React.Component {
             openSnackbar: false
         }
         this.addParticipant = this.addParticipant.bind(this);
-        this.handleClickOpen = this.handleClickOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleChangeEDMMTextField = this.handleChangeEDMMTextField.bind(this);
     }
 
-     addParticipant() {
-         yaml.loadAll(this.state.edmmField, function(doc) {
-             console.log(doc)
-             rows.push(createData(doc.owner, doc.multi_id, "NOT UPLOADED", "NOT STARTED",
-                 doc.participants[doc.owner].endpoint))
-         })
+     addParticipant(event) {
+         const reader = new FileReader()
 
-         let base64String = Buffer.from(this.state.edmmField).toString("base64")
-         console.log(base64String)
+         reader.onload = async (e) => {
+             yaml.loadAll(e.target.result, function(doc) {
+                 console.log(doc)
+                 rows.push(createData(doc.owner, doc.multi_id, "NOT UPLOADED", "NOT STARTED",
+                     doc.participants[doc.owner].endpoint, e.target.result))
 
-         this.setState({
-            rows: rows,
-            open: false
-        })
-    }
+                 let base64String = Buffer.from(e.target.result).toString("base64")
+                 console.log(base64String)
 
-    handleClickOpen() {
-        this.setState({
-            open: true
-        })
-    }
+                 postUploadModel(doc.participants[doc.owner].endpoint, base64String, doc.multi_id)
+             })
 
-    handleClose() {
-        this.setState({
-            open: false
-        })
-    }
 
-    handleChangeEDMMTextField(event) {
-        this.setState({edmmField: event.target.value});
+             this.setState({
+                 rows: rows,
+                 open: false
+             })
+         }
+         reader.readAsText(event.target.files[0])
+
     }
 
     render() {
@@ -122,24 +108,19 @@ class Dashboard extends React.Component {
                 <br/>
                 {tableBar}
                 <div>
-                    <Button variant="contained" style={{background: "#0277BD", color: 'white'}}
-                            onClick={this.handleClickOpen}>
-                        Add EDMM Model
-                    </Button>
-                    <Dialog maxWidth={"md"} fullWidth={true} open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="form-dialog-title">Upload EDMM Model to the EDMM Transformation Framework</DialogTitle>
-                        <DialogContent>
-                            <TextareaAutosize onChange={this.handleChangeEDMMTextField} value={this.state.edmmField} style={{width: "100%", minHeight: 30}} aria-label="minimum height" rowsMin={8} placeholder="Place YAML EDMM Model here" />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleClose} color="primary">
-                                Cancel
-                            </Button>
-                            <Button onClick={this.addParticipant} color="primary">
-                                Add Model
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <input
+                        style={{display: "none"}}
+                        accept="*/*"
+                        id="contained-button-file"
+                        multiple
+                        type="file"
+                        onChange={e => this.addParticipant(e)}
+                    />
+                    <label htmlFor="contained-button-file">
+                        <Button style={{background: "#0277BD", color: 'white'}} variant="contained" color="primary" component="span">
+                            Add EDMM Model
+                        </Button>
+                    </label>
                 </div>
             </div>
         );

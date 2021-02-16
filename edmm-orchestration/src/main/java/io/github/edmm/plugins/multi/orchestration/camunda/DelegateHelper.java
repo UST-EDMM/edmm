@@ -38,7 +38,6 @@ public class DelegateHelper {
             }
         }
         logger.info("Retrieving BPMN properties");
-        System.out.println(bpmnProperties);
         return bpmnProperties;
     }
 
@@ -61,7 +60,6 @@ public class DelegateHelper {
             }
         }
         logger.info("Retrieving BPMN property");
-        System.out.println(propertyValue);
         return propertyValue;
     }
 
@@ -72,7 +70,7 @@ public class DelegateHelper {
             json = ow.writeValueAsString(object);
             logger.info("Object parsed to JSON");
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("Object failed to parse to JSON", e);
         }
         return json;
     }

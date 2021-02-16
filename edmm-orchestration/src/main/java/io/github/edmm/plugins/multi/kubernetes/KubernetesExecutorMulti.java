@@ -220,12 +220,6 @@ public class KubernetesExecutorMulti extends DeploymentExecutor {
                 e.printStackTrace();
             }
         }
-
-        properties.forEach(x -> {
-            System.out.println(x.getComponent());
-            System.out.println(x.getProperties());
-        });
-
     }
 
     public List<ComponentProperties> executeWithOutputProperty() {

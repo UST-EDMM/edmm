@@ -5,45 +5,19 @@ import java.util.UUID;
 
 import io.github.edmm.plugins.multi.model.ComponentProperties;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeployResult {
 
     private String modelId;
-
     private UUID correlationId;
-
     private List<ComponentProperties> output;
-
-    public DeployResult() {
-
-    }
-
-    public DeployResult(String modelId, UUID correlationId, List<ComponentProperties> output) {
-        this.modelId = modelId;
-        this.correlationId = correlationId;
-        this.output = output;
-    }
-
-    public String getModelId() {
-        return modelId;
-    }
-
-    public void setModelId(String modelId) {
-        this.modelId = modelId;
-    }
-
-    public List<ComponentProperties> getOutput() {
-        return output;
-    }
-
-    public void setOutput(List<ComponentProperties> output) {
-        this.output = output;
-    }
-
-    public UUID getCorrelationId() {
-        return correlationId;
-    }
-
-    public void setCorrelationId(UUID correlationId) {
-        this.correlationId = correlationId;
-    }
 }
+
