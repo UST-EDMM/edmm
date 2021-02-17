@@ -9,6 +9,13 @@
     </extension>
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.web.Application" />
     <option name="ALTERNATIVE_JRE_PATH" />
+    <additionalParameters>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="repository.path" />
+        <option name="value" value="C:\work\edmm\getting-started\modeling-repository" />
+      </param>
+    </additionalParameters>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

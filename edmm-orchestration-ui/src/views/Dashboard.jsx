@@ -18,15 +18,10 @@ import CardContent from "@material-ui/core/CardContent";
 import yaml from "js-yaml"
 import {postUploadModel} from "../api/TransformationFrameworkAPI";
 
-const rows = [
-    /*
-    createData('Participant A', 12345, "UPLOADED"),
-    createData('Participant B', 12345, "NOT UPLOADED"),
-    createData('Participant C', 12345, "NOT UPLOADED")*/
-];
+const rows = [];
 
-function createData(deploymentName, edmmID, uploadStatus, startedStatus, endpoint, content) {
-    return { deploymentName, edmmID, uploadStatus, startedStatus, endpoint, content };
+function createData(owner, edmmID, uploadStatus, startedStatus, endpoint, content) {
+    return { owner, edmmID, uploadStatus, startedStatus, endpoint, content };
 }
 
 class Dashboard extends React.Component {
@@ -59,7 +54,6 @@ class Dashboard extends React.Component {
                  postUploadModel(doc.participants[doc.owner].endpoint, base64String, doc.multi_id)
              })
 
-
              this.setState({
                  rows: rows,
                  open: false
@@ -72,7 +66,7 @@ class Dashboard extends React.Component {
     render() {
 
         let tableBar;
-        console.log(rows.length)
+
         if (rows.length !== 0) {
             tableBar = <CardContent style={{maxWidth: 1300, margin: "0 auto"
             }}>
@@ -80,9 +74,8 @@ class Dashboard extends React.Component {
                     <Table style={{minWidth: 650}} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell><b>Deployment Name</b></TableCell>
+                                <TableCell><b>Owner</b></TableCell>
                                 <TableCell align="right"><b>EDMM ID</b></TableCell>
-                                <TableCell align="right"><b>Upload Status</b></TableCell>
                                 <TableCell align="right"><b>Deployment Status</b></TableCell>
                                 <TableCell align="right"/>
                                 <TableCell align="right"/>

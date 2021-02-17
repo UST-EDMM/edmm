@@ -81,10 +81,9 @@ export default function BasicTable(props) {
         props.tableValues && props.tableValues.map((row, i) => (
             <TableRow key={i}>
                 <TableCell component="th" scope="row">
-                    {row.deploymentName}
+                    {row.owner}
                 </TableCell>
                 <TableCell align="right">{row.edmmID}</TableCell>
-                <TableCell align="right">{row.uploadStatus}</TableCell>
                 <TableCell align="right">{row.startedStatus}</TableCell>
                 <TableCell align="right">
                     <Button variant="outlined" onClick={(e) => showModel(e, i)} style={{color: "#0277BD"}}>Show Model</Button></TableCell>

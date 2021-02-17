@@ -81,8 +81,7 @@
         <dependency>
             <groupId>io.github.ust.edmm</groupId>
             <artifactId>edmm-orchestration</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

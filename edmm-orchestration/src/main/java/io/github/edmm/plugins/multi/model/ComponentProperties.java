@@ -2,35 +2,19 @@ package io.github.edmm.plugins.multi.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ComponentProperties implements Serializable {
 
     private String component;
     private HashMap<String, String> properties;
 
-    public ComponentProperties() {
-
-    }
-
-    public ComponentProperties(String component, HashMap<String, String> properties) {
-        this.component = component;
-        this.properties = properties;
-    }
-
-    public String getComponent() {
-        return component;
-    }
-
-    public void setComponent(String component) {
-        this.component = component;
-    }
-
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(HashMap<String, String> properties) {
-        this.properties = properties;
-    }
 }
