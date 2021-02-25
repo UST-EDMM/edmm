@@ -9,7 +9,7 @@ import io.github.edmm.plugins.rules.Rule;
 public class KubernetesBeanstalkRule extends Rule {
 
     public KubernetesBeanstalkRule() {
-        super("kubernetes-beanstalk", "Suggest to use a Tomcat-based compute stack instead of AWS Beanstalk", 1, ReplacementReason.PREFERRED);
+        super("kubernetes-beanstalk", "Suggest to use a Tomcat-based compute stack instead of AWS Beanstalk", 1, ReplacementReason.UNSUPPORTED);
     }
 
     @Override
