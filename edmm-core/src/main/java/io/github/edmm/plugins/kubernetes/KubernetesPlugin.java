@@ -1,12 +1,17 @@
 package io.github.edmm.plugins.kubernetes;
 
+import java.util.List;
+
 import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.ExecutionPlugin;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.InputParameter;
+import io.github.edmm.plugins.kubernetes.rules.KubernetesBeanstalkRule;
+import io.github.edmm.plugins.rules.Rule;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static io.github.edmm.model.parameters.ParameterType.NAME;
@@ -35,13 +40,16 @@ public class KubernetesPlugin extends TransformationPlugin<KubernetesLifecycle> 
 
     @Override
     public void execute(ExecutionContext context) {
-        // TODO
-        // Set<ParameterInstance> parameters = ParameterInstance.of(context.getUserInputs(), KUBERNETES.getTransformationParameters());
         new KubernetesExecutor(context, KUBERNETES).execute();
     }
 
     @Override
     public void destroy(ExecutionContext context) throws Exception {
         // noop
+    }
+
+    @Override
+    public List<Rule> getRules() {
+        return Lists.newArrayList(new KubernetesBeanstalkRule());
     }
 }
