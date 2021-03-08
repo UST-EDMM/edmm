@@ -12,6 +12,10 @@ public class MongoDbSchema extends Database {
         super(mappingEntity);
     }
 
+    public String getSchemaName() {
+        return getProperty(SCHEMA_NAME).orElse("data");
+    }
+
     @Override
     public void accept(ComponentVisitor v) {
         v.visit(this);

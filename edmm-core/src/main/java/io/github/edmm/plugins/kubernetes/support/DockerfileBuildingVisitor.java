@@ -164,8 +164,8 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
             .ifPresent(port -> stack.addPort(new PortMapping(component.getNormalizedName(), port, port, "TCP")));
         stack.addPort(new PortMapping("management", component.getManagementPort()));
         visit((RootComponent) component);
-        builder.env("RABBITMQ_DEFAULT_USER", "user");
-        builder.env("RABBITMQ_DEFAULT_PASS", "user");
+        builder.env("RABBITMQ_DEFAULT_USER", "guest");
+        builder.env("RABBITMQ_DEFAULT_PASS", "guest");
         builder.setSkipStartOperation(true);
         builder.setSkipCreateOperation(true);
     }
