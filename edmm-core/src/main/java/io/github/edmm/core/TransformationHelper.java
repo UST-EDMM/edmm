@@ -14,6 +14,7 @@ import io.github.edmm.model.relation.RootRelation;
 
 import lombok.var;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.Graph;
 
 public abstract class TransformationHelper {
@@ -52,7 +53,7 @@ public abstract class TransformationHelper {
         component.getProperties().values().stream()
             .filter(p -> !matchesBlacklist(p.getName()))
             .filter(p -> !(p.isComputed() || p.getValue() == null || p.getValue().startsWith("$")))
-            .forEach(p -> envVars.put(p.getNormalizedName().toUpperCase(), p.getValue()));
+            .forEach(p -> envVars.put(p.getNormalizedName().toUpperCase(), StringUtils.isBlank(p.getValue()) ? "\"\"" : p.getValue()));
         return envVars;
     }
 
