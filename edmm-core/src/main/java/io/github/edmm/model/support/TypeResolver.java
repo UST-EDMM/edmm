@@ -9,10 +9,15 @@ import io.github.edmm.model.component.Compute;
 import io.github.edmm.model.component.Database;
 import io.github.edmm.model.component.Dbaas;
 import io.github.edmm.model.component.Dbms;
+import io.github.edmm.model.component.Go;
+import io.github.edmm.model.component.Mom;
+import io.github.edmm.model.component.MongoDb;
+import io.github.edmm.model.component.MongoDbSchema;
 import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.MysqlDbms;
 import io.github.edmm.model.component.Paas;
 import io.github.edmm.model.component.Platform;
+import io.github.edmm.model.component.RabbitMq;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Saas;
 import io.github.edmm.model.component.SoftwareComponent;
@@ -53,6 +58,12 @@ public abstract class TypeResolver {
         put("aws_aurora", AwsAurora.class);
         put("saas", Saas.class);
         put("auth0", Auth0.class);
+        put("go", Go.class);
+        put("mom", Mom.class);
+        put("rabbitmq", RabbitMq.class);
+        put("mongodb", MongoDb.class);
+        put("mongodb_schema", MongoDbSchema.class);
+
         // Relations
         put("depends_on", DependsOn.class);
         put("hosted_on", HostedOn.class);

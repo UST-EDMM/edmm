@@ -18,7 +18,7 @@ import org.jgrapht.Graph;
 
 public abstract class TransformationHelper {
 
-    private static final String[] DEFAULT_PROPERTY_BLACKLIST = {"*key_name*", "*public_key*"};
+    private static final String[] DEFAULT_PROPERTY_BLACKLIST = {"*key_name*", "*public_key*", "name"};
 
     public static boolean matchesBlacklist(String name, String... blacklist) {
         Set<String> values = Stream.concat(Arrays.stream(DEFAULT_PROPERTY_BLACKLIST), Arrays.stream(blacklist))

@@ -1,5 +1,7 @@
 package io.github.edmm.model.component;
 
+import java.util.Optional;
+
 import io.github.edmm.core.parser.MappingEntity;
 import io.github.edmm.model.support.Attribute;
 import io.github.edmm.model.visitor.ComponentVisitor;
@@ -7,16 +9,16 @@ import io.github.edmm.model.visitor.ComponentVisitor;
 import lombok.ToString;
 
 @ToString
-public class MysqlDbms extends Dbms {
+public class Mom extends SoftwareComponent {
 
-    public static final Attribute<String> VERSION = new Attribute<>("version", String.class);
+    public static final Attribute<Integer> PORT = new Attribute<>("port", Integer.class);
 
-    public MysqlDbms(MappingEntity mappingEntity) {
+    public Mom(MappingEntity mappingEntity) {
         super(mappingEntity);
     }
 
-    public String getVersion() {
-        return getProperty(VERSION, "8");
+    public Optional<Integer> getPort() {
+        return getProperty(PORT);
     }
 
     @Override

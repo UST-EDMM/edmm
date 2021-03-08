@@ -13,11 +13,12 @@ import io.github.edmm.docker.PortMapping;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.MongoDb;
+import io.github.edmm.model.component.MongoDbSchema;
 import io.github.edmm.model.component.MysqlDatabase;
 import io.github.edmm.model.component.MysqlDbms;
+import io.github.edmm.model.component.RabbitMq;
 import io.github.edmm.model.component.RootComponent;
-import io.github.edmm.model.component.Tomcat;
-import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.visitor.ComponentVisitor;
 
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
                 builder.run("./" + filename);
             }
             // Expose ports
-            stack.getPorts().forEach(port -> builder.expose(port.getValue()));
+            stack.getPorts().forEach(port -> builder.expose(port.getPort()));
             // Add final CMD statement
             if (!builder.isSkipStartOperation() && !stack.getStartOperations().isEmpty()) {
                 FileMapping mapping = stack.getStartOperations().get(stack.getStartOperations().size() - 1);
@@ -158,12 +159,31 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
     }
 
     @Override
-    public void visit(Tomcat component) {
+    public void visit(RabbitMq component) {
+        component.getProperty(PORT)
+            .ifPresent(port -> stack.addPort(new PortMapping(component.getNormalizedName(), port, port, "TCP")));
+        stack.addPort(new PortMapping("management", component.getManagementPort()));
         visit((RootComponent) component);
+        builder.env("RABBITMQ_DEFAULT_USER", "user");
+        builder.env("RABBITMQ_DEFAULT_PASS", "user");
+        builder.setSkipStartOperation(true);
+        builder.setSkipCreateOperation(true);
     }
 
     @Override
-    public void visit(WebApplication component) {
+    public void visit(MongoDb component) {
+        component.getProperty(PORT)
+            .ifPresent(port -> stack.addPort(new PortMapping(component.getNormalizedName(), 27017, port, null)));
         visit((RootComponent) component);
+        component.getRootUser().ifPresent(value -> builder.env("MONGO_INITDB_ROOT_USERNAME", value));
+        component.getRootPassword().ifPresent(value -> builder.env("MONGO_INITDB_ROOT_PASSWORD", value));
+        builder.setSkipStartOperation(true);
+        builder.setSkipCreateOperation(true);
+    }
+
+    @Override
+    public void visit(MongoDbSchema component) {
+        visit((RootComponent) component);
+        builder.env("MONGO_INITDB_DATABASE", component.getSchemaName());
     }
 }

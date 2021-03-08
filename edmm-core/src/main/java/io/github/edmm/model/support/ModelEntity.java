@@ -106,6 +106,10 @@ public abstract class ModelEntity extends DescribableElement {
         }
     }
 
+    public <T> T getProperty(Attribute<T> attribute, T defaultValue) {
+        return getProperty(attribute).orElse(defaultValue);
+    }
+
     public Map<String, Operation> getOperations() {
         EntityGraph graph = entity.getGraph();
         Map<String, Operation> result = new HashMap<>();

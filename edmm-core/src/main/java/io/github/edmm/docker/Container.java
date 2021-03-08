@@ -2,9 +2,11 @@ package io.github.edmm.docker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import io.github.edmm.model.component.RootComponent;
 
@@ -24,7 +26,7 @@ public final class Container {
     private Map<String, String> envVars = new HashMap<>();
     private List<String> runtimeEnvVars = new ArrayList<>();
     private List<FileMapping> artifacts = new ArrayList<>();
-    private List<PortMapping> ports = new ArrayList<>();
+    private Set<PortMapping> ports = new HashSet<>();
     private List<FileMapping> operations = new ArrayList<>();
     private List<FileMapping> startOperations = new ArrayList<>();
 
@@ -34,7 +36,7 @@ public final class Container {
         this.envVars = new HashMap<>(stack.envVars);
         this.runtimeEnvVars = new ArrayList<>(stack.runtimeEnvVars);
         this.artifacts = new ArrayList<>(stack.artifacts);
-        this.ports = new ArrayList<>(stack.ports);
+        this.ports = new HashSet<>(stack.ports);
         this.operations = new ArrayList<>(stack.operations);
         this.startOperations = new ArrayList<>(stack.startOperations);
     }

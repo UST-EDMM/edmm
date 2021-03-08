@@ -27,6 +27,7 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
 
     public static final Attribute<String> TYPE = new Attribute<>("type", String.class);
     public static final Attribute<RootRelation> RELATIONS = new Attribute<>("relations", RootRelation.class);
+    public static final Attribute<String> NAME = new Attribute<>("name", String.class);
 
     private final List<RootRelation> relationCache = new LinkedList<>();
 
@@ -38,6 +39,11 @@ public class RootComponent extends ModelEntity implements VisitableComponent {
             orElseThrow(() -> new IllegalStateException("A component must be an instance of an existing type"));
         List<MappingEntity> typeChain = GraphHelper.resolveInheritanceChain(graph, typeRef);
         typeChain.forEach(this::updateEntityChain);
+    }
+
+    @Override
+    public String getName() {
+        return getProperty(NAME).orElseGet(super::getName);
     }
 
     public String getType() {

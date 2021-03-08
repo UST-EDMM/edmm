@@ -60,7 +60,7 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
                 builder.run("./" + filename);
             }
             // Expose ports
-            stack.getPorts().forEach(port -> builder.expose(port.getValue()));
+            stack.getPorts().forEach(port -> builder.expose(port.getPort()));
             // Add final CMD statement
             if (!stack.getStartOperations().isEmpty()) {
                 FileMapping mapping = stack.getStartOperations().get(stack.getStartOperations().size() - 1);

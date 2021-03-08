@@ -1,7 +1,9 @@
 package io.github.edmm.plugins.kubernetes.support;
 
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.MongoDb;
 import io.github.edmm.model.component.MysqlDbms;
+import io.github.edmm.model.component.RabbitMq;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.visitor.ComponentVisitor;
@@ -36,7 +38,7 @@ public class ImageMappingVisitor implements ComponentVisitor {
 
     @Override
     public void visit(MysqlDbms component) {
-        baseImage = "library/mysql:8";
+        baseImage = "library/mysql:" + component.getVersion();
     }
 
     @Override
@@ -44,5 +46,15 @@ public class ImageMappingVisitor implements ComponentVisitor {
         if (!hasComputeScripts && !hasCreateScript(component)) {
             baseImage = "library/tomcat:8.5";
         }
+    }
+
+    @Override
+    public void visit(RabbitMq component) {
+        baseImage = "library/rabbitmq:3-management";
+    }
+
+    @Override
+    public void visit(MongoDb component) {
+        baseImage = "library/mongo:3.4";
     }
 }
