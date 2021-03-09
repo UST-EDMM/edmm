@@ -20,8 +20,12 @@ public abstract class BaseElement {
         this.entity = entity;
     }
 
-    public String getName() {
+    public String getId() {
         return entity.getName();
+    }
+
+    public String getName() {
+        return getId();
     }
 
     public String getNormalizedName() {
