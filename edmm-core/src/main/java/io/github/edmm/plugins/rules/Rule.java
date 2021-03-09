@@ -42,12 +42,12 @@ public abstract class Rule implements Comparable<Rule> {
         ruleAssessor = new RuleAssessor();
     }
 
-    public Rule (String name, String description, ReplacementReason reason) {
+    public Rule(String name, String description, ReplacementReason reason) {
         this(name, description, DEFAULT_PRIORITY, reason);
     }
 
     public Rule(String name, String description) {
-        this(name,description, DEFAULT_PRIORITY, ReplacementReason.UNSUPPORTED);
+        this(name, description, DEFAULT_PRIORITY, ReplacementReason.UNSUPPORTED);
     }
 
     /**
@@ -56,7 +56,7 @@ public abstract class Rule implements Comparable<Rule> {
     public boolean evaluate(DeploymentModel actualModel, RootComponent currentComponent) {
         DeploymentModel expectedModel = DeploymentModel.of(fromTopology(new EdmmYamlBuilder()).build());
 
-        RuleAssessor.Result assessResult = ruleAssessor.assess(expectedModel,actualModel,currentComponent,false);
+        RuleAssessor.Result assessResult = ruleAssessor.assess(expectedModel, actualModel, currentComponent, false);
         // the unsupportedComponents should be retrieved immediately after the asses function
         // if evaluate returns true its value is valid and will be used in the execute function
         unsupportedComponents = assessResult.getUnsupportedComponents();
@@ -65,13 +65,13 @@ public abstract class Rule implements Comparable<Rule> {
 
         if (exceptYamlBuilders != null && assessResult.matches()) {
             // if the topology matches we check for exceptions
-            for (EdmmYamlBuilder yamlBuilder: exceptYamlBuilders) {
-                 DeploymentModel exceptionModel = DeploymentModel.of(yamlBuilder.build());
-                 if ( ruleAssessor.assess(exceptionModel, actualModel, currentComponent, true).matches() ) {
-                     // if there is an exact match this rule shouldn't be evaluated because
-                     // we found a topology representing an exception
-                     return false;
-                 }
+            for (EdmmYamlBuilder yamlBuilder : exceptYamlBuilders) {
+                DeploymentModel exceptionModel = DeploymentModel.of(yamlBuilder.build());
+                if (ruleAssessor.assess(exceptionModel, actualModel, currentComponent, true).matches()) {
+                    // if there is an exact match this rule shouldn't be evaluated because
+                    // we found a topology representing an exception
+                    return false;
+                }
             }
         }
         return assessResult.matches();
@@ -93,9 +93,9 @@ public abstract class Rule implements Comparable<Rule> {
     protected abstract EdmmYamlBuilder toTopology(EdmmYamlBuilder yamlBuilder);
 
     /**
-     * @return an array of topologies that are exceptions w.r.t. fromTopology
-     *          i.e. the plugin supports Auth0 but not any other Saas: fromTopology function will return Saas,
-     *          while this function will return Auth0, so that this rule will match every Saas except Auth0
+     * @return an array of topologies that are exceptions w.r.t. fromTopology i.e. the plugin supports Auth0 but not any
+     * other Saas: fromTopology function will return Saas, while this function will return Auth0, so that this rule will
+     * match every Saas except Auth0
      */
     protected EdmmYamlBuilder[] exceptTopologies() {
         return null;
@@ -106,7 +106,7 @@ public abstract class Rule implements Comparable<Rule> {
         rules.add(new PaasDefaultRule());
         rules.add(new SaasDefaultRule());
         rules.add(new DbaasDefaultRule());
-        return  rules;
+        return rules;
     }
 
     @Override
@@ -140,15 +140,14 @@ public abstract class Rule implements Comparable<Rule> {
     public class Result {
         private final String reason;
         private final List<String> unsupportedComponents;
-        private final Map<String,Object> toTopology;
+        private final Map<String, Object> toTopology;
 
-        public Result(ReplacementReason reason, List<RootComponent> unsupportedComponents, Map<String,Object> toTopology) {
+        public Result(ReplacementReason reason, List<RootComponent> unsupportedComponents, Map<String, Object> toTopology) {
             this.reason = reason.toString();
             this.toTopology = toTopology;
-
             this.unsupportedComponents = unsupportedComponents.stream()
-                                                            .map(BaseElement::getName)
-                                                            .collect(Collectors.toList());
+                .map(BaseElement::getId)
+                .collect(Collectors.toList());
         }
 
         public boolean isUnsupported() {
