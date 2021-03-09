@@ -8,6 +8,7 @@
       </pattern>
     </extension>
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.cli.Application" />
+    <option name="PROGRAM_PARAMETERS" value="transform -r C:\work\edmm\getting-started\modeling-repository kubernetes C:\work\edmm\getting-started\examples\sockshop\deployment.yml" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">
       <option name="Make" enabled="true" />

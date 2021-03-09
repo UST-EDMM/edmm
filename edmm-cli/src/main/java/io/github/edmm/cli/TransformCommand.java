@@ -28,6 +28,7 @@ public class TransformCommand implements Callable<Integer> {
 
     private String target;
     private File input;
+    private File repository;
 
     private TransformationService transformationService;
     private PluginService pluginService;
@@ -51,10 +52,21 @@ public class TransformCommand implements Callable<Integer> {
         this.input = input;
     }
 
+    @CommandLine.Option(names = {"-r", "--repository"}, description = "The path to the repository directory")
+    public void setRepository(File repository) {
+        if (!repository.exists() || !repository.isDirectory()) {
+            throw new CommandLine.ParameterException(spec.commandLine(), "An existing directory must be specified");
+        }
+        this.repository = repository;
+    }
+
     @Override
     public Integer call() {
-        File sourceDirectory = input.getParentFile();
-        File targetDirectory = new File(sourceDirectory, target);
+        File sourceDirectory = repository;
+        if (sourceDirectory == null) {
+            sourceDirectory = input.getParentFile();
+        }
+        File targetDirectory = new File(input.getParentFile(), target);
         DeploymentModel model = DeploymentModel.of(input);
         TransformationContext context = transformationService.createContext(model, target, sourceDirectory, targetDirectory);
         transformationService.start(context);
