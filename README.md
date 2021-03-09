@@ -12,31 +12,25 @@ The CLI can be used to select the desired target deployment technology into whic
 The output is an executable technology-specific deployment model that can be executed with the selected technology.
 The following figure shows an high-level overview of the EDMM Transformation Framework.
 
-
-
-## Transformation 
+[DEMO: https://youtu.be/MGWBFomOGYU](https://youtu.be/MGWBFomOGYU)
 
 ![](docs/overview.png)
 
-[Link to the video: https://youtu.be/MGWBFomOGYU](https://youtu.be/MGWBFomOGYU)
 
-The demo is split into two parts.
-First, we start with the EDMM Modeling Tool, which is based on [Eclipse Winery](https://github.com/eclipse/winery), in order to graphically model an EDMM-based application deployment.
-The EDMM Modeling Tool is able to export an EDMM YAML file according to the [specification](https://github.com/UST-EDMM/spec-yaml).
-After the EDMM model has been downloaded it can be fed into the EDMM Transformation Framework.
-For example, to convert the supported scenario into Kubernetes resource files one can run the `edmm` CLI tool as follows:
+The EDMM Modeling Tool, which is based on [Eclipse Winery](https://github.com/eclipse/winery), in order to graphically model an EDMM-based application deployment.
+From here, users can export an EDMM YAML file according to the [specification](https://github.com/UST-EDMM/spec-yaml) or trigger the transformation and download an archive containing the generated files and templates for a certain deployment technology. 
+Similarly, the EDMM CLI can be used to trigger the same transformation from a command-prompt:
 
 ```shell
-edmm transform kubernetes ./edmm-model.yml
+edmm transform kubernetes <path-to-edmm-yaml-file>
 ```
 
-The generated Kubernetes resource files are located relative to the `edmm_model.yml` file inside a `kubernetes` directory.
-For the supported scenario, the tool will create two separate Kubernetes stacks, each consisting of a Service resource, a Deployment resource wired with the service, and a generated `Dockerfile` containing the layers expressed by the EDMM model.
-By building the Docker images (`docker build -t <name> .`) one can apply the Kubernetes resources to a cluster (`kubectl apply -f <files>`).
+The generated files are usually located relative to the given model file.
+Finally, users can employ a deployment technology's native tooling to execute the deployment of the application.
 
 
 
-## Usage
+## Usage: EDMM CLI
 
 The final distribution package can be downloaded form the [releases](https://github.com/UST-EDMM/edmm/releases) page.
 Extract the files to a location on your filesystem and add it to your path variable (Linux: `$PATH`, Windows: `%PATH%`).
@@ -91,9 +85,9 @@ We use Maven as our build tool:
 ./mvnw clean package
 ```
 
-Build the `edmm-web` Docker image:
+Build the Docker image:
 
 ```shell
-docker build -t edmm-web .
-docker run -it -p 5000:5000 edmm-web
+docker build -t edmm .
+docker run -it -p 5000:5000 edmm
 ```
