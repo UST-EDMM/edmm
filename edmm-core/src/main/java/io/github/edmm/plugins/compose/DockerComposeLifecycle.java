@@ -25,7 +25,7 @@ public class DockerComposeLifecycle extends KubernetesLifecycle {
             resolveBaseImage(stack);
             buildDockerfile(stack, fileAccess);
         }
-        DockerComposeBuilder composeBuilder = new DockerComposeBuilder(containers, dependencyGraph, fileAccess);
+        DockerComposeBuilder composeBuilder = new DockerComposeBuilder(containers, dependencyGraph, fileAccess, graph);
         composeBuilder.populateComposeFile();
         logger.info("Transformation to Docker Compose successful");
     }
