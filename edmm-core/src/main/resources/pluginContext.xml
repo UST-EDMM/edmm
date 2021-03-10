@@ -2,16 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="ansible" class="io.github.edmm.plugins.ansible.AnsiblePlugin"/>
-    <bean id="azure" class="io.github.edmm.plugins.azure.AzurePlugin"/>
     <bean id="cfn" class="io.github.edmm.plugins.cfn.CloudFormationPlugin"/>
-    <bean id="chef" class="io.github.edmm.plugins.chef.ChefPlugin"/>
-    <bean id="cloudify" class="io.github.edmm.plugins.cloudify.CloudifyPlugin"/>
     <bean id="compose" class="io.github.edmm.plugins.compose.DockerComposePlugin"/>
-    <bean id="heat" class="io.github.edmm.plugins.heat.HeatPlugin"/>
     <bean id="kubernetes" class="io.github.edmm.plugins.kubernetes.KubernetesPlugin"/>
-    <bean id="puppet" class="io.github.edmm.plugins.puppet.PuppetPlugin"/>
     <bean id="terraform" class="io.github.edmm.plugins.terraform.TerraformPlugin"/>
-    <bean id="juju" class="io.github.edmm.plugins.juju.JujuPlugin"/>
-    <bean id="saltstack" class="io.github.edmm.plugins.salt.SaltStackPlugin"/>
-    <bean id="cfengine" class="io.github.edmm.plugins.cfengine.CFEnginePlugin"/>
+    <!--<bean id="azure" class="io.github.edmm.plugins.azure.AzurePlugin"/>-->
+    <!--<bean id="chef" class="io.github.edmm.plugins.chef.ChefPlugin"/>-->
+    <!--<bean id="cloudify" class="io.github.edmm.plugins.cloudify.CloudifyPlugin"/>-->
+    <!--<bean id="heat" class="io.github.edmm.plugins.heat.HeatPlugin"/>-->
+    <!--<bean id="puppet" class="io.github.edmm.plugins.puppet.PuppetPlugin"/>-->
+    <!--<bean id="juju" class="io.github.edmm.plugins.juju.JujuPlugin"/>-->
+    <!--<bean id="saltstack" class="io.github.edmm.plugins.salt.SaltStackPlugin"/>-->
+    <!--<bean id="cfengine" class="io.github.edmm.plugins.cfengine.CFEnginePlugin"/>-->
 </beans>
