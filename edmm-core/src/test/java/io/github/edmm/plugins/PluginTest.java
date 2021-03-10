@@ -3,18 +3,17 @@ package io.github.edmm.plugins;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
+import io.github.edmm.core.DeploymentTechnology;
 import io.github.edmm.core.execution.ExecutionContext;
 import io.github.edmm.core.plugin.AbstractLifecycle;
 import io.github.edmm.core.plugin.ExecutionPlugin;
 import io.github.edmm.core.plugin.TransformationPlugin;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.model.parameters.ParameterInstance;
-
-import io.github.edmm.plugins.rules.Rule;
 import io.github.edmm.plugins.rules.RuleEngine;
+import io.github.edmm.utils.Env;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.slf4j.Logger;
@@ -26,10 +25,31 @@ public abstract class PluginTest {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginTest.class);
 
-    protected final File targetDirectory;
+    private boolean skipCleanup = false;
+    protected File repositoryDirectory;
+    protected File inputFile;
+    protected File targetDirectory;
 
-    public PluginTest(File targetDirectory) {
+    public PluginTest(File repositoryDirectory, File inputFile, File targetDirectory) throws Exception {
+        this.repositoryDirectory = repositoryDirectory;
+        this.inputFile = inputFile;
         this.targetDirectory = targetDirectory;
+        String repositoryValue = Env.get("REPOSITORY", null);
+        String inputFileValue = Env.get("INPUT_FILE", null);
+        String outputDirectoryValue = Env.get("OUTPUT_DIR", null);
+        if (repositoryValue != null && inputFileValue != null && outputDirectoryValue != null) {
+            this.skipCleanup = true;
+            this.repositoryDirectory = new File(repositoryValue);
+            this.inputFile = new File(inputFileValue);
+            this.targetDirectory = new File(outputDirectoryValue);
+        }
+        logger.info("Source directory is '{}'", this.repositoryDirectory.getCanonicalPath());
+        logger.info("Target directory is '{}'", this.targetDirectory.getCanonicalPath());
+        logger.info("Input file at '{}'", this.inputFile.getCanonicalPath());
+    }
+
+    protected void executeLifecycle(TransformationPlugin<?> plugin) {
+        executeLifecycle(plugin, new TransformationContext(inputFile, DeploymentTechnology.NOOP, repositoryDirectory, targetDirectory));
     }
 
     protected void executeLifecycle(TransformationPlugin<?> plugin, TransformationContext context) {
@@ -47,7 +67,7 @@ public abstract class PluginTest {
             AbstractLifecycle lifecycle = plugin.getLifecycle(context);
 
             RuleEngine ruleEngine = new RuleEngine();
-            long unsupportedRulesCount = RuleEngine.countUnsupportedRules(ruleEngine.fire(context,plugin));
+            long unsupportedRulesCount = RuleEngine.countUnsupportedRules(ruleEngine.fire(context, plugin));
 
             logger.info("RuleEngine.fire(): unsupportedRuless={}", unsupportedRulesCount);
 
@@ -93,7 +113,7 @@ public abstract class PluginTest {
 
     @After
     public void destroy() throws Exception {
-        if (targetDirectory != null) {
+        if (targetDirectory != null && !skipCleanup) {
             logger.info("Clean up working directory...");
             FileUtils.deleteDirectory(targetDirectory);
         }

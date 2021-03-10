@@ -22,6 +22,7 @@ import io.github.edmm.plugins.cfn.CloudFormationPlugin;
 import io.github.edmm.plugins.cfn.rules.AuroraRule;
 import io.github.edmm.plugins.cfn.rules.BeanstalkRule;
 import io.github.edmm.plugins.cfn.rules.CfnPaasRule;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(),false).matches());
+            Assert.assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(), false).matches());
         else
             Assert.fail("component not present");
     }
@@ -63,18 +64,18 @@ public class RulesTests {
         DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
 
         Optional<RootComponent> currentComponent = actualModel.getComponent("WebApplication");
-        RuleAssessor ruleAssessor  = new RuleAssessor();
+        RuleAssessor ruleAssessor = new RuleAssessor();
 
         // the actual model should match the expected model, but not the other way around
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(expectedModel,actualModel,currentComponent.get(),false).matches());
+            Assert.assertTrue(ruleAssessor.assess(expectedModel, actualModel, currentComponent.get(), false).matches());
         else Assert.fail("component not present");
 
         currentComponent = expectedModel.getComponent("WebApplication");
-        ruleAssessor  = new RuleAssessor();
+        ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertFalse(ruleAssessor.assess(actualModel, expectedModel,currentComponent.get(),false).matches());
+            Assert.assertFalse(ruleAssessor.assess(actualModel, expectedModel, currentComponent.get(), false).matches());
         else Assert.fail("component not present");
     }
 
@@ -94,45 +95,45 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(model,model,currentComponent.get(),false).matches());
+            Assert.assertTrue(ruleAssessor.assess(model, model, currentComponent.get(), false).matches());
         else
             Assert.fail("component not present");
     }
 
     @Test
-    public void testRuleEngineWithAnsible(){
+    public void testRuleEngineWithAnsible() {
         RuleEngine ruleEngine = new RuleEngine();
         AnsiblePlugin ansible = new AnsiblePlugin();
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         // pet-clinic like topology
         yamlBuilder.component(Auth0.class)
-                   .component(WebApplication.class)
-                   .hostedOn(AwsBeanstalk.class)
-                   .connectsTo(Auth0.class)
-                   .connectsTo(MysqlDatabase.class)
-                   .component(MysqlDatabase.class)
-                   .hostedOn(AwsAurora.class)
-                   .component(AwsAurora.class)
-                   .component(AwsBeanstalk.class);
+            .component(WebApplication.class)
+            .hostedOn(AwsBeanstalk.class)
+            .connectsTo(Auth0.class)
+            .connectsTo(MysqlDatabase.class)
+            .component(MysqlDatabase.class)
+            .hostedOn(AwsAurora.class)
+            .component(AwsAurora.class)
+            .component(AwsBeanstalk.class);
 
         DeploymentModel model = DeploymentModel.of(yamlBuilder.build());
         TransformationContext context = new TransformationContext(model, ansible.getDeploymentTechnology());
 
         List<Rule.Result> results = ruleEngine.fire(context, ansible);
 
-        Assert.assertEquals(3,results.size());
+        Assert.assertEquals(3, results.size());
 
-        for (Rule.Result result: results) {
+        for (Rule.Result result : results) {
             List<String> unsupportedComponents = result.getUnsupportedComponents();
             boolean contains = unsupportedComponents.contains("AwsAurora") ||
-                               unsupportedComponents.contains("AwsBeanstalk") ||
-                               unsupportedComponents.contains("Auth0");
+                unsupportedComponents.contains("AwsBeanstalk") ||
+                unsupportedComponents.contains("Auth0");
             Assert.assertTrue(contains);
         }
     }
 
     @Test
-    public void testRuleExceptionWithCfnPaasRule(){
+    public void testRuleExceptionWithCfnPaasRule() {
         CfnPaasRule cfnPaasRule = new CfnPaasRule();
 
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
@@ -144,7 +145,7 @@ public class RulesTests {
 
         // AwsBeanstalk is in the exception list so the evaluation should return false
         if (component.isPresent())
-            Assert.assertFalse(cfnPaasRule.evaluate(actualModel,  component.get()));
+            Assert.assertFalse(cfnPaasRule.evaluate(actualModel, component.get()));
         else
             Assert.fail("component not present");
 
@@ -156,7 +157,7 @@ public class RulesTests {
 
         // every other Paas component evaluation should return true instead
         if (component.isPresent())
-            Assert.assertTrue(cfnPaasRule.evaluate(actualModel,  component.get()));
+            Assert.assertTrue(cfnPaasRule.evaluate(actualModel, component.get()));
         else
             Assert.fail("component not present");
     }
@@ -169,8 +170,8 @@ public class RulesTests {
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder
             .component(WebServer.class, "WebServer1")
-            .hostedOn(Compute.class,"Compute1")
-            .component(Compute.class,"Compute1");
+            .hostedOn(Compute.class, "Compute1")
+            .component(Compute.class, "Compute1");
         DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
         Optional<RootComponent> currentComponent = actualModel.getComponent("WebServer1");
 
@@ -181,7 +182,7 @@ public class RulesTests {
 
             List<Rule.Result> results = ruleEngine.fire(actualModel, rules, currentComponent.get());
 
-            Assert.assertEquals(1,results.size());
+            Assert.assertEquals(1, results.size());
             List<String> unsupportedComponents = results.get(0).getUnsupportedComponents();
             Assert.assertTrue(unsupportedComponents.contains("WebServer1") && unsupportedComponents.contains("Compute1"));
         } else
@@ -193,8 +194,8 @@ public class RulesTests {
         RuleEngine ruleEngine = new RuleEngine();
         EdmmYamlBuilder yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder.component(Saas.class)
-                   .hostedOn(Paas.class)
-                   .component(Paas.class);
+            .hostedOn(Paas.class)
+            .component(Paas.class);
         DeploymentModel actualModel = DeploymentModel.of(yamlBuilder.build());
 
         List<Rule> rules = new ArrayList<>();
@@ -202,13 +203,11 @@ public class RulesTests {
         rules.add(new CfnPaasRule());
         rules.add(new AuroraRule());
 
-
-
-        for (RootComponent component: actualModel.getComponents()) {
-             ruleEngine.fire(actualModel, rules, component);
+        for (RootComponent component : actualModel.getComponents()) {
+            ruleEngine.fire(actualModel, rules, component);
         }
         // bad trick to get the results list
-        List<Rule.Result> results  = ruleEngine.fire(actualModel, new ArrayList<>(), null);
+        List<Rule.Result> results = ruleEngine.fire(actualModel, new ArrayList<>(), null);
         Assert.assertEquals(2, results.size());
         Assert.assertEquals("Paas", results.get(0).getUnsupportedComponents().get(0));
         Assert.assertEquals("Saas", results.get(1).getUnsupportedComponents().get(0));

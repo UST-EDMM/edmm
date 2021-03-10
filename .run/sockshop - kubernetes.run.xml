@@ -1,0 +1,24 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="sockshop - kubernetes" type="JUnit" factoryName="JUnit">
+    <module name="edmm-core" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="io.github.edmm.plugins.disabled.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="io.github.edmm.plugins" />
+    <option name="MAIN_CLASS_NAME" value="io.github.edmm.plugins.KubernetesTests" />
+    <option name="METHOD_NAME" value="testLifecycleExecution" />
+    <option name="TEST_OBJECT" value="method" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
+    <envs>
+      <env name="REPOSITORY" value="../getting-started/modeling-repository" />
+      <env name="INPUT_FILE" value="../getting-started/examples/sockshop/deployment.yml" />
+      <env name="OUTPUT_DIR" value="../getting-started/examples/sockshop/kubernetes" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Kubernetes Transformation" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="petclinic - kubernetes" type="JUnit" factoryName="JUnit">
     <module name="edmm-core" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="io.github.edmm.plugins.*" />
+        <option name="PATTERN" value="io.github.edmm.plugins.disabled.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
@@ -11,10 +11,11 @@
     <option name="MAIN_CLASS_NAME" value="io.github.edmm.plugins.KubernetesTests" />
     <option name="METHOD_NAME" value="testLifecycleExecution" />
     <option name="TEST_OBJECT" value="method" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <envs>
-      <env name="REPOSITORY" value="C:\work\edmm\getting-started\modeling-repository" />
-      <env name="INPUT_FILE" value="C:\work\edmm\getting-started\examples\sockshop\deployment.yml" />
-      <env name="OUTPUT_DIR" value="C:\work\edmm\getting-started\examples\sockshop\kubernetes" />
+      <env name="REPOSITORY" value="../getting-started/modeling-repository" />
+      <env name="INPUT_FILE" value="../getting-started/examples/petclinic/deployment.yml" />
+      <env name="OUTPUT_DIR" value="../getting-started/examples/petclinic/kubernetes" />
     </envs>
     <method v="2">
       <option name="Make" enabled="true" />
