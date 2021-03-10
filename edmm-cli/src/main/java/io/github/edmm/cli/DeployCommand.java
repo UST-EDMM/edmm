@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 
-// @Component
+@Component
 @CommandLine.Command(
     name = "deploy",
     descriptionHeading = "%n",

@@ -47,7 +47,7 @@ public class TransformCommand implements Callable<Integer> {
     @CommandLine.Parameters(arity = "1..1", index = "1..*", description = "The input EDMM file (YAML)")
     public void setInput(File input) {
         if (!input.exists() || !input.isFile()) {
-            throw new CommandLine.ParameterException(spec.commandLine(), "An existing file must be specified");
+            throw new CommandLine.ParameterException(spec.commandLine(), "An existing file must be specified, but was " + input.getAbsolutePath());
         }
         this.input = input;
     }
@@ -55,7 +55,7 @@ public class TransformCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"-r", "--repository"}, description = "The path to the repository directory")
     public void setRepository(File repository) {
         if (!repository.exists() || !repository.isDirectory()) {
-            throw new CommandLine.ParameterException(spec.commandLine(), "An existing directory must be specified");
+            throw new CommandLine.ParameterException(spec.commandLine(), "An existing directory must be specified, but was " + repository.getAbsolutePath());
         }
         this.repository = repository;
     }

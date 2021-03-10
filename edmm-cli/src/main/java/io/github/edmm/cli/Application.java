@@ -21,7 +21,6 @@ import static picocli.CommandLine.usage;
     subcommands = {
         CommandLine.HelpCommand.class,
         TransformCommand.class,
-        DeployCommand.class,
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")

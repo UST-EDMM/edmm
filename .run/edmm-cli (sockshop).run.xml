@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="edmm-cli" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="edmm-cli (sockshop)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="edmm-cli" />
     <extension name="coverage">
       <pattern>
@@ -8,7 +8,8 @@
       </pattern>
     </extension>
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.cli.Application" />
-    <option name="PROGRAM_PARAMETERS" value="help" />
+    <option name="PROGRAM_PARAMETERS" value="transform -r ../getting-started/modeling-repository kubernetes ../getting-started/examples/sockshop/deployment.yml" />
+    <option name="WORKING_DIRECTORY" value="file://$ProjectFileDir$" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">
       <option name="Make" enabled="true" />
