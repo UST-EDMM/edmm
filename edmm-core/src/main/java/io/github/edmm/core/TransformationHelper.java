@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.github.edmm.model.component.MongoDb;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 
@@ -16,6 +17,8 @@ import lombok.var;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.Graph;
+
+import static io.github.edmm.model.component.Dbms.PORT;
 
 public abstract class TransformationHelper {
 
@@ -54,6 +57,11 @@ public abstract class TransformationHelper {
             .filter(p -> !matchesBlacklist(p.getName()))
             .filter(p -> !(p.isComputed() || p.getValue() == null || p.getValue().startsWith("$")))
             .forEach(p -> envVars.put(p.getNormalizedName().toUpperCase(), StringUtils.isBlank(p.getValue()) ? "\"\"" : p.getValue()));
+
+        if (component instanceof MongoDb) {
+            envVars.put(PORT.getName().toUpperCase(), "27017");
+        }
+
         return envVars;
     }
 

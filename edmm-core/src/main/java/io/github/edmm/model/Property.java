@@ -69,4 +69,8 @@ public class Property extends DescribableElement {
     public void setValue(String value) {
         set(VALUE, value);
     }
+
+    public MappingEntity getComponentEntity() {
+        return componentEntity;
+    }
 }

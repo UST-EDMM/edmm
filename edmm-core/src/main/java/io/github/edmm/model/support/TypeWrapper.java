@@ -28,6 +28,12 @@ public abstract class TypeWrapper {
         return components;
     }
 
+    public static RootComponent wrapComponent(MappingEntity entity) {
+        String type = entity.getValue(RootComponent.TYPE);
+        Class<?> clazz = TypeResolver.resolve(type);
+        return doWrap(entity, clazz);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T wrapScalarEntity(ScalarEntity entity, Class<T> targetType) {
         String value = entity.getValue();

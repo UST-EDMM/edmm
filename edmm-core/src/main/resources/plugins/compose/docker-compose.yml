@@ -6,8 +6,8 @@ services:
     build: ${service.targetDirectory}
     <#if service.ports?size != 0>
     ports:
-      <#list service.ports as port>
-      - '${port}:${port}'
+      <#list service.ports as from, to>
+      - '${from}:${to}'
       </#list>
     <#else>
     </#if>
