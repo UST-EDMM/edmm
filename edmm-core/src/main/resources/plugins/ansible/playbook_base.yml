@@ -20,7 +20,7 @@
         host: "{{ props.PUBLIC_ADDRESS }}"
         port: 22
 </#list>
----
+
 <#list hosts as key,value>
 - name: populate environment for ${value.name}
   hosts: ${value.name}
@@ -38,7 +38,7 @@
         line: "{{ item.key }}={{ item.value}}"
       with_items: "{{ props.env }}"
 </#list>
----
+
 <#list plays as play>
 # Play for '${play.name}'
 - name: ${play.name}
@@ -67,8 +67,14 @@
         dest: ${file.target}
     </#list>
     <#list play.tasks as task>
+    - name: create destination directory
+      file:
+        path: ${task.wd}
+        state: directory
     - name: ${task.name}
-      script: ${task.script}
+      script:
+        chdir: ${task.wd}
+        cmd: ${task.script}
       <#if task.args?? && task.args?size != 0>
       args:
       <#list task.args as arg_key,arg_value>

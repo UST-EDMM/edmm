@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.github.edmm.model.Property;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 
@@ -19,7 +20,7 @@ import org.jgrapht.Graph;
 
 public abstract class TransformationHelper {
 
-    private static final String[] DEFAULT_PROPERTY_BLACKLIST = {"*key_name*", "*public_key*", "name"};
+    public static final String[] DEFAULT_PROPERTY_BLACKLIST = {"*key_name*", "*public_key*", "name", "*private_key*"};
 
     public static boolean matchesBlacklist(String name, String... blacklist) {
         Set<String> values = Stream.concat(Arrays.stream(DEFAULT_PROPERTY_BLACKLIST), Arrays.stream(blacklist))
@@ -43,7 +44,23 @@ public abstract class TransformationHelper {
             if (p.isComputed() || p.getValue() == null || p.getValue().startsWith("$")) {
                 continue;
             }
-            envVars.put(entry.getKey().toUpperCase(), p.getValue());
+            envVars.put(entry.getKey().toUpperCase(), StringUtils.isBlank(p.getValue()) ? "\"\"" : p.getValue());
+        }
+        return envVars;
+    }
+
+    public static Map<String, Property> collectProperties(Graph<RootComponent, RootRelation> graph, RootComponent component) {
+        Map<String, Property> envVars = new HashMap<>();
+        var properties = TopologyGraphHelper.resolveComponentStackProperties(graph, component);
+        for (var entry : properties.entrySet()) {
+            var p = entry.getValue();
+            if (matchesBlacklist(entry.getKey())) {
+                continue;
+            }
+            if (p.isComputed() || p.getValue() == null || p.getValue().startsWith("$")) {
+                continue;
+            }
+            envVars.put(entry.getKey().toUpperCase(), p);
         }
         return envVars;
     }

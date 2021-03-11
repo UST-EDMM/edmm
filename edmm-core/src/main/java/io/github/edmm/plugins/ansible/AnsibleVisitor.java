@@ -69,7 +69,6 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
 
         copyFiles(component);
         Map<String, String> envVars = TransformationHelper.collectEnvVars(graph, component);
-        // List<String> runtimeEnvVars = TransformationHelper.collectRuntimeEnvVars(graph, component);
         List<AnsibleTask> tasks = convertOperations(collectOperations(component), component);
         List<AnsibleFile> files = collectFiles(component);
 
@@ -82,9 +81,9 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
         String absoluteKeyPath = null;
         Optional<String> optionalPrivateKeyPath = compute.getPrivateKeyPath();
         if (optionalPrivateKeyPath.isPresent()) {
-            File file = new File(optionalPrivateKeyPath.get());
-            if (file.isFile()) {
-                absoluteKeyPath = file.getAbsolutePath();
+            absoluteKeyPath = optionalPrivateKeyPath.get();
+            if (!new File(optionalPrivateKeyPath.get()).isFile()) {
+                logger.warn("SSH private key file does not exist and may produce deployment issues");
             }
         }
         if (absoluteKeyPath == null) {
@@ -97,7 +96,6 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
             .name(component.getName())
             .hosts(host)
             .vars(envVars)
-            // .runtimeVars(runtimeEnvVars)
             .tasks(tasks)
             .files(files)
             .build();
@@ -112,7 +110,9 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
     @Override
     public void visit(Compute component) {
         try {
-            component.addProperty(PUBLIC_ADDRESS.getName(), gen.getNextIp());
+            if (!component.getProperty(PUBLIC_ADDRESS).isPresent()) {
+                component.addProperty(PUBLIC_ADDRESS.getName(), gen.getNextIp());
+            }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -136,11 +136,11 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
             String basename = FilenameUtils.getName(operation.getValue());
             String newPath = "./files/" + component.getNormalizedName() + "/" + basename;
             Map<String, String> args = new HashMap<>();
-            // args.put("chdir", "/opt/" + component.getNormalizedName());
             AnsibleTask task = AnsibleTask.builder()
                 .name(operation.getNormalizedName())
                 .script(newPath)
                 .args(args)
+                .wd("/opt/" + component.getNormalizedName())
                 .build();
             tasks.add(task);
         });
@@ -188,11 +188,12 @@ public class AnsibleVisitor implements ComponentVisitor, RelationVisitor {
         try {
             fileAccess.write(FILE_NAME, TemplateHelper.toString(cfg, "playbook_base.yml", data));
             for (var entry : stackMapping.entrySet()) {
-                Map<String, Property> computedProps = new HashMap<>();
+                Map<String, Property> props = new HashMap<>();
                 for (var component : entry.getValue()) {
-                    computedProps.putAll(TopologyGraphHelper.resolveComputedProperties(graph, component));
+                    props.putAll(TopologyGraphHelper.resolveComputedProperties(graph, component));
+                    props.putAll(TransformationHelper.collectProperties(graph, component));
                 }
-                fileAccess.write(entry.getKey().getName() + "_props.json", convertToJson(computedProps));
+                fileAccess.write(entry.getKey().getName() + "_props.json", convertToJson(props));
             }
         } catch (Exception e) {
             logger.error("Error writing Ansible files: {}", e.getMessage(), e);

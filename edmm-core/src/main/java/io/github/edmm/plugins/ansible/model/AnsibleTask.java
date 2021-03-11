@@ -11,4 +11,5 @@ public class AnsibleTask {
     private String name;
     private String script;
     private Map<String, String> args;
+    private String wd;
 }
