@@ -4,8 +4,6 @@ import lombok.Value;
 
 @Value
 public class AnsibleFile {
-    private String src;
-    private String target;
+    String src;
+    String target;
 }
-
-

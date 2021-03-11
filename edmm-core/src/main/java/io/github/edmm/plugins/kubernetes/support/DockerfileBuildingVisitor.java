@@ -13,6 +13,7 @@ import io.github.edmm.docker.PortMapping;
 import io.github.edmm.model.Artifact;
 import io.github.edmm.model.Operation;
 import io.github.edmm.model.component.Compute;
+import io.github.edmm.model.component.Dbms;
 import io.github.edmm.model.component.MongoDb;
 import io.github.edmm.model.component.MongoDbSchema;
 import io.github.edmm.model.component.MysqlDatabase;
@@ -103,6 +104,11 @@ public class DockerfileBuildingVisitor implements ComponentVisitor {
 
     private void collectEnvVars(RootComponent component) {
         Map<String, String> envVars = TransformationHelper.collectEnvVars(component);
+
+        if (component instanceof MongoDb) {
+            envVars.put(Dbms.PORT.getName().toUpperCase(), "27017");
+        }
+
         envVars.forEach(builder::env);
     }
 

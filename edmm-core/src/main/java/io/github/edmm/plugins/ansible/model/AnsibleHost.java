@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class AnsibleHost {
-    private String name;
-    private String privKeyFile;
+    String name;
+    String privateKeyFile;
 }

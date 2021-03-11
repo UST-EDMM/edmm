@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 public class IpGenerator {
+
     // Used ips
     private final LinkedList<Integer> usedIPs;
     // Lowerbound 10.0.0.0
@@ -50,7 +51,7 @@ public class IpGenerator {
     /**
      * Return next available ip
      */
-    String getNextIp() throws AllUsedIpsException {
+    public String getNextIp() throws AllUsedIpsException {
         int arraySize = upperBound - lowerBound;
         if (usedIPs.size() == arraySize) throw new AllUsedIpsException();
         usedIPs.add(index++);
@@ -58,7 +59,9 @@ public class IpGenerator {
         return String.format("%d.%d.%d.%d", (index >> 24 & 0xff), (index >> 16 & 0xff),
             (index >> 8 & 0xff), (index & 0xff));
     }
+
+    public static class AllUsedIpsException extends Exception {
+    }
+
 }
 
-class AllUsedIpsException extends Exception {
-}
