@@ -5,6 +5,9 @@ handling the automated management of generated workflow artifacts. The generated
 on the EDMM model is automatically uploaded to the respective Camunda engine and can be 
 started in a few button clicks. 
 
+## Requirements
+- The EDMM Transformation Framework has to be running 
+
 ## Available Scripts
 
 In the project directory, you can run:
