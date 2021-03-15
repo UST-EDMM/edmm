@@ -7,19 +7,19 @@ import io.github.edmm.model.relation.RootRelation;
 
 public interface RelationVisitor {
 
-    default void visit(ConnectsTo relation) {
+    default void visit(RootRelation relation) {
         // noop
+    }
+
+    default void visit(ConnectsTo relation) {
+        visit((RootRelation) relation);
     }
 
     default void visit(DependsOn relation) {
-        // noop
+        visit((RootRelation) relation);
     }
 
     default void visit(HostedOn relation) {
-        // noop
-    }
-
-    default void visit(RootRelation relation) {
-        // noop;
+        visit((RootRelation) relation);
     }
 }

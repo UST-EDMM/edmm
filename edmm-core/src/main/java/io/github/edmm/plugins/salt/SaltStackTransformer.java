@@ -20,6 +20,7 @@ import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.model.visitor.ComponentVisitor;
 import io.github.edmm.model.visitor.RelationVisitor;
 import io.github.edmm.model.visitor.VisitorHelper;
+import io.github.edmm.plugins.salt.IpGenerator.AllUsedIpsException;
 import io.github.edmm.plugins.salt.model.SaltBase;
 import io.github.edmm.plugins.salt.model.SaltFormula;
 

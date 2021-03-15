@@ -1,27 +1,46 @@
 ---
-# add hosts
 <#list hosts as key,value>
+# Add host for '${value.name}'
 - hosts: localhost
   gather_facts: no
   tasks:
     - include_vars:
-        file: ${value.name}_host.json
-        name: requiredProperties
+        file: ${value.name}_props.json
+        name: props
     - name: Add host
       add_host:
         name: ${value.name}
-        ansible_host: '{{requiredProperties.HOSTNAME}}'
+        ansible_host: "{{ props.PUBLIC_ADDRESS }}"
         ansible_user: ubuntu
-        ansible_ssh_extra_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-        ansible_ssh_private_key_file: ${value.privKeyFile}
+        ansible_ssh_extra_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        ansible_ssh_private_key_file: ${value.privateKeyFile}
         ansible_python_interpreter: /usr/bin/python3
-    - name: Wait 600 seconds for target connection to become reachable/usable
+    - name: Wait for target connection to become available
       wait_for:
-        host: '{{requiredProperties.HOSTNAME}}'
+        host: "{{ props.PUBLIC_ADDRESS }}"
         port: 22
 </#list>
-  <#list plays as play>
-# Play for component ${play.name}
+
+<#list hosts as key,value>
+- name: populate environment for ${value.name}
+  hosts: ${value.name}
+  become: yes
+  become_user: root
+  tasks:
+    - include_vars:
+        file: ${value.name}_props.json
+        name: props
+    - name: populate /etc/environment
+      lineinfile:
+        path: "/etc/environment"
+        state: present
+        regexp: "^{{ item.key }}="
+        line: "{{ item.key }}={{ item.value}}"
+      with_items: "{{ props.env }}"
+</#list>
+
+<#list plays as play>
+# Play for '${play.name}'
 - name: ${play.name}
   <#if play.hosts??>
   hosts: ${play.hosts}
@@ -37,23 +56,25 @@
   <#else>
   </#if>
   tasks:
-    - include_vars:
-        file: ${play.name}_requiredProps.json
-
-        name: requiredProperties
     <#list play.files as file>
-    - name: Make sure destination dir exists
+    - name: create destination directory
       file:
-        path:  '{{ "${file.target}" | dirname }}'
+        path: "{{ '${file.target}' | dirname }}"
         state: directory
-    - name: Copy file to remote
+    - name: copy file
       copy:
         src: ${file.src}
         dest: ${file.target}
     </#list>
     <#list play.tasks as task>
+    - name: create destination directory
+      file:
+        path: ${task.wd}
+        state: directory
     - name: ${task.name}
-      script: ${task.script}
+      script:
+        chdir: ${task.wd}
+        cmd: ${task.script}
       <#if task.args?? && task.args?size != 0>
       args:
       <#list task.args as arg_key,arg_value>
@@ -61,15 +82,14 @@
       </#list>
       <#else>
       </#if>
-      register: hello
+      register: result
       <#if play.runtimeVars?? && play.runtimeVars?size != 0>
       environment:
         <#list play.runtimeVars as var>
-        ${var}: '{{requiredProperties.${var}}}'
+        ${var}: "{{ props.${var} }}"
         </#list>
       <#else>
       </#if>
-    - debug: msg="{{ hello.stdout }}"
+    - debug: msg="{{ result.stdout }}"
     </#list>
-
-  </#list>
+</#list>

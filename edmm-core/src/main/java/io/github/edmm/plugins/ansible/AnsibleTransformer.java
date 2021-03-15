@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import static io.github.edmm.plugins.ansible.AnsibleLifecycle.FILE_NAME;
 
+@Deprecated
 public class AnsibleTransformer implements ComponentVisitor {
 
     private static final Logger logger = LoggerFactory.getLogger(AnsibleTransformer.class);
