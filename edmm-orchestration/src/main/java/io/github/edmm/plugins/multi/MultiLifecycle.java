@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.edmm.core.TopologyGraphHelper;
 import io.github.edmm.core.execution.ExecutionContext;
@@ -21,16 +23,19 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.orchestration.Group;
 import io.github.edmm.model.orchestration.Technology;
 import io.github.edmm.model.relation.RootRelation;
-import io.github.edmm.plugins.DeploymentExecutor;
+import io.github.edmm.plugins.multi.DeploymentExecutor;
 import io.github.edmm.plugins.multi.ansible.AnsibleAreaLifecycle;
 import io.github.edmm.plugins.multi.ansible.AnsibleExecutor;
 import io.github.edmm.plugins.multi.kubernetes.KubernetesAreaLifecycle;
 import io.github.edmm.plugins.multi.kubernetes.KubernetesExecutorMulti;
+import io.github.edmm.plugins.multi.model.ComponentProperties;
 import io.github.edmm.plugins.multi.model.ComponentResources;
 import io.github.edmm.plugins.multi.model.Plan;
 import io.github.edmm.plugins.multi.model.PlanStep;
 import io.github.edmm.plugins.multi.terraform.TerraformAreaLifecycle;
 import io.github.edmm.plugins.multi.terraform.TerraformExecutor;
+import io.github.edmm.plugins.multi.undefined_technology.UndefinedAreaLifeCycle;
+import io.github.edmm.plugins.multi.workflows.Templating;
 
 import com.google.gson.Gson;
 import lombok.var;
@@ -43,13 +48,25 @@ import org.slf4j.LoggerFactory;
 public class MultiLifecycle extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiLifecycle.class);
-
-    private final List<AbstractLifecycle> groupLifecycles;
+    private static final Map<String, TransformationContext> store = new ConcurrentHashMap<>();
+    private static List<AbstractLifecycle> groupLifecycles = null;
 
     public MultiLifecycle(TransformationContext context) {
 
         super(context);
         groupLifecycles = new ArrayList<>();
+    }
+
+    public MultiLifecycle(String id) {
+        super(store.get(id));
+    }
+
+    public Boolean isTransformationContextAvailable(String id) {
+        return store.containsKey(id);
+    }
+
+    public void putContext() {
+        store.put(context.getId(), context);
     }
 
     public void preprareGroups(List<Group> sortedGroups) {
@@ -66,12 +83,15 @@ public class MultiLifecycle extends AbstractLifecycle {
             File targetDir = new File(context.getTargetDirectory(), subDir);
             TransformationContext groupContext = new TransformationContext(subDir, context.getModel(),
                 context.getDeploymentTechnology(), context.getSourceDirectory(), targetDir, group);
+
             if (group.getTechnology() == Technology.ANSIBLE) {
                 grpLifecycle = new AnsibleAreaLifecycle(groupContext);
             } else if (group.getTechnology() == Technology.TERRAFORM) {
                 grpLifecycle = new TerraformAreaLifecycle(groupContext);
             } else if (group.getTechnology() == Technology.KUBERNETES) {
                 grpLifecycle = new KubernetesAreaLifecycle(groupContext);
+            } else if (group.getTechnology() == Technology.UNDEFINED) {
+                grpLifecycle = new UndefinedAreaLifeCycle(groupContext);
             } else {
                 String error = String.format("could not find technology: %s for components %s", group.getTechnology(),
                     group);
@@ -88,8 +108,10 @@ public class MultiLifecycle extends AbstractLifecycle {
     public void createWorkflow(List<Group> sortedGroups) {
 
         Plan plan = new Plan();
+
         for (int i = 0; i < sortedGroups.size(); i++) {
             var group = sortedGroups.get(i);
+
             var step = new PlanStep(group.getTechnology());
             TopologicalOrderIterator<RootComponent, RootRelation> subIterator = new TopologicalOrderIterator<>(
                 sortedGroups.get(i).subGraph);
@@ -99,9 +121,21 @@ public class MultiLifecycle extends AbstractLifecycle {
                 var propLists = TransformationHelper.collectRuntimeEnvInputOutput(context.getTopologyGraph(), comp);
                 step.components
                     .add(new ComponentResources(comp.getName(), propLists.getFirst(), propLists.getSecond()));
+
             }
 
+            if (!step.tech.equals(Technology.UNDEFINED) && context.getModel().getMultiId() != null) {
+                step.setParticipantEndpoint(context.getModel().getParticipantEndpoint(context.getModel().getOwner()));
+            } else {
+                step.setParticipantEndpoint(null);
+            }
+
+            step.setStep(i);
             plan.steps.add(step);
+        }
+
+        if (context.getModel().getMultiId() != null) {
+            createBPMN(plan);
         }
 
         Writer writer = new StringWriter();
@@ -110,6 +144,20 @@ public class MultiLifecycle extends AbstractLifecycle {
         try {
             context.getFileAccess().write("state.yaml", writer.toString());
             context.getFileAccess().write("execution.plan.json", plan.toJson());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createBPMN(Plan plan) {
+
+        Templating templating = new Templating(context);
+        templating.createBPMNInitiateSequence(context.getModel().getParticipants());
+        templating.createBPMNFromExecutionPlanSequence(templating.createExecutionPlanSequence(plan));
+
+        try {
+            templating.mergeFiles();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,6 +166,9 @@ public class MultiLifecycle extends AbstractLifecycle {
     @Override
     public void transform() {
         logger.info("Begin transformation to Multi...");
+
+        store.put(context.getId(), context);
+
         // new Groupprovisioning
         List<Group> sortedGroups = GroupProvisioning.determineProvisiongingOrder(context.getModel());
         preprareGroups(sortedGroups);
@@ -127,11 +178,130 @@ public class MultiLifecycle extends AbstractLifecycle {
             groupLifecycles.get(i).transform();
             groupLifecycles.get(i).cleanup();
         }
-        createWorkflow(sortedGroups);
 
+        createWorkflow(sortedGroups);
         logger.info("Transformation to Multi successful");
 
-        execute();
+        if (context.getModel().getMultiId() == null) {
+            execute();
+        }
+    }
+
+    /**
+     * Assigns the sent process variables by Camunda to the specific lifecycle graphs
+     *
+     */
+    public List<ComponentProperties> assignRuntimeVariablesToLifecycles(ArrayList<String> components,
+                                                                        ArrayList<ComponentProperties> inputs) {
+        // Populate input properties to respective components
+        inputs.forEach(component -> populateInputProperties(component.getComponent(), component.getProperties()));
+
+        // Deploy all components
+        return deployComponents(components);
+
+    }
+
+    /**
+     * Updates the component by the sent process variables and executes
+     * the specified technology of the component
+     *
+     */
+    public List<ComponentProperties> deployComponents(ArrayList<String> components) {
+
+        AbstractLifecycle targetLifecycle = null;
+
+        // Looks up the lifecycle of the component and assigns them to targetLifecycle
+        for (AbstractLifecycle groupLifecycle : groupLifecycles) {
+            for (var component : groupLifecycle.getTransformationContext().getGroup().groupComponents) {
+
+                // Since it does not matter, which component is chosen from the Arraylist
+                // The component itself knows which technology and other components are part of it
+                if (component.getName().equals(components.get(0))) {
+                    targetLifecycle = groupLifecycle;
+                }
+
+            }
+        }
+
+        // If targetLifecycle is available, the component is queried and updated with the sent process variables
+        if (targetLifecycle != null) {
+            Technology technology = targetLifecycle.getTransformationContext().getGroup().getTechnology();
+            return executeTechnology(targetLifecycle, technology);
+        }
+        return null;
+    }
+
+    /**
+     * Executes the technology with given lifecycle and technology
+     *
+     * @param lifecycle Specific lifecycle of the technology created by the workflow generation
+     * @param technology Specific technology that has to be executed with given lifecycle
+     */
+    public List<ComponentProperties> executeTechnology(AbstractLifecycle lifecycle, Technology technology) {
+
+        DeploymentExecutor visitorContext;
+        ExecutionContext orchContext = new ExecutionContext(lifecycle.getTransformationContext());
+
+        if (technology == Technology.ANSIBLE) {
+            visitorContext = new AnsibleExecutor(orchContext, null);
+        } else if (technology == Technology.TERRAFORM) {
+            visitorContext = new TerraformExecutor(orchContext, null);
+        } else if (technology == Technology.KUBERNETES) {
+            visitorContext = new KubernetesExecutorMulti(orchContext, null);
+        } else {
+            throw new IllegalArgumentException("Technology could not be found.");
+        }
+        logger.info("execute next tech");
+        try {
+            return visitorContext.executeWithOutputProperty();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Updates the component by the sent input process properties
+     *
+     * @param component Component that has to be updated
+     * @param properties Sent process properties by Camunda
+     */
+    public void populateInputProperties(String component, Map<String, String> properties) {
+
+        // Determine the component and update the graph
+        for (AbstractLifecycle groupLifecycle : groupLifecycles) {
+            groupLifecycle.getTransformationContext().getGroup().groupComponents.forEach(lifecycleComponent -> {
+
+                if (lifecycleComponent.getName().equals(component)) {
+                    updateVariables(lifecycleComponent, properties);
+                }
+            });
+        }
+    }
+
+    /**
+     * Updates the properties/variables by the sent process variables
+     *
+     * @param component Component that has to be updated by the process variables
+     * @param variables Sent process variables by Camunda
+     */
+    public void updateVariables(RootComponent component, Map<String, String> variables) {
+        Map<String, Property> properties = component.getProperties();
+
+        variables.forEach((variablesKey, variablesValue) -> {
+            var componentKey = component.getProperty(variablesKey);
+
+            if (componentKey.isPresent() && (componentKey.get().getValue() == null ||
+                componentKey.get().getValue().isEmpty()) ||
+                componentKey.get().getValue().startsWith("$")) {
+
+                Property property = properties.get(variablesKey);
+                property.setValue(variablesValue);
+                logger.info("Updating property from component");
+            }
+
+        });
     }
 
     // this could be another lifecycle step, but is planned to be completely
@@ -177,15 +347,18 @@ public class MultiLifecycle extends AbstractLifecycle {
                 }
                 logger.info("execute next tech");
                 visitorContext.execute();
+
             }
             Writer writer = new StringWriter();
             context.getModel().getGraph().generateYamlOutput(writer);
             fileAccess.write("state.yaml", writer.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         scanner.close();
+
     }
 
     private Map<String, Property> getComputedProperties(RootComponent component) {

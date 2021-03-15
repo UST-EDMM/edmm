@@ -52,9 +52,11 @@ public class TransformationHandler {
             DeploymentModel deploymentModel = DeploymentModel.of(input);
             Path sourceDirectory = Paths.get(repositoryPath);
             Path targetDirectory = Files.createTempDirectory(id + "-");
+
             context = transformationService.createContext(deploymentModel, model.getTarget(), sourceDirectory.toFile(), targetDirectory.toFile());
             context.setId(id);
             store.put(id, context);
+
         } catch (Exception e) {
             throw new IllegalStateException("Could not create transformation context", e);
         }

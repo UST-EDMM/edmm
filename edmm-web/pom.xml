@@ -78,6 +78,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.ust.edmm</groupId>
+            <artifactId>edmm-orchestration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

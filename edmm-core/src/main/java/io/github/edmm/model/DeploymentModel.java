@@ -2,6 +2,7 @@ package io.github.edmm.model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +112,26 @@ public final class DeploymentModel {
     public Optional<OrchestrationTechnologyMapping> getTechnologyMapping() {
         return graph.getOrchestrationTechnologyEntity()
             .map(entity -> new OrchestrationTechnologyMapping((MappingEntity) entity, getComponents()));
+    }
+
+    public String getMultiId() {
+        return graph.getMultiId();
+    }
+
+    public String getParticipantEndpoint(String participant) {
+        return graph.getParticipantEndpoint(participant);
+    }
+
+    public String getParticipantFromComponentName(String componentName) {
+        return graph.getParticipantFromComponentName(componentName);
+    }
+
+    public HashMap<String, String> getParticipants() {
+        return graph.getParticipants();
+    }
+
+    public String getOwner() {
+        return graph.getOwner();
     }
 
     public Technology getTechnology(RootComponent component) {

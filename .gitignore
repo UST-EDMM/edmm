@@ -10,5 +10,7 @@ target
 ### VS Code ###
 .vscode/
 
+/repository/
+
 .gradle
 edmm-core/src/test/resources/templates/multi
