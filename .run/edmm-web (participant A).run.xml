@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="edmm-web" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="edmm-web (participant A)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="edmm-web" />
     <extension name="coverage">
       <pattern>
@@ -15,6 +15,11 @@
         <option name="enabled" value="true" />
         <option name="name" value="repository.path" />
         <option name="value" value="../getting-started/modeling-repository" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="server.port" />
+        <option name="value" value="5000" />
       </param>
     </additionalParameters>
     <method v="2">
