@@ -2,10 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="ansible" class="io.github.edmm.plugins.ansible.AnsiblePlugin"/>
-    <bean id="cfn" class="io.github.edmm.plugins.cfn.CloudFormationPlugin"/>
     <bean id="compose" class="io.github.edmm.plugins.compose.DockerComposePlugin"/>
     <bean id="kubernetes" class="io.github.edmm.plugins.kubernetes.KubernetesPlugin"/>
     <bean id="terraform" class="io.github.edmm.plugins.terraform.TerraformPlugin"/>
+    <!--<bean id="cfn" class="io.github.edmm.plugins.cfn.CloudFormationPlugin"/>-->
     <!--<bean id="azure" class="io.github.edmm.plugins.azure.AzurePlugin"/>-->
     <!--<bean id="chef" class="io.github.edmm.plugins.chef.ChefPlugin"/>-->
     <!--<bean id="cloudify" class="io.github.edmm.plugins.cloudify.CloudifyPlugin"/>-->
