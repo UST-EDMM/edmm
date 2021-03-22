@@ -37,6 +37,7 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
 
     public static final EntityId ROOT = new EntityId("0");
+    public static final EntityId VERSION = ROOT.extend("version");
     public static final EntityId MULTI_ID = ROOT.extend("multi_id");
     public static final EntityId OWNER = ROOT.extend("owner");
     public static final EntityId COMPONENTS = ROOT.extend("components");
