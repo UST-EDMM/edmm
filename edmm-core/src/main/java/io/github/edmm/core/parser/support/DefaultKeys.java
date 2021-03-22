@@ -23,6 +23,8 @@ public abstract class DefaultKeys {
     public static final String TYPE = "type";
     public static final String VALUE = "value";
     public static final String COMPUTED = "computed";
+    public static final String ENDPOINT = "endpoint";
+    public static final String COMPONENTS = "components";
     public static final String[] LIFECYCLE = {CREATE,CONFIGURE,START,STOP,DELETE};
     // endregion
 

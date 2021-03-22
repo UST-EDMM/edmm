@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.github.edmm.core.parser.support.DefaultKeys;
 import io.github.edmm.core.parser.support.GraphHelper;
 import io.github.edmm.core.parser.support.GraphNormalizer;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.var;
@@ -45,8 +45,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     public static final EntityId PARTICIPANTS = ROOT.extend("participants");
 
     public EntityGraph() {
-        // the edge supplier isn't needed if we use always the function
-        // addEdge(V sourceVertex, V targetVertex, E e) of the AbstractBaseClass
         super(null, null, false);
         addVertex(new MappingEntity(ROOT, this));
     }
@@ -73,11 +71,13 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     public String getParticipantEndpoint(String participant) {
-
+        if (getParticipantsEntity().isPresent()) {
+            throw new RuntimeException("No participants defined");
+        }
         for (var p : getParticipantsEntity().get().getChildren()) {
             if (p.getName().equals(participant)) {
                 for (var partner : p.getChildren()) {
-                    if (partner.getName().equals("endpoint")) {
+                    if (partner.getName().equals(DefaultKeys.ENDPOINT)) {
                         ScalarEntity scalarEntity = (ScalarEntity) partner;
                         return scalarEntity.getValue();
                     }
@@ -88,12 +88,13 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     public HashMap<String, String> getParticipants() {
-
+        if (getParticipantsEntity().isPresent()) {
+            throw new RuntimeException("No participants defined");
+        }
         HashMap<String, String> participants = new HashMap<>();
-
         for (var p : getParticipantsEntity().get().getChildren()) {
             for (var partner : p.getChildren()) {
-                if (partner.getName().equals("endpoint")) {
+                if (partner.getName().equals(DefaultKeys.ENDPOINT)) {
                     ScalarEntity scalarEntity = (ScalarEntity) partner;
                     participants.put(p.getName(), scalarEntity.getValue());
                 }
@@ -103,10 +104,12 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     public String getParticipantFromComponentName(String componentName) {
-
+        if (getParticipantsEntity().isPresent()) {
+            throw new RuntimeException("No participants defined");
+        }
         for (var p : getParticipantsEntity().get().getChildren()) {
             for (var partner : p.getChildren()) {
-                if (partner.getName().equals("components")) {
+                if (partner.getName().equals(DefaultKeys.COMPONENTS)) {
                     SequenceEntity sequenceEntity = (SequenceEntity) partner;
                     for (var comp : sequenceEntity.getChildren()) {
                         ScalarEntity scalarEntity = (ScalarEntity) comp;
@@ -121,7 +124,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     public String getMultiId() {
-
         if (getEntity(MULTI_ID).isPresent()) {
             ScalarEntity scalarEntity = (ScalarEntity) getEntity(MULTI_ID).get();
             return scalarEntity.getValue();
@@ -131,7 +133,6 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
     }
 
     public String getOwner() {
-
         if (getEntity(OWNER).isPresent()) {
             ScalarEntity scalarEntity = (ScalarEntity) getEntity(OWNER).get();
             return scalarEntity.getValue();
