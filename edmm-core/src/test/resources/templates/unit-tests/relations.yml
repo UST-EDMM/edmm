@@ -28,14 +28,6 @@ components:
 component_types:
   base:
     extends: null
-    description: The base type
-    metadata: {}
-    operations:
-      create: ~
-      configure: ~
-      start: ~
-      stop: ~
-      delete: ~
   compute:
     extends: base
     properties:
@@ -51,14 +43,8 @@ component_types:
 relation_types:
   depends_on:
     extends: null
-    properties: {}
     operations:
-      pre_configure_source: ~
-      pre_configure_target: ~
-      post_configure_source: ~
-      post_configure_target: ~
-      target_changed: ~
-      target_removed: ~
+      post_configure_target: add.sh
   hosted_on:
     extends: depends_on
   connects_to:

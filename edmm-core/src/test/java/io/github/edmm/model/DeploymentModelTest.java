@@ -106,7 +106,7 @@ public class DeploymentModelTest {
         assertTrue(relation instanceof DependsOn);
         assertEquals("db", relation.getTarget());
         assertEquals(0, relation.getProperties().size());
-        assertEquals(6, relation.getOperations().size());
+        assertEquals(1, relation.getOperations().size());
         assertEquals(3, model.getTopology().vertexSet().size());
         assertEquals(4, model.getTopology().edgeSet().size());
     }

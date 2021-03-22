@@ -29,26 +29,10 @@ metadata:
 relation_types:
   depends_on:
     operations:
-      pre_configure_source:
-        artifacts:
-        - cmd: null
-      pre_configure_target:
-        artifacts:
-        - cmd: null
-      target_removed:
-        artifacts:
-        - cmd: null
-      post_configure_source:
-        artifacts:
-        - cmd: null
       post_configure_target:
         artifacts:
-        - cmd: null
-      target_changed:
-        artifacts:
-        - cmd: null
+        - cmd: add.sh
     extends: null
-    properties: null
   hosted_on:
     extends: depends_on
   connects_to:
@@ -69,25 +53,7 @@ component_types:
   software_component:
     extends: base
   base:
-    metadata: null
-    operations:
-      stop:
-        artifacts:
-        - cmd: null
-      start:
-        artifacts:
-        - cmd: null
-      create:
-        artifacts:
-        - cmd: null
-      configure:
-        artifacts:
-        - cmd: null
-      delete:
-        artifacts:
-        - cmd: null
     extends: null
-    description: The base type
 version: edm_1_0
 properties:
   bar:
