@@ -251,18 +251,34 @@ public class EntityGraph extends SimpleDirectedGraph<Entity, EntityGraph.Edge> {
                 Map<String, Object> childMap = createMapFromGraph(child);
                 map.put(child.getName(), childMap.isEmpty() ? null : childMap);
             } else if (child instanceof SequenceEntity) {
-                List<Map> list = new ArrayList<>();
+                List<Object> list = new ArrayList<>();
                 child.getDirectChildren().stream()
                     .sorted()
                     .forEach(grandChild -> {
                         Map<String, Object> localMap = new HashMap<>();
                         if (grandChild instanceof ScalarEntity) {
-                            localMap.put(grandChild.getName(), ((ScalarEntity) grandChild).getValue());
+                            String key = grandChild.getName();
+                            Object value = ((ScalarEntity) grandChild).getValue();
+                            boolean isInteger = false;
+                            try {
+                                isInteger = Integer.parseInt(key) >= 0;
+                            } catch (NumberFormatException e) {
+                                // ignore
+                            }
+                            if (key.equals(value) || isInteger) {
+                                list.add(value);
+                            } else if (value == null) {
+                                list.add(key);
+                            } else {
+                                localMap.put(key, value);
+                            }
                         } else {
                             Map<String, Object> grandChildMap = createMapFromGraph(grandChild);
                             localMap.put(grandChild.getName(), grandChildMap.isEmpty() ? null : grandChildMap);
                         }
-                        list.add(localMap);
+                        if (!localMap.isEmpty()) {
+                            list.add(localMap);
+                        }
                     });
                 if (!list.isEmpty()) {
                     map.put(child.getName(), list);

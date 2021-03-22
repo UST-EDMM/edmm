@@ -1,0 +1,11 @@
+---
+version: edm_1_0
+
+participants:
+  partnerA:
+    endpoint: http://localhost:5000
+    components:
+      - ubuntu_db
+      - foo: db
+      - dbms
+      - ubuntu_app

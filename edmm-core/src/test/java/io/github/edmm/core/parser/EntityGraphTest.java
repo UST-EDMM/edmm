@@ -1,23 +1,41 @@
 package io.github.edmm.core.parser;
 
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.ClassPathResource;
 
 public class EntityGraphTest {
 
-    private static EntityGraph graph;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @Test
+    public void testBasicParsing() throws Exception {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/properties.yml");
-        graph = new EntityGraph(resource.getInputStream());
+        EntityGraph graph = new EntityGraph(resource.getInputStream());
+        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version"))
+            .orElseThrow(IllegalStateException::new)).getValue());
     }
 
     @Test
-    public void testBasicParsing() {
-        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version"))
-                .orElseThrow(IllegalStateException::new)).getValue());
+    public void testParticipantParsingAndYamlGeneration() throws Exception {
+        ClassPathResource resource = new ClassPathResource("templates/unit-tests/participants.yml");
+        ClassPathResource expectation = new ClassPathResource("templates/unit-tests/participants_expectation.yml");
+        EntityGraph graph = new EntityGraph(resource.getInputStream());
+
+        StringWriter writer = new StringWriter();
+        graph.generateYamlOutput(writer);
+
+        // Use JSONAssert to compare the YAML files
+        ObjectMapper om = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+        JsonNode actual = objectMapper.readTree(writer.toString());
+        JsonNode expected = objectMapper.readTree(IOUtils.toString(expectation.getInputStream(), StandardCharsets.UTF_8));
+        JSONAssert.assertEquals(om.writeValueAsString(actual), om.writeValueAsString(expected), false);
     }
 }
