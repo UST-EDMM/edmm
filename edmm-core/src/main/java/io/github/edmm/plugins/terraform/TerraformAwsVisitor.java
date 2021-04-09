@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform.aws;
+package io.github.edmm.plugins.terraform;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +34,6 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.component.Tomcat;
 import io.github.edmm.model.component.WebApplication;
 import io.github.edmm.model.relation.ConnectsTo;
-import io.github.edmm.plugins.terraform.TerraformVisitor;
 import io.github.edmm.plugins.terraform.model.Auth0ResourceServer;
 import io.github.edmm.plugins.terraform.model.Aws;
 import io.github.edmm.plugins.terraform.model.FileProvisioner;
