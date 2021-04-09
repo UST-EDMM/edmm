@@ -53,12 +53,15 @@ components:
       machine_image: ubuntu
       instance_type: large
       key_name: edmm
+      private_key_path: ~/.ssh/id_rsa
       public_key: |
         -----BEGIN PUBLIC KEY-----
         MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0
         FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/
         3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB
         -----END PUBLIC KEY-----
+    artifacts:
+     - provider: ./files/openstack.json
 
 ###############################################
 ## Component Types
