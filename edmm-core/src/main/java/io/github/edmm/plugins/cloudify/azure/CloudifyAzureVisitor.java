@@ -27,7 +27,6 @@ import io.github.edmm.model.relation.ConnectsTo;
 import io.github.edmm.plugins.cloudify.CloudifyVisitor;
 import io.github.edmm.plugins.cloudify.model.azure.Script;
 import io.github.edmm.plugins.cloudify.model.azure.VirtualMachine;
-import io.github.edmm.plugins.terraform.TerraformAwsVisitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ import static io.github.edmm.plugins.cloudify.CloudifyLifecycle.FILE_NAME;
 
 public class CloudifyAzureVisitor extends CloudifyVisitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(TerraformAwsVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(CloudifyAzureVisitor.class);
 
     private final Map<Compute, VirtualMachine> computeInstances = new HashMap<>();
 
