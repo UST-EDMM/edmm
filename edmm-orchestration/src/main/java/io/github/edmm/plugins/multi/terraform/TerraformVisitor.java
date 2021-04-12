@@ -187,9 +187,12 @@ public class TerraformVisitor implements ComponentVisitor, RelationVisitor {
             BashScript envScript = new BashScript(fileAccess, "env.sh");
             openstackInstance.getEnvVars().forEach((name, value) -> envScript.append("export " + name + "=" + value));
             // Copy artifacts to target directory
-            // env is already there
             for (FileProvisioner provisioner : openstackInstance.getFileProvisioners()) {
                 try {
+                    // env.sh is already there
+                    if (provisioner.getSource().equalsIgnoreCase("./env.sh")) {
+                        continue;
+                    }
                     fileAccess.copy(provisioner.getSource(), provisioner.getSource());
                 } catch (IOException e) {
                     logger.warn("Failed to copy file '{}'", provisioner.getSource());
