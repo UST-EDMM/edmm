@@ -189,7 +189,7 @@ public class AnsibleVisitor implements MultiVisitor, RelationVisitor {
 
         try {
             fileAccess.write(AnsibleAreaLifecycle.FILE_NAME,
-                TemplateHelper.toString(cfg, "playbook_base.yml", templateData));
+                TemplateHelper.toString(cfg, "play.yml", templateData));
         } catch (IOException e) {
             logger.error("Failed to write Ansible file", e);
         }
