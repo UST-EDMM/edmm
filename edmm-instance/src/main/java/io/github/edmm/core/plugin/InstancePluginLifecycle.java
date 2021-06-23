@@ -11,6 +11,8 @@ public interface InstancePluginLifecycle {
 
     void transformDirectlyToTOSCA();
 
+    void storeTransformedTOSCA();
+
     void createYAML();
 
     void cleanup();

@@ -4,7 +4,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import io.github.edmm.core.plugin.Authenticator;
-
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.AppsV1Api;
@@ -17,15 +16,13 @@ import lombok.Getter;
 public class AuthenticatorImpl implements Authenticator {
 
     private final String kubeConfigPath;
-    private final String inputDeploymentName;
 
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
     private ApiClient client;
 
-    public AuthenticatorImpl(String kubeConfigPath, String inputDeploymentName) {
+    public AuthenticatorImpl(String kubeConfigPath) {
         this.kubeConfigPath = kubeConfigPath;
-        this.inputDeploymentName = inputDeploymentName;
     }
 
     @Override

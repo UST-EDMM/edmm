@@ -18,7 +18,6 @@ import io.github.edmm.plugins.heat.util.HeatConstants;
 import io.github.edmm.plugins.heat.util.HeatMetadataHandler;
 import io.github.edmm.plugins.heat.util.HeatPropertiesHandler;
 import io.github.edmm.plugins.heat.util.HeatResourceHandler;
-
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
@@ -98,6 +97,11 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
 
     @Override
     public void transformDirectlyToTOSCA() {
+
+    }
+
+    @Override
+    public void storeTransformedTOSCA() {
 
     }
 

@@ -2,6 +2,9 @@ package io.github.edmm.plugins.cfn;
 
 import java.util.List;
 
+import com.amazonaws.services.cloudformation.AmazonCloudFormation;
+import com.amazonaws.services.cloudformation.model.Stack;
+import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
@@ -16,10 +19,6 @@ import io.github.edmm.plugins.cfn.model.Template;
 import io.github.edmm.plugins.cfn.util.CfnMetadataHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackPropertiesHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackResourcesHandler;
-
-import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.model.Stack;
-import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +69,11 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
 
     @Override
     public void transformDirectlyToTOSCA() {
+
+    }
+
+    @Override
+    public void storeTransformedTOSCA() {
 
     }
 

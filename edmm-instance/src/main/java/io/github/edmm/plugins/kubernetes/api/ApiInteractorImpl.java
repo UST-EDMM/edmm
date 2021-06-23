@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import io.github.edmm.core.plugin.ApiInteractor;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.kubernetes.util.KubernetesConstants;
-
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
@@ -35,9 +34,13 @@ public class ApiInteractorImpl implements ApiInteractor {
             V1DeploymentList allDeployments = this.appsApi.listDeploymentForAllNamespaces(null, null,
                 null, null, null, null, null,
                 null, null);
-            this.deployment = allDeployments.getItems().stream().filter(depl ->
-                depl.getMetadata().getName().equals(this.inputDeploymentName))
-                .findFirst().orElseThrow(InstanceTransformationException::new);
+            if (this.inputDeploymentName != null) {
+                this.deployment = allDeployments.getItems().stream().filter(depl ->
+                    depl.getMetadata().getName().equals(this.inputDeploymentName))
+                    .findFirst().orElseThrow(InstanceTransformationException::new);
+            } else {
+                this.deployment = allDeployments.getItems().stream().findFirst().orElseThrow(InstanceTransformationException::new);
+            }
         } catch (ApiException e) {
             throw new InstanceTransformationException("Unable to retrieve deployment.", e.getCause());
         }
@@ -57,7 +60,6 @@ public class ApiInteractorImpl implements ApiInteractor {
                     && pod.getMetadata().getLabels().get(KubernetesConstants.APP)
                     .equals(this.deployment.getMetadata().getLabels().get(KubernetesConstants.APP)))
                 .collect(Collectors.toList());
-
         } catch (ApiException e) {
             throw new InstanceTransformationException("Unable to retrieve components of deployment.", e.getCause());
         }

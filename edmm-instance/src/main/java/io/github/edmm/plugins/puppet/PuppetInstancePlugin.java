@@ -1,12 +1,5 @@
 package io.github.edmm.plugins.puppet;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -17,28 +10,19 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
-import io.github.edmm.plugins.puppet.model.Fact;
-import io.github.edmm.plugins.puppet.model.Master;
-import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
-import io.github.edmm.plugins.puppet.model.PuppetState;
-import io.github.edmm.plugins.puppet.model.Report;
-import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
+import io.github.edmm.plugins.puppet.model.*;
 import io.github.edmm.plugins.puppet.typemapper.MySQLMapper;
 import io.github.edmm.plugins.puppet.typemapper.TomcatMapper;
 import io.github.edmm.plugins.puppet.typemapper.WebApplicationMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.Constants;
-
-import org.eclipse.winery.model.tosca.TEntityTemplate;
-import org.eclipse.winery.model.tosca.TNodeTemplate;
-import org.eclipse.winery.model.tosca.TNodeType;
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
-import org.eclipse.winery.model.tosca.TTopologyTemplate;
+import org.eclipse.winery.model.tosca.*;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<PuppetInstancePlugin> {
 
@@ -103,6 +87,11 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
+
+            // TODO temporary fix -> remove
+            if (nodeOS == null || nodeOSRelease == null) {
+                return;
+            }
 
             TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
             TNodeTemplate vm = ModelUtilities.instantiateNodeTemplate(vmType);
@@ -202,7 +191,12 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 .build()
             ).build();
 
-        toscaTransformer.save(serviceTemplate);
+        updateGeneratedServiceTemplate(serviceTemplate);
+    }
+
+    @Override
+    public void storeTransformedTOSCA() {
+        Optional.ofNullable(retrieveGeneratedServiceTemplate()).ifPresent(toscaTransformer::save);
     }
 
     private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate) {

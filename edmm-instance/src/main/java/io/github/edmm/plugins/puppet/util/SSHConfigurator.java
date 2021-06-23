@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import io.github.edmm.core.transformation.InstanceTransformationException;
-import io.github.edmm.plugins.puppet.model.Master;
-import io.github.edmm.util.Util;
-
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import io.github.edmm.core.transformation.InstanceTransformationException;
+import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.util.Util;
 
 public class SSHConfigurator {
 
@@ -92,7 +91,7 @@ public class SSHConfigurator {
                 return Util.readFromStream(stream);
             }
         } catch (JSchException | SftpException | IOException e) {
-            throw new InstanceTransformationException("Failed to retrieve public key from master", e.getCause());
+            throw new InstanceTransformationException("Failed to retrieve public key from master", e);
         }
     }
 

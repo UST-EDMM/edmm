@@ -1,10 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="edmm-instance" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="edmm-instance" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.Application" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
+    <configuration default="false" name="edmm-instance" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <module name="edmm-instance"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.Application"/>
+        <option name="PROGRAM_PARAMETERS"
+                value="multitransform -u rosso -ip 173.212.243.69 -f C:\Users\rosso\.ssh\puppet-master -c C:\Users\rosso\repos_unsynced\edmm\remote-config"/>
+        <option name="ALTERNATIVE_JRE_PATH"/>
+        <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
 </component>

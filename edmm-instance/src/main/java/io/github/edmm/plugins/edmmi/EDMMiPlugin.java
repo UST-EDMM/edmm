@@ -10,7 +10,6 @@ import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.OpenTOSCAConnector;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,11 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     @Override
     public void transformDirectlyToTOSCA() {
         this.transformEdmmiToTOSCA();
+    }
+
+    @Override
+    public void storeTransformedTOSCA() {
+
     }
 
     @Override

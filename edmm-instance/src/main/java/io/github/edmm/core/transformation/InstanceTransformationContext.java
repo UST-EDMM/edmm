@@ -14,6 +14,7 @@ public final class InstanceTransformationContext {
     private final SourceTechnology sourceTechnology;
     private final String outputPath;
     private final Timestamp timestamp;
+    private final boolean multiTransform;
 
     @Setter
     private State state = State.READY;
@@ -22,10 +23,15 @@ public final class InstanceTransformationContext {
         this(UUID.randomUUID().toString(), sourceTechnology, outputPath);
     }
 
-    public InstanceTransformationContext(@NonNull String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath) {
+    public InstanceTransformationContext(String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath) {
+        this(id, sourceTechnology, outputPath, false);
+    }
+
+    public InstanceTransformationContext(String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath, boolean multiTransform) {
         this.id = id;
         this.sourceTechnology = sourceTechnology;
         this.outputPath = outputPath;
+        this.multiTransform = multiTransform;
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 

@@ -5,16 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 import io.github.edmm.util.Util;
-
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -64,7 +63,7 @@ public class Master {
             this.session.connect();
         } catch (JSchException e) {
             throw new InstanceTransformationException("Failed to connect with Puppet Master. Please make sure the " +
-                "correct user, host, sshPort, and private key location of the Puppet Master is set.");
+                "correct user, host, sshPort, and private key location of the Puppet Master is set.", e);
         }
     }
 

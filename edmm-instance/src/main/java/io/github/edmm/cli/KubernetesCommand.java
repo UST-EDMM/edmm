@@ -1,10 +1,11 @@
 package io.github.edmm.cli;
 
+import java.util.UUID;
+
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,14 +25,14 @@ public class KubernetesCommand extends TransformCommand {
 
     @CommandLine.Option(names = {"-c", "--kubeConfigPath"}, required = true)
     private String kubeConfigPath;
-    @CommandLine.Option(names = {"-id", "--applicationId"}, required = true,
+    @CommandLine.Option(names = {"-id", "--applicationId"}, required = false,
         description = "You need to specify the name of the application you want to transform.")
     private String applicationId;
 
     @Override
     public void run() {
-        InstanceTransformationContext context = new InstanceTransformationContext(applicationId, KUBERNETES, outputPath);
-        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath);
+        InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(), KUBERNETES, outputPath);
+        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, applicationId);
         InstancePlugin<KubernetesInstancePlugin> plugin = new InstancePlugin<>(KUBERNETES, pluginLifecycle);
         try {
             plugin.execute();

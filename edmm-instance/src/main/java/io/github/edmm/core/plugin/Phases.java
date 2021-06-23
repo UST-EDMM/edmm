@@ -5,6 +5,7 @@ public enum Phases {
     GET_MODELS,
     TRANSFORM_EDMMi,
     TRANSFORM_TOSCA,
+    STORE_TRANSFORMED_TOSCA,
     CREATE_YAML,
     CLEANUP,
 }
