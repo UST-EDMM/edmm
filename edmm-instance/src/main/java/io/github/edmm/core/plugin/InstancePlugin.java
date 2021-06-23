@@ -6,6 +6,7 @@ import org.eclipse.winery.model.tosca.TServiceTemplate;
 
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
+
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -57,7 +58,9 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
         logger.info("EDMMi Transformation finished after {} ms", time);
     }
 
-    private int countExecutionPhases(InstanceTransformationContext context, List<? extends InstanceLifecyclePhase<?>> phases) {
+    private int countExecutionPhases(
+        InstanceTransformationContext context,
+        List<? extends InstanceLifecyclePhase<?>> phases) {
         return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 

@@ -77,7 +77,8 @@ public abstract class CastUtil {
 
     private static <T> void checkCast(Class<T> tClass, Object objectToCast) {
         if (!tClass.isInstance(objectToCast)) {
-            throw new ClassCastException("Expected: " + tClass.getName() + "but was: " + objectToCast.getClass().getName()
+            throw new ClassCastException("Expected: " + tClass.getName() + "but was: " + objectToCast.getClass()
+                .getName()
             );
         }
     }

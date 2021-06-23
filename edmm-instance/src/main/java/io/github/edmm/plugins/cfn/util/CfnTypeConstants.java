@@ -120,5 +120,4 @@ class CfnTypeConstants {
     static final String WAF = AWS_PREFIX + "WAF" + Constants.DELIMITER;
     static final String WAFv2 = AWS_PREFIX + "WAFv2" + Constants.DELIMITER;
     static final String WorkSpaces = AWS_PREFIX + "WorkSpaces" + Constants.DELIMITER;
-
 }

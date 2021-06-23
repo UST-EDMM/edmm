@@ -17,7 +17,8 @@ import static java.util.stream.Collectors.toMap;
 public class HeatMetadataHandler {
 
     static Metadata getComponentMetadata(Resource resource, Map<String, Object> resourceContent) {
-        Map<String, Object> propertiesMap = getPropertiesMap(getResourceMap(resourceContent, resource.getResourceName()));
+        Map<String, Object> propertiesMap = getPropertiesMap(getResourceMap(resourceContent,
+            resource.getResourceName()));
         List<String> tagList = getTagList(propertiesMap);
         Map<String, Object> metadataMap = getMetadataMap(propertiesMap);
 

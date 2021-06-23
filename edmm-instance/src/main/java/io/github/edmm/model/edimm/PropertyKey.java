@@ -233,5 +233,4 @@ public class PropertyKey {
             return this.toscaPropertyKey;
         }
     }
-
 }

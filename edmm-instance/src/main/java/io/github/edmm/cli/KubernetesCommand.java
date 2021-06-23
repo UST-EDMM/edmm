@@ -6,6 +6,7 @@ import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,10 @@ import picocli.CommandLine;
 public class KubernetesCommand extends TransformCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesCommand.class);
-    private static final SourceTechnology KUBERNETES = SourceTechnology.builder().id("kubernetes").name("Kubernetes").build();
+    private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
+        .id("kubernetes")
+        .name("Kubernetes")
+        .build();
 
     @CommandLine.Option(names = {"-c", "--kubeConfigPath"}, required = true)
     private String kubeConfigPath;
@@ -31,7 +35,9 @@ public class KubernetesCommand extends TransformCommand {
 
     @Override
     public void run() {
-        InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(), KUBERNETES, outputPath);
+        InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(),
+            KUBERNETES,
+            outputPath);
         KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, applicationId);
         InstancePlugin<KubernetesInstancePlugin> plugin = new InstancePlugin<>(KUBERNETES, pluginLifecycle);
         try {

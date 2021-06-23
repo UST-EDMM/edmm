@@ -23,11 +23,18 @@ public final class InstanceTransformationContext {
         this(UUID.randomUUID().toString(), sourceTechnology, outputPath);
     }
 
-    public InstanceTransformationContext(String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath) {
+    public InstanceTransformationContext(
+        String id,
+        @NonNull SourceTechnology sourceTechnology,
+        @NonNull String outputPath) {
         this(id, sourceTechnology, outputPath, false);
     }
 
-    public InstanceTransformationContext(String id, @NonNull SourceTechnology sourceTechnology, @NonNull String outputPath, boolean multiTransform) {
+    public InstanceTransformationContext(
+        String id,
+        @NonNull SourceTechnology sourceTechnology,
+        @NonNull String outputPath,
+        boolean multiTransform) {
         this.id = id;
         this.sourceTechnology = sourceTechnology;
         this.outputPath = outputPath;

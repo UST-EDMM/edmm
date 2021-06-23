@@ -12,19 +12,22 @@ public class TopologyTemplateDTO {
     public TopologyTemplateDTO(ServiceTemplateInstance serviceTemplateInstance) {
         this.nodeTemplates = createNodeTemplateDTOs(serviceTemplateInstance);
         this.relationshipTemplates = createRelationshipTemplateDTOs(serviceTemplateInstance);
-
     }
 
     private List<NodeTemplateDTO> createNodeTemplateDTOs(ServiceTemplateInstance serviceTemplateInstance) {
         List<NodeTemplateDTO> nodeTemplateDTOs = new ArrayList<>();
-        serviceTemplateInstance.getNodeTemplateInstances().forEach(nodeTemplateInstance -> nodeTemplateDTOs.add(NodeTemplateDTO.ofNodeTemplateInstance(nodeTemplateInstance)));
+        serviceTemplateInstance.getNodeTemplateInstances()
+            .forEach(nodeTemplateInstance -> nodeTemplateDTOs.add(NodeTemplateDTO.ofNodeTemplateInstance(
+                nodeTemplateInstance)));
 
         return nodeTemplateDTOs;
     }
 
     private List<RelationshipTemplateDTO> createRelationshipTemplateDTOs(ServiceTemplateInstance serviceTemplateInstance) {
         List<RelationshipTemplateDTO> relationshipTemplateDTOs = new ArrayList<>();
-        serviceTemplateInstance.getRelationshipTemplateInstances().forEach(relationshipTemplateInstance -> relationshipTemplateDTOs.add(RelationshipTemplateDTO.ofRelationshipTemplateInstance(relationshipTemplateInstance)));
+        serviceTemplateInstance.getRelationshipTemplateInstances()
+            .forEach(relationshipTemplateInstance -> relationshipTemplateDTOs.add(RelationshipTemplateDTO.ofRelationshipTemplateInstance(
+                relationshipTemplateInstance)));
 
         return relationshipTemplateDTOs;
     }

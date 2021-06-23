@@ -6,6 +6,7 @@ import io.github.edmm.cli.KubernetesCommand;
 import io.github.edmm.cli.MultiTransformCommand;
 import io.github.edmm.cli.ParseCommand;
 import io.github.edmm.cli.PuppetCommand;
+
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -17,8 +17,12 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 class HeatRelationHandler {
 
-    static List<RelationInstance> getRelationInstances(List<? extends Resource> resources, Map<String, Object> resourceContent, Resource resourceInput) {
-        List<String> dependsOnList = CastUtil.safelyCastToStringList(CastUtil.safelyCastToStringObjectMap(resourceContent.get(resourceInput.getResourceName())).get(HeatConstants.DEPENDS_ON));
+    static List<RelationInstance> getRelationInstances(
+        List<? extends Resource> resources,
+        Map<String, Object> resourceContent,
+        Resource resourceInput) {
+        List<String> dependsOnList = CastUtil.safelyCastToStringList(CastUtil.safelyCastToStringObjectMap(
+            resourceContent.get(resourceInput.getResourceName())).get(HeatConstants.DEPENDS_ON));
         List<RelationInstance> relationInstances = new ArrayList<>();
         AtomicInteger relationCount = new AtomicInteger();
         emptyIfNull(dependsOnList).forEach(dependsOnResource -> {

@@ -54,7 +54,8 @@ public class Status {
         IMPORT_ROLLBACK_IN_PROGRESS(InstanceState.InstanceStateForComponentInstance.UPDATING),
         UPDATE_COMPLETE(InstanceState.InstanceStateForComponentInstance.UPDATED),
         UPDATE_FAILED(InstanceState.InstanceStateForComponentInstance.ERROR),
-        UPDATE_IN_PROGRESS(InstanceState.InstanceStateForComponentInstance.UPDATING),;
+        UPDATE_IN_PROGRESS(InstanceState.InstanceStateForComponentInstance.UPDATING),
+        ;
 
         private final InstanceState.InstanceStateForComponentInstance componentInstanceState;
 

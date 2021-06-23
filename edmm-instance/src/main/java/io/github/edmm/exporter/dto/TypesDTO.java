@@ -2,12 +2,13 @@ package io.github.edmm.exporter.dto;
 
 import javax.xml.namespace.QName;
 
+import org.eclipse.winery.common.version.WineryVersion;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.eclipse.winery.common.version.WineryVersion;
 
 @Getter
 @Setter

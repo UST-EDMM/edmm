@@ -21,7 +21,9 @@ class NodeTemplateDTO {
         nodeTemplateDTO.setType(String.valueOf(nodeTemplateInstance.getNodeType()));
         Map<String, Map<String, String>> propertyMap = new LinkedHashMap<>();
         propertyMap.put("kvproperties", new LinkedHashMap<>());
-        nodeTemplateInstance.getInstanceProperties().forEach(instanceProp -> propertyMap.get("kvproperties").put(instanceProp.getName(), String.valueOf(instanceProp.getValue())));
+        nodeTemplateInstance.getInstanceProperties()
+            .forEach(instanceProp -> propertyMap.get("kvproperties")
+                .put(instanceProp.getName(), String.valueOf(instanceProp.getValue())));
         nodeTemplateDTO.setProperties(propertyMap);
 
         return nodeTemplateDTO;

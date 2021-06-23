@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 
 import io.github.edmm.core.plugin.support.ExecutionFunction;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
+
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -20,11 +21,18 @@ public class InstanceLifecyclePhase<L extends InstancePluginLifecycle> {
     private final Predicate<InstanceTransformationContext> predicate;
     private State state = State.PENDING;
 
-    InstanceLifecyclePhase(@NonNull Phases phase, @NonNull AbstractLifecycleInstancePlugin<L> phaseAccess, @NonNull ExecutionFunction<L> function) {
+    InstanceLifecyclePhase(
+        @NonNull Phases phase,
+        @NonNull AbstractLifecycleInstancePlugin<L> phaseAccess,
+        @NonNull ExecutionFunction<L> function) {
         this(phase, phaseAccess, function, c -> true);
     }
 
-    InstanceLifecyclePhase(@NonNull Phases phase, @NonNull AbstractLifecycleInstancePlugin<L> phaseAccess, @NonNull ExecutionFunction<L> function, Predicate<InstanceTransformationContext> predicate) {
+    InstanceLifecyclePhase(
+        @NonNull Phases phase,
+        @NonNull AbstractLifecycleInstancePlugin<L> phaseAccess,
+        @NonNull ExecutionFunction<L> function,
+        Predicate<InstanceTransformationContext> predicate) {
         this.phase = phase;
         this.phaseAccess = phaseAccess;
         this.function = function;

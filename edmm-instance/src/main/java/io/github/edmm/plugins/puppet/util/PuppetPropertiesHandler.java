@@ -25,9 +25,13 @@ import org.apache.commons.codec.binary.Base64;
 public class PuppetPropertiesHandler {
     static List<InstanceProperty> getComponentInstanceProperties(ComponentType componentType, List<Fact> facts) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
-        facts.forEach(fact -> instanceProperties.add(new InstanceProperty(fact.getName(), fact.getValue().getClass().getSimpleName(), fact.getValue())));
+        facts.forEach(fact -> instanceProperties.add(new InstanceProperty(fact.getName(),
+            fact.getValue().getClass().getSimpleName(),
+            fact.getValue())));
         EDMMPropertyMapperImplementation propMapper = new EDMMPropertyMapperImplementation();
-        instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propMapper.mapToEDMMPropertyKey(componentType, instanceProperty.getKey())));
+        instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propMapper.mapToEDMMPropertyKey(
+            componentType,
+            instanceProperty.getKey())));
         List<InstanceProperty> toBeRemoved = new ArrayList<>();
         for (InstanceProperty instanceProperty : instanceProperties) {
             if (instanceProperty.getKey() == null) {
@@ -61,7 +65,8 @@ public class PuppetPropertiesHandler {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
             RSAPrivateCrtKey privateCrtKey = (RSAPrivateCrtKey) privateKey;
-            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(privateCrtKey.getModulus(), privateCrtKey.getPublicExponent());
+            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(privateCrtKey.getModulus(),
+                privateCrtKey.getPublicExponent());
             PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
 
             java.util.Base64.Encoder encoder = java.util.Base64.getEncoder();

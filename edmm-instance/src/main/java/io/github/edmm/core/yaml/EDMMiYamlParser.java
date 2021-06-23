@@ -20,9 +20,8 @@ import org.yaml.snakeyaml.Yaml;
 
 public class EDMMiYamlParser {
     private final static Logger LOGGER = Logger.getLogger(EDMMiYamlParser.class.getName());
-
-    private Map<String, Object> yamlData;
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
+    private Map<String, Object> yamlData;
 
     public DeploymentInstance parseYamlAndTransformToDeploymentInstance(String fileInput) {
 
@@ -44,14 +43,23 @@ public class EDMMiYamlParser {
     }
 
     private void transformToDeploymentInstance() {
-        this.deploymentInstance.setName(this.yamlData.get(YamlConstants.NAME) != null ? String.valueOf(this.yamlData.get(YamlConstants.NAME)) : null);
-        this.deploymentInstance.setVersion(this.yamlData.get(YamlConstants.VERSION) != null ? String.valueOf(this.yamlData.get(YamlConstants.VERSION)) : null);
-        this.deploymentInstance.setState(this.yamlData.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForDeploymentInstance.valueOf(String.valueOf(this.yamlData.get(YamlConstants.STATE))) : null);
-        this.deploymentInstance.setId(this.yamlData.get(YamlConstants.ID) != null ? String.valueOf(this.yamlData.get(YamlConstants.ID)) : null);
-        this.deploymentInstance.setCreatedAt(this.yamlData.get(YamlConstants.CREATED_AT) != null ? String.valueOf(this.yamlData.get(YamlConstants.CREATED_AT)) : null);
-        this.deploymentInstance.setDescription(this.yamlData.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(this.yamlData.get(YamlConstants.DESCRIPTION)) : null);
-        this.deploymentInstance.setMetadata(this.yamlData.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(this.yamlData.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
-        this.deploymentInstance.setInstanceProperties(this.yamlData.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(this.yamlData) : Collections.emptyList());
-        this.deploymentInstance.setComponentInstances(this.yamlData.get(YamlConstants.COMPONENT_INSTANCES) != null ? YamlSupport.getComponentInstancesFromYamlContent(this.yamlData) : Collections.emptyList());
+        this.deploymentInstance.setName(this.yamlData.get(YamlConstants.NAME) != null ? String.valueOf(this.yamlData.get(
+            YamlConstants.NAME)) : null);
+        this.deploymentInstance.setVersion(this.yamlData.get(YamlConstants.VERSION) != null ? String.valueOf(this.yamlData
+            .get(YamlConstants.VERSION)) : null);
+        this.deploymentInstance.setState(this.yamlData.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForDeploymentInstance
+            .valueOf(String.valueOf(this.yamlData.get(YamlConstants.STATE))) : null);
+        this.deploymentInstance.setId(this.yamlData.get(YamlConstants.ID) != null ? String.valueOf(this.yamlData.get(
+            YamlConstants.ID)) : null);
+        this.deploymentInstance.setCreatedAt(this.yamlData.get(YamlConstants.CREATED_AT) != null ? String.valueOf(this.yamlData
+            .get(YamlConstants.CREATED_AT)) : null);
+        this.deploymentInstance.setDescription(this.yamlData.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(
+            this.yamlData.get(YamlConstants.DESCRIPTION)) : null);
+        this.deploymentInstance.setMetadata(this.yamlData.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(
+            this.yamlData.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
+        this.deploymentInstance.setInstanceProperties(this.yamlData.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport
+            .getInstancePropertiesFromYamlContent(this.yamlData) : Collections.emptyList());
+        this.deploymentInstance.setComponentInstances(this.yamlData.get(YamlConstants.COMPONENT_INSTANCES) != null ? YamlSupport
+            .getComponentInstancesFromYamlContent(this.yamlData) : Collections.emptyList());
     }
 }

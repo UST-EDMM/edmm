@@ -13,7 +13,6 @@ public abstract class HeatConstants {
     static final String DEPENDS_ON = "depends_on";
     static final String TIMEOUT = "timeout_time";
     static final String UPDATED_TIME = "updated_time";
-
     private static final String OS = "OS" + Constants.DELIMITER;
     static final String Aodh = OS + "Aodh" + Constants.DELIMITER;
     static final String Barbican = OS + "Barbican" + Constants.DELIMITER;

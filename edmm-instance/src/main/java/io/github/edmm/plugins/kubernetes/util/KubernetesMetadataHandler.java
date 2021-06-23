@@ -67,7 +67,8 @@ public class KubernetesMetadataHandler {
 
     private void handleDeletionPeriod() {
         if (kubernetesMetadata.getDeletionGracePeriodSeconds() != null) {
-            this.metadataMap.put(KubernetesConstants.DELETION_GRACE_PERIOD_SECONDS, kubernetesMetadata.getDeletionGracePeriodSeconds());
+            this.metadataMap.put(KubernetesConstants.DELETION_GRACE_PERIOD_SECONDS,
+                kubernetesMetadata.getDeletionGracePeriodSeconds());
         }
     }
 

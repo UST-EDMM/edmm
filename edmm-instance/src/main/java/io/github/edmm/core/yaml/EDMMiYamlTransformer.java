@@ -58,7 +58,8 @@ public class EDMMiYamlTransformer {
     }
 
     private void createYamlWithRepresenter() {
-        this.yaml = new Yaml(ConfigurationModelRepresenter.getConfiguredRepresenter(), new YamlSupport().getYamlOptions());
+        this.yaml = new Yaml(ConfigurationModelRepresenter.getConfiguredRepresenter(),
+            new YamlSupport().getYamlOptions());
     }
 
     private FileWriter createWriter(String fileOutputLocation) throws IOException {

@@ -30,7 +30,8 @@ public class InstanceTransformationService {
         SourceTechnology sourceTechnology = context.getSourceTechnology();
         Optional<InstancePlugin<?>> plugin = instancePluginService.findBySourceTechnology(sourceTechnology);
         if (!plugin.isPresent()) {
-            logger.error("Instance transformation plugin for given technology '{}' could not be found", sourceTechnology.getId());
+            logger.error("Instance transformation plugin for given technology '{}' could not be found",
+                sourceTechnology.getId());
             return;
         }
         if (context.getState() == InstanceTransformationContext.State.READY) {

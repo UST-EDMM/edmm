@@ -2,9 +2,6 @@ package io.github.edmm.plugins.cfn;
 
 import java.util.List;
 
-import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.model.Stack;
-import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
@@ -19,6 +16,10 @@ import io.github.edmm.plugins.cfn.model.Template;
 import io.github.edmm.plugins.cfn.util.CfnMetadataHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackPropertiesHandler;
 import io.github.edmm.plugins.cfn.util.CfnStackResourcesHandler;
+
+import com.amazonaws.services.cloudformation.AmazonCloudFormation;
+import com.amazonaws.services.cloudformation.model.Stack;
+import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +62,13 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
         this.deploymentInstance.setVersion(this.template.getAWSTemplateFormatVersion());
         this.deploymentInstance.setCreatedAt(String.valueOf(this.stack.getCreationTime()));
         this.deploymentInstance.setDescription(this.stack.getDescription());
-        this.deploymentInstance.setState(Status.CfnStackStatus.valueOf(this.stack.getStackStatus()).toEDiMMDeploymentInstanceState());
-        this.deploymentInstance.setInstanceProperties(new CfnStackPropertiesHandler().getInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
+        this.deploymentInstance.setState(Status.CfnStackStatus.valueOf(this.stack.getStackStatus())
+            .toEDiMMDeploymentInstanceState());
+        this.deploymentInstance.setInstanceProperties(new CfnStackPropertiesHandler().getInstanceProperties(this.stack.getParameters(),
+            this.stack.getOutputs()));
         this.deploymentInstance.setMetadata(new CfnMetadataHandler(this.stack).getMetadataForDeploymentInstance());
-        this.deploymentInstance.setComponentInstances(new CfnStackResourcesHandler(this.stackResources, this.template).getComponentInstances());
+        this.deploymentInstance.setComponentInstances(new CfnStackResourcesHandler(this.stackResources,
+            this.template).getComponentInstances());
     }
 
     @Override
@@ -80,8 +84,11 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
     @Override
     public void transformEdmmiToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(
+            deploymentInstance);
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(),
+            serviceTemplateInstance,
+            context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 

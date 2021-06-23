@@ -16,5 +16,4 @@ public enum RelationType {
     public TOSCABaseTypes.TOSCABaseRelationTypes toToscaRelationBaseType() {
         return toscaRelationBaseType;
     }
-
 }

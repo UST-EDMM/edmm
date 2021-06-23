@@ -35,7 +35,8 @@ public class UbuntuMapper implements TypeTransformer {
             String componentOsVersion = matcher.group(1);
             return myWineryConnector.getBaseNodeTypesQNames()
                 .stream()
-                .filter(aQName -> Objects.equals(VersionUtils.getNameWithoutVersion(aQName.getLocalPart()), UBUNTU_NODE_TYPE_NAME))
+                .filter(aQName -> Objects.equals(VersionUtils.getNameWithoutVersion(aQName.getLocalPart()),
+                    UBUNTU_NODE_TYPE_NAME))
                 .filter(aQName -> {
                     String nodeTypeOsVersion = VersionUtils.getVersion(aQName.getLocalPart()).getComponentVersion();
                     return Objects.equals(nodeTypeOsVersion, componentOsVersion);
@@ -48,7 +49,10 @@ public class UbuntuMapper implements TypeTransformer {
     }
 
     @Override
-    public boolean refineHost(TNodeTemplate nodeTemplate, TNodeTemplate defaultHost, TTopologyTemplate topologyTemplate) {
+    public boolean refineHost(
+        TNodeTemplate nodeTemplate,
+        TNodeTemplate defaultHost,
+        TTopologyTemplate topologyTemplate) {
         return false;
     }
 }

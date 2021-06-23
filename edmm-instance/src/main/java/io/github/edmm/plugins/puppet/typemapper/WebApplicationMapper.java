@@ -5,19 +5,21 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
-import io.github.edmm.core.transformation.TypeTransformer;
-import io.github.edmm.exporter.WineryConnector;
-
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 
+import io.github.edmm.core.transformation.TypeTransformer;
+import io.github.edmm.exporter.WineryConnector;
+
 public class WebApplicationMapper implements TypeTransformer {
 
-    public static QName toscaWebServer = QName.valueOf("{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebServer");
-    public static QName toscaWebApp = QName.valueOf("{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebApplication");
+    public static QName toscaWebServer = QName.valueOf(
+        "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebServer");
+    public static QName toscaWebApp = QName.valueOf(
+        "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebApplication");
 
     @Override
     public boolean canHandle(String component, String version) {

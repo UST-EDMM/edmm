@@ -29,30 +29,44 @@ public class NodeTemplateInstance {
     private QName serviceTemplateId;
     private List<TOSCAProperty> instanceProperties;
 
-    public static NodeTemplateInstance ofComponentInstance(String deploymentInstanceId, String deploymentInstanceName, ComponentInstance componentInstance) {
+    public static NodeTemplateInstance ofComponentInstance(
+        String deploymentInstanceId,
+        String deploymentInstanceName,
+        ComponentInstance componentInstance) {
         NodeTemplateInstance nodeTemplateInstance = new NodeTemplateInstance();
 
         nodeTemplateInstance.setNodeTemplateInstanceId(componentInstance.getId());
         nodeTemplateInstance.setId(componentInstance.getId());
         nodeTemplateInstance.setName(componentInstance.getName());
-        nodeTemplateInstance.setNodeType(tryNodeTypeRefinement(componentInstance.getType().toTOSCABaseNodeType(), componentInstance.getInstanceProperties()));
+        nodeTemplateInstance.setNodeType(tryNodeTypeRefinement(componentInstance.getType().toTOSCABaseNodeType(),
+            componentInstance.getInstanceProperties()));
         nodeTemplateInstance.setServiceTemplateInstanceId(deploymentInstanceId);
-        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL, deploymentInstanceName));
+        nodeTemplateInstance.setServiceTemplateId(new QName(OpenTOSCANamespaces.OPENTOSCA_SERVICE_TEMPL,
+            deploymentInstanceName));
         nodeTemplateInstance.setState(componentInstance.getState().toTOSCANodeTemplateInstanceState());
-        nodeTemplateInstance.setInstanceProperties(handlePropertyKeyMapping(componentInstance.getInstanceProperties(), componentInstance.getType()));
-        nodeTemplateInstance.getInstanceProperties().add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty(Constants.STATE, String.class.getSimpleName(), Constants.RUNNING)));
+        nodeTemplateInstance.setInstanceProperties(handlePropertyKeyMapping(componentInstance.getInstanceProperties(),
+            componentInstance.getType()));
+        nodeTemplateInstance.getInstanceProperties()
+            .add(InstanceProperty.convertToTOSCAProperty(new InstanceProperty(Constants.STATE,
+                String.class.getSimpleName(),
+                Constants.RUNNING)));
         return nodeTemplateInstance;
     }
 
-    private static QName tryNodeTypeRefinement(TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType, List<InstanceProperty> instanceProperties) {
-        QName normativeNodeType = new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE, String.valueOf(toscaBaseNodeType));
+    private static QName tryNodeTypeRefinement(
+        TOSCABaseTypes.TOSCABaseNodeTypes toscaBaseNodeType,
+        List<InstanceProperty> instanceProperties) {
+        QName normativeNodeType = new QName(OpenTOSCANamespaces.OPENTOSCA_NORMATIVE_NODE_TYPES_NAMESPACE,
+            String.valueOf(toscaBaseNodeType));
         TOSCATypeMapperImplementation toscaRefiner = new TOSCATypeMapperImplementation();
         QName refinedNodeType = toscaRefiner.refineTOSCAType(normativeNodeType, instanceProperties);
 
         return refinedNodeType != null ? refinedNodeType : normativeNodeType;
     }
 
-    private static List<TOSCAProperty> handlePropertyKeyMapping(List<InstanceProperty> instanceProperties, ComponentType unrefinedType) {
+    private static List<TOSCAProperty> handlePropertyKeyMapping(
+        List<InstanceProperty> instanceProperties,
+        ComponentType unrefinedType) {
         List<TOSCAProperty> toscaProperties = new ArrayList<>();
         for (InstanceProperty property : instanceProperties) {
             String mappedKey = getTOSCAPropertyMapping(property.getKey(), unrefinedType);

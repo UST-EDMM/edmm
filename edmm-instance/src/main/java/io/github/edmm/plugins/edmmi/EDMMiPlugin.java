@@ -10,6 +10,7 @@ import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.OpenTOSCAConnector;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,11 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     @Override
     public void transformEdmmiToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(
+            deploymentInstance);
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(),
+            serviceTemplateInstance,
+            context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 
@@ -59,7 +63,8 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     @Override
     public void createYAML() {
         EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
-        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance, new File(context.getOutputPath()).getParent() + directorySuffix);
+        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance,
+            new File(context.getOutputPath()).getParent() + directorySuffix);
         logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 

@@ -1,5 +1,22 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.eclipse.winery.model.tosca.TEntityTemplate;
+import org.eclipse.winery.model.tosca.TNodeTemplate;
+import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
+import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTopologyTemplate;
+import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
+import org.eclipse.winery.model.tosca.utils.ModelUtilities;
+
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -10,19 +27,20 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
-import io.github.edmm.plugins.puppet.model.*;
+import io.github.edmm.plugins.puppet.model.Fact;
+import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.plugins.puppet.model.PuppetResourceStatus;
+import io.github.edmm.plugins.puppet.model.PuppetState;
+import io.github.edmm.plugins.puppet.model.Report;
+import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 import io.github.edmm.plugins.puppet.typemapper.MySQLMapper;
 import io.github.edmm.plugins.puppet.typemapper.TomcatMapper;
 import io.github.edmm.plugins.puppet.typemapper.WebApplicationMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.Constants;
-import org.eclipse.winery.model.tosca.*;
-import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
-import org.eclipse.winery.model.tosca.utils.ModelUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<PuppetInstancePlugin> {
 
@@ -41,7 +59,14 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     private final TOSCATransformer toscaTransformer;
     private Master master;
 
-    public PuppetInstancePlugin(InstanceTransformationContext context, String user, String ip, String privateKeyLocation, Integer port, String operatingSystem, String operatingSystemRelease) {
+    public PuppetInstancePlugin(
+        InstanceTransformationContext context,
+        String user,
+        String ip,
+        String privateKeyLocation,
+        Integer port,
+        String operatingSystem,
+        String operatingSystemRelease) {
         super(context);
         this.user = user;
         this.ip = ip;
@@ -57,7 +82,10 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
     @Override
     public void prepare() {
-        AuthenticatorImpl authenticator = new AuthenticatorImpl(new Master(this.user, this.ip, this.privateKeyLocation, this.port));
+        AuthenticatorImpl authenticator = new AuthenticatorImpl(new Master(this.user,
+            this.ip,
+            this.privateKeyLocation,
+            this.port));
         authenticator.authenticate();
         this.master = authenticator.getMaster();
     }
@@ -93,7 +121,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 return;
             }
 
-            TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(), nodeOSRelease.getValue().toString());
+            TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(),
+                nodeOSRelease.getValue().toString());
             TNodeTemplate vm = ModelUtilities.instantiateNodeTemplate(vmType);
             vm.setId(node.getCertname());
             vm.setName(node.getCertname());
@@ -130,7 +159,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
-                TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(), "");
+                TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(),
+                    "");
                 TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
                 hypervisor.setName(hypervisorFacts.getValue().toString());
                 this.populateNodeTemplateProperties(hypervisor);
@@ -155,7 +185,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                             : event.getContaining_class();
                     }))
                 .distinct()
-                .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'", identifiedComponent, node.getCertname()))
+                .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'",
+                    identifiedComponent,
+                    node.getCertname()))
                 .forEach(identifiedComponent -> {
                     TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
@@ -183,7 +215,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
         });
 
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("puppet-" + this.master.getId(), topologyTemplate)
+        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("puppet-" + this.master.getId(),
+            topologyTemplate)
             .setName("puppet-" + this.master.getId())
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
             .addTags(new TTags.Builder()
@@ -214,7 +247,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 .forEach(entry ->
                     additionalProperties.put(entry.getKey(), entry.getValue() != null && !entry.getValue().isEmpty()
                         ? entry.getValue()
-                        : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId().replaceAll("(\\s)|(:)|(\\.)", "_"))
+                        : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
+                        .replaceAll("(\\s)|(:)|(\\.)", "_"))
                 );
         }
 
@@ -225,8 +259,11 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
     @Override
     public void transformEdmmiToTOSCA() {
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(
+            deploymentInstance);
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(),
+            serviceTemplateInstance,
+            context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 

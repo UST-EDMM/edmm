@@ -34,6 +34,7 @@ import io.github.edmm.plugins.kubernetes.util.KubernetesDeploymentPropertiesHand
 import io.github.edmm.plugins.kubernetes.util.KubernetesMetadataHandler;
 import io.github.edmm.plugins.kubernetes.util.KubernetesPodsHandler;
 import io.github.edmm.plugins.kubernetes.util.KubernetesStateHandler;
+
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
@@ -49,7 +50,10 @@ import org.slf4j.LoggerFactory;
 public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<KubernetesInstancePlugin> {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePlugin.class);
-    private static final SourceTechnology KUBERNETES = SourceTechnology.builder().id("kubernetes").name("Kubernetes").build();
+    private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
+        .id("kubernetes")
+        .name("Kubernetes")
+        .build();
     private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     private final String kubeConfigPath;
@@ -62,7 +66,10 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private List<V1Pod> podsOfDeploymentInstance;
     private String inputDeploymentName;
 
-    public KubernetesInstancePlugin(InstanceTransformationContext context, String kubeConfigPath, String inputDeploymentName) {
+    public KubernetesInstancePlugin(
+        InstanceTransformationContext context,
+        String kubeConfigPath,
+        String inputDeploymentName) {
         super(context);
         this.kubeConfigPath = kubeConfigPath;
         this.inputDeploymentName = inputDeploymentName;
@@ -90,13 +97,20 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     @Override
     public void transformToEDMMi() {
         this.deploymentInstance.setName(this.kubernetesDeploymentInstance.getMetadata().getName());
-        this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata().getCreationTimestamp()));
-        this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata().getAnnotations().get(KubernetesConstants.VERSION));
-        this.deploymentInstance.setMetadata(new KubernetesMetadataHandler(this.kubernetesDeploymentInstance.getMetadata()).getMetadata(this.kubernetesDeploymentInstance.getApiVersion(), this.kubernetesDeploymentInstance.getKind()));
+        this.deploymentInstance.setCreatedAt(String.valueOf(this.kubernetesDeploymentInstance.getMetadata()
+            .getCreationTimestamp()));
+        this.deploymentInstance.setVersion(KubernetesConstants.VERSION + this.kubernetesDeploymentInstance.getMetadata()
+            .getAnnotations()
+            .get(KubernetesConstants.VERSION));
+        this.deploymentInstance.setMetadata(new KubernetesMetadataHandler(this.kubernetesDeploymentInstance.getMetadata())
+            .getMetadata(this.kubernetesDeploymentInstance.getApiVersion(),
+                this.kubernetesDeploymentInstance.getKind()));
         this.deploymentInstance.setId(this.kubernetesDeploymentInstance.getMetadata().getUid());
-        this.deploymentInstance.setState(KubernetesStateHandler.getDeploymentInstanceState(this.kubernetesDeploymentInstance.getStatus()));
+        this.deploymentInstance.setState(KubernetesStateHandler.getDeploymentInstanceState(this.kubernetesDeploymentInstance
+            .getStatus()));
         this.deploymentInstance.setComponentInstances(KubernetesPodsHandler.getComponentInstances(this.podsOfDeploymentInstance));
-        this.deploymentInstance.setInstanceProperties(new KubernetesDeploymentPropertiesHandler(this.kubernetesDeploymentInstance.getStatus()).getDeploymentInstanceProperties());
+        this.deploymentInstance.setInstanceProperties(new KubernetesDeploymentPropertiesHandler(this.kubernetesDeploymentInstance
+            .getStatus()).getDeploymentInstanceProperties());
     }
 
     @Override
@@ -132,28 +146,42 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                     try {
                         List<V1Container> containers;
                         if (this.inputDeploymentName != null) {
-                            containers = this.kubernetesDeploymentInstance.getSpec().getTemplate().getSpec().getContainers();
+                            containers = this.kubernetesDeploymentInstance.getSpec()
+                                .getTemplate()
+                                .getSpec()
+                                .getContainers();
                         } else {
                             V1PodList v1PodList = this.coreV1Api.listPodForAllNamespaces(null, null,
                                 null, null, null, null,
                                 null, null, null);
-                            containers = v1PodList.getItems().stream().flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream()).collect(Collectors.toList());
+                            containers = v1PodList.getItems()
+                                .stream()
+                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
+                                .collect(Collectors.toList());
                         }
 
                         containers.forEach(aV1Container -> {
                             String image = aV1Container.getImage();
                             String name = aV1Container.getName();
-                            TNodeType dockerContainerType = myTOSCATransformer.getComputeNodeType("DockerContainer", "");
-                            TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(dockerContainerType);
+                            TNodeType dockerContainerType = myTOSCATransformer.getComputeNodeType("DockerContainer",
+                                "");
+                            TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
+                                dockerContainerType);
                             dockerContainerTemplate.setName(name);
-                            LinkedHashMap<String, String> kvProperties = Optional.ofNullable(dockerContainerTemplate.getProperties()).map(TEntityTemplate.Properties::getKVProperties).orElseGet(LinkedHashMap::new);
+                            LinkedHashMap<String, String> kvProperties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                .map(TEntityTemplate.Properties::getKVProperties)
+                                .orElseGet(LinkedHashMap::new);
                             kvProperties.put("ContainerID", name);
                             kvProperties.put("ImageID", image);
-                            TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties()).orElseGet(TEntityTemplate.Properties::new);
+                            TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                .orElseGet(TEntityTemplate.Properties::new);
                             properties.setKVProperties(kvProperties);
                             dockerContainerTemplate.setProperties(properties);
                             topologyTemplate.addNodeTemplate(dockerContainerTemplate);
-                            ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate, dockerEngineTemplate, ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
+                            ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
+                                dockerEngineTemplate,
+                                ToscaBaseTypes.hostedOnRelationshipType,
+                                topologyTemplate);
                         });
                     } catch (ApiException aE) {
                         this.logger.error("Error retrieving Pods", aE);
@@ -164,7 +192,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
             this.logger.error("Error retrieving node list", aE);
         }
 
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata().getName(), topologyTemplate)
+        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance
+            .getMetadata()
+            .getName(), topologyTemplate)
             .setName("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata().getName())
             .setTargetNamespace("http://opentosca.org/retrieved/instances")
             .addTags(new TTags.Builder()
@@ -184,7 +214,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     public void transformEdmmiToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(this.deploymentInstance);
-        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(),
+            serviceTemplateInstance,
+            context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 

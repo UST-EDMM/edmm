@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import io.github.edmm.core.plugin.Authenticator;
+
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.AppsV1Api;
@@ -28,7 +29,8 @@ public class AuthenticatorImpl implements Authenticator {
     @Override
     public void authenticate() {
         try {
-            this.client = ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(new FileReader(this.kubeConfigPath))).build();
+            this.client = ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(new FileReader(this.kubeConfigPath)))
+                .build();
         } catch (IOException e) {
             e.printStackTrace();
         }

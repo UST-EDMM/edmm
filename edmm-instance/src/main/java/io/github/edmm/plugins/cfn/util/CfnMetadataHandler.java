@@ -11,9 +11,9 @@ import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 
 public class CfnMetadataHandler {
+    private final Map<String, Object> metadataMap = new LinkedHashMap<>();
     private Stack stack;
     private StackResourceDetail stackResource;
-    private final Map<String, Object> metadataMap = new LinkedHashMap<>();
 
     public CfnMetadataHandler(Stack stack) {
         this.stack = stack;
@@ -84,7 +84,10 @@ public class CfnMetadataHandler {
     private void handleRollbackTriggerARN(RollbackTrigger rollbackTrigger, int rollbackTriggerCount) {
         if (rollbackTrigger.getArn() != null) {
             this.metadataMap.put(generateMetadataKey(
-                CfnConstants.ROLLBACK_CONFIGURATION, CfnConstants.ROLLBACK_TRIGGER, rollbackTriggerCount, CfnConstants.ARN),
+                CfnConstants.ROLLBACK_CONFIGURATION,
+                CfnConstants.ROLLBACK_TRIGGER,
+                rollbackTriggerCount,
+                CfnConstants.ARN),
                 rollbackTrigger.getArn());
         }
     }
@@ -92,7 +95,10 @@ public class CfnMetadataHandler {
     private void handleRollbackTriggerType(RollbackTrigger rollbackTrigger, int rollbackTriggerCount) {
         if (rollbackTrigger.getType() != null) {
             this.metadataMap.put(generateMetadataKey(
-                CfnConstants.ROLLBACK_CONFIGURATION, CfnConstants.ROLLBACK_TRIGGER, rollbackTriggerCount, CfnConstants.TYPE),
+                CfnConstants.ROLLBACK_CONFIGURATION,
+                CfnConstants.ROLLBACK_TRIGGER,
+                rollbackTriggerCount,
+                CfnConstants.TYPE),
                 rollbackTrigger.getType());
         }
     }
@@ -113,7 +119,9 @@ public class CfnMetadataHandler {
     private void handleNotificationARNs() {
         if (this.stack.getNotificationARNs() != null) {
             AtomicInteger notificationARNCount = new AtomicInteger();
-            this.stack.getNotificationARNs().forEach(notificationARN -> this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + String.valueOf(notificationARNCount.getAndIncrement()), notificationARN));
+            this.stack.getNotificationARNs()
+                .forEach(notificationARN -> this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + String.valueOf(
+                    notificationARNCount.getAndIncrement()), notificationARN));
         }
     }
 
@@ -137,7 +145,8 @@ public class CfnMetadataHandler {
 
     private void handleTerminationProtection() {
         if (this.stack.getEnableTerminationProtection() != null) {
-            this.metadataMap.put(CfnConstants.ENABLE_TERMINATION_PROTECTION, this.stack.getEnableTerminationProtection());
+            this.metadataMap.put(CfnConstants.ENABLE_TERMINATION_PROTECTION,
+                this.stack.getEnableTerminationProtection());
         }
     }
 
@@ -156,7 +165,9 @@ public class CfnMetadataHandler {
     private void handleCapabilities() {
         if (this.stack.getCapabilities() != null) {
             AtomicInteger capabilityCount = new AtomicInteger();
-            this.stack.getCapabilities().forEach(capability -> this.metadataMap.put(CfnConstants.CAPABILITIES + String.valueOf(capabilityCount.getAndIncrement()), capability));
+            this.stack.getCapabilities()
+                .forEach(capability -> this.metadataMap.put(CfnConstants.CAPABILITIES + String.valueOf(capabilityCount.getAndIncrement()),
+                    capability));
         }
     }
 

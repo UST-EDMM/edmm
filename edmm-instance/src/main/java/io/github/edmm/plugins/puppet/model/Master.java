@@ -5,15 +5,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.util.MasterInitializer;
 import io.github.edmm.plugins.puppet.util.NodesHandler;
 import io.github.edmm.plugins.puppet.util.SSHConfigurator;
 import io.github.edmm.util.Util;
+
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -106,7 +107,8 @@ public class Master {
 
             return reader.readLine();
         } catch (JSchException | IOException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+            throw new InstanceTransformationException(
+                "Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
     }
 }

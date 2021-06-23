@@ -33,15 +33,23 @@ public class ComponentInstance extends BasicInstance {
 
     public static ComponentInstance ofYamlContent(Map<String, Object> yamlContent) {
         ComponentInstance componentInstance = new ComponentInstance();
-        componentInstance.setName(yamlContent.get(YamlConstants.NAME) != null ? String.valueOf(yamlContent.get(YamlConstants.NAME)) : null);
-        componentInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? ComponentType.valueOf(yamlContent.get(YamlConstants.TYPE).toString()) : null);
-        componentInstance.setState(yamlContent.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForComponentInstance.valueOf(String.valueOf(yamlContent.get(YamlConstants.STATE))) : null);
+        componentInstance.setName(yamlContent.get(YamlConstants.NAME) != null ? String.valueOf(yamlContent.get(
+            YamlConstants.NAME)) : null);
+        componentInstance.setType(yamlContent.get(YamlConstants.TYPE) != null ? ComponentType.valueOf(yamlContent.get(
+            YamlConstants.TYPE).toString()) : null);
+        componentInstance.setState(yamlContent.get(YamlConstants.STATE) != null ? InstanceState.InstanceStateForComponentInstance
+            .valueOf(String.valueOf(yamlContent.get(YamlConstants.STATE))) : null);
         componentInstance.setId(yamlContent.get(YamlConstants.ID) != null ? String.valueOf(yamlContent.get(YamlConstants.ID)) : null);
-        componentInstance.setCreatedAt(yamlContent.get(YamlConstants.CREATED_AT) != null ? String.valueOf(yamlContent.get(YamlConstants.CREATED_AT)) : null);
-        componentInstance.setInstanceProperties(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport.getInstancePropertiesFromYamlContent(yamlContent) : Collections.emptyList());
-        componentInstance.setDescription(yamlContent.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(yamlContent.get(YamlConstants.DESCRIPTION)) : null);
-        componentInstance.setMetadata(yamlContent.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(yamlContent.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
-        componentInstance.setRelationInstances(yamlContent.get(YamlConstants.RELATION_INSTANCES) != null ? YamlSupport.getRelationInstancesFromYamlContent(yamlContent) : Collections.emptyList());
+        componentInstance.setCreatedAt(yamlContent.get(YamlConstants.CREATED_AT) != null ? String.valueOf(yamlContent.get(
+            YamlConstants.CREATED_AT)) : null);
+        componentInstance.setInstanceProperties(yamlContent.get(YamlConstants.INSTANCE_PROPERTIES) != null ? YamlSupport
+            .getInstancePropertiesFromYamlContent(yamlContent) : Collections.emptyList());
+        componentInstance.setDescription(yamlContent.get(YamlConstants.DESCRIPTION) != null ? String.valueOf(yamlContent
+            .get(YamlConstants.DESCRIPTION)) : null);
+        componentInstance.setMetadata(yamlContent.get(YamlConstants.METADATA) != null ? Metadata.of(CastUtil.safelyCastToStringObjectMap(
+            yamlContent.get(YamlConstants.METADATA))) : Metadata.of(Collections.emptyMap()));
+        componentInstance.setRelationInstances(yamlContent.get(YamlConstants.RELATION_INSTANCES) != null ? YamlSupport.getRelationInstancesFromYamlContent(
+            yamlContent) : Collections.emptyList());
 
         return componentInstance;
     }

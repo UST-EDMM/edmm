@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
-import io.github.edmm.core.transformation.TypeTransformer;
-import io.github.edmm.exporter.WineryConnector;
-
 import org.eclipse.winery.common.version.VersionUtils;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
+
+import io.github.edmm.core.transformation.TypeTransformer;
+import io.github.edmm.exporter.WineryConnector;
 
 public class MySQLMapper implements TypeTransformer {
 
@@ -49,7 +49,10 @@ public class MySQLMapper implements TypeTransformer {
     }
 
     @Override
-    public boolean refineHost(TNodeTemplate nodeTemplate, TNodeTemplate defaultHost, TTopologyTemplate topologyTemplate) {
+    public boolean refineHost(
+        TNodeTemplate nodeTemplate,
+        TNodeTemplate defaultHost,
+        TTopologyTemplate topologyTemplate) {
         if (nodeTemplate.getType().getLocalPart().toLowerCase().startsWith("MySQL-DB".toLowerCase())) {
             if (nodeTemplate.getType().getLocalPart().toLowerCase().startsWith("MySQL-DBMS".toLowerCase())) {
                 Optional<TNodeTemplate> optionalDB = topologyTemplate.getNodeTemplates().stream()

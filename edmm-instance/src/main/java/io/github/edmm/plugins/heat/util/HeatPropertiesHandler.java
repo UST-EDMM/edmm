@@ -13,7 +13,9 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class HeatPropertiesHandler {
 
-    public static List<InstanceProperty> getDeploymentInstanceProperties(Map<String, String> parameterMap, List<Map<String, Object>> outputList) {
+    public static List<InstanceProperty> getDeploymentInstanceProperties(
+        Map<String, String> parameterMap,
+        List<Map<String, Object>> outputList) {
         return Stream.of(
             handleParameterMap(parameterMap),
             handleOutputList(outputList)).flatMap(Collection::stream)
@@ -22,7 +24,9 @@ public class HeatPropertiesHandler {
 
     private static List<InstanceProperty> handleParameterMap(Map<String, String> parameterMap) {
         List<InstanceProperty> deploymentInstanceProperties = new ArrayList<>();
-        parameterMap.forEach((key, value) -> deploymentInstanceProperties.add(new InstanceProperty(key, value.getClass().getSimpleName(), value)));
+        parameterMap.forEach((key, value) -> deploymentInstanceProperties.add(new InstanceProperty(key,
+            value.getClass().getSimpleName(),
+            value)));
         return deploymentInstanceProperties;
     }
 
@@ -30,7 +34,9 @@ public class HeatPropertiesHandler {
         List<InstanceProperty> deploymentInstanceProperties = new ArrayList<>();
         emptyIfNull(outputList).forEach(
             entry -> entry.forEach((key, value) -> {
-                deploymentInstanceProperties.add(new InstanceProperty(key, key.getClass().getSimpleName(), String.valueOf(value)));
+                deploymentInstanceProperties.add(new InstanceProperty(key,
+                    key.getClass().getSimpleName(),
+                    String.valueOf(value)));
             })
         );
         return deploymentInstanceProperties;

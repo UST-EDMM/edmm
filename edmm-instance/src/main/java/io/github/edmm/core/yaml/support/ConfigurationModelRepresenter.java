@@ -39,7 +39,11 @@ public class ConfigurationModelRepresenter extends Representer {
     }
 
     @Override
-    protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue, Tag customTag) {
+    protected NodeTuple representJavaBeanProperty(
+        Object javaBean,
+        Property property,
+        Object propertyValue,
+        Tag customTag) {
         if (propertyValue == null || isPropertyValueListEmpty(propertyValue) || isPropertyValueMapEmpty(propertyValue)) {
             return null;
         } else {

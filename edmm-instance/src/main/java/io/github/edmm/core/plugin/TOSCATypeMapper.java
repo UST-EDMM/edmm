@@ -9,8 +9,6 @@ import io.github.edmm.model.opentosca.OpenTOSCANamespaces;
 
 public interface TOSCATypeMapper {
 
-    QName refineTOSCAType(QName qName, List<InstanceProperty> instanceProperties);
-
     // TODO: replace this with actual repository search, currently this is hardcoded for demo purposes
     static QName searchWineryRepositoryForType(String type) {
         type = type.replaceAll("\\s+", "");
@@ -42,4 +40,6 @@ public interface TOSCATypeMapper {
                 return null;
         }
     }
+
+    QName refineTOSCAType(QName qName, List<InstanceProperty> instanceProperties);
 }

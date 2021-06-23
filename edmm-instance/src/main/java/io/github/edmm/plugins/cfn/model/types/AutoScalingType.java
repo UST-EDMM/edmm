@@ -9,7 +9,6 @@ public enum AutoScalingType {
     ScalingPolicy(ComponentType.Software_Component),
     ScheduledAction(ComponentType.Software_Component);
 
-
     ComponentType componentType;
 
     AutoScalingType(ComponentType componentType) {

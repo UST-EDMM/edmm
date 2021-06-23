@@ -18,6 +18,7 @@ import io.github.edmm.plugins.heat.util.HeatConstants;
 import io.github.edmm.plugins.heat.util.HeatMetadataHandler;
 import io.github.edmm.plugins.heat.util.HeatPropertiesHandler;
 import io.github.edmm.plugins.heat.util.HeatResourceHandler;
+
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.heat.Resource;
@@ -43,7 +44,15 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
     private OSClientV3 osClient;
     private List<? extends Resource> resources;
 
-    public HeatInstancePlugin(InstanceTransformationContext context, String userName, String password, String projectId, String domainName, String authenticationEndpoint, String stackName, String stackId) {
+    public HeatInstancePlugin(
+        InstanceTransformationContext context,
+        String userName,
+        String password,
+        String projectId,
+        String domainName,
+        String authenticationEndpoint,
+        String stackName,
+        String stackId) {
         super(context);
         this.userName = userName;
         this.password = password;
@@ -56,7 +65,11 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
 
     @Override
     public void prepare() {
-        AuthenticatorImpl authenticator = new AuthenticatorImpl(authenticationEndpoint, userName, password, domainName, projectId);
+        AuthenticatorImpl authenticator = new AuthenticatorImpl(authenticationEndpoint,
+            userName,
+            password,
+            domainName,
+            projectId);
         try {
             authenticator.authenticate();
             this.osClient = authenticator.getHeatClient();
@@ -80,18 +93,27 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
         this.deploymentInstance.setCreatedAt(this.stack.getCreationTime());
         this.deploymentInstance.setDescription(this.stack.getDescription());
         this.deploymentInstance.setName(this.stack.getName());
-        this.deploymentInstance.setState(StackStatus.StackStatusForDeploymentInstance.valueOf(this.stack.getStatus()).toEDIMMDeploymentInstanceState());
+        this.deploymentInstance.setState(StackStatus.StackStatusForDeploymentInstance.valueOf(this.stack.getStatus())
+            .toEDIMMDeploymentInstanceState());
         this.deploymentInstance.setVersion(String.valueOf(this.template.get(HeatConstants.VERSION)));
-        this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(), this.stack.getOutputs()));
-        this.deploymentInstance.setMetadata(HeatMetadataHandler.getDeploymentMetadata(this.stack.getTags(), this.stack.getTimeoutMins(), this.stack.getUpdatedTime()));
-        this.deploymentInstance.setComponentInstances(HeatResourceHandler.getComponentInstances(this.resources, this.template, this.osClient));
+        this.deploymentInstance.setInstanceProperties(HeatPropertiesHandler.getDeploymentInstanceProperties(this.stack.getParameters(),
+            this.stack.getOutputs()));
+        this.deploymentInstance.setMetadata(HeatMetadataHandler.getDeploymentMetadata(this.stack.getTags(),
+            this.stack.getTimeoutMins(),
+            this.stack.getUpdatedTime()));
+        this.deploymentInstance.setComponentInstances(HeatResourceHandler.getComponentInstances(this.resources,
+            this.template,
+            this.osClient));
     }
 
     @Override
     public void transformEdmmiToTOSCA() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(deploymentInstance);
-        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(), serviceTemplateInstance, context.getOutputPath() + deploymentInstance.getName() + ".csar");
+        ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(
+            deploymentInstance);
+        OpenTOSCAConnector.processServiceTemplateInstanceToOpenTOSCA(context.getSourceTechnology().getName(),
+            serviceTemplateInstance,
+            context.getOutputPath() + deploymentInstance.getName() + ".csar");
         logger.info("Transformed to OpenTOSCA Service Template Instance: {}", serviceTemplateInstance.getCsarId());
     }
 

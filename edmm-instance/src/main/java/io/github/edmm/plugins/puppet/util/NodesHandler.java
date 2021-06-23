@@ -54,7 +54,9 @@ public class NodesHandler {
     }
 
     private Fact getFact(String certName, FactType factType) {
-        return checkAndReplaceIPAddressKey(buildFactFromString(this.master.executeCommandAndHandleResult(Commands.getFactCommandByFactType(certName, factType))));
+        return checkAndReplaceIPAddressKey(buildFactFromString(this.master.executeCommandAndHandleResult(Commands.getFactCommandByFactType(
+            certName,
+            factType))));
     }
 
     private Fact checkAndReplaceIPAddressKey(Fact fact) {
@@ -65,7 +67,8 @@ public class NodesHandler {
     }
 
     private void setNodeStates() {
-        this.master.getNodes().forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
+        this.master.getNodes()
+            .forEach(node -> node.setState(PuppetState.NodeState.valueOf(node.getLatest_report_status())));
     }
 
     private List<Node> buildNodesFromString(String jsonString) {
@@ -75,5 +78,4 @@ public class NodesHandler {
     private Fact buildFactFromString(String jsonString) {
         return GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Fact.class);
     }
-
 }

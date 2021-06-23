@@ -25,23 +25,33 @@ public class ApiInteractorImpl implements ApiInteractor {
 
     @Override
     public Stack getDeployment() {
-        return this.cloudFormation.describeStacks().getStacks().stream().filter(stack -> stack.getStackName().equals(this.inputStackName)).findFirst().orElse(null);
+        return this.cloudFormation.describeStacks()
+            .getStacks()
+            .stream()
+            .filter(stack -> stack.getStackName().equals(this.inputStackName))
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
     public List<StackResourceDetail> getComponents() {
         List<StackResourceDetail> stackResources = new ArrayList<>();
-        this.cloudFormation.describeStackResources(new DescribeStackResourcesRequest().withStackName(this.inputStackName)).getStackResources().forEach(
-            stackResource -> stackResources.add(getDetailedComponent(this.inputStackName, stackResource.getLogicalResourceId())));
+        this.cloudFormation.describeStackResources(new DescribeStackResourcesRequest().withStackName(this.inputStackName))
+            .getStackResources()
+            .forEach(
+                stackResource -> stackResources.add(getDetailedComponent(this.inputStackName,
+                    stackResource.getLogicalResourceId())));
         return stackResources;
     }
 
     private StackResourceDetail getDetailedComponent(String inputStackName, String logicalResourceId) {
-        return this.cloudFormation.describeStackResource(new DescribeStackResourceRequest().withStackName(inputStackName).withLogicalResourceId(logicalResourceId)).getStackResourceDetail();
+        return this.cloudFormation.describeStackResource(new DescribeStackResourceRequest().withStackName(inputStackName)
+            .withLogicalResourceId(logicalResourceId)).getStackResourceDetail();
     }
 
     @Override
     public Template getModel() {
-        return Template.fromTemplateBodyString(this.cloudFormation.getTemplate(new GetTemplateRequest().withStackName(this.inputStackName)).getTemplateBody());
+        return Template.fromTemplateBodyString(this.cloudFormation.getTemplate(new GetTemplateRequest().withStackName(
+            this.inputStackName)).getTemplateBody());
     }
 }

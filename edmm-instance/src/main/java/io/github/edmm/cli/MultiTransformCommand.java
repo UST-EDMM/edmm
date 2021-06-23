@@ -12,6 +12,7 @@ import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
 import io.github.edmm.plugins.puppet.PuppetInstancePlugin;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,10 @@ import picocli.CommandLine;
 )
 public class MultiTransformCommand extends TransformCommand {
     private static final Logger logger = LoggerFactory.getLogger(MultiTransformCommand.class);
-    private static final SourceTechnology MULTI_TRANSFORM = SourceTechnology.builder().id("multitransform").name("Multi Transform").build();
+    private static final SourceTechnology MULTI_TRANSFORM = SourceTechnology.builder()
+        .id("multitransform")
+        .name("Multi Transform")
+        .build();
 
     @CommandLine.Option(names = {"-c", "--kubeConfigPath"}, required = true)
     private String kubeConfigPath;
@@ -42,15 +46,25 @@ public class MultiTransformCommand extends TransformCommand {
     @Override
     public void run() {
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(), MULTI_TRANSFORM, outputPath, true);
+        InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(),
+            MULTI_TRANSFORM,
+            outputPath,
+            true);
         KubernetesInstancePlugin kubernetesLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, null);
-        InstancePlugin<KubernetesInstancePlugin> kubernetesPlugin = new InstancePlugin<>(MULTI_TRANSFORM, kubernetesLifecycle);
+        InstancePlugin<KubernetesInstancePlugin> kubernetesPlugin = new InstancePlugin<>(MULTI_TRANSFORM,
+            kubernetesLifecycle);
         try {
             kubernetesPlugin.execute();
         } catch (Exception e) {
             logger.error("Error while executing transformation.", e);
         }
-        PuppetInstancePlugin puppetLifecycle = new PuppetInstancePlugin(context, user, ip, privateKeyLocation, port, null, null);
+        PuppetInstancePlugin puppetLifecycle = new PuppetInstancePlugin(context,
+            user,
+            ip,
+            privateKeyLocation,
+            port,
+            null,
+            null);
         InstancePlugin<PuppetInstancePlugin> puppetPlugin = new InstancePlugin<>(MULTI_TRANSFORM, puppetLifecycle);
         try {
             puppetPlugin.execute();
@@ -64,7 +78,9 @@ public class MultiTransformCommand extends TransformCommand {
         toscaTransformer.save(mergedServiceTemplate);
     }
 
-    private TServiceTemplate mergeServiceTemplate(TServiceTemplate aServiceTemplate, TServiceTemplate aOtherServiceTemplate) {
+    private TServiceTemplate mergeServiceTemplate(
+        TServiceTemplate aServiceTemplate,
+        TServiceTemplate aOtherServiceTemplate) {
         TTopologyTemplate topologyTemplate = aServiceTemplate.getTopologyTemplate();
         TTopologyTemplate otherTopologyTemplate = aOtherServiceTemplate.getTopologyTemplate();
 

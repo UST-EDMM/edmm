@@ -11,6 +11,8 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
+import org.eclipse.winery.model.tosca.TNodeType;
+
 import io.github.edmm.exporter.dto.EnrichmentDTO;
 import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
@@ -38,7 +40,6 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.eclipse.winery.model.tosca.TNodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +58,19 @@ public abstract class OpenTOSCAConnector {
     private static final String csarPath = "csar";
     private static final String csarDownloadPath = "?" + csarPath;
 
-    public static void processServiceTemplateInstanceToOpenTOSCA(String deploymentTechnology, ServiceTemplateInstance serviceTemplateInstance, String outputPath) {
+    public static void processServiceTemplateInstanceToOpenTOSCA(
+        String deploymentTechnology,
+        ServiceTemplateInstance serviceTemplateInstance,
+        String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         setServiceTemplateTag(deploymentTechnology, serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
-        applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()), serviceTemplateInstance.getServiceTemplateId());
+        applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()),
+            serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
-        importCSARToContainerAndStartInstance(serviceTemplateInstance.getCsarId(), outputPath, serviceTemplateInstance.getServiceTemplateId());
+        importCSARToContainerAndStartInstance(serviceTemplateInstance.getCsarId(),
+            outputPath,
+            serviceTemplateInstance.getServiceTemplateId());
     }
 
     public static List<TypesDTO> getAllNodeTypes() {
@@ -80,7 +87,8 @@ public abstract class OpenTOSCAConnector {
     }
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
-        ServiceTemplateCreationDTO creationDTO = new ServiceTemplateCreationDTO(serviceTemplateId.getNamespaceURI(), serviceTemplateId.getLocalPart());
+        ServiceTemplateCreationDTO creationDTO = new ServiceTemplateCreationDTO(serviceTemplateId.getNamespaceURI(),
+            serviceTemplateId.getLocalPart());
         postServiceTemplate(creationDTO);
     }
 
@@ -148,13 +156,17 @@ public abstract class OpenTOSCAConnector {
 
     private static void exportCSAR(QName serviceTemplateId, String outputPath) {
         try {
-            FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + csarDownloadPath), new File(outputPath));
+            FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(
+                serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
             LOGGER.error("Failed to export CSAR from Winery.", e);
         }
     }
 
-    private static void importCSARToContainerAndStartInstance(String csarId, String outputPath, QName serviceTemplateId) {
+    private static void importCSARToContainerAndStartInstance(
+        String csarId,
+        String outputPath,
+        QName serviceTemplateId) {
         if (importCSARToContainer(outputPath)) {
             createCSARInstance(csarId, serviceTemplateId);
         }
@@ -271,6 +283,7 @@ public abstract class OpenTOSCAConnector {
     }
 
     private static String doubleEncodeNamespace(QName qName) throws UnsupportedEncodingException {
-        return "/" + URLEncoder.encode(URLEncoder.encode(qName.getNamespaceURI(), "UTF-8"), "UTF-8") + "/" + qName.getLocalPart() + "/";
+        return "/" + URLEncoder.encode(URLEncoder.encode(qName.getNamespaceURI(), "UTF-8"),
+            "UTF-8") + "/" + qName.getLocalPart() + "/";
     }
 }

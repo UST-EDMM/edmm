@@ -27,7 +27,8 @@ public class AuthenticatorImpl implements Authenticator {
         try {
             this.credentialsProvider.getCredentials();
         } catch (AmazonClientException e) {
-            throw new InstanceTransformationException("Failed to locate credentials for AWS! Make sure they are in ~/.aws/credentials");
+            throw new InstanceTransformationException(
+                "Failed to locate credentials for AWS! Make sure they are in ~/.aws/credentials");
         }
     }
 
@@ -38,7 +39,8 @@ public class AuthenticatorImpl implements Authenticator {
                 .withRegion(Regions.US_EAST_1)
                 .build();
         } catch (AmazonCloudFormationException e) {
-            throw new InstanceTransformationException("Failed to authenticate with AWS! Make sure that the credentials in ~/.aws/credentials are up to date and correct.");
+            throw new InstanceTransformationException(
+                "Failed to authenticate with AWS! Make sure that the credentials in ~/.aws/credentials are up to date and correct.");
         }
     }
 }

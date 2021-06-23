@@ -36,8 +36,9 @@ public class MasterInitializer {
     }
 
     private String buildMasterNameFromString(String jsonString) {
-        Map<String, String> masterNameKeyValuePair = CastUtil.safelyCastToStringStringMap(GsonHelper.parseJsonStringToObjectType(jsonString.substring(1, jsonString.length() - 1), Map.class));
+        Map<String, String> masterNameKeyValuePair = CastUtil.safelyCastToStringStringMap(GsonHelper.parseJsonStringToObjectType(
+            jsonString.substring(1, jsonString.length() - 1),
+            Map.class));
         return masterNameKeyValuePair.get("name");
     }
-
 }

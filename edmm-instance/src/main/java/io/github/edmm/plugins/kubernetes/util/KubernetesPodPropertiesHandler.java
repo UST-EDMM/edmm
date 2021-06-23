@@ -33,7 +33,8 @@ class KubernetesPodPropertiesHandler {
 
     private void setPropertyKeys() {
         EDMMPropertyMapperImplementation propertyKeyMapper = new EDMMPropertyMapperImplementation();
-        this.instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propertyKeyMapper.toComputePropertyKey(instanceProperty.getKey())));
+        this.instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propertyKeyMapper.toComputePropertyKey(
+            instanceProperty.getKey())));
     }
 
     private void handlePodIP() {

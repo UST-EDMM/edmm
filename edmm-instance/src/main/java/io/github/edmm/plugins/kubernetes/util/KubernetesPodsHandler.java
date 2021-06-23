@@ -22,8 +22,12 @@ public class KubernetesPodsHandler {
                 componentInstance.setId(String.valueOf(UUID.randomUUID().hashCode()));
                 componentInstance.setState(KubernetesStateHandler.getComponentInstanceState(pod.getStatus()));
                 componentInstance.setCreatedAt(String.valueOf(pod.getMetadata().getCreationTimestamp()));
-                componentInstance.setInstanceProperties(new KubernetesPodPropertiesHandler(pod.getStatus(), container).getComponentInstanceProperties());
-                componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), container.getImage().split(":")[0]));
+                componentInstance.setInstanceProperties(new KubernetesPodPropertiesHandler(pod.getStatus(),
+                    container).getComponentInstanceProperties());
+                componentInstance.getInstanceProperties()
+                    .add(new InstanceProperty(Constants.TYPE,
+                        String.class.getSimpleName(),
+                        container.getImage().split(":")[0]));
                 componentInstances.add(componentInstance);
             });
         });

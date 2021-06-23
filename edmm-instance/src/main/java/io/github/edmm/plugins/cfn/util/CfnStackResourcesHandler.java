@@ -30,11 +30,16 @@ public class CfnStackResourcesHandler {
             componentInstance.setId(stackResource.getPhysicalResourceId());
             componentInstance.setDescription(stackResource.getDescription());
             componentInstance.setType(new EDMMTypeMapperImplementation().toComponentType(stackResource.getResourceType()));
-            componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), stackResource.getResourceType())));
+            componentInstance.setInstanceProperties(Collections.singletonList(new InstanceProperty(Constants.TYPE,
+                String.class.getSimpleName(),
+                stackResource.getResourceType())));
             componentInstance.setCreatedAt(String.valueOf(stackResource.getLastUpdatedTimestamp()));
             componentInstance.setMetadata(new CfnMetadataHandler(stackResource).getMetadataOfComponentInstance());
-            componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus()).toEDiMMComponentInstanceState());
-            componentInstance.setRelationInstances(new CfnStackRelationHandler(stackResource, this.stackResources, this.template).getRelationInstances());
+            componentInstance.setState(Status.CfnStackResourceStatus.valueOf(stackResource.getResourceStatus())
+                .toEDiMMComponentInstanceState());
+            componentInstance.setRelationInstances(new CfnStackRelationHandler(stackResource,
+                this.stackResources,
+                this.template).getRelationInstances());
             this.componentInstances.add(componentInstance);
         });
         return this.componentInstances;

@@ -18,11 +18,14 @@ class CfnStackRelationHandler {
 
     private final StackResourceDetail stackResource;
     private final List<StackResourceDetail> stackResources;
-    private Resource currentResource;
     private final Template template;
     private final List<RelationInstance> relationInstances = new ArrayList<>();
+    private Resource currentResource;
 
-    CfnStackRelationHandler(StackResourceDetail stackResource, List<StackResourceDetail> stackResources, Template template) {
+    CfnStackRelationHandler(
+        StackResourceDetail stackResource,
+        List<StackResourceDetail> stackResources,
+        Template template) {
         this.stackResource = stackResource;
         this.stackResources = stackResources;
         this.template = template;

@@ -24,7 +24,10 @@ public class HeatResourceHandler {
 
     private static final int firstEntryIndex = 0;
 
-    public static List<ComponentInstance> getComponentInstances(List<? extends Resource> resources, Map<String, Object> template, OSClient.OSClientV3 osClient) {
+    public static List<ComponentInstance> getComponentInstances(
+        List<? extends Resource> resources,
+        Map<String, Object> template,
+        OSClient.OSClientV3 osClient) {
         List<ComponentInstance> componentInstances = new ArrayList<>();
         resources.forEach(resource -> {
             Map<String, Object> resourceContent = CastUtil.safelyCastToStringObjectMap(template.get(HeatConstants.RESOURCES));
@@ -33,7 +36,11 @@ public class HeatResourceHandler {
         return componentInstances;
     }
 
-    private static ComponentInstance getComponentInstance(List<? extends Resource> resources, Resource resource, Map<String, Object> resourceContent, OSClient.OSClientV3 osClient) {
+    private static ComponentInstance getComponentInstance(
+        List<? extends Resource> resources,
+        Resource resource,
+        Map<String, Object> resourceContent,
+        OSClient.OSClientV3 osClient) {
         String originalType = resource.getType();
         ComponentInstance componentInstance = new ComponentInstance();
 
@@ -41,17 +48,34 @@ public class HeatResourceHandler {
         componentInstance.setId(resource.getPhysicalResourceId());
         componentInstance.setCreatedAt(String.valueOf(resource.getTime()));
         componentInstance.setName(resource.getResourceName());
-        componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus()).toEDIMMComponentInstanceState());
-        componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource, resourceContent, componentInstance.getType()));
+        componentInstance.setState(StackStatus.StackStatusForComponentInstance.valueOf(resource.getResourceStatus())
+            .toEDIMMComponentInstanceState());
+        componentInstance.setInstanceProperties(HeatResourceHandler.getResourceInstanceProperties(resource,
+            resourceContent,
+            componentInstance.getType()));
         // set property with original type string in order to avoid losing this info since we map to EDMM types
 
         if (componentInstance.getType().equals(ComponentType.Compute)) {
             originalType = getOriginalTypeFromImageIdentifier(resource.getResourceName(), resourceContent, osClient);
-            componentInstance.getInstanceProperties().add(new InstanceProperty(String.valueOf(PropertyKey.Compute.public_address), String.class.getSimpleName(), getIpAddress(componentInstance.getId(), osClient)));
-            componentInstance.getInstanceProperties().add(new InstanceProperty(String.valueOf(PropertyKey.Compute.public_key), String.class.getSimpleName(), getPublicKey(String.valueOf(componentInstance.getInstanceProperties().stream().filter(prop -> prop.getKey().equals("key_name")).findFirst().get().getInstanceValue()), osClient)));
+            componentInstance.getInstanceProperties()
+                .add(new InstanceProperty(String.valueOf(PropertyKey.Compute.public_address),
+                    String.class.getSimpleName(),
+                    getIpAddress(componentInstance.getId(), osClient)));
+            componentInstance.getInstanceProperties()
+                .add(new InstanceProperty(String.valueOf(PropertyKey.Compute.public_key),
+                    String.class.getSimpleName(),
+                    getPublicKey(String.valueOf(componentInstance.getInstanceProperties()
+                        .stream()
+                        .filter(prop -> prop.getKey().equals("key_name"))
+                        .findFirst()
+                        .get()
+                        .getInstanceValue()), osClient)));
         }
-        componentInstance.getInstanceProperties().add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), originalType));
-        componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources, resourceContent, resource));
+        componentInstance.getInstanceProperties()
+            .add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), originalType));
+        componentInstance.setRelationInstances(HeatRelationHandler.getRelationInstances(resources,
+            resourceContent,
+            resource));
         componentInstance.setMetadata(HeatMetadataHandler.getComponentMetadata(resource, resourceContent));
 
         return componentInstance;
@@ -62,30 +86,47 @@ public class HeatResourceHandler {
     }
 
     private static String getIpAddress(String serverId, OSClient.OSClientV3 osClient) {
-        Map<String, List<? extends Address>> ipAddress = osClient.compute().servers().get(serverId).getAddresses().getAddresses();
+        Map<String, List<? extends Address>> ipAddress = osClient.compute()
+            .servers()
+            .get(serverId)
+            .getAddresses()
+            .getAddresses();
         for (String key : ipAddress.keySet()) {
             List<? extends Address> ipAddressList = ipAddress.get(key);
-            Optional<? extends Address> addressOptional = ipAddressList.stream().filter(ip -> InetAddresses.isInetAddress(ip.getAddr())).findFirst();
+            Optional<? extends Address> addressOptional = ipAddressList.stream()
+                .filter(ip -> InetAddresses.isInetAddress(ip.getAddr()))
+                .findFirst();
             Address address = addressOptional.orElse(null);
             return address.getAddr();
         }
         return null;
     }
 
-    private static String getOriginalTypeFromImageIdentifier(String resourceName, Map<String, Object> resourceContent, OSClient.OSClientV3 osClient) {
-        Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(HeatMetadataHandler.getResourceMap(resourceContent, resourceName));
+    private static String getOriginalTypeFromImageIdentifier(
+        String resourceName,
+        Map<String, Object> resourceContent,
+        OSClient.OSClientV3 osClient) {
+        Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(HeatMetadataHandler.getResourceMap(
+            resourceContent,
+            resourceName));
         String imageProp = String.valueOf(propertiesMap.get("image"));
         return osClient.imagesV2().get(imageProp).getName();
     }
 
-    private static List<InstanceProperty> getResourceInstanceProperties(Resource resource, Map<String, Object> allResourceContent, ComponentType componentType) {
-        Map<String, Object> resourceMap = HeatMetadataHandler.getResourceMap(allResourceContent, resource.getResourceName());
+    private static List<InstanceProperty> getResourceInstanceProperties(
+        Resource resource,
+        Map<String, Object> allResourceContent,
+        ComponentType componentType) {
+        Map<String, Object> resourceMap = HeatMetadataHandler.getResourceMap(allResourceContent,
+            resource.getResourceName());
         Map<String, Object> propertiesMap = HeatMetadataHandler.getPropertiesMap(resourceMap);
 
         return handleResourceInstanceProperties(componentType, propertiesMap);
     }
 
-    private static List<InstanceProperty> handleResourceInstanceProperties(ComponentType componentType, Map<String, Object> propertiesMap) {
+    private static List<InstanceProperty> handleResourceInstanceProperties(
+        ComponentType componentType,
+        Map<String, Object> propertiesMap) {
         List<InstanceProperty> instanceProperties = new ArrayList<>();
 
         propertiesMap.forEach((key, value) -> {
@@ -95,7 +136,9 @@ public class HeatResourceHandler {
             instanceProperties.addAll(Objects.requireNonNull(handleResourceInstanceProperty(key, value)));
         });
         EDMMPropertyMapperImplementation propMapper = new EDMMPropertyMapperImplementation();
-        instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propMapper.mapToEDMMPropertyKey(componentType, instanceProperty.getKey())));
+        instanceProperties.forEach(instanceProperty -> instanceProperty.setKey(propMapper.mapToEDMMPropertyKey(
+            componentType,
+            instanceProperty.getKey())));
         List<InstanceProperty> toBeRemoved = new ArrayList<>();
         for (InstanceProperty instanceProperty : instanceProperties) {
             if (instanceProperty.getKey() == null) {
@@ -125,7 +168,9 @@ public class HeatResourceHandler {
         if (value.get(firstEntryIndex) instanceof String) {
             value.forEach(entry -> instanceProperties.add(handleStringProperty(key, String.valueOf(entry))));
         } else if (value.get(firstEntryIndex) instanceof Map) {
-            value.forEach(entry -> CastUtil.safelyCastToStringStringMap(entry).forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + Constants.DELIMITER + pKey, pValue))));
+            value.forEach(entry -> CastUtil.safelyCastToStringStringMap(entry)
+                .forEach((pKey, pValue) -> instanceProperties.add(handleStringProperty(key + Constants.DELIMITER + pKey,
+                    pValue))));
         }
         return instanceProperties;
     }
@@ -133,5 +178,4 @@ public class HeatResourceHandler {
     private static boolean isNoResourceInstanceProperty(String key) {
         return key.equals(HeatConstants.METADATA) || key.equals(HeatConstants.TAGS);
     }
-
 }

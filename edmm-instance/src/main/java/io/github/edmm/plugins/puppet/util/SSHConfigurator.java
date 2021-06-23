@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import io.github.edmm.core.transformation.InstanceTransformationException;
+import io.github.edmm.plugins.puppet.model.Master;
+import io.github.edmm.util.Util;
+
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import io.github.edmm.core.transformation.InstanceTransformationException;
-import io.github.edmm.plugins.puppet.model.Master;
-import io.github.edmm.util.Util;
 
 public class SSHConfigurator {
 
@@ -102,7 +103,8 @@ public class SSHConfigurator {
             channelExec.setCommand(command);
             channelExec.connect();
         } catch (JSchException e) {
-            throw new InstanceTransformationException("Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
+            throw new InstanceTransformationException(
+                "Failed to query data from Puppet Master. Please make sure that PuppetDB on Puppet Master is up and running.");
         }
     }
 

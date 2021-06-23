@@ -38,7 +38,13 @@ public class PuppetCommand extends TransformCommand {
     @Override
     public void run() {
         InstanceTransformationContext context = new InstanceTransformationContext(PUPPET, outputPath);
-        PuppetInstancePlugin pluginLifecycle = new PuppetInstancePlugin(context, user, ip, privateKeyLocation, port, operatingSystem, operatingSystemRelease);
+        PuppetInstancePlugin pluginLifecycle = new PuppetInstancePlugin(context,
+            user,
+            ip,
+            privateKeyLocation,
+            port,
+            operatingSystem,
+            operatingSystemRelease);
         InstancePlugin<PuppetInstancePlugin> plugin = new InstancePlugin<>(PUPPET, pluginLifecycle);
         try {
             plugin.execute();
