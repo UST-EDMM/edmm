@@ -5,15 +5,9 @@ public interface InstancePluginLifecycle {
 
     void getModels();
 
-    void transformToEDMMi();
-
-    void transformEdmmiToTOSCA();
-
     void transformDirectlyToTOSCA();
 
     void storeTransformedTOSCA();
-
-    void createYAML();
 
     void cleanup();
 }

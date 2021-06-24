@@ -1,12 +1,9 @@
 package io.github.edmm.plugins.edmmi;
 
-import java.io.File;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.yaml.EDMMiYamlParser;
-import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.exporter.OpenTOSCAConnector;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
@@ -17,9 +14,6 @@ import org.slf4j.LoggerFactory;
 public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
 
     private static final Logger logger = LoggerFactory.getLogger(EDMMiPlugin.class);
-
-    private static final String directorySuffix = "/";
-    private DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     public EDMMiPlugin(InstanceTransformationContext context) {
         super(context);
@@ -34,13 +28,9 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     }
 
     @Override
-    public void transformToEDMMi() {
+    public void transformDirectlyToTOSCA() {
         EDMMiYamlParser EDMMiYamlParser = new EDMMiYamlParser();
-        this.deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(context.getOutputPath());
-    }
-
-    @Override
-    public void transformEdmmiToTOSCA() {
+        DeploymentInstance deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(context.getOutputPath());
         TOSCATransformer toscaTransformer = new TOSCATransformer();
         ServiceTemplateInstance serviceTemplateInstance = toscaTransformer.transformEDiMMToServiceTemplateInstance(
             deploymentInstance);
@@ -51,21 +41,8 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     }
 
     @Override
-    public void transformDirectlyToTOSCA() {
-        this.transformEdmmiToTOSCA();
-    }
-
-    @Override
     public void storeTransformedTOSCA() {
 
-    }
-
-    @Override
-    public void createYAML() {
-        EDMMiYamlTransformer EDMMiYamlTransformer = new EDMMiYamlTransformer();
-        EDMMiYamlTransformer.createYamlforEDiMM(this.deploymentInstance,
-            new File(context.getOutputPath()).getParent() + directorySuffix);
-        logger.info("Saved YAML for EDMMi to {}", EDMMiYamlTransformer.getFileOutputLocation());
     }
 
     @Override

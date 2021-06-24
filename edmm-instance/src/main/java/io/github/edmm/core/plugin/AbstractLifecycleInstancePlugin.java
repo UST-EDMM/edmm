@@ -30,8 +30,6 @@ public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLi
         List<InstanceLifecyclePhase<L>> phases = new ArrayList<>();
         phases.add(new InstanceLifecyclePhase<>(Phases.PREPARE, this, InstancePluginLifecycle::prepare));
         phases.add(new InstanceLifecyclePhase<>(Phases.GET_MODELS, this, InstancePluginLifecycle::getModels));
-//        phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_EDMMi, this, InstancePluginLifecycle::transformToEDMMi));
-//        phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_TOSCA, this, InstancePluginLifecycle::transformEdmmiToTOSCA));
         phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_TOSCA,
             this,
             InstancePluginLifecycle::transformDirectlyToTOSCA));
@@ -39,7 +37,6 @@ public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLi
             this,
             InstancePluginLifecycle::storeTransformedTOSCA,
             context -> !context.isMultiTransform()));
-//        phases.add(new InstanceLifecyclePhase<>(Phases.CREATE_YAML, this, InstancePluginLifecycle::createYAML));
         phases.add(new InstanceLifecyclePhase<>(Phases.CLEANUP, this, InstancePluginLifecycle::cleanup));
         return Collections.unmodifiableList(phases);
     }
