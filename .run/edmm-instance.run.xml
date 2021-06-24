@@ -4,7 +4,7 @@
         <module name="edmm-instance"/>
         <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.Application"/>
         <option name="PROGRAM_PARAMETERS"
-                value="multitransform -u rosso -ip 173.212.243.69 -f C:\Users\rosso\.ssh\puppet-master -c C:\Users\rosso\repos_unsynced\edmm\remote-config"/>
+                value="multitransform -c C:\Users\rosso\repos_unsynced\edmm\multi-transform-config.yml"/>
         <option name="ALTERNATIVE_JRE_PATH"/>
         <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE"/>
         <method v="2">

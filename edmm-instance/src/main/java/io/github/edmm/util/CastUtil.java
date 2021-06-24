@@ -14,6 +14,12 @@ public abstract class CastUtil {
     }
 
     @SuppressWarnings("rawtypes")
+    public static Optional<Map<String, Object>> safelyCastToStringObjectMapOptional(Object objectToCast) {
+        Optional<Map> mapOptional = checkMapForCast(objectToCast);
+        return mapOptional.map(CastUtil::castToStringObjectMap);
+    }
+
+    @SuppressWarnings("rawtypes")
     public static Map<String, String> safelyCastToStringStringMap(Object objectToCast) {
         Optional<Map> mapOptional = checkMapForCast(objectToCast);
         return mapOptional.map(CastUtil::castToStringStringMap).orElse(Collections.emptyMap());
@@ -53,16 +59,12 @@ public abstract class CastUtil {
 
     @SuppressWarnings("rawtypes")
     private static Optional<Map> checkMapForCast(Object objectToCast) {
-        return Optional.ofNullable(objectToCast)
-            .filter(Map.class::isInstance)
-            .map(Map.class::cast);
+        return Optional.ofNullable(objectToCast).filter(Map.class::isInstance).map(Map.class::cast);
     }
 
     @SuppressWarnings("rawtypes")
     private static Optional<List> checkListForCast(Object objectToCast) {
-        return Optional.ofNullable(objectToCast)
-            .filter(List.class::isInstance)
-            .map(List.class::cast);
+        return Optional.ofNullable(objectToCast).filter(List.class::isInstance).map(List.class::cast);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -73,24 +75,21 @@ public abstract class CastUtil {
             checkCast(vClass, e.getValue());
         }
 
-        @SuppressWarnings("unchecked")
-        Map<K, V> result = (Map<K, V>) map;
+        @SuppressWarnings("unchecked") Map<K, V> result = (Map<K, V>) map;
         return result;
     }
 
     private static <K> List<K> castToListOf(Class<K> kClass, List<?> listToCast) {
         listToCast.forEach(entry -> checkCast(kClass, entry));
 
-        @SuppressWarnings("unchecked")
-        List<K> result = (List<K>) listToCast;
+        @SuppressWarnings("unchecked") List<K> result = (List<K>) listToCast;
         return result;
     }
 
     private static <T> void checkCast(Class<T> tClass, Object objectToCast) {
         if (!tClass.isInstance(objectToCast)) {
             throw new ClassCastException("Expected: " + tClass.getName() + "but was: " + objectToCast.getClass()
-                .getName()
-            );
+                .getName());
         }
     }
 }

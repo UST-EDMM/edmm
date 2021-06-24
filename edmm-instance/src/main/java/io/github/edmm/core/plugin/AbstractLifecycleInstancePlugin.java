@@ -13,6 +13,7 @@ import lombok.Getter;
 public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLifecycle> implements
     InstancePluginLifecycle {
 
+    @Getter
     protected final InstanceTransformationContext context;
 
     @Getter
