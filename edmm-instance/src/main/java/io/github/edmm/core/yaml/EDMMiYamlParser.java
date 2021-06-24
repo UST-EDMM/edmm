@@ -1,6 +1,5 @@
 package io.github.edmm.core.yaml;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -35,7 +34,7 @@ public class EDMMiYamlParser {
         Yaml yaml = new Yaml();
         InputStream input = null;
         try {
-            input = new FileInputStream(new File(fileInput));
+            input = new FileInputStream(fileInput);
         } catch (FileNotFoundException e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }

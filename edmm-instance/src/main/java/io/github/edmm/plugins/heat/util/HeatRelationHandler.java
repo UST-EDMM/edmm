@@ -34,7 +34,7 @@ class HeatRelationHandler {
                 .findFirst()
                 .orElseThrow(InstanceTransformationException::new)
                 .getResourceName());
-            relationInstance.setId(RelationType.DependsOn + Constants.DELIMITER + String.valueOf(relationCount.getAndIncrement()));
+            relationInstance.setId(RelationType.DependsOn + Constants.DELIMITER + relationCount.getAndIncrement());
             relationInstances.add(relationInstance);
         });
         return relationInstances;

@@ -33,11 +33,9 @@ public class HeatPropertiesHandler {
     private static List<InstanceProperty> handleOutputList(List<Map<String, Object>> outputList) {
         List<InstanceProperty> deploymentInstanceProperties = new ArrayList<>();
         emptyIfNull(outputList).forEach(
-            entry -> entry.forEach((key, value) -> {
-                deploymentInstanceProperties.add(new InstanceProperty(key,
-                    key.getClass().getSimpleName(),
-                    String.valueOf(value)));
-            })
+            entry -> entry.forEach((key, value) -> deploymentInstanceProperties.add(new InstanceProperty(key,
+                key.getClass().getSimpleName(),
+                String.valueOf(value))))
         );
         return deploymentInstanceProperties;
     }

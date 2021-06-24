@@ -3,6 +3,7 @@ package io.github.edmm.plugins.puppet.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 
 import io.github.edmm.core.transformation.InstanceTransformationException;
 import io.github.edmm.plugins.puppet.model.Master;
@@ -46,7 +47,7 @@ public class SSHConfigurator {
             URL resource = classLoader.getResource("edimm_ssh.zip");
             ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
-            channelSftp.put(resource.getFile(), this.outputLocation);
+            channelSftp.put(Objects.requireNonNull(resource).getFile(), this.outputLocation);
         } catch (JSchException | SftpException e) {
             e.printStackTrace();
         }
@@ -58,7 +59,7 @@ public class SSHConfigurator {
             URL resource = classLoader.getResource("edimm_ssh.sh");
             ChannelSftp channelSftp = this.setupChannelSftp();
             channelSftp.connect();
-            channelSftp.put(resource.getFile(), this.outputLocation);
+            channelSftp.put(Objects.requireNonNull(resource).getFile(), this.outputLocation);
 
             this.executeSimpleCommand(Commands.EXECUTE_HELPER_SCRIPT);
         } catch (JSchException | SftpException e) {

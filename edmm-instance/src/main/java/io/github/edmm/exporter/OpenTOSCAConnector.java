@@ -277,11 +277,6 @@ public abstract class OpenTOSCAConnector {
         return null;
     }
 
-    private static List<EnrichmentDTO> getJsonStringAsEnrichmentDTOs(String jsonString) {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, List.class);
-    }
-
     private static String doubleEncodeNamespace(QName qName) throws UnsupportedEncodingException {
         return "/" + URLEncoder.encode(URLEncoder.encode(qName.getNamespaceURI(), "UTF-8"),
             "UTF-8") + "/" + qName.getLocalPart() + "/";

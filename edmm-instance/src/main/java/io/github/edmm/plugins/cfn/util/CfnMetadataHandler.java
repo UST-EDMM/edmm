@@ -24,7 +24,7 @@ public class CfnMetadataHandler {
     }
 
     private static String generateMetadataKey(String firstKey, String secondKey, int count, String thirdKey) {
-        return firstKey + CfnConstants.DELIMITER + secondKey + String.valueOf(count) + CfnConstants.DELIMITER + CfnConstants.DELIMITER + thirdKey;
+        return firstKey + CfnConstants.DELIMITER + secondKey + count + CfnConstants.DELIMITER + CfnConstants.DELIMITER + thirdKey;
     }
 
     public Metadata getMetadataForDeploymentInstance() {
@@ -120,8 +120,8 @@ public class CfnMetadataHandler {
         if (this.stack.getNotificationARNs() != null) {
             AtomicInteger notificationARNCount = new AtomicInteger();
             this.stack.getNotificationARNs()
-                .forEach(notificationARN -> this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + String.valueOf(
-                    notificationARNCount.getAndIncrement()), notificationARN));
+                .forEach(notificationARN -> this.metadataMap.put(CfnConstants.NOTIFICATION_ARNS + notificationARNCount.getAndIncrement(),
+                    notificationARN));
         }
     }
 
@@ -166,7 +166,7 @@ public class CfnMetadataHandler {
         if (this.stack.getCapabilities() != null) {
             AtomicInteger capabilityCount = new AtomicInteger();
             this.stack.getCapabilities()
-                .forEach(capability -> this.metadataMap.put(CfnConstants.CAPABILITIES + String.valueOf(capabilityCount.getAndIncrement()),
+                .forEach(capability -> this.metadataMap.put(CfnConstants.CAPABILITIES + capabilityCount.getAndIncrement(),
                     capability));
         }
     }

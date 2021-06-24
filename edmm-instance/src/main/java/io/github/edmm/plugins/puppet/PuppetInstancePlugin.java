@@ -3,6 +3,7 @@ package io.github.edmm.plugins.puppet;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import io.github.edmm.plugins.puppet.typemapper.MySQLMapper;
 import io.github.edmm.plugins.puppet.typemapper.TomcatMapper;
 import io.github.edmm.plugins.puppet.typemapper.WebApplicationMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
+import io.github.edmm.util.CastUtil;
 import io.github.edmm.util.Constants;
 
 import org.slf4j.Logger;
@@ -146,7 +148,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                 Fact ec2_metadata = node.getFactByName("ec2_metadata");
                 if (ec2_metadata != null) {
-                    Map<String, Object> values = (Map<String, Object>) ec2_metadata.getValue();
+                    Map<String, Object> values = CastUtil.safelyCastToStringObjectMap(ec2_metadata.getValue());
                     if (values.get("instance-type") != null) {
                         vmProps.put(Constants.VMTYPE, values.get("instance-type").toString());
                     }
@@ -209,7 +211,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 });
 
             if (environments.size() > 0) {
-                Map<String, String> vmProperties = vm.getProperties().getKVProperties();
+                Map<String, String> vmProperties = Optional.ofNullable(properties)
+                    .map(TEntityTemplate.Properties::getKVProperties)
+                    .orElseGet(LinkedHashMap::new);
                 vmProperties.put("PuppetEnvironments", String.join(",", environments));
                 populateNodeTemplateProperties(vm, vmProperties);
             }

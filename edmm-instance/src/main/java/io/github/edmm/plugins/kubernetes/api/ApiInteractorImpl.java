@@ -1,6 +1,5 @@
 package io.github.edmm.plugins.kubernetes.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +53,7 @@ public class ApiInteractorImpl implements ApiInteractor {
 
     @Override
     public List<V1Pod> getComponents() {
-        List<V1Pod> podsOfDeployment = new ArrayList<>();
+        List<V1Pod> podsOfDeployment;
         try {
             V1PodList podList = this.coreApi.listPodForAllNamespaces(null, null,
                 null, null, null, null,

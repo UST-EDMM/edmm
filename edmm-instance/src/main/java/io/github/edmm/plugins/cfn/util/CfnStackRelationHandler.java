@@ -76,7 +76,7 @@ class CfnStackRelationHandler {
     }
 
     private String generateIdOfRelation(AtomicInteger relationCount) {
-        return RelationType.DependsOn + Constants.DELIMITER + String.valueOf(relationCount.getAndIncrement());
+        return RelationType.DependsOn + Constants.DELIMITER + relationCount.getAndIncrement();
     }
 
     private String getTargetInstanceIdOfRelation(String dependsOnValue) {

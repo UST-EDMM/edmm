@@ -60,11 +60,11 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private final WineryConnector myWineryConnector;
     private final TOSCATransformer myTOSCATransformer;
     private final List<TypeTransformer> myHostTransformers;
+    private final String inputDeploymentName;
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
     private V1Deployment kubernetesDeploymentInstance;
     private List<V1Pod> podsOfDeploymentInstance;
-    private String inputDeploymentName;
 
     public KubernetesInstancePlugin(
         InstanceTransformationContext context,
@@ -184,12 +184,12 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 topologyTemplate);
                         });
                     } catch (ApiException aE) {
-                        this.logger.error("Error retrieving Pods", aE);
+                        logger.error("Error retrieving Pods", aE);
                     }
                 }
             });
         } catch (ApiException aE) {
-            this.logger.error("Error retrieving node list", aE);
+            logger.error("Error retrieving node list", aE);
         }
 
         TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance

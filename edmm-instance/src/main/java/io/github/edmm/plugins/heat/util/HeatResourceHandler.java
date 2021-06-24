@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.ComponentType;
@@ -68,8 +67,8 @@ public class HeatResourceHandler {
                         .stream()
                         .filter(prop -> prop.getKey().equals("key_name"))
                         .findFirst()
-                        .get()
-                        .getInstanceValue()), osClient)));
+                        .map(InstanceProperty::getInstanceValue)
+                        .orElse(null)), osClient)));
         }
         componentInstance.getInstanceProperties()
             .add(new InstanceProperty(Constants.TYPE, String.class.getSimpleName(), originalType));
@@ -93,11 +92,10 @@ public class HeatResourceHandler {
             .getAddresses();
         for (String key : ipAddress.keySet()) {
             List<? extends Address> ipAddressList = ipAddress.get(key);
-            Optional<? extends Address> addressOptional = ipAddressList.stream()
+            //noinspection UnstableApiUsage
+            return ipAddressList.stream()
                 .filter(ip -> InetAddresses.isInetAddress(ip.getAddr()))
-                .findFirst();
-            Address address = addressOptional.orElse(null);
-            return address.getAddr();
+                .findFirst().map(Address::getAddr).orElse(null);
         }
         return null;
     }
@@ -153,7 +151,7 @@ public class HeatResourceHandler {
         if (value instanceof String) {
             return Collections.singletonList(handleStringProperty(key, String.valueOf(value)));
         } else if (value instanceof List) {
-            return handleListProperty(key, (List) value);
+            return handleListProperty(key, (List<?>) value);
         }
         return Collections.emptyList();
     }

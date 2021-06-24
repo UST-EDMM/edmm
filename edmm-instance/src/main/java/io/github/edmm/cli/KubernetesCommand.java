@@ -29,8 +29,7 @@ public class KubernetesCommand extends TransformCommand {
 
     @CommandLine.Option(names = {"-c", "--kubeConfigPath"}, required = true)
     private String kubeConfigPath;
-    @CommandLine.Option(names = {"-id", "--applicationId"}, required = false,
-        description = "You need to specify the name of the application you want to transform.")
+    @CommandLine.Option(names = {"-id", "--applicationId"}, description = "You need to specify the name of the application you want to transform.")
     private String applicationId;
 
     @Override
