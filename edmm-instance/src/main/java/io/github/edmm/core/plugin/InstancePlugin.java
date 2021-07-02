@@ -50,7 +50,7 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
             if (phase.shouldExecute(lifecycle.context)) {
                 phase.execute(lifecycle);
             } else {
-                logger.info("Skipping phase |{}|", phase);
+                logger.info("Skipping phase |{}|", phase.getPhase().name());
                 phase.skip();
             }
         }
@@ -59,8 +59,7 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
     }
 
     private int countExecutionPhases(
-        InstanceTransformationContext context,
-        List<? extends InstanceLifecyclePhase<?>> phases) {
+        InstanceTransformationContext context, List<? extends InstanceLifecyclePhase<?>> phases) {
         return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 

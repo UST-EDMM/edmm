@@ -100,6 +100,16 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     public void transformDirectlyToTOSCA() {
         TTopologyTemplate topologyTemplate = new TTopologyTemplate();
 
+        TNodeType puppetNodeType = toscaTransformer.getSoftwareNodeType("Puppet", null);
+        TNodeTemplate puppetMaster = ModelUtilities.instantiateNodeTemplate(puppetNodeType);
+        Map<String, String> masterProperties = new HashMap<>();
+        masterProperties.put(Constants.PUPPET_MASTER, this.master.getIp());
+        masterProperties.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
+        masterProperties.put(Constants.PUPPET_MASTER_USER, this.master.getUser());
+        masterProperties.put(Constants.PUPPET_MASTER_PORT, String.valueOf(this.master.getSshPort()));
+        populateNodeTemplateProperties(puppetMaster, masterProperties);
+        topologyTemplate.addNodeTemplate(puppetMaster);
+
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -144,6 +154,10 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             topologyTemplate.addNodeTemplate(vm);
+            ModelUtilities.createRelationshipTemplateAndAddToTopology(vm,
+                puppetMaster,
+                Constants.deployedByRelationshipType,
+                topologyTemplate);
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
@@ -187,6 +201,10 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
+                    ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode,
+                        puppetMaster,
+                        Constants.deployedByRelationshipType,
+                        topologyTemplate);
 
                     if (this.toscaTransformer.getTransformTypePlugins()
                         .stream()

@@ -1,8 +1,10 @@
 package io.github.edmm.plugins.kubernetes;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.typemapper.UbuntuMapper;
+import io.github.edmm.util.Constants;
 
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.AppsV1Api;
@@ -50,7 +53,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
     private final String kubeConfigPath;
     private final WineryConnector myWineryConnector;
-    private final TOSCATransformer myTOSCATransformer;
+    private final TOSCATransformer toscaTransformer;
     private final List<TypeTransformer> myHostTransformers;
     private final String inputDeploymentName;
     private AppsV1Api appsApi;
@@ -65,7 +68,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         this.inputDeploymentName = inputDeploymentName;
         this.myWineryConnector = WineryConnector.getInstance();
         myHostTransformers = Arrays.asList(new UbuntuMapper(myWineryConnector));
-        myTOSCATransformer = new TOSCATransformer(Arrays.asList(new UbuntuMapper(myWineryConnector)));
+        toscaTransformer = new TOSCATransformer(Arrays.asList(new UbuntuMapper(myWineryConnector)));
     }
 
     @Override
@@ -87,6 +90,15 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     @Override
     public void transformDirectlyToTOSCA() {
         TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+
+        TNodeType kubernetesNodeType = toscaTransformer.getSoftwareNodeType("Kubernetes", null);
+        TNodeTemplate kubernetesCluster = ModelUtilities.instantiateNodeTemplate(kubernetesNodeType);
+        String basePath = this.coreV1Api.getApiClient().getBasePath();
+        Map<String, String> clusterProperties = new HashMap<>();
+        clusterProperties.put(Constants.KUBERNETES_CLUSTER_IP, basePath);
+        populateNodeTemplateProperties(kubernetesCluster, clusterProperties);
+        topologyTemplate.addNodeTemplate(kubernetesCluster);
+
         try {
             V1NodeList v1NodeList = this.coreV1Api.listNode(false, null, null, null, null, null, null, null, null);
             v1NodeList.getItems().stream().findFirst().ifPresent(aV1Node -> {
@@ -97,7 +109,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                     .findFirst()
                     .map(aTypeTransformer -> aTypeTransformer.performTransformation(osImage, ""))
                     .map(myWineryConnector::getNodeType)
-                    .orElseGet(() -> myTOSCATransformer.getComputeNodeType(osImage, ""));
+                    .orElseGet(() -> toscaTransformer.getComputeNodeType(osImage, ""));
                 TNodeTemplate hostTemplate = ModelUtilities.instantiateNodeTemplate(hostNodeType);
                 hostTemplate.setId(nodeInfo.getMachineID());
                 hostTemplate.setName(nodeInfo.getMachineID());
@@ -107,13 +119,17 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                 int versionIdx = containerRuntimeVersion.indexOf("://");
                 String containerRuntime = containerRuntimeVersion.substring(0, versionIdx);
                 if (Objects.equals(containerRuntime, "docker")) {
-                    TNodeType dockerEngineType = myTOSCATransformer.getComputeNodeType("DockerEngine", "");
+                    TNodeType dockerEngineType = toscaTransformer.getComputeNodeType("DockerEngine", "");
                     TNodeTemplate dockerEngineTemplate = ModelUtilities.instantiateNodeTemplate(dockerEngineType);
                     dockerEngineTemplate.setName("KubeDockerEngine");
                     topologyTemplate.addNodeTemplate(dockerEngineTemplate);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerEngineTemplate,
                         hostTemplate,
                         ToscaBaseTypes.hostedOnRelationshipType,
+                        topologyTemplate);
+                    ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerEngineTemplate,
+                        kubernetesCluster,
+                        Constants.deployedByRelationshipType,
                         topologyTemplate);
 
                     try {
@@ -142,8 +158,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         containers.forEach(aV1Container -> {
                             String image = aV1Container.getImage();
                             String name = aV1Container.getName();
-                            TNodeType dockerContainerType = myTOSCATransformer.getComputeNodeType("DockerContainer",
-                                "");
+                            TNodeType dockerContainerType = toscaTransformer.getComputeNodeType("DockerContainer", "");
                             TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
                                 dockerContainerType);
                             dockerContainerTemplate.setName(name);
@@ -160,6 +175,10 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                             ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
                                 dockerEngineTemplate,
                                 ToscaBaseTypes.hostedOnRelationshipType,
+                                topologyTemplate);
+                            ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
+                                kubernetesCluster,
+                                Constants.deployedByRelationshipType,
                                 topologyTemplate);
                         });
                     } catch (ApiException aE) {
@@ -184,10 +203,29 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
     @Override
     public void storeTransformedTOSCA() {
-        Optional.ofNullable(retrieveGeneratedServiceTemplate()).ifPresent(myTOSCATransformer::save);
+        Optional.ofNullable(retrieveGeneratedServiceTemplate()).ifPresent(toscaTransformer::save);
     }
 
     @Override
     public void cleanup() {
+    }
+
+    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
+        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
+            nodeTemplate.getProperties()
+                .getKVProperties()
+                .entrySet()
+                .stream()
+                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
+                    .isEmpty())
+                .forEach(entry -> additionalProperties.put(entry.getKey(),
+                    entry.getValue() != null && !entry.getValue()
+                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
+                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
+        }
+
+        // workaround to set new properties
+        nodeTemplate.setProperties(new TEntityTemplate.Properties());
+        nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 }

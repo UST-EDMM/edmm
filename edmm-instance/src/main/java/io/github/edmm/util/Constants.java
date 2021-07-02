@@ -1,5 +1,7 @@
 package io.github.edmm.util;
 
+import javax.xml.namespace.QName;
+
 public abstract class Constants {
     public static final String DELIMITER = "::";
     public static final String TYPE = "type";
@@ -19,4 +21,9 @@ public abstract class Constants {
     public static final String PUPPET_MASTER = "MasterIP";
     public static final String PUPPET_MASTER_KEY = "MasterPrivateKey";
     public static final String PUPPET_MASTER_USER = "MasterUserName";
+    public static final String PUPPET_MASTER_PORT = "MasterPort";
+    public static final String KUBERNETES_CLUSTER_IP = "cluster_ip";
+
+    public static final QName deployedByRelationshipType = QName.valueOf(
+        "{https://examples.opentosca.org/edmm/relationshiptypes}deployedBy");
 }
