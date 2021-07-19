@@ -6,6 +6,7 @@ import io.github.edmm.cli.KubernetesCommand;
 import io.github.edmm.cli.MultiTransformCommand;
 import io.github.edmm.cli.ParseCommand;
 import io.github.edmm.cli.PuppetCommand;
+import io.github.edmm.cli.TerraformCommand;
 
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import static picocli.CommandLine.usage;
         ParseCommand.class,
         PuppetCommand.class,
         MultiTransformCommand.class,
+        TerraformCommand.class,
     }
 )
 @SpringBootApplication(scanBasePackages = "io.github.edmm")

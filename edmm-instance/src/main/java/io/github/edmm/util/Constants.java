@@ -26,4 +26,5 @@ public abstract class Constants {
 
     public static final QName deployedByRelationshipType = QName.valueOf(
         "{https://examples.opentosca.org/edmm/relationshiptypes}deployedBy");
+    public static final String TOSCA_NAME_SPACE_RETRIEVED_INSTANCES = "http://opentosca.org/retrieved/instances";
 }
