@@ -91,15 +91,21 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     public void transformDirectlyToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            return new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata()
-                .getName(), topologyTemplate).setName("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata()
-                .getName())
+            String serviceTemplateId = "kubernetes-" + this.kubernetesDeploymentInstance.getMetadata().getName();
+            logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
+            return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
                 .setTargetNamespace("http://opentosca.org/retrieved/instances")
                 .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
                 .build();
         });
 
-        TTopologyTemplate topologyTemplate = serviceTemplate.getTopologyTemplate();
+        TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
+            .orElseGet(() -> {
+                logger.info("Creating new topology template, as existing service template has none");
+                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
+                serviceTemplate.setTopologyTemplate(topologyTemplate1);
+                return topologyTemplate1;
+            });
 
         TNodeType kubernetesNodeType = toscaTransformer.getSoftwareNodeType("Kubernetes", null);
         TNodeTemplate kubernetesCluster = ModelUtilities.instantiateNodeTemplate(kubernetesNodeType);
@@ -137,9 +143,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         hostTemplate,
                         ToscaBaseTypes.hostedOnRelationshipType,
                         topologyTemplate);
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerEngineTemplate,
-                        kubernetesCluster,
-                        Constants.deployedByRelationshipType,
+                    ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
+                        dockerEngineTemplate,
+                        Constants.managedByRelationshipType,
                         topologyTemplate);
 
                     try {
@@ -186,9 +192,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 dockerEngineTemplate,
                                 ToscaBaseTypes.hostedOnRelationshipType,
                                 topologyTemplate);
-                            ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
-                                kubernetesCluster,
-                                Constants.deployedByRelationshipType,
+                            ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
+                                dockerContainerTemplate,
+                                Constants.managedByRelationshipType,
                                 topologyTemplate);
                         });
                     } catch (ApiException aE) {

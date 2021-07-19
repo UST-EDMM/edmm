@@ -110,9 +110,9 @@ public class EC2InstanceHandler implements ResourceHandler {
 
             populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
-            ModelUtilities.createRelationshipTemplateAndAddToTopology(instanceNode,
-                terraformNode,
-                Constants.deployedByRelationshipType,
+            ModelUtilities.createRelationshipTemplateAndAddToTopology(terraformNode,
+                instanceNode,
+                Constants.managedByRelationshipType,
                 topologyTemplate);
         }
     }

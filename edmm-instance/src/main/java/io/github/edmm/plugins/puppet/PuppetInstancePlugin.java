@@ -100,14 +100,21 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     public void transformDirectlyToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            return new TServiceTemplate.Builder("puppet-" + this.master.getId(),
-                topologyTemplate).setName("puppet-" + this.master.getId())
+            String serviceTempalteId = "puppet-" + this.master.getId();
+            logger.info("Creating new service template for transformation |{}|", serviceTempalteId);
+            return new TServiceTemplate.Builder(serviceTempalteId, topologyTemplate).setName(serviceTempalteId)
                 .setTargetNamespace("http://opentosca.org/retrieved/instances")
                 .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
                 .build();
         });
 
-        TTopologyTemplate topologyTemplate = serviceTemplate.getTopologyTemplate();
+        TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
+            .orElseGet(() -> {
+                logger.info("Creating new topology template, as existing service template has none");
+                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
+                serviceTemplate.setTopologyTemplate(topologyTemplate1);
+                return topologyTemplate1;
+            });
 
         TNodeType puppetNodeType = toscaTransformer.getSoftwareNodeType("Puppet", null);
         TNodeTemplate puppetMaster = ModelUtilities.instantiateNodeTemplate(puppetNodeType);
@@ -163,9 +170,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             topologyTemplate.addNodeTemplate(vm);
-            ModelUtilities.createRelationshipTemplateAndAddToTopology(vm,
-                puppetMaster,
-                Constants.deployedByRelationshipType,
+            ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
+                vm,
+                Constants.managedByRelationshipType,
                 topologyTemplate);
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
@@ -210,9 +217,9 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode,
-                        puppetMaster,
-                        Constants.deployedByRelationshipType,
+                    ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
+                        softwareNode,
+                        Constants.managedByRelationshipType,
                         topologyTemplate);
 
                     if (this.toscaTransformer.getTransformTypePlugins()
