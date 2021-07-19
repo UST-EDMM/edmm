@@ -89,7 +89,17 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
     @Override
     public void transformDirectlyToTOSCA() {
-        TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+        TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
+            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+            return new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata()
+                .getName(), topologyTemplate).setName("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata()
+                .getName())
+                .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
+                .build();
+        });
+
+        TTopologyTemplate topologyTemplate = serviceTemplate.getTopologyTemplate();
 
         TNodeType kubernetesNodeType = toscaTransformer.getSoftwareNodeType("Kubernetes", null);
         TNodeTemplate kubernetesCluster = ModelUtilities.instantiateNodeTemplate(kubernetesNodeType);
@@ -189,14 +199,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         } catch (ApiException aE) {
             logger.error("Error retrieving node list", aE);
         }
-
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("kubernetes-" + this.kubernetesDeploymentInstance
-            .getMetadata()
-            .getName(), topologyTemplate).setName("kubernetes-" + this.kubernetesDeploymentInstance.getMetadata()
-            .getName())
-            .setTargetNamespace("http://opentosca.org/retrieved/instances")
-            .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
-            .build();
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

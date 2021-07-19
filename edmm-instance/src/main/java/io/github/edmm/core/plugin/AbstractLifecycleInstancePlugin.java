@@ -41,7 +41,7 @@ public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLi
         return Collections.unmodifiableList(phases);
     }
 
-    protected void updateGeneratedServiceTemplate(TServiceTemplate aGeneratedServiceTemplate) {
+    public void updateGeneratedServiceTemplate(TServiceTemplate aGeneratedServiceTemplate) {
         myServiceTemplate = aGeneratedServiceTemplate;
     }
 

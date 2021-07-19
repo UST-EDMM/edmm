@@ -76,7 +76,17 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
 
     @Override
     public void transformDirectlyToTOSCA() {
-        TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+        TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
+            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+            String serviceTemplateId = "terraform-" + UUID.randomUUID();
+            return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
+                .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
+                .addTags(new TTags.Builder().addTag("deploymentTechnology",
+                    getContext().getSourceTechnology().getName()).build())
+                .build();
+        });
+
+        TTopologyTemplate topologyTemplate = serviceTemplate.getTopologyTemplate();
 
         TNodeType backendNodeType = toscaTransformer.getComputeNodeType(terraformBackendInfo.getOperatingSystem(),
             terraformBackendInfo.getOperatingSystemVersion());
@@ -97,14 +107,6 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
             backendNode,
             ToscaBaseTypes.hostedOnRelationshipType,
             topologyTemplate);
-
-        String serviceTemplateId = "terraform-" + UUID.randomUUID();
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(
-            serviceTemplateId)
-            .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
-            .addTags(new TTags.Builder().addTag("deploymentTechnology", getContext().getSourceTechnology().getName())
-                .build())
-            .build();
 
         terraformState.getResources()
             .forEach(curResource -> resourceHandlers.stream()

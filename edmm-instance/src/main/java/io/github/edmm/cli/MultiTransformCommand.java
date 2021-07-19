@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,18 +80,22 @@ public class MultiTransformCommand extends TransformCommand {
 
         Collection<InstancePlugin<TerraformInstancePlugin>> terraformPlugins = parseTerraformConfig(technologyInstances);
 
-        Collection<TServiceTemplate> serviceTemplates = new HashSet<>();
+        UUID uuid = UUID.randomUUID();
+        TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + uuid,
+            topologyTemplate).setName("multitransform-" + uuid)
+            .setTargetNamespace("http://opentosca.org/retrieved/instances")
+            .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
+            .build();
+
         for (InstancePlugin<KubernetesInstancePlugin> kubernetesPlugin : kubernetesPlugins) {
             String contextId = kubernetesPlugin.getLifecycle().getContext().getId();
             logger.info("Executing kubernetes transformation |" + contextId + "|");
+
             try {
+                kubernetesPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
                 kubernetesPlugin.execute();
-                TServiceTemplate serviceTemplate = kubernetesPlugin.retrieveGeneratedServiceTemplate();
-                if (serviceTemplate != null) {
-                    serviceTemplates.add(serviceTemplate);
-                } else {
-                    logger.warn("Could not retrieve generated service template for kubernetes transformation |" + contextId + "|");
-                }
+                serviceTemplate = kubernetesPlugin.retrieveGeneratedServiceTemplate();
             } catch (Exception e) {
                 logger.error("Error executing kubernetes transformation |" + contextId + "|", e);
             }
@@ -102,13 +105,9 @@ public class MultiTransformCommand extends TransformCommand {
             String contextId = puppetPlugin.getLifecycle().getContext().getId();
             logger.info("Executing puppet transformation |" + contextId + "|");
             try {
+                puppetPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
                 puppetPlugin.execute();
-                TServiceTemplate serviceTemplate = puppetPlugin.retrieveGeneratedServiceTemplate();
-                if (serviceTemplate != null) {
-                    serviceTemplates.add(serviceTemplate);
-                } else {
-                    logger.warn("Could not retrieve generated service template for puppet transformation |" + contextId + "|");
-                }
+                serviceTemplate = puppetPlugin.retrieveGeneratedServiceTemplate();
             } catch (Exception e) {
                 logger.error("Error executing puppet transformation |" + contextId + "|", e);
             }
@@ -118,31 +117,16 @@ public class MultiTransformCommand extends TransformCommand {
             String contextId = terraformPlugin.getLifecycle().getContext().getId();
             logger.info("Executing terraform transformation |" + contextId + "|");
             try {
+                terraformPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
                 terraformPlugin.execute();
-                TServiceTemplate serviceTemplate = terraformPlugin.retrieveGeneratedServiceTemplate();
-                if (serviceTemplate != null) {
-                    serviceTemplates.add(serviceTemplate);
-                } else {
-                    logger.warn("Could not retrieve generated service template for terraform transformation |" + contextId + "|");
-                }
+                serviceTemplate = terraformPlugin.retrieveGeneratedServiceTemplate();
             } catch (Exception e) {
                 logger.error("Error executing terraform transformation |" + contextId + "|", e);
             }
         }
 
         TOSCATransformer toscaTransformer = new TOSCATransformer();
-        serviceTemplates.stream()
-            .map(TServiceTemplate::getTopologyTemplate)
-            .reduce(this::mergeTopologyTemplate)
-            .map(tTopologyTemplate -> {
-                UUID uuid = UUID.randomUUID();
-                return new TServiceTemplate.Builder("multitransform-" + uuid, tTopologyTemplate).setName(
-                    "multitransform-" + uuid)
-                    .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                    .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
-                    .build();
-            })
-            .ifPresent(toscaTransformer::save);
+        toscaTransformer.save(serviceTemplate);
     }
 
     private Collection<InstancePlugin<PuppetInstancePlugin>> parsePuppetConfig(Map<String, Object> technologyInstances) {

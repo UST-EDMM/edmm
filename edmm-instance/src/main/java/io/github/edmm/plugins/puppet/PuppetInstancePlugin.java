@@ -98,7 +98,16 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
     @Override
     public void transformDirectlyToTOSCA() {
-        TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+        TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
+            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+            return new TServiceTemplate.Builder("puppet-" + this.master.getId(),
+                topologyTemplate).setName("puppet-" + this.master.getId())
+                .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
+                .build();
+        });
+
+        TTopologyTemplate topologyTemplate = serviceTemplate.getTopologyTemplate();
 
         TNodeType puppetNodeType = toscaTransformer.getSoftwareNodeType("Puppet", null);
         TNodeTemplate puppetMaster = ModelUtilities.instantiateNodeTemplate(puppetNodeType);
@@ -224,12 +233,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 populateNodeTemplateProperties(vm, vmProperties);
             }
         });
-
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("puppet-" + this.master.getId(),
-            topologyTemplate).setName("puppet-" + this.master.getId())
-            .setTargetNamespace("http://opentosca.org/retrieved/instances")
-            .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
-            .build();
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }
