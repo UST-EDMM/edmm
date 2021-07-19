@@ -13,6 +13,7 @@ public class EC2InstanceAttributes {
     private String id;
     private String instanceType;
     private String keyName;
+    private String privateIp;
 
     public String getAmi() {
         return ami;
@@ -60,5 +61,13 @@ public class EC2InstanceAttributes {
 
     public void setKeyName(String keyName) {
         this.keyName = keyName;
+    }
+
+    public String getPrivateIp() {
+        return privateIp;
+    }
+
+    public void setPrivateIp(String privateIp) {
+        this.privateIp = privateIp;
     }
 }

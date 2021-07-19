@@ -73,13 +73,14 @@ public class EC2InstanceHandler implements ResourceHandler {
         for (EC2Instance curInstance : ec2InstanceResource.getInstances()) {
             EC2InstanceAttributes attributes = curInstance.getAttributes();
             String publicIp = attributes.getPublicIp();
+            String privateIp = attributes.getPrivateIp();
 
             List<TNodeTemplate> matchingNodes = topologyTemplate.getNodeTemplates()
                 .stream()
                 .filter(tNodeTemplate -> Optional.ofNullable(tNodeTemplate.getProperties())
                     .map(TEntityTemplate.Properties::getKVProperties)
                     .map(kvProperties -> kvProperties.get(Constants.VMIP))
-                    .map(nodeIp -> Objects.equals(nodeIp, publicIp))
+                    .map(nodeIp -> Objects.equals(nodeIp, publicIp) || Objects.equals(nodeIp, privateIp))
                     .orElse(false))
                 .collect(Collectors.toList());
 
@@ -89,8 +90,10 @@ public class EC2InstanceHandler implements ResourceHandler {
                     matchingNodes.size());
                 instanceNode = matchingNodes.get(0);
             } else if (matchingNodes.size() == 1) {
+                logger.info("Found a suitable node template in topology template. Using it.");
                 instanceNode = matchingNodes.get(0);
             } else {
+                logger.info("Could not find a suitable node template in topology template. Creating a new one.");
                 TNodeType computeNodeType = toscaTransformer.getComputeNodeType(attributes.getAmi(), "");
                 instanceNode = ModelUtilities.instantiateNodeTemplate(computeNodeType);
                 instanceNode.setId(attributes.getArn());
