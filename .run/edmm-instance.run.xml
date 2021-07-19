@@ -1,12 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="edmm-instance" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="edmm-instance" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.Application" />
-    <option name="PROGRAM_PARAMETERS" value="terraform -f &quot;C:\Users\rosso\repos_unsynced\terraform-master-thesis\terraform.tfstate&quot;" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
+    <configuration default="false" name="edmm-instance" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <module name="edmm-instance"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.edmm.Application"/>
+        <option name="PROGRAM_PARAMETERS"
+                value="multitransform -c C:\Users\rosso\repos_unsynced\edmm\multi-transform-config.yml"/>
+        <option name="ALTERNATIVE_JRE_PATH"/>
+        <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
 </component>

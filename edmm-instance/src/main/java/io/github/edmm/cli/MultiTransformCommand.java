@@ -26,6 +26,7 @@ import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
 import io.github.edmm.plugins.puppet.PuppetInstancePlugin;
+import io.github.edmm.plugins.terraform.TerraformInstancePlugin;
 import io.github.edmm.util.CastUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +48,7 @@ public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_PUPPET_PORT = "port";
     private static final String CONFIG_PUPPET_OPERATING_SYSTEM = "operating-system";
     private static final String CONFIG_PUPPET_OPERATING_SYSTEM_VERSION = "operating-system-version";
+    private static final String CONFIG_TERRAFORM_STATE_FILE_PATH = "state-file";
     private static final Logger logger = LoggerFactory.getLogger(MultiTransformCommand.class);
     private static final SourceTechnology MULTI_TRANSFORM = SourceTechnology.builder()
         .id("multitransform")
@@ -55,6 +57,10 @@ public class MultiTransformCommand extends TransformCommand {
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
         .id("kubernetes")
         .name("Kubernetes")
+        .build();
+    private static final SourceTechnology TERRAFORM = SourceTechnology.builder()
+        .id("terraform")
+        .name("Terraform")
         .build();
     private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
     @CommandLine.Option(names = {"-p", "--port"}, defaultValue = "22")
@@ -73,6 +79,8 @@ public class MultiTransformCommand extends TransformCommand {
 
         Collection<InstancePlugin<PuppetInstancePlugin>> puppetPlugins = parsePuppetConfig(technologyInstances);
 
+        Collection<InstancePlugin<TerraformInstancePlugin>> terraformPlugins = parseTerraformConfig(technologyInstances);
+
         Collection<TServiceTemplate> serviceTemplates = new HashSet<>();
         for (InstancePlugin<KubernetesInstancePlugin> kubernetesPlugin : kubernetesPlugins) {
             String contextId = kubernetesPlugin.getLifecycle().getContext().getId();
@@ -86,7 +94,7 @@ public class MultiTransformCommand extends TransformCommand {
                     logger.warn("Could not retrieve generated service template for kubernetes transformation |" + contextId + "|");
                 }
             } catch (Exception e) {
-                logger.error("Error executing kubernetes transformation |" + contextId + "|");
+                logger.error("Error executing kubernetes transformation |" + contextId + "|", e);
             }
         }
 
@@ -102,7 +110,23 @@ public class MultiTransformCommand extends TransformCommand {
                     logger.warn("Could not retrieve generated service template for puppet transformation |" + contextId + "|");
                 }
             } catch (Exception e) {
-                logger.error("Error executing puppet transformation |" + contextId + "|");
+                logger.error("Error executing puppet transformation |" + contextId + "|", e);
+            }
+        }
+
+        for (InstancePlugin<TerraformInstancePlugin> terraformPlugin : terraformPlugins) {
+            String contextId = terraformPlugin.getLifecycle().getContext().getId();
+            logger.info("Executing terraform transformation |" + contextId + "|");
+            try {
+                terraformPlugin.execute();
+                TServiceTemplate serviceTemplate = terraformPlugin.retrieveGeneratedServiceTemplate();
+                if (serviceTemplate != null) {
+                    serviceTemplates.add(serviceTemplate);
+                } else {
+                    logger.warn("Could not retrieve generated service template for terraform transformation |" + contextId + "|");
+                }
+            } catch (Exception e) {
+                logger.error("Error executing terraform transformation |" + contextId + "|", e);
             }
         }
 
@@ -115,7 +139,7 @@ public class MultiTransformCommand extends TransformCommand {
                 return new TServiceTemplate.Builder("multitransform-" + uuid, tTopologyTemplate).setName(
                     "multitransform-" + uuid)
                     .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                    .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
+                    .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
                     .build();
             })
             .ifPresent(toscaTransformer::save);
@@ -195,6 +219,30 @@ public class MultiTransformCommand extends TransformCommand {
                     kubeConfigPath,
                     inputDeploymentName);
                 return new InstancePlugin<>(KUBERNETES, kubernetesInstancePlugin);
+            }).collect(Collectors.toSet()))
+            .orElse(Collections.emptySet());
+    }
+
+    private Set<InstancePlugin<TerraformInstancePlugin>> parseTerraformConfig(Map<String, Object> technologyInstances) {
+        return Optional.ofNullable(technologyInstances.get("terraform"))
+            .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
+            .map(Map::entrySet)
+            .map(entries -> entries.stream().map(terraformInstance -> {
+                Map<String, Object> terraformConfig = CastUtil.safelyCastToStringObjectMap(terraformInstance.getValue());
+                String instanceId = terraformInstance.getKey();
+                Path terraformStateFilePath = Optional.ofNullable(terraformConfig.get(CONFIG_TERRAFORM_STATE_FILE_PATH))
+                    .map(Object::toString)
+                    .filter(StringUtils::isNotBlank)
+                    .map(Paths::get)
+                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_TERRAFORM_STATE_FILE_PATH + "| for technology instance |" + instanceId + "|"));
+
+                InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
+                    TERRAFORM,
+                    outputPath,
+                    true);
+                TerraformInstancePlugin terraformInstancePlugin = new TerraformInstancePlugin(context,
+                    terraformStateFilePath);
+                return new InstancePlugin<>(TERRAFORM, terraformInstancePlugin);
             }).collect(Collectors.toSet()))
             .orElse(Collections.emptySet());
     }
