@@ -26,5 +26,9 @@ public abstract class Constants {
 
     public static final QName managesRelationshipType = QName.valueOf(
         "{https://examples.opentosca.org/edmm/relationshiptypes}manages");
+    public static final QName managesAppRelationshipType = QName.valueOf(
+        "{https://examples.opentosca.org/edmm/relationshiptypes}managesApp");
+    public static final QName managesInfraRelationshipType = QName.valueOf(
+        "{https://examples.opentosca.org/edmm/relationshiptypes}managesInfra");
     public static final String TOSCA_NAME_SPACE_RETRIEVED_INSTANCES = "http://opentosca.org/retrieved/instances";
 }

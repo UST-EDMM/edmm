@@ -172,7 +172,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             topologyTemplate.addNodeTemplate(vm);
             ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
                 vm,
-                Constants.managesRelationshipType,
+                Constants.managesAppRelationshipType,
                 topologyTemplate);
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
@@ -219,7 +219,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     topologyTemplate.addNodeTemplate(softwareNode);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
                         softwareNode,
-                        Constants.managesRelationshipType,
+                        Constants.managesAppRelationshipType,
                         topologyTemplate);
 
                     if (this.toscaTransformer.getTransformTypePlugins()
