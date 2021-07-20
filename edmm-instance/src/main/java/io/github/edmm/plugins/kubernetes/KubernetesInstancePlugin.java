@@ -145,7 +145,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         topologyTemplate);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
                         dockerEngineTemplate,
-                        Constants.managedByRelationshipType,
+                        Constants.managesRelationshipType,
                         topologyTemplate);
 
                     try {
@@ -194,7 +194,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 topologyTemplate);
                             ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
                                 dockerContainerTemplate,
-                                Constants.managedByRelationshipType,
+                                Constants.managesRelationshipType,
                                 topologyTemplate);
                         });
                     } catch (ApiException aE) {
