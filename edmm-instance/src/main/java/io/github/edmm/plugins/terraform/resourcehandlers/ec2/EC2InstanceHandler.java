@@ -107,6 +107,7 @@ public class EC2InstanceHandler implements ResourceHandler {
             propertiesForInstance.put(Constants.VM_KEY_PAIR_NAME, attributes.getKeyName());
             propertiesForInstance.put(Constants.VM_INSTANCE_ID, attributes.getId());
             propertiesForInstance.put(Constants.VMIP, attributes.getPublicIp());
+            propertiesForInstance.put(Constants.EC_2_AMI, attributes.getAmi());
 
             populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 

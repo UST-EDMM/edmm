@@ -23,6 +23,7 @@ public abstract class Constants {
     public static final String PUPPET_MASTER_USER = "MasterUserName";
     public static final String PUPPET_MASTER_PORT = "MasterPort";
     public static final String KUBERNETES_CLUSTER_IP = "cluster_ip";
+    public static final String EC_2_AMI = "ec2-ami";
 
     public static final QName managesRelationshipType = QName.valueOf(
         "{https://examples.opentosca.org/edmm/relationshiptypes}manages");
