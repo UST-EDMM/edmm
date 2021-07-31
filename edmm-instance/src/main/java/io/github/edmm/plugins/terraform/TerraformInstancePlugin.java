@@ -22,10 +22,12 @@ import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.plugins.terraform.model.TerraformBackendInfo;
 import io.github.edmm.plugins.terraform.model.TerraformState;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.ec2.EC2InstanceHandler;
+import io.github.edmm.plugins.terraform.typemapper.WindowsMapper;
 import io.github.edmm.util.Constants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +40,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
 
     private final Path terraformStateFile;
     private final TOSCATransformer toscaTransformer;
+    private final WineryConnector wineryConnector;
     private final List<ResourceHandler> resourceHandlers;
     private final String terraformNodeId;
 
@@ -49,7 +52,8 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         super(context);
         this.terraformStateFile = terraformStateFile;
         terraformNodeId = "terraform-backend-" + UUID.randomUUID();
-        toscaTransformer = new TOSCATransformer();
+        wineryConnector = WineryConnector.getInstance();
+        toscaTransformer = new TOSCATransformer(Arrays.asList(new WindowsMapper(wineryConnector)));
         resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer, terraformNodeId));
     }
 
