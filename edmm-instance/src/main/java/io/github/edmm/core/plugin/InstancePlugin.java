@@ -1,7 +1,5 @@
 package io.github.edmm.core.plugin;
 
-import java.util.List;
-
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -27,13 +25,7 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
     public InstancePlugin(@NonNull SourceTechnology sourceTechnology, L lifecycle) {
         this.lifecycle = lifecycle;
         this.sourceTechnology = sourceTechnology;
-        logger.debug("Initializing instance transformation plugin '{}'", sourceTechnology.getName());
-        this.init();
         logger.debug("Initialized instance transformation plugin '{}'", sourceTechnology.getName());
-    }
-
-    private void init() {
-        // noop
     }
 
     public void execute() throws Exception {
@@ -56,11 +48,6 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
         }
         time = System.currentTimeMillis() - time;
         logger.info("EDMMi Transformation finished after {} ms", time);
-    }
-
-    private int countExecutionPhases(
-        InstanceTransformationContext context, List<? extends InstanceLifecyclePhase<?>> phases) {
-        return (int) phases.stream().filter(e -> e.shouldExecute(context)).count();
     }
 
     public L getLifecycle(InstanceTransformationContext context) {

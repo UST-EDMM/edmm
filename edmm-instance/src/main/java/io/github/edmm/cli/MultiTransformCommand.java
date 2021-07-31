@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,8 +19,8 @@ import java.util.stream.Collectors;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTags;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
-import org.eclipse.winery.repository.backend.BackendUtils;
 
+import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -39,6 +41,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "multitransform", descriptionHeading = "%n", description = "Starts a transformation from multiple source technologies to OpenTOSCA.", customSynopsis = "@|bold edmmi transform_puppet|@ @|yellow <path to edmmi yaml file>|@")
 public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_PUPPET_IP = "ip";
+    private static final String CONFIG_MODEL_NAME = "model-name";
     private static final String CONFIG_TECHNOLOGY_INSTANCES = "technology-instances";
     private static final String CONFIG_KUBERNETES_KUBE_CONFIG_PATH = "kube-config-path";
     private static final String CONFIG_KUBERNETES_INPUT_DEPLOYMENT_NAME = "input-deployment-name";
@@ -67,6 +70,8 @@ public class MultiTransformCommand extends TransformCommand {
     @CommandLine.Option(names = {"-c", "--configFile"}, required = true)
     private String configFilePath;
 
+    private String modelName;
+
     @Override
     public void run() {
         Path configFile = checkConfigFileArgument();
@@ -80,53 +85,39 @@ public class MultiTransformCommand extends TransformCommand {
 
         Collection<InstancePlugin<TerraformInstancePlugin>> terraformPlugins = parseTerraformConfig(technologyInstances);
 
-        UUID uuid = UUID.randomUUID();
-        TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-        TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + uuid,
-            topologyTemplate).setName("multitransform-" + uuid)
-            .setTargetNamespace("http://opentosca.org/retrieved/instances")
-            .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
-            .build();
+        List<InstancePlugin<? extends AbstractLifecycleInstancePlugin<? extends AbstractLifecycleInstancePlugin<?>>>> plugins = new ArrayList<>();
+        plugins.addAll(kubernetesPlugins);
+        plugins.addAll(puppetPlugins);
+        plugins.addAll(terraformPlugins);
 
-        for (InstancePlugin<KubernetesInstancePlugin> kubernetesPlugin : kubernetesPlugins) {
-            String contextId = kubernetesPlugin.getLifecycle().getContext().getId();
-            logger.info("Executing kubernetes transformation |" + contextId + "|");
-
-            try {
-                kubernetesPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
-                kubernetesPlugin.execute();
-                serviceTemplate = kubernetesPlugin.retrieveGeneratedServiceTemplate();
-            } catch (Exception e) {
-                logger.error("Error executing kubernetes transformation |" + contextId + "|", e);
-            }
+        if (StringUtils.isBlank(modelName)) {
+            modelName = UUID.randomUUID().toString();
         }
 
-        for (InstancePlugin<PuppetInstancePlugin> puppetPlugin : puppetPlugins) {
-            String contextId = puppetPlugin.getLifecycle().getContext().getId();
-            logger.info("Executing puppet transformation |" + contextId + "|");
-            try {
-                puppetPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
-                puppetPlugin.execute();
-                serviceTemplate = puppetPlugin.retrieveGeneratedServiceTemplate();
-            } catch (Exception e) {
-                logger.error("Error executing puppet transformation |" + contextId + "|", e);
-            }
-        }
+        if (!plugins.isEmpty()) {
+            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
+            TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + modelName,
+                topologyTemplate).setName("multitransform-" + modelName)
+                .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
+                .build();
 
-        for (InstancePlugin<TerraformInstancePlugin> terraformPlugin : terraformPlugins) {
-            String contextId = terraformPlugin.getLifecycle().getContext().getId();
-            logger.info("Executing terraform transformation |" + contextId + "|");
-            try {
-                terraformPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
-                terraformPlugin.execute();
-                serviceTemplate = terraformPlugin.retrieveGeneratedServiceTemplate();
-            } catch (Exception e) {
-                logger.error("Error executing terraform transformation |" + contextId + "|", e);
+            for (InstancePlugin<? extends AbstractLifecycleInstancePlugin<? extends AbstractLifecycleInstancePlugin<?>>> curPlugin : plugins) {
+                String contextId = curPlugin.getLifecycle().getContext().getId();
+                String sourceTechnologyName = curPlugin.getLifecycle().getContext().getSourceTechnology().getName();
+                logger.info("Executing |{}| transformation |{}|", sourceTechnologyName, contextId);
+                try {
+                    curPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
+                    curPlugin.execute();
+                    serviceTemplate = curPlugin.retrieveGeneratedServiceTemplate();
+                } catch (Exception e) {
+                    logger.error("Error executing |{}| transformation |{}|", sourceTechnologyName, contextId, e);
+                }
             }
-        }
 
-        TOSCATransformer toscaTransformer = new TOSCATransformer();
-        toscaTransformer.save(serviceTemplate);
+            TOSCATransformer toscaTransformer = new TOSCATransformer();
+            toscaTransformer.save(serviceTemplate);
+        }
     }
 
     private Collection<InstancePlugin<PuppetInstancePlugin>> parsePuppetConfig(Map<String, Object> technologyInstances) {
@@ -158,7 +149,7 @@ public class MultiTransformCommand extends TransformCommand {
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);
                 String operatingSystemVersion = Optional.ofNullable(puppetConfig.get(
-                    CONFIG_PUPPET_OPERATING_SYSTEM_VERSION))
+                        CONFIG_PUPPET_OPERATING_SYSTEM_VERSION))
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);
@@ -240,6 +231,9 @@ public class MultiTransformCommand extends TransformCommand {
             throw new IllegalStateException("Could not load config file |" + configFile + "|", e);
         }
 
+        Optional.ofNullable(config.get(CONFIG_MODEL_NAME))
+            .ifPresent(configModelName -> modelName = configModelName.toString());
+
         return CastUtil.safelyCastToStringObjectMapOptional(config.get(CONFIG_TECHNOLOGY_INSTANCES))
             .orElseThrow(() -> new IllegalArgumentException("No technology instances provided in configuration"));
     }
@@ -258,19 +252,5 @@ public class MultiTransformCommand extends TransformCommand {
             throw new IllegalArgumentException("Invalid config file path", e);
         }
         return configFile;
-    }
-
-    private TTopologyTemplate mergeTopologyTemplate(
-        TTopologyTemplate topologyTemplate, TTopologyTemplate otherTopologyTemplate) {
-
-        if (topologyTemplate == null) {
-            return otherTopologyTemplate;
-        }
-        if (otherTopologyTemplate == null) {
-            return topologyTemplate;
-        }
-
-        BackendUtils.mergeTopologyTemplateAinTopologyTemplateB(otherTopologyTemplate, topologyTemplate);
-        return topologyTemplate;
     }
 }
