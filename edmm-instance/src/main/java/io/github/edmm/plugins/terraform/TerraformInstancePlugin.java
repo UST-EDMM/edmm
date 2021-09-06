@@ -4,31 +4,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.eclipse.winery.model.tosca.TEntityTemplate;
-import org.eclipse.winery.model.tosca.TNodeTemplate;
-import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTags;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
-import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
-import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.exporter.WineryConnector;
+import io.github.edmm.model.ToscaDeploymentTechnology;
 import io.github.edmm.plugins.terraform.model.TerraformBackendInfo;
 import io.github.edmm.plugins.terraform.model.TerraformState;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.ec2.EC2InstanceHandler;
 import io.github.edmm.plugins.terraform.typemapper.WindowsMapper;
 import io.github.edmm.util.Constants;
+import io.github.edmm.util.Util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
@@ -40,9 +38,8 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
 
     private final Path terraformStateFile;
     private final TOSCATransformer toscaTransformer;
-    private final WineryConnector wineryConnector;
     private final List<ResourceHandler> resourceHandlers;
-    private final String terraformNodeId;
+    private final ToscaDeploymentTechnology terraformTechnology;
 
     private TerraformBackendInfo terraformBackendInfo;
     private TerraformState terraformState;
@@ -51,10 +48,18 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         InstanceTransformationContext context, Path terraformStateFile) {
         super(context);
         this.terraformStateFile = terraformStateFile;
-        terraformNodeId = "terraform-backend-" + UUID.randomUUID();
-        wineryConnector = WineryConnector.getInstance();
+        String terraformNodeId = "terraform-backend-" + UUID.randomUUID();
+        WineryConnector wineryConnector = WineryConnector.getInstance();
         toscaTransformer = new TOSCATransformer(Arrays.asList(new WindowsMapper(wineryConnector)));
-        resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer, terraformNodeId));
+
+        terraformTechnology = new ToscaDeploymentTechnology();
+        terraformTechnology.setId(terraformNodeId);
+        terraformTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        terraformTechnology.setInfraManagedIds(Collections.emptyList());
+        terraformTechnology.setAppManagedIds(Collections.emptyList());
+        terraformTechnology.setProperties(Collections.emptyMap());
+
+        resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer, terraformTechnology));
     }
 
     @Override
@@ -99,31 +104,24 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
                 return topologyTemplate1;
             });
 
-        TNodeType backendNodeType = toscaTransformer.getComputeNodeType(terraformBackendInfo.getOperatingSystem(),
-            terraformBackendInfo.getOperatingSystemVersion());
-        TNodeTemplate backendNode = ModelUtilities.instantiateNodeTemplate(backendNodeType);
-        topologyTemplate.addNodeTemplate(backendNode);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+            serviceTemplate,
+            objectMapper);
+        deploymentTechnologies.add(terraformTechnology);
 
-        TNodeType terraformNodeType = toscaTransformer.getSoftwareNodeType("Terraform", null);
-        TNodeTemplate terraformNode = ModelUtilities.instantiateNodeTemplate(terraformNodeType);
-        terraformNode.setId(terraformNodeId);
         Map<String, String> terraformProperties = new HashMap<>();
         terraformProperties.put("Version", terraformBackendInfo.getTerraformVersion());
 
-        populateNodeTemplateProperties(terraformNode, terraformProperties);
-
-        topologyTemplate.addNodeTemplate(terraformNode);
-
-        ModelUtilities.createRelationshipTemplateAndAddToTopology(terraformNode,
-            backendNode,
-            ToscaBaseTypes.hostedOnRelationshipType,
-            topologyTemplate);
+        terraformTechnology.setProperties(terraformProperties);
 
         terraformState.getResources()
             .forEach(curResource -> resourceHandlers.stream()
                 .filter(resourceHandler -> resourceHandler.canHandleResource(curResource))
                 .findFirst()
                 .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
+
+        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }
@@ -144,24 +142,5 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not parse terraform state", e);
         }
-    }
-
-    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
-        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
-            nodeTemplate.getProperties()
-                .getKVProperties()
-                .entrySet()
-                .stream()
-                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
-                    .isEmpty())
-                .forEach(entry -> additionalProperties.put(entry.getKey(),
-                    entry.getValue() != null && !entry.getValue()
-                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
-                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
-        }
-
-        // workaround to set new properties
-        nodeTemplate.setProperties(new TEntityTemplate.Properties());
-        nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 }

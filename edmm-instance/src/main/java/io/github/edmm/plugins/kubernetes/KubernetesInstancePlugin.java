@@ -1,12 +1,15 @@
 package io.github.edmm.plugins.kubernetes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.eclipse.winery.model.tosca.TEntityTemplate;
@@ -24,12 +27,15 @@ import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.transformation.TypeTransformer;
 import io.github.edmm.exporter.WineryConnector;
+import io.github.edmm.model.ToscaDeploymentTechnology;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.typemapper.UbuntuMapper;
 import io.github.edmm.util.Constants;
+import io.github.edmm.util.Util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
@@ -37,7 +43,6 @@ import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
-import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.models.V1PodList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +64,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
     private V1Deployment kubernetesDeploymentInstance;
-    private List<V1Pod> podsOfDeploymentInstance;
 
     public KubernetesInstancePlugin(
         InstanceTransformationContext context, String kubeConfigPath, String inputDeploymentName) {
@@ -84,7 +88,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.appsApi, this.coreV1Api, this.inputDeploymentName);
         this.kubernetesDeploymentInstance = apiInteractor.getDeployment();
-        this.podsOfDeploymentInstance = apiInteractor.getComponents();
+        apiInteractor.getComponents();
     }
 
     @Override
@@ -107,14 +111,28 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                 return topologyTemplate1;
             });
 
-        TNodeType kubernetesNodeType = toscaTransformer.getSoftwareNodeType("Kubernetes", null);
-        TNodeTemplate kubernetesCluster = ModelUtilities.instantiateNodeTemplate(kubernetesNodeType);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+            serviceTemplate,
+            objectMapper);
+
+        ToscaDeploymentTechnology kubernetesTechnology = new ToscaDeploymentTechnology();
+        kubernetesTechnology.setId("kubernetes-" + UUID.randomUUID());
+        kubernetesTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        kubernetesTechnology.setInfraManagedIds(Collections.emptyList());
+        kubernetesTechnology.setAppManagedIds(Collections.emptyList());
+        kubernetesTechnology.setProperties(Collections.emptyMap());
+
         String basePath = this.coreV1Api.getApiClient().getBasePath();
         Map<String, String> clusterProperties = new HashMap<>();
         clusterProperties.put(Constants.KUBERNETES_CLUSTER_IP, basePath);
-        populateNodeTemplateProperties(kubernetesCluster, clusterProperties);
-        topologyTemplate.addNodeTemplate(kubernetesCluster);
 
+        kubernetesTechnology.setProperties(clusterProperties);
+
+        deploymentTechnologies.add(kubernetesTechnology);
+
+        List<String> appManagedIds = new ArrayList<>();
+        List<String> infraManagedIds = new ArrayList<>();
         try {
             V1NodeList v1NodeList = this.coreV1Api.listNode(false, null, null, null, null, null, null, null, null);
             v1NodeList.getItems().stream().findFirst().ifPresent(aV1Node -> {
@@ -143,10 +161,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         hostTemplate,
                         ToscaBaseTypes.hostedOnRelationshipType,
                         topologyTemplate);
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
-                        dockerEngineTemplate,
-                        Constants.managesAppRelationshipType,
-                        topologyTemplate);
+                    appManagedIds.add(dockerEngineTemplate.getId());
 
                     try {
                         List<V1Container> containers;
@@ -192,10 +207,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 dockerEngineTemplate,
                                 ToscaBaseTypes.hostedOnRelationshipType,
                                 topologyTemplate);
-                            ModelUtilities.createRelationshipTemplateAndAddToTopology(kubernetesCluster,
-                                dockerContainerTemplate,
-                                Constants.managesInfraRelationshipType,
-                                topologyTemplate);
+                            infraManagedIds.add(dockerContainerTemplate.getId());
                         });
                     } catch (ApiException aE) {
                         logger.error("Error retrieving Pods", aE);
@@ -205,6 +217,13 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         } catch (ApiException aE) {
             logger.error("Error retrieving node list", aE);
         }
+
+        appManagedIds.addAll(kubernetesTechnology.getAppManagedIds());
+        kubernetesTechnology.setAppManagedIds(appManagedIds);
+        infraManagedIds.addAll(kubernetesTechnology.getInfraManagedIds());
+        kubernetesTechnology.setInfraManagedIds(infraManagedIds);
+
+        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }
@@ -216,24 +235,5 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
     @Override
     public void cleanup() {
-    }
-
-    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
-        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
-            nodeTemplate.getProperties()
-                .getKVProperties()
-                .entrySet()
-                .stream()
-                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
-                    .isEmpty())
-                .forEach(entry -> additionalProperties.put(entry.getKey(),
-                    entry.getValue() != null && !entry.getValue()
-                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
-                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
-        }
-
-        // workaround to set new properties
-        nodeTemplate.setProperties(new TEntityTemplate.Properties());
-        nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 }

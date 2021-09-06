@@ -1,5 +1,6 @@
 package io.github.edmm.plugins.terraform.resourcehandlers.ec2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.model.ToscaDeploymentTechnology;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.util.Constants;
 
@@ -28,11 +30,12 @@ public class EC2InstanceHandler implements ResourceHandler {
     private static final String PROPERTY_TYPE = "type";
 
     private final TOSCATransformer toscaTransformer;
-    private final String terraformNodeId;
+    private final ToscaDeploymentTechnology terraformDeploymentTechnology;
 
-    public EC2InstanceHandler(TOSCATransformer toscaTransformer, String terraformNodeId) {
+    public EC2InstanceHandler(
+        TOSCATransformer toscaTransformer, ToscaDeploymentTechnology terraformDeploymentTechnology) {
         this.toscaTransformer = Objects.requireNonNull(toscaTransformer);
-        this.terraformNodeId = Objects.requireNonNull(terraformNodeId);
+        this.terraformDeploymentTechnology = terraformDeploymentTechnology;
     }
 
     @Override
@@ -63,10 +66,8 @@ public class EC2InstanceHandler implements ResourceHandler {
         if (topologyTemplate == null) {
             throw new IllegalArgumentException("No topology template specified");
         }
-        TNodeTemplate terraformNode = topologyTemplate.getNodeTemplate(terraformNodeId);
-        if (terraformNode == null) {
-            throw new IllegalArgumentException("Could not find terraform node");
-        }
+
+        List<String> infraManagedNodeIds = new ArrayList<>();
 
         EC2InstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource, EC2InstanceResource.class);
 
@@ -111,10 +112,10 @@ public class EC2InstanceHandler implements ResourceHandler {
 
             populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
-            ModelUtilities.createRelationshipTemplateAndAddToTopology(terraformNode,
-                instanceNode,
-                Constants.managesInfraRelationshipType,
-                topologyTemplate);
+            infraManagedNodeIds.add(instanceNode.getId());
+
+            infraManagedNodeIds.addAll(terraformDeploymentTechnology.getInfraManagedIds());
+            terraformDeploymentTechnology.setInfraManagedIds(infraManagedNodeIds);
         }
     }
 }

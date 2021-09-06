@@ -2,20 +2,29 @@ package io.github.edmm.core.transformation;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 
-@Getter
 @Builder
 public final class SourceTechnology {
 
     private final String id;
     private final String name;
 
-    public SourceTechnology(@NonNull String id, @NonNull String name) {
+    @JsonCreator
+    public SourceTechnology(@NonNull @JsonProperty("id") String id, @NonNull @JsonProperty("name") String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

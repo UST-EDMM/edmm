@@ -29,6 +29,7 @@ import io.github.edmm.plugins.kubernetes.KubernetesInstancePlugin;
 import io.github.edmm.plugins.puppet.PuppetInstancePlugin;
 import io.github.edmm.plugins.terraform.TerraformInstancePlugin;
 import io.github.edmm.util.CastUtil;
+import io.github.edmm.util.Constants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import picocli.CommandLine;
 @Component
 @CommandLine.Command(name = "multitransform", descriptionHeading = "%n", description = "Starts a transformation from multiple source technologies to OpenTOSCA.", customSynopsis = "@|bold edmmi transform_puppet|@ @|yellow <path to edmmi yaml file>|@")
 public class MultiTransformCommand extends TransformCommand {
+    private static final String EMPTY_JSON_LIST = "[]";
     private static final String CONFIG_PUPPET_IP = "ip";
     private static final String CONFIG_MODEL_NAME = "model-name";
     private static final String CONFIG_TECHNOLOGY_INSTANCES = "technology-instances";
@@ -65,8 +67,6 @@ public class MultiTransformCommand extends TransformCommand {
         .name("Terraform")
         .build();
     private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
-    @CommandLine.Option(names = {"-p", "--port"}, defaultValue = "22")
-    private Integer port;
     @CommandLine.Option(names = {"-c", "--configFile"}, required = true)
     private String configFilePath;
 
@@ -99,7 +99,9 @@ public class MultiTransformCommand extends TransformCommand {
             TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + modelName,
                 topologyTemplate).setName("multitransform-" + modelName)
                 .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
+                .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName())
+                    .addTag(Constants.TAG_DEPLOYMENT_TECHNOLOGIES, EMPTY_JSON_LIST)
+                    .build())
                 .build();
 
             for (InstancePlugin<? extends AbstractLifecycleInstancePlugin<? extends AbstractLifecycleInstancePlugin<?>>> curPlugin : plugins) {

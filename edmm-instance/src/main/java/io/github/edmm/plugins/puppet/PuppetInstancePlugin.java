@@ -1,5 +1,7 @@
 package io.github.edmm.plugins.puppet;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
@@ -22,6 +25,7 @@ import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.model.ToscaDeploymentTechnology;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
@@ -36,7 +40,9 @@ import io.github.edmm.plugins.puppet.typemapper.WebApplicationMapper;
 import io.github.edmm.plugins.puppet.util.PuppetNodeHandler;
 import io.github.edmm.util.CastUtil;
 import io.github.edmm.util.Constants;
+import io.github.edmm.util.Util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,16 +122,28 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 return topologyTemplate1;
             });
 
-        TNodeType puppetNodeType = toscaTransformer.getSoftwareNodeType("Puppet", null);
-        TNodeTemplate puppetMaster = ModelUtilities.instantiateNodeTemplate(puppetNodeType);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+            serviceTemplate,
+            objectMapper);
+
+        ToscaDeploymentTechnology puppetTechnology = new ToscaDeploymentTechnology();
+        puppetTechnology.setId("puppet-" + UUID.randomUUID());
+        puppetTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        puppetTechnology.setInfraManagedIds(Collections.emptyList());
+        puppetTechnology.setAppManagedIds(Collections.emptyList());
+        puppetTechnology.setProperties(Collections.emptyMap());
+
+        deploymentTechnologies.add(puppetTechnology);
+
         Map<String, String> masterProperties = new HashMap<>();
         masterProperties.put(Constants.PUPPET_MASTER, this.master.getIp());
         masterProperties.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
         masterProperties.put(Constants.PUPPET_MASTER_USER, this.master.getUser());
         masterProperties.put(Constants.PUPPET_MASTER_PORT, String.valueOf(this.master.getSshPort()));
-        populateNodeTemplateProperties(puppetMaster, masterProperties);
-        topologyTemplate.addNodeTemplate(puppetMaster);
+        puppetTechnology.setProperties(masterProperties);
 
+        List<String> appManagedIds = new ArrayList<>();
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -170,10 +188,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             topologyTemplate.addNodeTemplate(vm);
-            ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
-                vm,
-                Constants.managesAppRelationshipType,
-                topologyTemplate);
+            appManagedIds.add(vm.getId());
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
@@ -217,10 +232,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
-                    ModelUtilities.createRelationshipTemplateAndAddToTopology(puppetMaster,
-                        softwareNode,
-                        Constants.managesAppRelationshipType,
-                        topologyTemplate);
+                    appManagedIds.add(softwareNode.getId());
 
                     if (this.toscaTransformer.getTransformTypePlugins()
                         .stream()
@@ -240,6 +252,11 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 populateNodeTemplateProperties(vm, vmProperties);
             }
         });
+
+        appManagedIds.addAll(puppetTechnology.getAppManagedIds()); // workaround to handle possibly immutable lists
+        puppetTechnology.setAppManagedIds(appManagedIds);
+
+        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }
