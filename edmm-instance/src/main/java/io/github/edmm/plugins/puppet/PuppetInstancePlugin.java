@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -130,8 +131,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         ToscaDeploymentTechnology puppetTechnology = new ToscaDeploymentTechnology();
         puppetTechnology.setId("puppet-" + UUID.randomUUID());
         puppetTechnology.setSourceTechnology(getContext().getSourceTechnology());
-        puppetTechnology.setInfraManagedIds(Collections.emptyList());
-        puppetTechnology.setAppManagedIds(Collections.emptyList());
+        puppetTechnology.setManagedIds(Collections.emptyList());
         puppetTechnology.setProperties(Collections.emptyMap());
 
         deploymentTechnologies.add(puppetTechnology);
@@ -143,7 +143,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         masterProperties.put(Constants.PUPPET_MASTER_PORT, String.valueOf(this.master.getSshPort()));
         puppetTechnology.setProperties(masterProperties);
 
-        List<String> appManagedIds = new ArrayList<>();
+        List<String> managedIds = new ArrayList<>();
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -188,7 +188,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             topologyTemplate.addNodeTemplate(vm);
-            appManagedIds.add(vm.getId());
+            managedIds.add(vm.getId());
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
@@ -212,12 +212,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 .flatMap(entry -> entry.stream()
                     .filter(event -> event.getStatus() == PuppetResourceStatus.success)
                     .sorted(Comparator.comparing(ResourceEventEntry::getTimestamp))
-                    .map(event -> {
-                        // :: separates class and operation
-                        int index = event.getContaining_class().lastIndexOf(Constants.DELIMITER);
-                        return index > 0 ? event.getContaining_class()
-                            .substring(0, index) : event.getContaining_class();
-                    }))
+                    .map(PuppetNodeHandler::extractComponentNameFromResourceEntry)
+                    .filter(Objects::nonNull))
                 .distinct()
                 .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'",
                     identifiedComponent,
@@ -232,7 +228,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     this.populateNodeTemplateProperties(softwareNode);
 
                     topologyTemplate.addNodeTemplate(softwareNode);
-                    appManagedIds.add(softwareNode.getId());
+                    managedIds.add(softwareNode.getId());
 
                     if (this.toscaTransformer.getTransformTypePlugins()
                         .stream()
@@ -253,8 +249,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
         });
 
-        appManagedIds.addAll(puppetTechnology.getAppManagedIds()); // workaround to handle possibly immutable lists
-        puppetTechnology.setAppManagedIds(appManagedIds);
+        managedIds.addAll(puppetTechnology.getManagedIds()); // workaround to handle possibly immutable lists
+        puppetTechnology.setManagedIds(managedIds);
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 

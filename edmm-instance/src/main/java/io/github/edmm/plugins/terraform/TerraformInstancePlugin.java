@@ -55,8 +55,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         terraformTechnology = new ToscaDeploymentTechnology();
         terraformTechnology.setId(terraformNodeId);
         terraformTechnology.setSourceTechnology(getContext().getSourceTechnology());
-        terraformTechnology.setInfraManagedIds(Collections.emptyList());
-        terraformTechnology.setAppManagedIds(Collections.emptyList());
+        terraformTechnology.setManagedIds(Collections.emptyList());
         terraformTechnology.setProperties(Collections.emptyMap());
 
         resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer, terraformTechnology));

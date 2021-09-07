@@ -8,8 +8,7 @@ import io.github.edmm.core.transformation.SourceTechnology;
 public class ToscaDeploymentTechnology {
     private String id;
     private SourceTechnology sourceTechnology;
-    private List<String> infraManagedIds;
-    private List<String> appManagedIds;
+    private List<String> managedIds;
     private Map<String, String> properties;
 
     public String getId() {
@@ -28,20 +27,12 @@ public class ToscaDeploymentTechnology {
         this.sourceTechnology = sourceTechnology;
     }
 
-    public List<String> getInfraManagedIds() {
-        return infraManagedIds;
+    public List<String> getManagedIds() {
+        return managedIds;
     }
 
-    public void setInfraManagedIds(List<String> infraManagedIds) {
-        this.infraManagedIds = infraManagedIds;
-    }
-
-    public List<String> getAppManagedIds() {
-        return appManagedIds;
-    }
-
-    public void setAppManagedIds(List<String> appManagedIds) {
-        this.appManagedIds = appManagedIds;
+    public void setManagedIds(List<String> managedIds) {
+        this.managedIds = managedIds;
     }
 
     public Map<String, String> getProperties() {

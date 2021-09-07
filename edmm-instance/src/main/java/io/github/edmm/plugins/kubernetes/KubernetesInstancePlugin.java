@@ -119,8 +119,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         ToscaDeploymentTechnology kubernetesTechnology = new ToscaDeploymentTechnology();
         kubernetesTechnology.setId("kubernetes-" + UUID.randomUUID());
         kubernetesTechnology.setSourceTechnology(getContext().getSourceTechnology());
-        kubernetesTechnology.setInfraManagedIds(Collections.emptyList());
-        kubernetesTechnology.setAppManagedIds(Collections.emptyList());
+        kubernetesTechnology.setManagedIds(Collections.emptyList());
         kubernetesTechnology.setProperties(Collections.emptyMap());
 
         String basePath = this.coreV1Api.getApiClient().getBasePath();
@@ -131,8 +130,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
         deploymentTechnologies.add(kubernetesTechnology);
 
-        List<String> appManagedIds = new ArrayList<>();
-        List<String> infraManagedIds = new ArrayList<>();
+        List<String> managedIds = new ArrayList<>();
         try {
             V1NodeList v1NodeList = this.coreV1Api.listNode(false, null, null, null, null, null, null, null, null);
             v1NodeList.getItems().stream().findFirst().ifPresent(aV1Node -> {
@@ -161,7 +159,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         hostTemplate,
                         ToscaBaseTypes.hostedOnRelationshipType,
                         topologyTemplate);
-                    appManagedIds.add(dockerEngineTemplate.getId());
+                    managedIds.add(dockerEngineTemplate.getId());
 
                     try {
                         List<V1Container> containers;
@@ -207,7 +205,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 dockerEngineTemplate,
                                 ToscaBaseTypes.hostedOnRelationshipType,
                                 topologyTemplate);
-                            infraManagedIds.add(dockerContainerTemplate.getId());
+                            managedIds.add(dockerContainerTemplate.getId());
                         });
                     } catch (ApiException aE) {
                         logger.error("Error retrieving Pods", aE);
@@ -218,10 +216,8 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
             logger.error("Error retrieving node list", aE);
         }
 
-        appManagedIds.addAll(kubernetesTechnology.getAppManagedIds());
-        kubernetesTechnology.setAppManagedIds(appManagedIds);
-        infraManagedIds.addAll(kubernetesTechnology.getInfraManagedIds());
-        kubernetesTechnology.setInfraManagedIds(infraManagedIds);
+        managedIds.addAll(kubernetesTechnology.getManagedIds());
+        kubernetesTechnology.setManagedIds(managedIds);
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 

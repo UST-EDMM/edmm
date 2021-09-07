@@ -67,7 +67,7 @@ public class EC2InstanceHandler implements ResourceHandler {
             throw new IllegalArgumentException("No topology template specified");
         }
 
-        List<String> infraManagedNodeIds = new ArrayList<>();
+        List<String> managedNodeIds = new ArrayList<>();
 
         EC2InstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource, EC2InstanceResource.class);
 
@@ -112,10 +112,10 @@ public class EC2InstanceHandler implements ResourceHandler {
 
             populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
-            infraManagedNodeIds.add(instanceNode.getId());
+            managedNodeIds.add(instanceNode.getId());
 
-            infraManagedNodeIds.addAll(terraformDeploymentTechnology.getInfraManagedIds());
-            terraformDeploymentTechnology.setInfraManagedIds(infraManagedNodeIds);
+            managedNodeIds.addAll(terraformDeploymentTechnology.getManagedIds());
+            terraformDeploymentTechnology.setManagedIds(managedNodeIds);
         }
     }
 }
