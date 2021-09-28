@@ -43,6 +43,7 @@ import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
 import io.kubernetes.client.models.V1PodList;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,17 +180,17 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 .getSpec()
                                 .getContainers();
                         } else if (this.targetNamespace != null) {
-                            containers = this.coreV1Api.listNamespacedPod(targetNamespace,
-                                    false,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    null)
-                                .getItems()
+                            V1PodList v1PodList = this.coreV1Api.listNamespacedPod(targetNamespace,
+                                false,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null);
+                            containers = v1PodList.getItems()
                                 .stream()
                                 .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
                                 .collect(Collectors.toList());
@@ -214,6 +215,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                             .forEach(aV1Container -> {
                                 String image = aV1Container.getImage();
                                 String name = aV1Container.getName();
+                                String hostIP = aV1Container.getPorts().get(0).getHostIP();
                                 TNodeType dockerContainerType = toscaTransformer.getComputeNodeType("DockerContainer",
                                     "");
                                 TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
@@ -224,6 +226,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                     .orElseGet(LinkedHashMap::new);
                                 kvProperties.put("ContainerID", name);
                                 kvProperties.put("ImageID", image);
+                                if (StringUtils.isNotBlank(hostIP)) {
+                                    kvProperties.put("ContainerIP", hostIP);
+                                }
                                 TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
                                     .orElseGet(TEntityTemplate.Properties::new);
                                 properties.setKVProperties(kvProperties);
