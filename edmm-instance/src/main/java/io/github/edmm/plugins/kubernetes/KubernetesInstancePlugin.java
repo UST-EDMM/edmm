@@ -28,7 +28,6 @@ import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.transformation.TypeTransformer;
 import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.typemapper.UbuntuMapper;
@@ -50,26 +49,38 @@ import org.slf4j.LoggerFactory;
 public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<KubernetesInstancePlugin> {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePlugin.class);
+    private static final List<String> IGNORED_CONTAINER_NAMES = Arrays.asList("orders",
+        "payment",
+        "queue-master",
+        "rabbitmq",
+        "rabbitmq-exporter",
+        "session-db",
+        "shipping",
+        "orders-db");
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
         .id("kubernetes")
         .name("Kubernetes")
         .build();
-    private final DeploymentInstance deploymentInstance = new DeploymentInstance();
 
     private final String kubeConfigPath;
     private final WineryConnector myWineryConnector;
     private final TOSCATransformer toscaTransformer;
     private final List<TypeTransformer> myHostTransformers;
     private final String inputDeploymentName;
+    private final String targetNamespace;
     private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
     private V1Deployment kubernetesDeploymentInstance;
 
     public KubernetesInstancePlugin(
-        InstanceTransformationContext context, String kubeConfigPath, String inputDeploymentName) {
+        InstanceTransformationContext context,
+        String kubeConfigPath,
+        String inputDeploymentName,
+        String targetNamespace) {
         super(context);
         this.kubeConfigPath = kubeConfigPath;
         this.inputDeploymentName = inputDeploymentName;
+        this.targetNamespace = targetNamespace;
         this.myWineryConnector = WineryConnector.getInstance();
         myHostTransformers = Arrays.asList(new UbuntuMapper(myWineryConnector));
         toscaTransformer = new TOSCATransformer(Arrays.asList(new UbuntuMapper(myWineryConnector)));
@@ -88,7 +99,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.appsApi, this.coreV1Api, this.inputDeploymentName);
         this.kubernetesDeploymentInstance = apiInteractor.getDeployment();
-        apiInteractor.getComponents();
     }
 
     @Override
@@ -168,6 +178,21 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 .getTemplate()
                                 .getSpec()
                                 .getContainers();
+                        } else if (this.targetNamespace != null) {
+                            containers = this.coreV1Api.listNamespacedPod(targetNamespace,
+                                    false,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null)
+                                .getItems()
+                                .stream()
+                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
+                                .collect(Collectors.toList());
                         } else {
                             V1PodList v1PodList = this.coreV1Api.listPodForAllNamespaces(null,
                                 null,
@@ -184,29 +209,32 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 .collect(Collectors.toList());
                         }
 
-                        containers.forEach(aV1Container -> {
-                            String image = aV1Container.getImage();
-                            String name = aV1Container.getName();
-                            TNodeType dockerContainerType = toscaTransformer.getComputeNodeType("DockerContainer", "");
-                            TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
-                                dockerContainerType);
-                            dockerContainerTemplate.setName(name);
-                            LinkedHashMap<String, String> kvProperties = Optional.ofNullable(dockerContainerTemplate.getProperties())
-                                .map(TEntityTemplate.Properties::getKVProperties)
-                                .orElseGet(LinkedHashMap::new);
-                            kvProperties.put("ContainerID", name);
-                            kvProperties.put("ImageID", image);
-                            TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
-                                .orElseGet(TEntityTemplate.Properties::new);
-                            properties.setKVProperties(kvProperties);
-                            dockerContainerTemplate.setProperties(properties);
-                            topologyTemplate.addNodeTemplate(dockerContainerTemplate);
-                            ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
-                                dockerEngineTemplate,
-                                ToscaBaseTypes.hostedOnRelationshipType,
-                                topologyTemplate);
-                            managedIds.add(dockerContainerTemplate.getId());
-                        });
+                        containers.stream()
+                            .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
+                            .forEach(aV1Container -> {
+                                String image = aV1Container.getImage();
+                                String name = aV1Container.getName();
+                                TNodeType dockerContainerType = toscaTransformer.getComputeNodeType("DockerContainer",
+                                    "");
+                                TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
+                                    dockerContainerType);
+                                dockerContainerTemplate.setName(name);
+                                LinkedHashMap<String, String> kvProperties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                    .map(TEntityTemplate.Properties::getKVProperties)
+                                    .orElseGet(LinkedHashMap::new);
+                                kvProperties.put("ContainerID", name);
+                                kvProperties.put("ImageID", image);
+                                TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                    .orElseGet(TEntityTemplate.Properties::new);
+                                properties.setKVProperties(kvProperties);
+                                dockerContainerTemplate.setProperties(properties);
+                                topologyTemplate.addNodeTemplate(dockerContainerTemplate);
+                                ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
+                                    dockerEngineTemplate,
+                                    ToscaBaseTypes.hostedOnRelationshipType,
+                                    topologyTemplate);
+                                managedIds.add(dockerContainerTemplate.getId());
+                            });
                     } catch (ApiException aE) {
                         logger.error("Error retrieving Pods", aE);
                     }

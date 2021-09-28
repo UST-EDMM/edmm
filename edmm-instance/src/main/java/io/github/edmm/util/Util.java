@@ -16,6 +16,7 @@ import org.eclipse.winery.model.tosca.TTags;
 
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.model.ToscaDeploymentTechnology;
+import io.github.edmm.model.ToscaDiscoveryPlugin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,6 +76,41 @@ public abstract class Util {
                     .constructCollectionType(List.class, ToscaDeploymentTechnology.class);
                 try {
                     return objectMapper.<List<ToscaDeploymentTechnology>>readValue(s, collectionType);
+                } catch (JsonProcessingException e) {
+                    throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
+                }
+            })
+            .orElseGet(ArrayList::new);
+    }
+
+    public static void updateDiscoveryPluginsInServiceTemplate(
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<ToscaDiscoveryPlugin> discoveryPlugins) {
+        try {
+            TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DISCOVERY_PLUGINS)
+                .setValue(objectMapper.writeValueAsString(discoveryPlugins))
+                .build();
+            serviceTemplate.getTags()
+                .getTag()
+                .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS));
+            serviceTemplate.getTags().getTag().add(updatedTag);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Could not write terraform deployment technology to JSON string");
+        }
+    }
+
+    public static List<ToscaDiscoveryPlugin> extractDiscoveryPluginsFromServiceTemplate(
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
+        return Optional.ofNullable(serviceTemplate.getTags())
+            .map(TTags::getTag)
+            .flatMap(tTags -> tTags.stream()
+                .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS))
+                .findAny())
+            .map(TTag::getValue)
+            .map(s -> {
+                CollectionType collectionType = objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, ToscaDiscoveryPlugin.class);
+                try {
+                    return objectMapper.<List<ToscaDiscoveryPlugin>>readValue(s, collectionType);
                 } catch (JsonProcessingException e) {
                     throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
                 }

@@ -20,10 +20,12 @@ import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.model.ToscaDeploymentTechnology;
+import io.github.edmm.model.ToscaDiscoveryPlugin;
 import io.github.edmm.plugins.terraform.model.TerraformBackendInfo;
 import io.github.edmm.plugins.terraform.model.TerraformState;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.ec2.EC2InstanceHandler;
+import io.github.edmm.plugins.terraform.resourcehandlers.ec2.KeyMapper;
 import io.github.edmm.plugins.terraform.typemapper.WindowsMapper;
 import io.github.edmm.util.Constants;
 import io.github.edmm.util.Util;
@@ -40,6 +42,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
     private final TOSCATransformer toscaTransformer;
     private final List<ResourceHandler> resourceHandlers;
     private final ToscaDeploymentTechnology terraformTechnology;
+    private final ToscaDiscoveryPlugin terraformDiscoveryPlugin;
 
     private TerraformBackendInfo terraformBackendInfo;
     private TerraformState terraformState;
@@ -58,7 +61,15 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         terraformTechnology.setManagedIds(Collections.emptyList());
         terraformTechnology.setProperties(Collections.emptyMap());
 
-        resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer, terraformTechnology));
+        terraformDiscoveryPlugin = new ToscaDiscoveryPlugin();
+        terraformDiscoveryPlugin.setId(terraformNodeId);
+        terraformDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
+        terraformDiscoveryPlugin.setSourceTechnology(getContext().getSourceTechnology());
+
+        resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer,
+            terraformTechnology,
+            terraformDiscoveryPlugin,
+            new KeyMapper()));
     }
 
     @Override
@@ -109,6 +120,11 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
             objectMapper);
         deploymentTechnologies.add(terraformTechnology);
 
+        List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
+            serviceTemplate,
+            objectMapper);
+        toscaDiscoveryPlugins.add(terraformDiscoveryPlugin);
+
         Map<String, String> terraformProperties = new HashMap<>();
         terraformProperties.put("Version", terraformBackendInfo.getTerraformVersion());
 
@@ -121,6 +137,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
                 .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, toscaDiscoveryPlugins);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

@@ -27,6 +27,7 @@ import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.model.ToscaDeploymentTechnology;
+import io.github.edmm.model.ToscaDiscoveryPlugin;
 import io.github.edmm.model.edimm.DeploymentInstance;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.api.PuppetApiInteractor;
@@ -127,9 +128,19 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
             serviceTemplate,
             objectMapper);
+        List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
+            serviceTemplate,
+            objectMapper);
+
+        String id = "puppet-" + UUID.randomUUID();
+        ToscaDiscoveryPlugin puppetDiscoveryPlugin = new ToscaDiscoveryPlugin();
+        puppetDiscoveryPlugin.setId(id);
+        puppetDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
+        puppetDiscoveryPlugin.setSourceTechnology(getContext().getSourceTechnology());
+        toscaDiscoveryPlugins.add(puppetDiscoveryPlugin);
 
         ToscaDeploymentTechnology puppetTechnology = new ToscaDeploymentTechnology();
-        puppetTechnology.setId("puppet-" + UUID.randomUUID());
+        puppetTechnology.setId(id);
         puppetTechnology.setSourceTechnology(getContext().getSourceTechnology());
         puppetTechnology.setManagedIds(Collections.emptyList());
         puppetTechnology.setProperties(Collections.emptyMap());
@@ -144,6 +155,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         puppetTechnology.setProperties(masterProperties);
 
         List<String> managedIds = new ArrayList<>();
+        List<String> discoveredIds = new ArrayList<>();
         master.getNodes().forEach(node -> {
             Fact nodeOS = node.getFactByName("operatingSystem".toLowerCase());
             Fact nodeOSRelease = node.getFactByName("operatingSystemRelease".toLowerCase());
@@ -164,7 +176,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 Map<String, String> vmProps = properties.getKVProperties();
                 vmProps.put(Constants.VMIP, node.getFactByName("ipaddress").getValue().toString());
                 vmProps.put(Constants.VM_INSTANCE_ID, node.getCertname());
-                vmProps.put(Constants.VM_PRIVATE_KEY, this.master.getPrivateKey());
                 vmProps.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
                 vmProps.put(Constants.STATE, Constants.RUNNING);
 
@@ -189,6 +200,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
             topologyTemplate.addNodeTemplate(vm);
             managedIds.add(vm.getId());
+            discoveredIds.add(vm.getId());
 
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
@@ -198,6 +210,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 hypervisor.setName(hypervisorFacts.getValue().toString());
                 this.populateNodeTemplateProperties(hypervisor);
                 topologyTemplate.addNodeTemplate(hypervisor);
+                discoveredIds.add(hypervisor.getId());
                 ModelUtilities.createRelationshipTemplateAndAddToTopology(vm,
                     hypervisor,
                     ToscaBaseTypes.hostedOnRelationshipType,
@@ -229,6 +242,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                     topologyTemplate.addNodeTemplate(softwareNode);
                     managedIds.add(softwareNode.getId());
+                    discoveredIds.add(softwareNode.getId());
 
                     if (this.toscaTransformer.getTransformTypePlugins()
                         .stream()
@@ -249,10 +263,14 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
         });
 
+        discoveredIds.addAll(puppetDiscoveryPlugin.getDiscoveredIds()); // workaround to handle possibly immutable lists
+        puppetDiscoveryPlugin.setDiscoveredIds(discoveredIds);
+
         managedIds.addAll(puppetTechnology.getManagedIds()); // workaround to handle possibly immutable lists
         puppetTechnology.setManagedIds(managedIds);
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, toscaDiscoveryPlugins);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

@@ -33,4 +33,5 @@ public abstract class Constants {
         "{https://examples.opentosca.org/edmm/relationshiptypes}managesInfra");
     public static final String TOSCA_NAME_SPACE_RETRIEVED_INSTANCES = "http://opentosca.org/retrieved/instances";
     public static final String TAG_DEPLOYMENT_TECHNOLOGIES = "jsonDeploymentTechnologies";
+    public static final String TAG_DISCOVERY_PLUGINS = "jsonDiscoveryPlugins";
 }

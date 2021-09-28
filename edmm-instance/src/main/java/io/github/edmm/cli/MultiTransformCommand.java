@@ -47,6 +47,7 @@ public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_TECHNOLOGY_INSTANCES = "technology-instances";
     private static final String CONFIG_KUBERNETES_KUBE_CONFIG_PATH = "kube-config-path";
     private static final String CONFIG_KUBERNETES_INPUT_DEPLOYMENT_NAME = "input-deployment-name";
+    private static final String CONFIG_KUBERNETES_TARGET_NAMESPACE = "target-namespace";
     private static final String CONFIG_PUPPET_USER = "user";
     private static final String CONFIG_PUPPET_PRIVATE_KEY_PATH = "private-key-path";
     private static final String CONFIG_PUPPET_PORT = "port";
@@ -187,6 +188,10 @@ public class MultiTransformCommand extends TransformCommand {
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);
+                String targetNamespace = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_TARGET_NAMESPACE))
+                    .map(Object::toString)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(null);
 
                 InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
                     KUBERNETES,
@@ -194,7 +199,8 @@ public class MultiTransformCommand extends TransformCommand {
                     true);
                 KubernetesInstancePlugin kubernetesInstancePlugin = new KubernetesInstancePlugin(context,
                     kubeConfigPath,
-                    inputDeploymentName);
+                    inputDeploymentName,
+                    targetNamespace);
                 return new InstancePlugin<>(KUBERNETES, kubernetesInstancePlugin);
             }).collect(Collectors.toSet()))
             .orElse(Collections.emptySet());

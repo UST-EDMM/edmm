@@ -17,6 +17,7 @@ import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.model.ToscaDeploymentTechnology;
+import io.github.edmm.model.ToscaDiscoveryPlugin;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.util.Constants;
 
@@ -31,11 +32,18 @@ public class EC2InstanceHandler implements ResourceHandler {
 
     private final TOSCATransformer toscaTransformer;
     private final ToscaDeploymentTechnology terraformDeploymentTechnology;
+    private final ToscaDiscoveryPlugin terraformDiscoveryPlugin;
+    private final KeyMapper keyMapper;
 
     public EC2InstanceHandler(
-        TOSCATransformer toscaTransformer, ToscaDeploymentTechnology terraformDeploymentTechnology) {
+        TOSCATransformer toscaTransformer,
+        ToscaDeploymentTechnology terraformDeploymentTechnology,
+        ToscaDiscoveryPlugin terraformDiscoveryPlugin,
+        KeyMapper keyMapper) {
         this.toscaTransformer = Objects.requireNonNull(toscaTransformer);
-        this.terraformDeploymentTechnology = terraformDeploymentTechnology;
+        this.terraformDeploymentTechnology = Objects.requireNonNull(terraformDeploymentTechnology);
+        this.terraformDiscoveryPlugin = Objects.requireNonNull(terraformDiscoveryPlugin);
+        this.keyMapper = keyMapper;
     }
 
     @Override
@@ -68,6 +76,7 @@ public class EC2InstanceHandler implements ResourceHandler {
         }
 
         List<String> managedNodeIds = new ArrayList<>();
+        List<String> discoveredIds = new ArrayList<>();
 
         EC2InstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource, EC2InstanceResource.class);
 
@@ -105,7 +114,10 @@ public class EC2InstanceHandler implements ResourceHandler {
 
             Map<String, String> propertiesForInstance = new HashMap<>();
             propertiesForInstance.put(Constants.VMTYPE, attributes.getInstanceType());
-            propertiesForInstance.put(Constants.VM_KEY_PAIR_NAME, attributes.getKeyName());
+            String keyName = attributes.getKeyName();
+            propertiesForInstance.put(Constants.VM_KEY_PAIR_NAME, keyName);
+            keyMapper.getPrivateKeyByName(keyName)
+                .ifPresent(key -> propertiesForInstance.put(Constants.VM_PRIVATE_KEY, key));
             propertiesForInstance.put(Constants.VM_INSTANCE_ID, attributes.getId());
             propertiesForInstance.put(Constants.VMIP, attributes.getPublicIp());
             propertiesForInstance.put(Constants.EC_2_AMI, attributes.getAmi());
@@ -113,9 +125,13 @@ public class EC2InstanceHandler implements ResourceHandler {
             populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
             managedNodeIds.add(instanceNode.getId());
+            discoveredIds.add(instanceNode.getId());
 
             managedNodeIds.addAll(terraformDeploymentTechnology.getManagedIds());
             terraformDeploymentTechnology.setManagedIds(managedNodeIds);
+
+            discoveredIds.addAll(terraformDiscoveryPlugin.getDiscoveredIds());
+            terraformDiscoveryPlugin.setDiscoveredIds(discoveredIds);
         }
     }
 }
