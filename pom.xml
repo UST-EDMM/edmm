@@ -39,7 +39,7 @@
         <module>edmm-core</module>
         <module>edmm-cli</module>
         <module>edmm-web</module>
-        <module>edmm-instance</module>
+        <module>TOSCin</module>
         <module>edmm-orchestration</module>
     </modules>
 

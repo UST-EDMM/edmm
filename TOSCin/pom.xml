@@ -10,7 +10,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>edmm-instance</artifactId>
+    <artifactId>TOSCin</artifactId>
 
     <properties>
         <checkstyle.config.location>../checkstyle.xml</checkstyle.config.location>
