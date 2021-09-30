@@ -3,13 +3,12 @@ package io.github.edmm.plugins.puppet.util;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import io.github.edmm.plugins.puppet.model.Master;
 import io.github.edmm.plugins.puppet.model.Report;
 import io.github.edmm.plugins.puppet.model.ResourceEventEntry;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 
 public class PuppetNodeHandler {
