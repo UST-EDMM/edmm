@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 
 import lombok.Getter;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
 
 public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLifecycle> implements
-    InstancePluginLifecycle {
+        InstancePluginLifecycle {
 
     @Getter
     protected final InstanceTransformationContext context;
@@ -31,12 +30,12 @@ public abstract class AbstractLifecycleInstancePlugin<L extends InstancePluginLi
         phases.add(new InstanceLifecyclePhase<>(Phases.PREPARE, this, InstancePluginLifecycle::prepare));
         phases.add(new InstanceLifecyclePhase<>(Phases.GET_MODELS, this, InstancePluginLifecycle::getModels));
         phases.add(new InstanceLifecyclePhase<>(Phases.TRANSFORM_TOSCA,
-            this,
-            InstancePluginLifecycle::transformDirectlyToTOSCA));
+                this,
+                InstancePluginLifecycle::transformDirectlyToTOSCA));
         phases.add(new InstanceLifecyclePhase<>(Phases.STORE_TRANSFORMED_TOSCA,
-            this,
-            InstancePluginLifecycle::storeTransformedTOSCA,
-            context -> !context.isMultiTransform()));
+                this,
+                InstancePluginLifecycle::storeTransformedTOSCA,
+                context -> !context.isMultiTransform()));
         phases.add(new InstanceLifecyclePhase<>(Phases.CLEANUP, this, InstancePluginLifecycle::cleanup));
         return Collections.unmodifiableList(phases);
     }

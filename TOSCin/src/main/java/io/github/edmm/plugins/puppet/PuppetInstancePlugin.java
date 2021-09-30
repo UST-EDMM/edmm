@@ -13,15 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.winery.model.tosca.TEntityTemplate;
-import org.eclipse.winery.model.tosca.TNodeTemplate;
-import org.eclipse.winery.model.tosca.TNodeType;
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
-import org.eclipse.winery.model.tosca.TTopologyTemplate;
-import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
-import org.eclipse.winery.model.tosca.utils.ModelUtilities;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -45,6 +36,14 @@ import io.github.edmm.util.Constants;
 import io.github.edmm.util.Util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.winery.model.tosca.TEntityTemplate;
+import org.eclipse.winery.model.tosca.TNodeTemplate;
+import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
+import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTopologyTemplate;
+import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
+import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,13 +65,13 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     private Master master;
 
     public PuppetInstancePlugin(
-        InstanceTransformationContext context,
-        String user,
-        String ip,
-        String privateKeyLocation,
-        Integer port,
-        String operatingSystem,
-        String operatingSystemRelease) {
+            InstanceTransformationContext context,
+            String user,
+            String ip,
+            String privateKeyLocation,
+            Integer port,
+            String operatingSystem,
+            String operatingSystemRelease) {
         super(context);
         this.user = user;
         this.ip = ip;
@@ -82,16 +81,16 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         this.operatingSystemRelease = operatingSystemRelease;
 
         this.toscaTransformer = new PuppetToscaTransformer(new MySQLMapper(),
-            new WebApplicationMapper(),
-            new TomcatMapper());
+                new WebApplicationMapper(),
+                new TomcatMapper());
     }
 
     @Override
     public void prepare() {
         AuthenticatorImpl authenticator = new AuthenticatorImpl(new Master(this.user,
-            this.ip,
-            this.privateKeyLocation,
-            this.port));
+                this.ip,
+                this.privateKeyLocation,
+                this.port));
         authenticator.authenticate();
         this.master = authenticator.getMaster();
     }
@@ -111,26 +110,26 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             String serviceTempalteId = "puppet-" + this.master.getId();
             logger.info("Creating new service template for transformation |{}|", serviceTempalteId);
             return new TServiceTemplate.Builder(serviceTempalteId, topologyTemplate).setName(serviceTempalteId)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
-                .build();
+                    .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                    .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
+                    .build();
         });
 
         TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
-            .orElseGet(() -> {
-                logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
-            });
+                .orElseGet(() -> {
+                    logger.info("Creating new topology template, as existing service template has none");
+                    TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
+                    serviceTemplate.setTopologyTemplate(topologyTemplate1);
+                    return topologyTemplate1;
+                });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
-            serviceTemplate,
-            objectMapper);
+                serviceTemplate,
+                objectMapper);
         List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
-            serviceTemplate,
-            objectMapper);
+                serviceTemplate,
+                objectMapper);
 
         String id = "puppet-" + UUID.randomUUID();
         ToscaDiscoveryPlugin puppetDiscoveryPlugin = new ToscaDiscoveryPlugin();
@@ -166,7 +165,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             }
 
             TNodeType vmType = toscaTransformer.getComputeNodeType(nodeOS.getValue().toString(),
-                nodeOSRelease.getValue().toString());
+                    nodeOSRelease.getValue().toString());
             TNodeTemplate vm = ModelUtilities.instantiateNodeTemplate(vmType);
             vm.setId(node.getCertname());
             vm.setName(node.getCertname());
@@ -205,59 +204,59 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             if (node.getFactByName("productName".toLowerCase()) != null) {
                 Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
                 TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue().toString(),
-                    "");
+                        "");
                 TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
                 hypervisor.setName(hypervisorFacts.getValue().toString());
                 this.populateNodeTemplateProperties(hypervisor);
                 topologyTemplate.addNodeTemplate(hypervisor);
                 discoveredIds.add(hypervisor.getId());
                 ModelUtilities.createRelationshipTemplateAndAddToTopology(vm,
-                    hypervisor,
-                    ToscaBaseTypes.hostedOnRelationshipType,
-                    topologyTemplate);
+                        hypervisor,
+                        ToscaBaseTypes.hostedOnRelationshipType,
+                        topologyTemplate);
             }
 
             Set<String> environments = new HashSet<>();
             List<Report> reports = PuppetNodeHandler.identifyRelevantReports(this.master, node.getCertname());
             reports.stream()
-                .peek(report -> environments.add(report.getEnvironment()))
-                .map(report -> report.getResource_events().getData())
-                .flatMap(entry -> entry.stream()
-                    .filter(event -> event.getStatus() == PuppetResourceStatus.success)
-                    .sorted(Comparator.comparing(ResourceEventEntry::getTimestamp))
-                    .map(PuppetNodeHandler::extractComponentNameFromResourceEntry)
-                    .filter(Objects::nonNull))
-                .distinct()
-                .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'",
-                    identifiedComponent,
-                    node.getCertname()))
-                .forEach(identifiedComponent -> {
-                    TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
+                    .peek(report -> environments.add(report.getEnvironment()))
+                    .map(report -> report.getResource_events().getData())
+                    .flatMap(entry -> entry.stream()
+                            .filter(event -> event.getStatus() == PuppetResourceStatus.success)
+                            .sorted(Comparator.comparing(ResourceEventEntry::getTimestamp))
+                            .map(PuppetNodeHandler::extractComponentNameFromResourceEntry)
+                            .filter(Objects::nonNull))
+                    .distinct()
+                    .peek(identifiedComponent -> logger.info("Identified component '{}' on stack '{}'",
+                            identifiedComponent,
+                            node.getCertname()))
+                    .forEach(identifiedComponent -> {
+                        TNodeType softwareNodeType = toscaTransformer.getSoftwareNodeType(identifiedComponent, "");
 
-                    TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
-                    String normalizedName = identifiedComponent.replaceAll("(\\s)|(:)|(\\.)", "_");
-                    softwareNode.setId(node.getCertname() + "-" + normalizedName);
-                    softwareNode.setName(normalizedName);
-                    this.populateNodeTemplateProperties(softwareNode);
+                        TNodeTemplate softwareNode = ModelUtilities.instantiateNodeTemplate(softwareNodeType);
+                        String normalizedName = identifiedComponent.replaceAll("(\\s)|(:)|(\\.)", "_");
+                        softwareNode.setId(node.getCertname() + "-" + normalizedName);
+                        softwareNode.setName(normalizedName);
+                        this.populateNodeTemplateProperties(softwareNode);
 
-                    topologyTemplate.addNodeTemplate(softwareNode);
-                    managedIds.add(softwareNode.getId());
-                    discoveredIds.add(softwareNode.getId());
+                        topologyTemplate.addNodeTemplate(softwareNode);
+                        managedIds.add(softwareNode.getId());
+                        discoveredIds.add(softwareNode.getId());
 
-                    if (this.toscaTransformer.getTransformTypePlugins()
-                        .stream()
-                        .noneMatch(typeTransformer -> typeTransformer.refineHost(softwareNode, vm, topologyTemplate))) {
-                        ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode,
-                            vm,
-                            ToscaBaseTypes.hostedOnRelationshipType,
-                            topologyTemplate);
-                    }
-                });
+                        if (this.toscaTransformer.getTransformTypePlugins()
+                                .stream()
+                                .noneMatch(typeTransformer -> typeTransformer.refineHost(softwareNode, vm, topologyTemplate))) {
+                            ModelUtilities.createRelationshipTemplateAndAddToTopology(softwareNode,
+                                    vm,
+                                    ToscaBaseTypes.hostedOnRelationshipType,
+                                    topologyTemplate);
+                        }
+                    });
 
             if (environments.size() > 0) {
                 Map<String, String> vmProperties = Optional.ofNullable(properties)
-                    .map(TEntityTemplate.Properties::getKVProperties)
-                    .orElseGet(LinkedHashMap::new);
+                        .map(TEntityTemplate.Properties::getKVProperties)
+                        .orElseGet(LinkedHashMap::new);
                 vmProperties.put("PuppetEnvironments", String.join(",", environments));
                 populateNodeTemplateProperties(vm, vmProperties);
             }
@@ -290,15 +289,15 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
         if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
             nodeTemplate.getProperties()
-                .getKVProperties()
-                .entrySet()
-                .stream()
-                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
-                    .isEmpty())
-                .forEach(entry -> additionalProperties.put(entry.getKey(),
-                    entry.getValue() != null && !entry.getValue()
-                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
-                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
+                    .getKVProperties()
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
+                            .isEmpty())
+                    .forEach(entry -> additionalProperties.put(entry.getKey(),
+                            entry.getValue() != null && !entry.getValue()
+                                    .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
+                                    .replaceAll("(\\s)|(:)|(\\.)", "_")));
         }
 
         // workaround to set new properties

@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
+import io.github.edmm.core.transformation.TypeTransformer;
+import io.github.edmm.exporter.WineryConnector;
+
 import org.eclipse.winery.common.version.VersionUtils;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
-
-import io.github.edmm.core.transformation.TypeTransformer;
-import io.github.edmm.exporter.WineryConnector;
 
 public class UbuntuMapper implements TypeTransformer {
     public static final String UBUNTU_NODE_TYPE_NAME = "Ubuntu";
@@ -34,15 +34,15 @@ public class UbuntuMapper implements TypeTransformer {
         if (matcher.matches()) {
             String componentOsVersion = matcher.group(1);
             return myWineryConnector.getBaseNodeTypesQNames()
-                .stream()
-                .filter(aQName -> Objects.equals(VersionUtils.getNameWithoutVersion(aQName.getLocalPart()),
-                    UBUNTU_NODE_TYPE_NAME))
-                .filter(aQName -> {
-                    String nodeTypeOsVersion = VersionUtils.getVersion(aQName.getLocalPart()).getComponentVersion();
-                    return Objects.equals(nodeTypeOsVersion, componentOsVersion);
-                })
-                .findFirst()
-                .orElse(null);
+                    .stream()
+                    .filter(aQName -> Objects.equals(VersionUtils.getNameWithoutVersion(aQName.getLocalPart()),
+                            UBUNTU_NODE_TYPE_NAME))
+                    .filter(aQName -> {
+                        String nodeTypeOsVersion = VersionUtils.getVersion(aQName.getLocalPart()).getComponentVersion();
+                        return Objects.equals(nodeTypeOsVersion, componentOsVersion);
+                    })
+                    .findFirst()
+                    .orElse(null);
         } else {
             return null;
         }
@@ -50,9 +50,9 @@ public class UbuntuMapper implements TypeTransformer {
 
     @Override
     public boolean refineHost(
-        TNodeTemplate nodeTemplate,
-        TNodeTemplate defaultHost,
-        TTopologyTemplate topologyTemplate) {
+            TNodeTemplate nodeTemplate,
+            TNodeTemplate defaultHost,
+            TTopologyTemplate topologyTemplate) {
         return false;
     }
 }

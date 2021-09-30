@@ -16,7 +16,6 @@ import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.repository.backend.BackendUtils;
 import org.eclipse.winery.repository.backend.IRepository;
 import org.eclipse.winery.repository.backend.RepositoryFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +45,11 @@ public class WineryConnector {
     public List<QName> getBaseNodeTypesQNames() {
         getNodeTypes();
         return this.nodeTypes.entrySet().stream()
-            .filter(entry -> entry.getValue().getTags() == null
-                || entry.getValue().getTags().getTag().stream().noneMatch(tag -> "feature".equals(tag.getName())))
-            .filter(entry -> !repository.getNamespaceManager().isGeneratedNamespace(entry.getKey().getNamespaceURI()))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
+                .filter(entry -> entry.getValue().getTags() == null
+                        || entry.getValue().getTags().getTag().stream().noneMatch(tag -> "feature".equals(tag.getName())))
+                .filter(entry -> !repository.getNamespaceManager().isGeneratedNamespace(entry.getKey().getNamespaceURI()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     public Map<QName, TNodeType> getNodeTypes() {
@@ -66,9 +65,9 @@ public class WineryConnector {
 
     public void save(TServiceTemplate serviceTemplate) throws IOException {
         BackendUtils.persist(
-            repository,
-            new ServiceTemplateId(serviceTemplate.getTargetNamespace(), serviceTemplate.getId(), false),
-            serviceTemplate
+                repository,
+                new ServiceTemplateId(serviceTemplate.getTargetNamespace(), serviceTemplate.getId(), false),
+                serviceTemplate
         );
     }
 }

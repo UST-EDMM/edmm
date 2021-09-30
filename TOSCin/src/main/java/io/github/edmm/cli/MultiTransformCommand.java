@@ -16,10 +16,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
-import org.eclipse.winery.model.tosca.TTopologyTemplate;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.plugin.InstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -32,6 +28,9 @@ import io.github.edmm.util.CastUtil;
 import io.github.edmm.util.Constants;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
+import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -56,17 +55,17 @@ public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_TERRAFORM_STATE_FILE_PATH = "state-file";
     private static final Logger logger = LoggerFactory.getLogger(MultiTransformCommand.class);
     private static final SourceTechnology MULTI_TRANSFORM = SourceTechnology.builder()
-        .id("multitransform")
-        .name("Multi Transform")
-        .build();
+            .id("multitransform")
+            .name("Multi Transform")
+            .build();
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
-        .id("kubernetes")
-        .name("Kubernetes")
-        .build();
+            .id("kubernetes")
+            .name("Kubernetes")
+            .build();
     private static final SourceTechnology TERRAFORM = SourceTechnology.builder()
-        .id("terraform")
-        .name("Terraform")
-        .build();
+            .id("terraform")
+            .name("Terraform")
+            .build();
     private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
     @CommandLine.Option(names = {"-c", "--configFile"}, required = true)
     private String configFilePath;
@@ -80,7 +79,7 @@ public class MultiTransformCommand extends TransformCommand {
         Map<String, Object> technologyInstances = parseConfigFile(configFile);
 
         Collection<InstancePlugin<KubernetesInstancePlugin>> kubernetesPlugins = parseKubernetesConfig(
-            technologyInstances);
+                technologyInstances);
 
         Collection<InstancePlugin<PuppetInstancePlugin>> puppetPlugins = parsePuppetConfig(technologyInstances);
 
@@ -98,12 +97,12 @@ public class MultiTransformCommand extends TransformCommand {
         if (!plugins.isEmpty()) {
             TTopologyTemplate topologyTemplate = new TTopologyTemplate();
             TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + modelName,
-                topologyTemplate).setName("multitransform-" + modelName)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName())
-                    .addTag(Constants.TAG_DEPLOYMENT_TECHNOLOGIES, EMPTY_JSON_LIST)
-                    .build())
-                .build();
+                    topologyTemplate).setName("multitransform-" + modelName)
+                    .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                    .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName())
+                            .addTag(Constants.TAG_DEPLOYMENT_TECHNOLOGIES, EMPTY_JSON_LIST)
+                            .build())
+                    .build();
 
             for (InstancePlugin<? extends AbstractLifecycleInstancePlugin<? extends AbstractLifecycleInstancePlugin<?>>> curPlugin : plugins) {
                 String contextId = curPlugin.getLifecycle().getContext().getId();
@@ -125,109 +124,109 @@ public class MultiTransformCommand extends TransformCommand {
 
     private Collection<InstancePlugin<PuppetInstancePlugin>> parsePuppetConfig(Map<String, Object> technologyInstances) {
         return Optional.ofNullable(technologyInstances.get("puppet"))
-            .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
-            .map(Map::entrySet)
-            .map(entries -> entries.stream().map(puppetInstance -> {
-                Map<String, Object> puppetConfig = CastUtil.safelyCastToStringObjectMap(puppetInstance.getValue());
-                String instanceId = puppetInstance.getKey();
-                String user = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_USER))
-                    .map(Objects::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_USER + "| for technology instance |" + instanceId + "|"));
-                String ip = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_IP))
-                    .map(Objects::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_IP + "| for technology instance |" + instanceId + "|"));
-                String privateKeyPath = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_PRIVATE_KEY_PATH))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_PRIVATE_KEY_PATH + "| for technology instance |" + instanceId + "|"));
-                Integer port1 = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_PORT))
-                    .map(Objects::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .map(Integer::valueOf)
-                    .orElse(22);
-                String operatingSystem = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_OPERATING_SYSTEM))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(null);
-                String operatingSystemVersion = Optional.ofNullable(puppetConfig.get(
-                        CONFIG_PUPPET_OPERATING_SYSTEM_VERSION))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(null);
+                .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
+                .map(Map::entrySet)
+                .map(entries -> entries.stream().map(puppetInstance -> {
+                    Map<String, Object> puppetConfig = CastUtil.safelyCastToStringObjectMap(puppetInstance.getValue());
+                    String instanceId = puppetInstance.getKey();
+                    String user = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_USER))
+                            .map(Objects::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_USER + "| for technology instance |" + instanceId + "|"));
+                    String ip = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_IP))
+                            .map(Objects::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_IP + "| for technology instance |" + instanceId + "|"));
+                    String privateKeyPath = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_PRIVATE_KEY_PATH))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_PUPPET_PRIVATE_KEY_PATH + "| for technology instance |" + instanceId + "|"));
+                    Integer port1 = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_PORT))
+                            .map(Objects::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .map(Integer::valueOf)
+                            .orElse(22);
+                    String operatingSystem = Optional.ofNullable(puppetConfig.get(CONFIG_PUPPET_OPERATING_SYSTEM))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(null);
+                    String operatingSystemVersion = Optional.ofNullable(puppetConfig.get(
+                                    CONFIG_PUPPET_OPERATING_SYSTEM_VERSION))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(null);
 
-                InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
-                    PUPPET,
-                    outputPath,
-                    true);
-                PuppetInstancePlugin instancePluginLifecycle = new PuppetInstancePlugin(context,
-                    user,
-                    ip,
-                    privateKeyPath,
-                    port1,
-                    operatingSystem,
-                    operatingSystemVersion);
-                return new InstancePlugin<>(context.getSourceTechnology(), instancePluginLifecycle);
-            }).collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
+                    InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
+                            PUPPET,
+                            outputPath,
+                            true);
+                    PuppetInstancePlugin instancePluginLifecycle = new PuppetInstancePlugin(context,
+                            user,
+                            ip,
+                            privateKeyPath,
+                            port1,
+                            operatingSystem,
+                            operatingSystemVersion);
+                    return new InstancePlugin<>(context.getSourceTechnology(), instancePluginLifecycle);
+                }).collect(Collectors.toSet()))
+                .orElse(Collections.emptySet());
     }
 
     private Set<InstancePlugin<KubernetesInstancePlugin>> parseKubernetesConfig(Map<String, Object> technologyInstances) {
         return Optional.ofNullable(technologyInstances.get("kubernetes"))
-            .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
-            .map(Map::entrySet)
-            .map(entries -> entries.stream().map(kubernetesInstance -> {
-                Map<String, Object> kubeConfig = CastUtil.safelyCastToStringObjectMap(kubernetesInstance.getValue());
-                String instanceId = kubernetesInstance.getKey();
-                String kubeConfigPath = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_KUBE_CONFIG_PATH))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_KUBERNETES_KUBE_CONFIG_PATH + "| for technology instance |" + instanceId + "|"));
-                String inputDeploymentName = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_INPUT_DEPLOYMENT_NAME))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(null);
-                String targetNamespace = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_TARGET_NAMESPACE))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(null);
+                .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
+                .map(Map::entrySet)
+                .map(entries -> entries.stream().map(kubernetesInstance -> {
+                    Map<String, Object> kubeConfig = CastUtil.safelyCastToStringObjectMap(kubernetesInstance.getValue());
+                    String instanceId = kubernetesInstance.getKey();
+                    String kubeConfigPath = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_KUBE_CONFIG_PATH))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_KUBERNETES_KUBE_CONFIG_PATH + "| for technology instance |" + instanceId + "|"));
+                    String inputDeploymentName = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_INPUT_DEPLOYMENT_NAME))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(null);
+                    String targetNamespace = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_TARGET_NAMESPACE))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(null);
 
-                InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
-                    KUBERNETES,
-                    outputPath,
-                    true);
-                KubernetesInstancePlugin kubernetesInstancePlugin = new KubernetesInstancePlugin(context,
-                    kubeConfigPath,
-                    inputDeploymentName,
-                    targetNamespace);
-                return new InstancePlugin<>(KUBERNETES, kubernetesInstancePlugin);
-            }).collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
+                    InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
+                            KUBERNETES,
+                            outputPath,
+                            true);
+                    KubernetesInstancePlugin kubernetesInstancePlugin = new KubernetesInstancePlugin(context,
+                            kubeConfigPath,
+                            inputDeploymentName,
+                            targetNamespace);
+                    return new InstancePlugin<>(KUBERNETES, kubernetesInstancePlugin);
+                }).collect(Collectors.toSet()))
+                .orElse(Collections.emptySet());
     }
 
     private Set<InstancePlugin<TerraformInstancePlugin>> parseTerraformConfig(Map<String, Object> technologyInstances) {
         return Optional.ofNullable(technologyInstances.get("terraform"))
-            .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
-            .map(Map::entrySet)
-            .map(entries -> entries.stream().map(terraformInstance -> {
-                Map<String, Object> terraformConfig = CastUtil.safelyCastToStringObjectMap(terraformInstance.getValue());
-                String instanceId = terraformInstance.getKey();
-                Path terraformStateFilePath = Optional.ofNullable(terraformConfig.get(CONFIG_TERRAFORM_STATE_FILE_PATH))
-                    .map(Object::toString)
-                    .filter(StringUtils::isNotBlank)
-                    .map(Paths::get)
-                    .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_TERRAFORM_STATE_FILE_PATH + "| for technology instance |" + instanceId + "|"));
+                .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
+                .map(Map::entrySet)
+                .map(entries -> entries.stream().map(terraformInstance -> {
+                    Map<String, Object> terraformConfig = CastUtil.safelyCastToStringObjectMap(terraformInstance.getValue());
+                    String instanceId = terraformInstance.getKey();
+                    Path terraformStateFilePath = Optional.ofNullable(terraformConfig.get(CONFIG_TERRAFORM_STATE_FILE_PATH))
+                            .map(Object::toString)
+                            .filter(StringUtils::isNotBlank)
+                            .map(Paths::get)
+                            .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_TERRAFORM_STATE_FILE_PATH + "| for technology instance |" + instanceId + "|"));
 
-                InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
-                    TERRAFORM,
-                    outputPath,
-                    true);
-                TerraformInstancePlugin terraformInstancePlugin = new TerraformInstancePlugin(context,
-                    terraformStateFilePath);
-                return new InstancePlugin<>(TERRAFORM, terraformInstancePlugin);
-            }).collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
+                    InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
+                            TERRAFORM,
+                            outputPath,
+                            true);
+                    TerraformInstancePlugin terraformInstancePlugin = new TerraformInstancePlugin(context,
+                            terraformStateFilePath);
+                    return new InstancePlugin<>(TERRAFORM, terraformInstancePlugin);
+                }).collect(Collectors.toSet()))
+                .orElse(Collections.emptySet());
     }
 
     private Map<String, Object> parseConfigFile(Path configFile) {
@@ -240,10 +239,10 @@ public class MultiTransformCommand extends TransformCommand {
         }
 
         Optional.ofNullable(config.get(CONFIG_MODEL_NAME))
-            .ifPresent(configModelName -> modelName = configModelName.toString());
+                .ifPresent(configModelName -> modelName = configModelName.toString());
 
         return CastUtil.safelyCastToStringObjectMapOptional(config.get(CONFIG_TECHNOLOGY_INSTANCES))
-            .orElseThrow(() -> new IllegalArgumentException("No technology instances provided in configuration"));
+                .orElseThrow(() -> new IllegalArgumentException("No technology instances provided in configuration"));
     }
 
     private Path checkConfigFileArgument() {

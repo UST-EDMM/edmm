@@ -8,11 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.winery.common.version.VersionUtils;
-import org.eclipse.winery.model.tosca.TNodeType;
-import org.eclipse.winery.model.tosca.TRelationshipType;
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-
 import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.model.edimm.ComponentInstance;
 import io.github.edmm.model.edimm.DeploymentInstance;
@@ -21,6 +16,10 @@ import io.github.edmm.model.opentosca.RelationshipTemplateInstance;
 import io.github.edmm.model.opentosca.ServiceTemplateInstance;
 
 import lombok.Getter;
+import org.eclipse.winery.common.version.VersionUtils;
+import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TRelationshipType;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,14 +61,14 @@ public class TOSCATransformer {
         }
         this.deploymentInstance.getComponentInstances().forEach(componentInstance -> {
             NodeTemplateInstance nodeTemplateInstance = NodeTemplateInstance.ofComponentInstance(this.deploymentInstance
-                .getId(), this.deploymentInstance.getName(), componentInstance);
+                    .getId(), this.deploymentInstance.getName(), componentInstance);
             this.nodeTemplateInstances.add(nodeTemplateInstance);
         });
     }
 
     private boolean isComponentInstancesExisting() {
         return this.deploymentInstance.getComponentInstances() != null && !this.deploymentInstance.getComponentInstances()
-            .isEmpty();
+                .isEmpty();
     }
 
     private void createRelationshipTemplateInstances() {
@@ -78,9 +77,9 @@ public class TOSCATransformer {
                 if (hasRelationshipInstances(componentInstance)) {
                     componentInstance.getRelationInstances().forEach(relationInstance -> {
                         RelationshipTemplateInstance relationshipTemplateInstance = RelationshipTemplateInstance.ofRelationInstance(
-                            this.deploymentInstance.getId(),
-                            relationInstance,
-                            componentInstance);
+                                this.deploymentInstance.getId(),
+                                relationInstance,
+                                componentInstance);
                         this.relationshipTemplateInstances.add(relationshipTemplateInstance);
                     });
                 }
@@ -137,28 +136,28 @@ public class TOSCATransformer {
         String normalizeName = normalizeName(name);
 
         Optional<TypeTransformer> transformer = transformTypePlugins.stream()
-            .filter(transformType -> transformType.canHandle(name, version))
-            .findFirst();
+                .filter(transformType -> transformType.canHandle(name, version))
+                .findFirst();
 
         if (transformer.isPresent()) {
             return transformer.get().performTransformation(name, version);
         }
 
         List<QName> candidates = this.wineryConnector.getBaseNodeTypesQNames().stream()
-            .filter(qName ->
-                normalizeName(VersionUtils.getNameWithoutVersion(qName.getLocalPart())).startsWith(normalizeName)
-            )
-            .peek(nodeType -> logger.info("Found matching NodeType {} for component {}", nodeType, name))
-            .collect(Collectors.toList());
+                .filter(qName ->
+                        normalizeName(VersionUtils.getNameWithoutVersion(qName.getLocalPart())).startsWith(normalizeName)
+                )
+                .peek(nodeType -> logger.info("Found matching NodeType {} for component {}", nodeType, name))
+                .collect(Collectors.toList());
 
         if (candidates.size() > 1) {
             List<QName> filteredCandidates = candidates.stream()
-                .filter(qName -> VersionUtils.getVersion(qName.getLocalPart()).getComponentVersion().toLowerCase()
-                    .startsWith(version.toLowerCase()))
-                .peek(qName -> logger.info("Found matching NodeType after filtering for version {} for component {}",
-                    qName,
-                    name))
-                .collect(Collectors.toList());
+                    .filter(qName -> VersionUtils.getVersion(qName.getLocalPart()).getComponentVersion().toLowerCase()
+                            .startsWith(version.toLowerCase()))
+                    .peek(qName -> logger.info("Found matching NodeType after filtering for version {} for component {}",
+                            qName,
+                            name))
+                    .collect(Collectors.toList());
 
             if (filteredCandidates.size() > 0) {
                 candidates = filteredCandidates;
@@ -167,12 +166,12 @@ public class TOSCATransformer {
 
         if (candidates.size() > 1) {
             List<QName> filteredCandidates = candidates.stream()
-                .filter(qName -> qName.getNamespaceURI().startsWith(OPENTOSCA_BASE))
-                .peek(qName -> logger.info(
-                    "Found matching NodeType after filtering for OT namespace {} for component {}",
-                    qName,
-                    name))
-                .collect(Collectors.toList());
+                    .filter(qName -> qName.getNamespaceURI().startsWith(OPENTOSCA_BASE))
+                    .peek(qName -> logger.info(
+                            "Found matching NodeType after filtering for OT namespace {} for component {}",
+                            qName,
+                            name))
+                    .collect(Collectors.toList());
 
             if (filteredCandidates.size() > 0) {
                 candidates = filteredCandidates;
@@ -193,14 +192,14 @@ public class TOSCATransformer {
 
     protected String normalizeName(String name) {
         return name.toLowerCase()
-            .replaceAll("\\s|-|_|\\.", "");
+                .replaceAll("\\s|-|_|\\.", "");
     }
 
     public void save(TServiceTemplate serviceTemplate) {
         try {
             logger.info("Saving Service Template [{}]{}",
-                serviceTemplate.getTargetNamespace(),
-                serviceTemplate.getId());
+                    serviceTemplate.getTargetNamespace(),
+                    serviceTemplate.getId());
             wineryConnector.save(serviceTemplate);
         } catch (IOException e) {
             logger.error("Error while persisting Service Template", e);

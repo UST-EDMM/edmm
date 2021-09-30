@@ -5,21 +5,21 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
+import io.github.edmm.core.transformation.TypeTransformer;
+import io.github.edmm.exporter.WineryConnector;
+
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 
-import io.github.edmm.core.transformation.TypeTransformer;
-import io.github.edmm.exporter.WineryConnector;
-
 public class WebApplicationMapper implements TypeTransformer {
 
     public static QName toscaWebServer = QName.valueOf(
-        "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebServer");
+            "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebServer");
     public static QName toscaWebApp = QName.valueOf(
-        "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebApplication");
+            "{http://docs.oasis-open.org/tosca/ToscaNormativeTypes/nodetypes}WebApplication");
 
     @Override
     public boolean canHandle(String component, String version) {
@@ -37,12 +37,12 @@ public class WebApplicationMapper implements TypeTransformer {
 
         if (ModelUtilities.isOfType(toscaWebApp, webApp.getType(), nodeTypes)) {
             Optional<TNodeTemplate> server = topologyTemplate.getNodeTemplates().stream()
-                .filter(webServer -> ModelUtilities.isOfType(toscaWebServer, webServer.getType(), nodeTypes))
-                .findFirst();
+                    .filter(webServer -> ModelUtilities.isOfType(toscaWebServer, webServer.getType(), nodeTypes))
+                    .findFirst();
             if (server.isPresent()) {
                 TNodeTemplate webServer = server.get();
                 ModelUtilities.createRelationshipTemplateAndAddToTopology(
-                    webApp, webServer, ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
+                        webApp, webServer, ToscaBaseTypes.hostedOnRelationshipType, topologyTemplate);
                 return true;
             }
         }

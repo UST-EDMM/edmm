@@ -11,8 +11,6 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import org.eclipse.winery.model.tosca.TNodeType;
-
 import io.github.edmm.exporter.dto.EnrichmentDTO;
 import io.github.edmm.exporter.dto.InstanceDTO;
 import io.github.edmm.exporter.dto.ServiceTemplateCreationDTO;
@@ -40,6 +38,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.winery.model.tosca.TNodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,18 +58,18 @@ public abstract class OpenTOSCAConnector {
     private static final String csarDownloadPath = "?" + csarPath;
 
     public static void processServiceTemplateInstanceToOpenTOSCA(
-        String deploymentTechnology,
-        ServiceTemplateInstance serviceTemplateInstance,
-        String outputPath) {
+            String deploymentTechnology,
+            ServiceTemplateInstance serviceTemplateInstance,
+            String outputPath) {
         createServiceTemplateInWinery(serviceTemplateInstance.getServiceTemplateId());
         setServiceTemplateTag(deploymentTechnology, serviceTemplateInstance.getServiceTemplateId());
         createTopologyTemplateInWinery(serviceTemplateInstance);
         applyFeatures(getAvailableFeatures(serviceTemplateInstance.getServiceTemplateId()),
-            serviceTemplateInstance.getServiceTemplateId());
+                serviceTemplateInstance.getServiceTemplateId());
         exportCSAR(serviceTemplateInstance.getServiceTemplateId(), outputPath);
         importCSARToContainerAndStartInstance(serviceTemplateInstance.getCsarId(),
-            outputPath,
-            serviceTemplateInstance.getServiceTemplateId());
+                outputPath,
+                serviceTemplateInstance.getServiceTemplateId());
     }
 
     public static List<TypesDTO> getAllNodeTypes() {
@@ -88,7 +87,7 @@ public abstract class OpenTOSCAConnector {
 
     private static void createServiceTemplateInWinery(QName serviceTemplateId) {
         ServiceTemplateCreationDTO creationDTO = new ServiceTemplateCreationDTO(serviceTemplateId.getNamespaceURI(),
-            serviceTemplateId.getLocalPart());
+                serviceTemplateId.getLocalPart());
         postServiceTemplate(creationDTO);
     }
 
@@ -108,8 +107,8 @@ public abstract class OpenTOSCAConnector {
     private static void putTopology(TopologyTemplateDTO topologyTemplateDTO, QName serviceTemplateId) {
         try {
             performPutRequest(
-                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath,
-                topologyTemplateDTO
+                    wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath,
+                    topologyTemplateDTO
             );
         } catch (IOException e) {
             LOGGER.debug("Failed to post Topology Template Instance to Winery.", e);
@@ -119,8 +118,8 @@ public abstract class OpenTOSCAConnector {
     private static void setServiceTemplateTag(String deploymentTechnology, QName serviceTemplateId) {
         try {
             performPostRequest(
-                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "tags",
-                new TagDTO("deploymentTechnology", deploymentTechnology)
+                    wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + "tags",
+                    new TagDTO("deploymentTechnology", deploymentTechnology)
             );
         } catch (IOException e) {
             LOGGER.error("Failed to set Tag for Service Template in Winery.", e);
@@ -130,8 +129,8 @@ public abstract class OpenTOSCAConnector {
     private static List<EnrichmentDTO> getAvailableFeatures(QName serviceTemplateId) {
         try {
             return performGetList(
-                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
-                EnrichmentDTO.class
+                    wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
+                    EnrichmentDTO.class
             );
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Error while encoding Namespace...", e);
@@ -146,8 +145,8 @@ public abstract class OpenTOSCAConnector {
         }
         try {
             performPutRequest(
-                wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
-                selectedFeatures
+                    wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(serviceTemplateId) + topologyTemplatePath + "/" + availableFeaturesPath,
+                    selectedFeatures
             );
         } catch (IOException e) {
             LOGGER.error("Failed to apply available features to Winery.", e);
@@ -157,16 +156,16 @@ public abstract class OpenTOSCAConnector {
     private static void exportCSAR(QName serviceTemplateId, String outputPath) {
         try {
             FileUtils.copyURLToFile(new URL(wineryEndpoint + serviceTemplatesPath + doubleEncodeNamespace(
-                serviceTemplateId) + csarDownloadPath), new File(outputPath));
+                    serviceTemplateId) + csarDownloadPath), new File(outputPath));
         } catch (IOException e) {
             LOGGER.error("Failed to export CSAR from Winery.", e);
         }
     }
 
     private static void importCSARToContainerAndStartInstance(
-        String csarId,
-        String outputPath,
-        QName serviceTemplateId) {
+            String csarId,
+            String outputPath,
+            QName serviceTemplateId) {
         if (importCSARToContainer(outputPath)) {
             createCSARInstance(csarId, serviceTemplateId);
         }
@@ -193,13 +192,13 @@ public abstract class OpenTOSCAConnector {
     private static void createCSARInstance(String csarId, QName serviceTemplateId) {
         try {
             performPostRequest(
-                containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/"
-                    + serviceTemplatesPath
-                    + "/" + serviceTemplateId.getLocalPart() + "/"
-                    + "buildplans/"
-                    + serviceTemplateId.getLocalPart().replace(".", "_")
-                    + "_buildPlan/instances",
-                generateInstancePayload()
+                    containerEndpoint + csarId.toLowerCase() + "." + csarPath + "/"
+                            + serviceTemplatesPath
+                            + "/" + serviceTemplateId.getLocalPart() + "/"
+                            + "buildplans/"
+                            + serviceTemplateId.getLocalPart().replace(".", "_")
+                            + "_buildPlan/instances",
+                    generateInstancePayload()
             );
         } catch (IOException e) {
             LOGGER.error("Failed to start CSAR instance in Container.", e);
@@ -224,15 +223,15 @@ public abstract class OpenTOSCAConnector {
         LOGGER.info("Executing {} request {}", request.getMethod(), request.getURI());
 
         HttpResponse response = HttpClientBuilder.create()
-            .build()
-            .execute(request);
+                .build()
+                .execute(request);
 
         LOGGER.info("Request returned Status {}({}) for {} request {}",
-            response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode(),
-            request.getMethod(), request.getURI());
+                response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode(),
+                request.getMethod(), request.getURI());
 
         return Response.Status.Family.familyOf(response.getStatusLine().getStatusCode())
-            == Response.Status.Family.SUCCESSFUL;
+                == Response.Status.Family.SUCCESSFUL;
     }
 
     private static StringEntity getObjectAsJson(Object entity) throws UnsupportedEncodingException {
@@ -279,6 +278,6 @@ public abstract class OpenTOSCAConnector {
 
     private static String doubleEncodeNamespace(QName qName) throws UnsupportedEncodingException {
         return "/" + URLEncoder.encode(URLEncoder.encode(qName.getNamespaceURI(), "UTF-8"),
-            "UTF-8") + "/" + qName.getLocalPart() + "/";
+                "UTF-8") + "/" + qName.getLocalPart() + "/";
     }
 }

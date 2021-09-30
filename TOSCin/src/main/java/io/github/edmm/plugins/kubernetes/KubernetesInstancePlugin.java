@@ -12,15 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.eclipse.winery.model.tosca.TEntityTemplate;
-import org.eclipse.winery.model.tosca.TNodeTemplate;
-import org.eclipse.winery.model.tosca.TNodeType;
-import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
-import org.eclipse.winery.model.tosca.TTopologyTemplate;
-import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
-import org.eclipse.winery.model.tosca.utils.ModelUtilities;
-
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
@@ -44,6 +35,14 @@ import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
 import io.kubernetes.client.models.V1PodList;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.winery.model.tosca.TEntityTemplate;
+import org.eclipse.winery.model.tosca.TNodeTemplate;
+import org.eclipse.winery.model.tosca.TNodeType;
+import org.eclipse.winery.model.tosca.TServiceTemplate;
+import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTopologyTemplate;
+import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
+import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,17 +50,17 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePlugin.class);
     private static final List<String> IGNORED_CONTAINER_NAMES = Arrays.asList("orders",
-        "payment",
-        "queue-master",
-        "rabbitmq",
-        "rabbitmq-exporter",
-        "session-db",
-        "shipping",
-        "orders-db");
+            "payment",
+            "queue-master",
+            "rabbitmq",
+            "rabbitmq-exporter",
+            "session-db",
+            "shipping",
+            "orders-db");
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
-        .id("kubernetes")
-        .name("Kubernetes")
-        .build();
+            .id("kubernetes")
+            .name("Kubernetes")
+            .build();
 
     private final String kubeConfigPath;
     private final WineryConnector myWineryConnector;
@@ -74,10 +73,10 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private V1Deployment kubernetesDeploymentInstance;
 
     public KubernetesInstancePlugin(
-        InstanceTransformationContext context,
-        String kubeConfigPath,
-        String inputDeploymentName,
-        String targetNamespace) {
+            InstanceTransformationContext context,
+            String kubeConfigPath,
+            String inputDeploymentName,
+            String targetNamespace) {
         super(context);
         this.kubeConfigPath = kubeConfigPath;
         this.inputDeploymentName = inputDeploymentName;
@@ -109,23 +108,23 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
             String serviceTemplateId = "kubernetes-" + this.kubernetesDeploymentInstance.getMetadata().getName();
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
             return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
-                .build();
+                    .setTargetNamespace("http://opentosca.org/retrieved/instances")
+                    .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
+                    .build();
         });
 
         TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
-            .orElseGet(() -> {
-                logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
-            });
+                .orElseGet(() -> {
+                    logger.info("Creating new topology template, as existing service template has none");
+                    TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
+                    serviceTemplate.setTopologyTemplate(topologyTemplate1);
+                    return topologyTemplate1;
+                });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
-            serviceTemplate,
-            objectMapper);
+                serviceTemplate,
+                objectMapper);
 
         ToscaDeploymentTechnology kubernetesTechnology = new ToscaDeploymentTechnology();
         kubernetesTechnology.setId("kubernetes-" + UUID.randomUUID());
@@ -148,11 +147,11 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                 V1NodeSystemInfo nodeInfo = aV1Node.getStatus().getNodeInfo();
                 String osImage = nodeInfo.getOsImage();
                 TNodeType hostNodeType = myHostTransformers.stream()
-                    .filter(aTypeTransformer -> aTypeTransformer.canHandle(osImage, ""))
-                    .findFirst()
-                    .map(aTypeTransformer -> aTypeTransformer.performTransformation(osImage, ""))
-                    .map(myWineryConnector::getNodeType)
-                    .orElseGet(() -> toscaTransformer.getComputeNodeType(osImage, ""));
+                        .filter(aTypeTransformer -> aTypeTransformer.canHandle(osImage, ""))
+                        .findFirst()
+                        .map(aTypeTransformer -> aTypeTransformer.performTransformation(osImage, ""))
+                        .map(myWineryConnector::getNodeType)
+                        .orElseGet(() -> toscaTransformer.getComputeNodeType(osImage, ""));
                 TNodeTemplate hostTemplate = ModelUtilities.instantiateNodeTemplate(hostNodeType);
                 hostTemplate.setId(nodeInfo.getMachineID());
                 hostTemplate.setName(nodeInfo.getMachineID());
@@ -167,9 +166,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                     dockerEngineTemplate.setName("KubeDockerEngine");
                     topologyTemplate.addNodeTemplate(dockerEngineTemplate);
                     ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerEngineTemplate,
-                        hostTemplate,
-                        ToscaBaseTypes.hostedOnRelationshipType,
-                        topologyTemplate);
+                            hostTemplate,
+                            ToscaBaseTypes.hostedOnRelationshipType,
+                            topologyTemplate);
                     managedIds.add(dockerEngineTemplate.getId());
 
                     try {
@@ -177,70 +176,70 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         V1PodList v1PodList;
                         if (this.targetNamespace != null) {
                             v1PodList = this.coreV1Api.listNamespacedPod(targetNamespace,
-                                false,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null);
+                                    false,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
                             containers = v1PodList.getItems()
-                                .stream()
-                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
-                                .collect(Collectors.toList());
+                                    .stream()
+                                    .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
+                                    .collect(Collectors.toList());
                         } else {
                             v1PodList = this.coreV1Api.listPodForAllNamespaces(null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null);
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
                             containers = v1PodList.getItems()
-                                .stream()
-                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
-                                .collect(Collectors.toList());
+                                    .stream()
+                                    .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
+                                    .collect(Collectors.toList());
                         }
 
                         v1PodList.getItems().stream().forEach(v1Pod -> {
                             v1Pod.getSpec()
-                                .getContainers()
-                                .stream()
-                                .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
-                                .forEach(aV1Container -> {
-                                    String image = aV1Container.getImage();
-                                    String name = aV1Container.getName();
-                                    String podIp = v1Pod.getStatus().getPodIP();
-                                    TNodeType dockerContainerType = toscaTransformer.getComputeNodeType(
-                                        "DockerContainer",
-                                        "");
-                                    TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
-                                        dockerContainerType);
-                                    dockerContainerTemplate.setName(name);
-                                    LinkedHashMap<String, String> kvProperties = Optional.ofNullable(
-                                            dockerContainerTemplate.getProperties())
-                                        .map(TEntityTemplate.Properties::getKVProperties)
-                                        .orElseGet(LinkedHashMap::new);
-                                    kvProperties.put("ContainerID", name);
-                                    kvProperties.put("ImageID", image);
-                                    if (StringUtils.isNotBlank(podIp)) {
-                                        kvProperties.put("ContainerIP", podIp);
-                                    }
-                                    TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
-                                        .orElseGet(TEntityTemplate.Properties::new);
-                                    properties.setKVProperties(kvProperties);
-                                    dockerContainerTemplate.setProperties(properties);
-                                    topologyTemplate.addNodeTemplate(dockerContainerTemplate);
-                                    ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
-                                        dockerEngineTemplate,
-                                        ToscaBaseTypes.hostedOnRelationshipType,
-                                        topologyTemplate);
-                                    managedIds.add(dockerContainerTemplate.getId());
-                                });
+                                    .getContainers()
+                                    .stream()
+                                    .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
+                                    .forEach(aV1Container -> {
+                                        String image = aV1Container.getImage();
+                                        String name = aV1Container.getName();
+                                        String podIp = v1Pod.getStatus().getPodIP();
+                                        TNodeType dockerContainerType = toscaTransformer.getComputeNodeType(
+                                                "DockerContainer",
+                                                "");
+                                        TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
+                                                dockerContainerType);
+                                        dockerContainerTemplate.setName(name);
+                                        LinkedHashMap<String, String> kvProperties = Optional.ofNullable(
+                                                        dockerContainerTemplate.getProperties())
+                                                .map(TEntityTemplate.Properties::getKVProperties)
+                                                .orElseGet(LinkedHashMap::new);
+                                        kvProperties.put("ContainerID", name);
+                                        kvProperties.put("ImageID", image);
+                                        if (StringUtils.isNotBlank(podIp)) {
+                                            kvProperties.put("ContainerIP", podIp);
+                                        }
+                                        TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                                .orElseGet(TEntityTemplate.Properties::new);
+                                        properties.setKVProperties(kvProperties);
+                                        dockerContainerTemplate.setProperties(properties);
+                                        topologyTemplate.addNodeTemplate(dockerContainerTemplate);
+                                        ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
+                                                dockerEngineTemplate,
+                                                ToscaBaseTypes.hostedOnRelationshipType,
+                                                topologyTemplate);
+                                        managedIds.add(dockerContainerTemplate.getId());
+                                    });
                         });
                     } catch (ApiException aE) {
                         logger.error("Error retrieving Pods", aE);
