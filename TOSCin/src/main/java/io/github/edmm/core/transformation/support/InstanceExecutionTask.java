@@ -32,7 +32,7 @@ public class InstanceExecutionTask implements Callable<Void> {
         logger.info("Starting instance transformation from {}", sourceTechnology.getName());
         context.setState(TRANSFORMING);
         try {
-            plugin.execute(context);
+            plugin.execute();
             context.setState(DONE);
         } catch (Exception e) {
             logger.info("Instance transformation from {} failed", sourceTechnology.getName());

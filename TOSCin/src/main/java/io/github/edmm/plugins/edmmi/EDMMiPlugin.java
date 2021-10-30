@@ -24,11 +24,7 @@ public class EDMMiPlugin extends AbstractLifecycleInstancePlugin<EDMMiPlugin> {
     }
 
     @Override
-    public void getModels() {
-    }
-
-    @Override
-    public void transformDirectlyToTOSCA() {
+    public void transformToTOSCA() {
         EDMMiYamlParser EDMMiYamlParser = new EDMMiYamlParser();
         DeploymentInstance deploymentInstance = EDMMiYamlParser.parseYamlAndTransformToDeploymentInstance(context.getOutputPath());
         TOSCATransformer toscaTransformer = new TOSCATransformer();

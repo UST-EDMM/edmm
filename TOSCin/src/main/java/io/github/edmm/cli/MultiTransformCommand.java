@@ -119,7 +119,7 @@ public class MultiTransformCommand extends TransformCommand {
                 try {
                     curPlugin.getLifecycle().updateGeneratedServiceTemplate(serviceTemplate);
                     curPlugin.execute();
-                    serviceTemplate = curPlugin.retrieveGeneratedServiceTemplate();
+                    serviceTemplate = curPlugin.getLifecycle().retrieveGeneratedServiceTemplate();
                 } catch (Exception e) {
                     logger.error("Error executing |{}| transformation |{}|", sourceTechnologyName, contextId, e);
                 }
@@ -242,17 +242,17 @@ public class MultiTransformCommand extends TransformCommand {
             .flatMap(CastUtil::safelyCastToStringObjectMapOptional)
             .map(Map::entrySet)
             .map(entries -> entries.stream().map(cfnInstance -> {
-                Map<String, Object> terraformConfig = CastUtil.safelyCastToStringObjectMap(cfnInstance.getValue());
+                Map<String, Object> cfnConfig = CastUtil.safelyCastToStringObjectMap(cfnInstance.getValue());
                 String instanceId = cfnInstance.getKey();
-                String region = Optional.ofNullable(terraformConfig.get(CONFIG_CFN_REGION))
+                String region = Optional.ofNullable(cfnConfig.get(CONFIG_CFN_REGION))
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse("us-east-1");
-                String stackName = Optional.ofNullable(terraformConfig.get(CONFIG_CFN_STACK_NAME))
+                String stackName = Optional.ofNullable(cfnConfig.get(CONFIG_CFN_STACK_NAME))
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElseThrow(() -> new IllegalArgumentException("Missing config key |" + CONFIG_CFN_STACK_NAME + "| for technology instance |" + instanceId + "|"));
-                String profileName = Optional.ofNullable(terraformConfig.get(CONFIG_CFN_PROFILE_NAME))
+                String profileName = Optional.ofNullable(cfnConfig.get(CONFIG_CFN_PROFILE_NAME))
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);

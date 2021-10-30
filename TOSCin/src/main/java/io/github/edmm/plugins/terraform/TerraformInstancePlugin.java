@@ -47,7 +47,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
     private TerraformState terraformState;
 
     public TerraformInstancePlugin(
-            InstanceTransformationContext context, Path terraformStateFile) {
+        InstanceTransformationContext context, Path terraformStateFile) {
         super(context);
         this.terraformStateFile = terraformStateFile;
         String terraformNodeId = "terraform-backend-" + UUID.randomUUID();
@@ -66,9 +66,9 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         terraformDiscoveryPlugin.setSourceTechnology(getContext().getSourceTechnology());
 
         resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer,
-                terraformTechnology,
-                terraformDiscoveryPlugin,
-                new KeyMapper()));
+            terraformTechnology,
+            terraformDiscoveryPlugin,
+            new KeyMapper()));
     }
 
     @Override
@@ -88,40 +88,35 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
     }
 
     @Override
-    public void getModels() {
-        // nothing to do, as resources have already been parsed with terraform state
-    }
-
-    @Override
-    public void transformDirectlyToTOSCA() {
+    public void transformToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             String serviceTemplateId = "terraform-" + UUID.randomUUID();
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
             TTopologyTemplate topologyTemplate = new TTopologyTemplate();
             return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
-                    .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
-                    .addTags(new TTags.Builder().addTag("deploymentTechnology",
-                            getContext().getSourceTechnology().getName()).build())
-                    .build();
+                .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
+                .addTags(new TTags.Builder().addTag("deploymentTechnology",
+                    getContext().getSourceTechnology().getName()).build())
+                .build();
         });
 
         TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
-                .orElseGet(() -> {
-                    logger.info("Creating new topology template, as existing service template has none");
-                    TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                    serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                    return topologyTemplate1;
-                });
+            .orElseGet(() -> {
+                logger.info("Creating new topology template, as existing service template has none");
+                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
+                serviceTemplate.setTopologyTemplate(topologyTemplate1);
+                return topologyTemplate1;
+            });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
-                serviceTemplate,
-                objectMapper);
+            serviceTemplate,
+            objectMapper);
         deploymentTechnologies.add(terraformTechnology);
 
         List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
-                serviceTemplate,
-                objectMapper);
+            serviceTemplate,
+            objectMapper);
         toscaDiscoveryPlugins.add(terraformDiscoveryPlugin);
 
         Map<String, String> terraformProperties = new HashMap<>();
@@ -130,10 +125,10 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         terraformTechnology.setProperties(terraformProperties);
 
         terraformState.getResources()
-                .forEach(curResource -> resourceHandlers.stream()
-                        .filter(resourceHandler -> resourceHandler.canHandleResource(curResource))
-                        .findFirst()
-                        .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
+            .forEach(curResource -> resourceHandlers.stream()
+                .filter(resourceHandler -> resourceHandler.canHandleResource(curResource))
+                .findFirst()
+                .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
         Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, toscaDiscoveryPlugins);

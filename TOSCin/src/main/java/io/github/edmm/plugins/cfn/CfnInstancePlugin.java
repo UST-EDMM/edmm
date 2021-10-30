@@ -83,10 +83,7 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
             new KeyMapper(),
             cfnTechnology,
             cfnDiscoveryPlugin));
-    }
 
-    @Override
-    public void getModels() {
         ApiInteractorImpl interactor = new ApiInteractorImpl(this.cloudFormation, this.inputStackName);
         this.stack = interactor.getDeployment();
         this.stackResources = interactor.getComponents();
@@ -94,7 +91,7 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
     }
 
     @Override
-    public void transformDirectlyToTOSCA() {
+    public void transformToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             String serviceTemplateId = "cfn-" + UUID.randomUUID();
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);

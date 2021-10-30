@@ -31,10 +31,6 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
         this.execute(this.lifecycle);
     }
 
-    public void execute(InstanceTransformationContext context) throws Exception {
-        this.execute(getLifecycle(context));
-    }
-
     private void execute(L lifecycle) throws Exception {
         long time = System.currentTimeMillis();
         for (InstanceLifecyclePhase<L> phase : lifecycle.getPhases()) {
@@ -47,13 +43,5 @@ public class InstancePlugin<L extends AbstractLifecycleInstancePlugin<L>> {
         }
         time = System.currentTimeMillis() - time;
         logger.info("EDMMi Transformation finished after {} ms", time);
-    }
-
-    public L getLifecycle(InstanceTransformationContext context) {
-        return this.lifecycle;
-    }
-
-    public TServiceTemplate retrieveGeneratedServiceTemplate() {
-        return this.lifecycle.retrieveGeneratedServiceTemplate();
     }
 }
