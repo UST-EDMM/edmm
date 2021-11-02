@@ -53,6 +53,7 @@ public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_PUPPET_PORT = "port";
     private static final String CONFIG_PUPPET_OPERATING_SYSTEM = "operating-system";
     private static final String CONFIG_PUPPET_OPERATING_SYSTEM_VERSION = "operating-system-version";
+    private static final String CONFIG_PUPPET_ENVIRONMENT = "environment";
     private static final String CONFIG_TERRAFORM_STATE_FILE_PATH = "state-file";
     private static final String CONFIG_CFN_STACK_NAME = "stack-name";
     private static final String CONFIG_CFN_PROFILE_NAME = "profile-name";
@@ -163,6 +164,11 @@ public class MultiTransformCommand extends TransformCommand {
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);
+                String environment = Optional.ofNullable(puppetConfig.get(
+                        CONFIG_PUPPET_ENVIRONMENT))
+                    .map(Object::toString)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(null);
 
                 InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
                     PUPPET,
@@ -174,7 +180,8 @@ public class MultiTransformCommand extends TransformCommand {
                     privateKeyPath,
                     port1,
                     operatingSystem,
-                    operatingSystemVersion);
+                    operatingSystemVersion,
+                    environment);
                 return new InstancePlugin<>(context.getSourceTechnology(), instancePluginLifecycle);
             }).collect(Collectors.toSet()))
             .orElse(Collections.emptySet());
