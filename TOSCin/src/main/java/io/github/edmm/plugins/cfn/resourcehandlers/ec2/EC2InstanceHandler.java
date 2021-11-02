@@ -14,6 +14,7 @@ import io.github.edmm.model.ToscaDiscoveryPlugin;
 import io.github.edmm.plugins.cfn.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.cfn.util.CfnTypeConstants;
 import io.github.edmm.util.Constants;
+import io.github.edmm.util.Util;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
@@ -120,7 +121,7 @@ public class EC2InstanceHandler implements ResourceHandler {
         propertiesForInstance.put(Constants.VMIP, publicIp);
         propertiesForInstance.put(Constants.EC_2_AMI, instance.getImageId());
 
-        populateNodeTemplateProperties(instanceNode, propertiesForInstance);
+        Util.populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
         managedNodeIds.add(instanceNode.getId());
         discoveredIds.add(instanceNode.getId());

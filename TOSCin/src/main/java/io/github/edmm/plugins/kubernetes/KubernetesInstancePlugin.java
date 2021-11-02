@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
-import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
@@ -169,7 +167,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                     managedIds.add(dockerEngineTemplate.getId());
 
                     try {
-                        List<V1Container> containers;
                         V1PodList v1PodList;
                         if (this.targetNamespace != null) {
                             v1PodList = this.coreV1Api.listNamespacedPod(targetNamespace,
@@ -182,10 +179,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 null,
                                 null,
                                 null);
-                            containers = v1PodList.getItems()
-                                .stream()
-                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
-                                .collect(Collectors.toList());
                         } else {
                             v1PodList = this.coreV1Api.listPodForAllNamespaces(null,
                                 null,
@@ -196,48 +189,40 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 null,
                                 null,
                                 null);
-                            containers = v1PodList.getItems()
-                                .stream()
-                                .flatMap(aV1Pod -> aV1Pod.getSpec().getContainers().stream())
-                                .collect(Collectors.toList());
                         }
 
-                        v1PodList.getItems().stream().forEach(v1Pod -> {
-                            v1Pod.getSpec()
-                                .getContainers()
-                                .stream()
-                                .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
-                                .forEach(aV1Container -> {
-                                    String image = aV1Container.getImage();
-                                    String name = aV1Container.getName();
-                                    String podIp = v1Pod.getStatus().getPodIP();
-                                    TNodeType dockerContainerType = toscaTransformer.getComputeNodeType(
-                                        "DockerContainer",
-                                        "");
-                                    TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
-                                        dockerContainerType);
-                                    dockerContainerTemplate.setName(name);
-                                    LinkedHashMap<String, String> kvProperties = Optional.ofNullable(
-                                            dockerContainerTemplate.getProperties())
-                                        .map(TEntityTemplate.Properties::getKVProperties)
-                                        .orElseGet(LinkedHashMap::new);
-                                    kvProperties.put("ContainerID", name);
-                                    kvProperties.put("ImageID", image);
-                                    if (StringUtils.isNotBlank(podIp)) {
-                                        kvProperties.put("ContainerIP", podIp);
-                                    }
-                                    TEntityTemplate.Properties properties = Optional.ofNullable(dockerContainerTemplate.getProperties())
-                                        .orElseGet(TEntityTemplate.Properties::new);
-                                    properties.setKVProperties(kvProperties);
-                                    dockerContainerTemplate.setProperties(properties);
-                                    topologyTemplate.addNodeTemplate(dockerContainerTemplate);
-                                    ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
-                                        dockerEngineTemplate,
-                                        ToscaBaseTypes.hostedOnRelationshipType,
-                                        topologyTemplate);
-                                    managedIds.add(dockerContainerTemplate.getId());
-                                });
-                        });
+                        v1PodList.getItems().forEach(v1Pod -> v1Pod.getSpec()
+                            .getContainers()
+                            .stream()
+                            .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
+                            .forEach(aV1Container -> {
+                                String image = aV1Container.getImage();
+                                String name = aV1Container.getName();
+                                String podIp = v1Pod.getStatus().getPodIP();
+                                TNodeType dockerContainerType = toscaTransformer.getComputeNodeType(
+                                    "DockerContainer",
+                                    "");
+                                TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
+                                    dockerContainerType);
+                                dockerContainerTemplate.setName(name);
+                                LinkedHashMap<String, String> kvProperties = Optional.ofNullable(
+                                        dockerContainerTemplate.getProperties())
+                                    .map(TEntityTemplate.Properties::getKVProperties)
+                                    .orElseGet(LinkedHashMap::new);
+                                kvProperties.put("ContainerID", name);
+                                kvProperties.put("ImageID", image);
+                                kvProperties.put(Constants.STATE, Constants.RUNNING);
+                                if (StringUtils.isNotBlank(podIp)) {
+                                    kvProperties.put("ContainerIP", podIp);
+                                }
+                                Util.populateNodeTemplateProperties(dockerContainerTemplate, kvProperties);
+                                topologyTemplate.addNodeTemplate(dockerContainerTemplate);
+                                ModelUtilities.createRelationshipTemplateAndAddToTopology(dockerContainerTemplate,
+                                    dockerEngineTemplate,
+                                    ToscaBaseTypes.hostedOnRelationshipType,
+                                    topologyTemplate);
+                                managedIds.add(dockerContainerTemplate.getId());
+                            }));
                     } catch (ApiException aE) {
                         logger.error("Error retrieving Pods", aE);
                     }

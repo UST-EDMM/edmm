@@ -181,7 +181,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     masterProps.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
                     masterProps.put(Constants.PUPPET_MASTER_USER, this.master.getUser());
                     vmProps.putAll(masterProps);
-                    populateNodeTemplateProperties(vm, vmProps);
+                    Util.populateNodeTemplateProperties(vm, vmProps);
 
                     Fact ec2_metadata = node.getFactByName("ec2_metadata");
                     if (ec2_metadata != null) {
@@ -256,7 +256,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                         .map(TEntityTemplate.Properties::getKVProperties)
                         .orElseGet(LinkedHashMap::new);
                     vmProperties.put("PuppetEnvironments", String.join(",", environments));
-                    populateNodeTemplateProperties(vm, vmProperties);
+                    Util.populateNodeTemplateProperties(vm, vmProperties);
                 }
             });
 
@@ -281,26 +281,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         Map<String, String> additionalProperties = new HashMap<>();
         additionalProperties.put("puppetInstanceType", nodeTemplate.getName());
         additionalProperties.put("State", "Running");
-        this.populateNodeTemplateProperties(nodeTemplate, additionalProperties);
-    }
-
-    private void populateNodeTemplateProperties(TNodeTemplate nodeTemplate, Map<String, String> additionalProperties) {
-        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
-            nodeTemplate.getProperties()
-                .getKVProperties()
-                .entrySet()
-                .stream()
-                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
-                    .isEmpty())
-                .forEach(entry -> additionalProperties.put(entry.getKey(),
-                    entry.getValue() != null && !entry.getValue()
-                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
-                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
-        }
-
-        // workaround to set new properties
-        nodeTemplate.setProperties(new TEntityTemplate.Properties());
-        nodeTemplate.getProperties().setKVProperties(additionalProperties);
+        Util.populateNodeTemplateProperties(nodeTemplate, additionalProperties);
     }
 
     @Override

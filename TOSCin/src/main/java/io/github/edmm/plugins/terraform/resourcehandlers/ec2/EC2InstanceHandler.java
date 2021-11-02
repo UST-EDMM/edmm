@@ -13,6 +13,7 @@ import io.github.edmm.model.ToscaDeploymentTechnology;
 import io.github.edmm.model.ToscaDiscoveryPlugin;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.util.Constants;
+import io.github.edmm.util.Util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.winery.model.tosca.TEntityTemplate;
@@ -35,10 +36,10 @@ public class EC2InstanceHandler implements ResourceHandler {
     private final KeyMapper keyMapper;
 
     public EC2InstanceHandler(
-            TOSCATransformer toscaTransformer,
-            ToscaDeploymentTechnology terraformDeploymentTechnology,
-            ToscaDiscoveryPlugin terraformDiscoveryPlugin,
-            KeyMapper keyMapper) {
+        TOSCATransformer toscaTransformer,
+        ToscaDeploymentTechnology terraformDeploymentTechnology,
+        ToscaDiscoveryPlugin terraformDiscoveryPlugin,
+        KeyMapper keyMapper) {
         this.toscaTransformer = Objects.requireNonNull(toscaTransformer);
         this.terraformDeploymentTechnology = Objects.requireNonNull(terraformDeploymentTechnology);
         this.terraformDiscoveryPlugin = Objects.requireNonNull(terraformDiscoveryPlugin);
@@ -48,9 +49,9 @@ public class EC2InstanceHandler implements ResourceHandler {
     @Override
     public boolean canHandleResource(Map<String, Object> resource) {
         boolean instanceType = Optional.ofNullable(resource.get(PROPERTY_TYPE))
-                .map(Object::toString)
-                .map(s -> s.endsWith("instance"))
-                .orElse(false);
+            .map(Object::toString)
+            .map(s -> s.endsWith("instance"))
+            .orElse(false);
 
         if (!instanceType) {
             return false;
@@ -58,7 +59,7 @@ public class EC2InstanceHandler implements ResourceHandler {
 
         try {
             EC2InstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource,
-                    EC2InstanceResource.class);
+                EC2InstanceResource.class);
         } catch (IllegalArgumentException e) {
             // assume we cannot handle the resource, if jackson conversion fails
             return false;
@@ -85,18 +86,18 @@ public class EC2InstanceHandler implements ResourceHandler {
             String privateIp = attributes.getPrivateIp();
 
             List<TNodeTemplate> matchingNodes = topologyTemplate.getNodeTemplates()
-                    .stream()
-                    .filter(tNodeTemplate -> Optional.ofNullable(tNodeTemplate.getProperties())
-                            .map(TEntityTemplate.Properties::getKVProperties)
-                            .map(kvProperties -> kvProperties.get(Constants.VMIP))
-                            .map(nodeIp -> Objects.equals(nodeIp, publicIp) || Objects.equals(nodeIp, privateIp))
-                            .orElse(false))
-                    .collect(Collectors.toList());
+                .stream()
+                .filter(tNodeTemplate -> Optional.ofNullable(tNodeTemplate.getProperties())
+                    .map(TEntityTemplate.Properties::getKVProperties)
+                    .map(kvProperties -> kvProperties.get(Constants.VMIP))
+                    .map(nodeIp -> Objects.equals(nodeIp, publicIp) || Objects.equals(nodeIp, privateIp))
+                    .orElse(false))
+                .collect(Collectors.toList());
 
             TNodeTemplate instanceNode;
             if (matchingNodes.size() > 1) {
                 logger.warn("Found |{}| > 1 suitable node templates in topology template. Defaulting to the first found",
-                        matchingNodes.size());
+                    matchingNodes.size());
                 instanceNode = matchingNodes.get(0);
             } else if (matchingNodes.size() == 1) {
                 logger.info("Found a suitable node template in topology template. Using it.");
@@ -116,12 +117,12 @@ public class EC2InstanceHandler implements ResourceHandler {
             String keyName = attributes.getKeyName();
             propertiesForInstance.put(Constants.VM_KEY_PAIR_NAME, keyName);
             keyMapper.getPrivateKeyByName(keyName)
-                    .ifPresent(key -> propertiesForInstance.put(Constants.VM_PRIVATE_KEY, key));
+                .ifPresent(key -> propertiesForInstance.put(Constants.VM_PRIVATE_KEY, key));
             propertiesForInstance.put(Constants.VM_INSTANCE_ID, attributes.getId());
             propertiesForInstance.put(Constants.VMIP, attributes.getPublicIp());
             propertiesForInstance.put(Constants.EC_2_AMI, attributes.getAmi());
 
-            populateNodeTemplateProperties(instanceNode, propertiesForInstance);
+            Util.populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
             managedNodeIds.add(instanceNode.getId());
             discoveredIds.add(instanceNode.getId());
