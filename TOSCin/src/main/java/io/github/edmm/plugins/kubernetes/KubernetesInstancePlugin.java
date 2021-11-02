@@ -47,14 +47,11 @@ import org.slf4j.LoggerFactory;
 public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<KubernetesInstancePlugin> {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePlugin.class);
-    private static final List<String> IGNORED_CONTAINER_NAMES = Arrays.asList("orders",
-        "payment",
+    private static final List<String> IGNORED_CONTAINER_NAMES = Arrays.asList(
         "queue-master",
         "rabbitmq",
         "rabbitmq-exporter",
-        "session-db",
-        "shipping",
-        "orders-db");
+        "session-db");
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
         .id("kubernetes")
         .name("Kubernetes")
@@ -212,6 +209,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 kvProperties.put("ContainerID", name);
                                 kvProperties.put("ImageID", image);
                                 kvProperties.put(Constants.STATE, Constants.RUNNING);
+                                kvProperties.put("PodName", v1Pod.getMetadata().getName());
                                 if (StringUtils.isNotBlank(podIp)) {
                                     kvProperties.put("ContainerIP", podIp);
                                 }
