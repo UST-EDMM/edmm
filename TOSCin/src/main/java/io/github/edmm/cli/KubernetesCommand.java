@@ -24,8 +24,6 @@ public class KubernetesCommand extends TransformCommand {
 
     @CommandLine.Option(names = {"-c", "--kubeConfigPath"}, required = true)
     private String kubeConfigPath;
-    @CommandLine.Option(names = {"-id", "--applicationId"}, description = "You need to specify the name of the application you want to transform.")
-    private String applicationId;
     @CommandLine.Option(names = {"--namespace"}, description = "You mayspecify the target namespace of the application you want to transform.")
     private String targetNamespace;
 
@@ -34,10 +32,7 @@ public class KubernetesCommand extends TransformCommand {
         InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(),
             KUBERNETES,
             outputPath);
-        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context,
-            kubeConfigPath,
-            applicationId,
-            targetNamespace);
+        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, targetNamespace);
         InstancePlugin<KubernetesInstancePlugin> plugin = new InstancePlugin<>(KUBERNETES, pluginLifecycle);
         try {
             plugin.execute();

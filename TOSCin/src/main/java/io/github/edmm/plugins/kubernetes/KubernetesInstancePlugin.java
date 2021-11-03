@@ -1,7 +1,13 @@
 package io.github.edmm.plugins.kubernetes;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,10 +21,10 @@ import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
+import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.core.transformation.TypeTransformer;
 import io.github.edmm.exporter.WineryConnector;
 import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.plugins.kubernetes.api.ApiInteractorImpl;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.typemapper.UbuntuMapper;
 import io.github.edmm.util.Constants;
@@ -26,9 +32,7 @@ import io.github.edmm.util.Util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.ApiException;
-import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
-import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
 import io.kubernetes.client.models.V1PodList;
@@ -61,20 +65,16 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private final WineryConnector myWineryConnector;
     private final TOSCATransformer toscaTransformer;
     private final List<TypeTransformer> myHostTransformers;
-    private final String inputDeploymentName;
     private final String targetNamespace;
-    private AppsV1Api appsApi;
     private CoreV1Api coreV1Api;
-    private V1Deployment kubernetesDeploymentInstance;
+    private byte[] base64ConfigContents;
 
     public KubernetesInstancePlugin(
         InstanceTransformationContext context,
         String kubeConfigPath,
-        String inputDeploymentName,
         String targetNamespace) {
         super(context);
         this.kubeConfigPath = kubeConfigPath;
-        this.inputDeploymentName = inputDeploymentName;
         this.targetNamespace = targetNamespace;
         this.myWineryConnector = WineryConnector.getInstance();
         myHostTransformers = Arrays.asList(new UbuntuMapper(myWineryConnector));
@@ -86,18 +86,23 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         AuthenticatorImpl authenticator = new AuthenticatorImpl(kubeConfigPath);
         authenticator.authenticate();
 
-        this.appsApi = authenticator.getAppsApi();
         this.coreV1Api = authenticator.getCoreV1Api();
 
-        ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.appsApi, this.coreV1Api, this.inputDeploymentName);
-        this.kubernetesDeploymentInstance = apiInteractor.getDeployment();
+        Path configFile = Paths.get(kubeConfigPath);
+        byte[] configContents;
+        try {
+            configContents = Files.readAllBytes(configFile);
+        } catch (IOException e) {
+            throw new TransformationException("Could not load contents of kubeConfig file |" + kubeConfigPath + "|", e);
+        }
+        base64ConfigContents = Base64.getEncoder().encode(configContents);
     }
 
     @Override
     public void transformToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            String serviceTemplateId = "kubernetes-" + this.kubernetesDeploymentInstance.getMetadata().getName();
+            String serviceTemplateId = "kubernetes-" + this.targetNamespace;
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
             return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
                 .setTargetNamespace("http://opentosca.org/retrieved/instances")
@@ -127,6 +132,8 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         String basePath = this.coreV1Api.getApiClient().getBasePath();
         Map<String, String> clusterProperties = new HashMap<>();
         clusterProperties.put(Constants.KUBERNETES_CLUSTER_IP, basePath);
+        clusterProperties.put(Constants.KUBERNETES_KUBE_CONFIG_CONTENTS, new String(base64ConfigContents, StandardCharsets.UTF_8));
+        clusterProperties.put(Constants.KUBERNETES_CLUSTER_NAMESPACE, targetNamespace);
 
         kubernetesTechnology.setProperties(clusterProperties);
 
