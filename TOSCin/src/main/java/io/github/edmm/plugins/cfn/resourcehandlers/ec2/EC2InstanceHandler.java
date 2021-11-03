@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.cfn.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.cfn.util.CfnTypeConstants;
 import io.github.edmm.util.Constants;
@@ -36,16 +36,16 @@ public class EC2InstanceHandler implements ResourceHandler {
     private final static Logger logger = LoggerFactory.getLogger(EC2InstanceHandler.class);
     private final TOSCATransformer toscaTransformer;
     private final KeyMapper keyMapper;
-    private final ToscaDeploymentTechnology cfnDeploymentTechnology;
-    private final ToscaDiscoveryPlugin cfnDiscoveryPlugin;
+    private final DeploymentTechnologyDescriptor cfnDeploymentTechnology;
+    private final DiscoveryPluginDescriptor cfnDiscoveryPlugin;
     private final AmazonEC2 ec2Client;
 
     public EC2InstanceHandler(TOSCATransformer toscaTransformer,
                               ProfileCredentialsProvider credentialsProvider,
                               String region,
                               KeyMapper keyMapper,
-                              ToscaDeploymentTechnology cfnDeploymentTechnology,
-                              ToscaDiscoveryPlugin cfnDiscoveryPlugin) {
+                              DeploymentTechnologyDescriptor cfnDeploymentTechnology,
+                              DiscoveryPluginDescriptor cfnDiscoveryPlugin) {
         this.toscaTransformer = Objects.requireNonNull(toscaTransformer);
         this.keyMapper = Objects.requireNonNull(keyMapper);
         this.cfnDeploymentTechnology = Objects.requireNonNull(cfnDeploymentTechnology);

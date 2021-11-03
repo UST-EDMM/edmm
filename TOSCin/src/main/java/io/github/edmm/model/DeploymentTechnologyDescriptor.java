@@ -3,11 +3,9 @@ package io.github.edmm.model;
 import java.util.List;
 import java.util.Map;
 
-import io.github.edmm.core.transformation.SourceTechnology;
-
-public class ToscaDeploymentTechnology {
+public class DeploymentTechnologyDescriptor {
     private String id;
-    private SourceTechnology sourceTechnology;
+    private String technologyId;
     private List<String> managedIds;
     private Map<String, String> properties;
 
@@ -19,12 +17,12 @@ public class ToscaDeploymentTechnology {
         this.id = id;
     }
 
-    public SourceTechnology getSourceTechnology() {
-        return sourceTechnology;
+    public String getTechnologyId() {
+        return technologyId;
     }
 
-    public void setSourceTechnology(SourceTechnology sourceTechnology) {
-        this.sourceTechnology = sourceTechnology;
+    public void setTechnologyId(String technologyId) {
+        this.technologyId = technologyId;
     }
 
     public List<String> getManagedIds() {

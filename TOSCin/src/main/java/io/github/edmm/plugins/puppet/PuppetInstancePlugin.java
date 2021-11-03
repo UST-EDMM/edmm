@@ -17,8 +17,8 @@ import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.Master;
@@ -118,23 +118,22 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
             });
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+        List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
             serviceTemplate,
             objectMapper);
-        List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
+        List<DiscoveryPluginDescriptor> discoveryPluginDescriptors = Util.extractDiscoveryPluginsFromServiceTemplate(
             serviceTemplate,
             objectMapper);
 
         String id = "puppet-" + UUID.randomUUID();
-        ToscaDiscoveryPlugin puppetDiscoveryPlugin = new ToscaDiscoveryPlugin();
-        puppetDiscoveryPlugin.setId(id);
+        DiscoveryPluginDescriptor puppetDiscoveryPlugin = new DiscoveryPluginDescriptor();
+        puppetDiscoveryPlugin.setId(getContext().getSourceTechnology().getId());
         puppetDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
-        puppetDiscoveryPlugin.setSourceTechnology(getContext().getSourceTechnology());
-        toscaDiscoveryPlugins.add(puppetDiscoveryPlugin);
+        discoveryPluginDescriptors.add(puppetDiscoveryPlugin);
 
-        ToscaDeploymentTechnology puppetTechnology = new ToscaDeploymentTechnology();
+        DeploymentTechnologyDescriptor puppetTechnology = new DeploymentTechnologyDescriptor();
         puppetTechnology.setId(id);
-        puppetTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        puppetTechnology.setTechnologyId(getContext().getSourceTechnology().getId());
         puppetTechnology.setManagedIds(Collections.emptyList());
         puppetTechnology.setProperties(Collections.emptyMap());
 
@@ -267,7 +266,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         puppetTechnology.setManagedIds(managedIds);
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
-        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, toscaDiscoveryPlugins);
+        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

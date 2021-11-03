@@ -24,7 +24,7 @@ import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.core.transformation.TransformationException;
 import io.github.edmm.core.transformation.TypeTransformer;
 import io.github.edmm.exporter.WineryConnector;
-import io.github.edmm.model.ToscaDeploymentTechnology;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
 import io.github.edmm.plugins.kubernetes.api.AuthenticatorImpl;
 import io.github.edmm.plugins.kubernetes.typemapper.UbuntuMapper;
 import io.github.edmm.util.Constants;
@@ -119,13 +119,13 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
             });
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+        List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
             serviceTemplate,
             objectMapper);
 
-        ToscaDeploymentTechnology kubernetesTechnology = new ToscaDeploymentTechnology();
+        DeploymentTechnologyDescriptor kubernetesTechnology = new DeploymentTechnologyDescriptor();
         kubernetesTechnology.setId("kubernetes-" + UUID.randomUUID());
-        kubernetesTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        kubernetesTechnology.setTechnologyId(getContext().getSourceTechnology().getId());
         kubernetesTechnology.setManagedIds(Collections.emptyList());
         kubernetesTechnology.setProperties(Collections.emptyMap());
 

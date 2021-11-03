@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.util.Constants;
 import io.github.edmm.util.Util;
@@ -31,14 +31,14 @@ public class EC2InstanceHandler implements ResourceHandler {
     private static final String PROPERTY_TYPE = "type";
 
     private final TOSCATransformer toscaTransformer;
-    private final ToscaDeploymentTechnology terraformDeploymentTechnology;
-    private final ToscaDiscoveryPlugin terraformDiscoveryPlugin;
+    private final DeploymentTechnologyDescriptor terraformDeploymentTechnology;
+    private final DiscoveryPluginDescriptor terraformDiscoveryPlugin;
     private final KeyMapper keyMapper;
 
     public EC2InstanceHandler(
         TOSCATransformer toscaTransformer,
-        ToscaDeploymentTechnology terraformDeploymentTechnology,
-        ToscaDiscoveryPlugin terraformDiscoveryPlugin,
+        DeploymentTechnologyDescriptor terraformDeploymentTechnology,
+        DiscoveryPluginDescriptor terraformDiscoveryPlugin,
         KeyMapper keyMapper) {
         this.toscaTransformer = Objects.requireNonNull(toscaTransformer);
         this.terraformDeploymentTechnology = Objects.requireNonNull(terraformDeploymentTechnology);

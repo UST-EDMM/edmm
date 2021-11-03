@@ -12,8 +12,8 @@ import java.util.UUID;
 import io.github.edmm.core.plugin.AbstractLifecycleInstancePlugin;
 import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.TOSCATransformer;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.cfn.api.ApiInteractorImpl;
 import io.github.edmm.plugins.cfn.api.AuthenticatorImpl;
 import io.github.edmm.plugins.cfn.model.Template;
@@ -40,8 +40,8 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
     private final String region;
     private final String profileName;
     private final TOSCATransformer toscaTransformer;
-    private final ToscaDeploymentTechnology cfnTechnology;
-    private final ToscaDiscoveryPlugin cfnDiscoveryPlugin;
+    private final DeploymentTechnologyDescriptor cfnTechnology;
+    private final DiscoveryPluginDescriptor cfnDiscoveryPlugin;
     private List<ResourceHandler> resourceHandlers;
     private AmazonCloudFormation cloudFormation;
     private Stack stack;
@@ -58,16 +58,15 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
         this.profileName = profileName;
         toscaTransformer = new TOSCATransformer();
 
-        cfnTechnology = new ToscaDeploymentTechnology();
+        cfnTechnology = new DeploymentTechnologyDescriptor();
         cfnTechnology.setId(getContext().getId());
-        cfnTechnology.setSourceTechnology(getContext().getSourceTechnology());
+        cfnTechnology.setTechnologyId(getContext().getSourceTechnology().getId());
         cfnTechnology.setManagedIds(Collections.emptyList());
         cfnTechnology.setProperties(Collections.emptyMap());
 
-        cfnDiscoveryPlugin = new ToscaDiscoveryPlugin();
-        cfnDiscoveryPlugin.setId(getContext().getId());
+        cfnDiscoveryPlugin = new DiscoveryPluginDescriptor();
+        cfnDiscoveryPlugin.setId(getContext().getSourceTechnology().getId());
         cfnDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
-        cfnDiscoveryPlugin.setSourceTechnology(getContext().getSourceTechnology());
     }
 
     @Override
@@ -112,15 +111,15 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
             });
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ToscaDeploymentTechnology> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
+        List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
             serviceTemplate,
             objectMapper);
         deploymentTechnologies.add(cfnTechnology);
 
-        List<ToscaDiscoveryPlugin> toscaDiscoveryPlugins = Util.extractDiscoveryPluginsFromServiceTemplate(
+        List<DiscoveryPluginDescriptor> discoveryPluginDescriptors = Util.extractDiscoveryPluginsFromServiceTemplate(
             serviceTemplate,
             objectMapper);
-        toscaDiscoveryPlugins.add(cfnDiscoveryPlugin);
+        discoveryPluginDescriptors.add(cfnDiscoveryPlugin);
 
         Map<String, String> cfnProperties = new HashMap<>();
         cfnProperties.put("Region", region);
@@ -134,7 +133,7 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
             .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
 
         Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
-        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, toscaDiscoveryPlugins);
+        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

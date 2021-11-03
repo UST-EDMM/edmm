@@ -12,8 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.github.edmm.core.transformation.TransformationException;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,7 +51,7 @@ public abstract class Util {
     public static void updateDeploymenTechnologiesInServiceTemplate(
         TServiceTemplate serviceTemplate,
         ObjectMapper objectMapper,
-        List<ToscaDeploymentTechnology> deploymentTechnologies) {
+        List<DeploymentTechnologyDescriptor> deploymentTechnologies) {
         try {
             TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DEPLOYMENT_TECHNOLOGIES)
                 .setValue(objectMapper.writeValueAsString(deploymentTechnologies))
@@ -69,7 +69,7 @@ public abstract class Util {
         }
     }
 
-    public static List<ToscaDeploymentTechnology> extractDeploymentTechnologiesFromServiceTemplate(
+    public static List<DeploymentTechnologyDescriptor> extractDeploymentTechnologiesFromServiceTemplate(
         TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
             .map(TTags::getTag)
@@ -79,9 +79,9 @@ public abstract class Util {
             .map(TTag::getValue)
             .map(s -> {
                 CollectionType collectionType = objectMapper.getTypeFactory()
-                    .constructCollectionType(List.class, ToscaDeploymentTechnology.class);
+                    .constructCollectionType(List.class, DeploymentTechnologyDescriptor.class);
                 try {
-                    return objectMapper.<List<ToscaDeploymentTechnology>>readValue(s, collectionType);
+                    return objectMapper.<List<DeploymentTechnologyDescriptor>>readValue(s, collectionType);
                 } catch (JsonProcessingException e) {
                     throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
                 }
@@ -90,7 +90,7 @@ public abstract class Util {
     }
 
     public static void updateDiscoveryPluginsInServiceTemplate(
-        TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<ToscaDiscoveryPlugin> discoveryPlugins) {
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<DiscoveryPluginDescriptor> discoveryPlugins) {
         try {
             TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DISCOVERY_PLUGINS)
                 .setValue(objectMapper.writeValueAsString(discoveryPlugins))
@@ -108,7 +108,7 @@ public abstract class Util {
         }
     }
 
-    public static List<ToscaDiscoveryPlugin> extractDiscoveryPluginsFromServiceTemplate(
+    public static List<DiscoveryPluginDescriptor> extractDiscoveryPluginsFromServiceTemplate(
         TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
             .map(TTags::getTag)
@@ -118,9 +118,9 @@ public abstract class Util {
             .map(TTag::getValue)
             .map(s -> {
                 CollectionType collectionType = objectMapper.getTypeFactory()
-                    .constructCollectionType(List.class, ToscaDiscoveryPlugin.class);
+                    .constructCollectionType(List.class, DiscoveryPluginDescriptor.class);
                 try {
-                    return objectMapper.<List<ToscaDiscoveryPlugin>>readValue(s, collectionType);
+                    return objectMapper.<List<DiscoveryPluginDescriptor>>readValue(s, collectionType);
                 } catch (JsonProcessingException e) {
                     throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
                 }
