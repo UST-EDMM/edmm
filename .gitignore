@@ -14,3 +14,12 @@ target
 
 .gradle
 edmm-core/src/test/resources/templates/multi
+
+# local kubectl config
+minikube-remote/
+
+# multi transform config file
+multi-transform-config.yml
+
+# dtd
+checkstyle-configuration_1_3.dtd

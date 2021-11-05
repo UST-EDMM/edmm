@@ -47,6 +47,7 @@ public class MultiTransformCommand extends TransformCommand {
     private static final String CONFIG_TECHNOLOGY_INSTANCES = "technology-instances";
     private static final String CONFIG_KUBERNETES_KUBE_CONFIG_PATH = "kube-config-path";
     private static final String CONFIG_KUBERNETES_TARGET_NAMESPACE = "target-namespace";
+    private static final String CONFIG_KUBERNETES_IGNORED_CONTAINER_NAMES = "ignored-container-names";
     private static final String CONFIG_PUPPET_USER = "user";
     private static final String CONFIG_PUPPET_PRIVATE_KEY_PATH = "private-key-path";
     private static final String CONFIG_PUPPET_PORT = "port";
@@ -201,6 +202,13 @@ public class MultiTransformCommand extends TransformCommand {
                     .map(Object::toString)
                     .filter(StringUtils::isNotBlank)
                     .orElse(null);
+                List<String> ignoredContainerNames = Optional.ofNullable(kubeConfig.get(CONFIG_KUBERNETES_IGNORED_CONTAINER_NAMES))
+                    .filter(List.class::isInstance)
+                    .map(List.class::cast)
+                    .map(list -> ((List<?>) list).stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList()))
+                    .orElse(Collections.emptyList());
 
                 InstanceTransformationContext context = new InstanceTransformationContext(instanceId,
                     KUBERNETES,
@@ -208,7 +216,8 @@ public class MultiTransformCommand extends TransformCommand {
                     true);
                 KubernetesInstancePlugin kubernetesInstancePlugin = new KubernetesInstancePlugin(context,
                     kubeConfigPath,
-                    targetNamespace);
+                    targetNamespace,
+                    ignoredContainerNames);
                 return new InstancePlugin<>(KUBERNETES, kubernetesInstancePlugin);
             }).collect(Collectors.toSet()))
             .orElse(Collections.emptySet());

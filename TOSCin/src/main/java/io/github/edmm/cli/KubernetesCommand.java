@@ -1,5 +1,6 @@
 package io.github.edmm.cli;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import io.github.edmm.core.plugin.InstancePlugin;
@@ -32,7 +33,7 @@ public class KubernetesCommand extends TransformCommand {
         InstanceTransformationContext context = new InstanceTransformationContext(UUID.randomUUID().toString(),
             KUBERNETES,
             outputPath);
-        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, targetNamespace);
+        KubernetesInstancePlugin pluginLifecycle = new KubernetesInstancePlugin(context, kubeConfigPath, targetNamespace, Collections.emptyList());
         InstancePlugin<KubernetesInstancePlugin> plugin = new InstancePlugin<>(KUBERNETES, pluginLifecycle);
         try {
             plugin.execute();

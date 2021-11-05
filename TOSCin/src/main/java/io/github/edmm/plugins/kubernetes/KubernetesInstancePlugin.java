@@ -66,16 +66,18 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     private final TOSCATransformer toscaTransformer;
     private final List<TypeTransformer> myHostTransformers;
     private final String targetNamespace;
+    private final List<String> ignoredContainerNames;
     private CoreV1Api coreV1Api;
     private byte[] base64ConfigContents;
 
     public KubernetesInstancePlugin(
         InstanceTransformationContext context,
         String kubeConfigPath,
-        String targetNamespace) {
+        String targetNamespace, List<String> ignoredContainerNames) {
         super(context);
         this.kubeConfigPath = kubeConfigPath;
         this.targetNamespace = targetNamespace;
+        this.ignoredContainerNames = Objects.requireNonNull(ignoredContainerNames);
         this.myWineryConnector = WineryConnector.getInstance();
         myHostTransformers = Arrays.asList(new UbuntuMapper(myWineryConnector));
         toscaTransformer = new TOSCATransformer(Arrays.asList(new UbuntuMapper(myWineryConnector)));
@@ -198,7 +200,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         v1PodList.getItems().forEach(v1Pod -> v1Pod.getSpec()
                             .getContainers()
                             .stream()
-                            .filter(aV1Container -> !IGNORED_CONTAINER_NAMES.contains(aV1Container.getName()))
+                            .filter(aV1Container -> !ignoredContainerNames.contains(aV1Container.getName()))
                             .forEach(aV1Container -> {
                                 String image = aV1Container.getImage();
                                 String name = aV1Container.getName();
