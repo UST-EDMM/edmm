@@ -7,16 +7,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import io.github.edmm.core.transformation.TransformationException;
-import io.github.edmm.model.ToscaDeploymentTechnology;
-import io.github.edmm.model.ToscaDiscoveryPlugin;
+import io.github.edmm.model.DeploymentTechnologyDescriptor;
+import io.github.edmm.model.DiscoveryPluginDescriptor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.eclipse.winery.model.tosca.TEntityTemplate;
+import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTags;
@@ -46,74 +49,102 @@ public abstract class Util {
     }
 
     public static void updateDeploymenTechnologiesInServiceTemplate(
-            TServiceTemplate serviceTemplate,
-            ObjectMapper objectMapper,
-            List<ToscaDeploymentTechnology> deploymentTechnologies) {
+        TServiceTemplate serviceTemplate,
+        ObjectMapper objectMapper,
+        List<DeploymentTechnologyDescriptor> deploymentTechnologies) {
         try {
             TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DEPLOYMENT_TECHNOLOGIES)
-                    .setValue(objectMapper.writeValueAsString(deploymentTechnologies))
-                    .build();
-            serviceTemplate.getTags()
-                    .getTag()
-                    .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES));
+                .setValue(objectMapper.writeValueAsString(deploymentTechnologies))
+                .build();
+            TTags serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
+                TTags tags = new TTags.Builder().build();
+                serviceTemplate.setTags(tags);
+                return tags;
+            });
+            serviceTemplateTags.getTag()
+                .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES));
             serviceTemplate.getTags().getTag().add(updatedTag);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Could not write terraform deployment technology to JSON string");
         }
     }
 
-    public static List<ToscaDeploymentTechnology> extractDeploymentTechnologiesFromServiceTemplate(
-            TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
+    public static List<DeploymentTechnologyDescriptor> extractDeploymentTechnologiesFromServiceTemplate(
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
-                .map(TTags::getTag)
-                .flatMap(tTags -> tTags.stream()
-                        .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES))
-                        .findAny())
-                .map(TTag::getValue)
-                .map(s -> {
-                    CollectionType collectionType = objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class, ToscaDeploymentTechnology.class);
-                    try {
-                        return objectMapper.<List<ToscaDeploymentTechnology>>readValue(s, collectionType);
-                    } catch (JsonProcessingException e) {
-                        throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
-                    }
-                })
-                .orElseGet(ArrayList::new);
+            .map(TTags::getTag)
+            .flatMap(tTags -> tTags.stream()
+                .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES))
+                .findAny())
+            .map(TTag::getValue)
+            .map(s -> {
+                CollectionType collectionType = objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, DeploymentTechnologyDescriptor.class);
+                try {
+                    return objectMapper.<List<DeploymentTechnologyDescriptor>>readValue(s, collectionType);
+                } catch (JsonProcessingException e) {
+                    throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
+                }
+            })
+            .orElseGet(ArrayList::new);
     }
 
     public static void updateDiscoveryPluginsInServiceTemplate(
-            TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<ToscaDiscoveryPlugin> discoveryPlugins) {
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<DiscoveryPluginDescriptor> discoveryPlugins) {
         try {
             TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DISCOVERY_PLUGINS)
-                    .setValue(objectMapper.writeValueAsString(discoveryPlugins))
-                    .build();
-            serviceTemplate.getTags()
-                    .getTag()
-                    .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS));
+                .setValue(objectMapper.writeValueAsString(discoveryPlugins))
+                .build();
+            TTags serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
+                TTags tags = new TTags.Builder().build();
+                serviceTemplate.setTags(tags);
+                return tags;
+            });
+            serviceTemplateTags.getTag()
+                .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS));
             serviceTemplate.getTags().getTag().add(updatedTag);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Could not write terraform deployment technology to JSON string");
         }
     }
 
-    public static List<ToscaDiscoveryPlugin> extractDiscoveryPluginsFromServiceTemplate(
-            TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
+    public static List<DiscoveryPluginDescriptor> extractDiscoveryPluginsFromServiceTemplate(
+        TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
-                .map(TTags::getTag)
-                .flatMap(tTags -> tTags.stream()
-                        .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS))
-                        .findAny())
-                .map(TTag::getValue)
-                .map(s -> {
-                    CollectionType collectionType = objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class, ToscaDiscoveryPlugin.class);
-                    try {
-                        return objectMapper.<List<ToscaDiscoveryPlugin>>readValue(s, collectionType);
-                    } catch (JsonProcessingException e) {
-                        throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
-                    }
-                })
-                .orElseGet(ArrayList::new);
+            .map(TTags::getTag)
+            .flatMap(tTags -> tTags.stream()
+                .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS))
+                .findAny())
+            .map(TTag::getValue)
+            .map(s -> {
+                CollectionType collectionType = objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, DiscoveryPluginDescriptor.class);
+                try {
+                    return objectMapper.<List<DiscoveryPluginDescriptor>>readValue(s, collectionType);
+                } catch (JsonProcessingException e) {
+                    throw new TransformationException("Deployment technologies tag could not be parsed as JSON", e);
+                }
+            })
+            .orElseGet(ArrayList::new);
+    }
+
+    public static void populateNodeTemplateProperties(TNodeTemplate nodeTemplate,
+                                                      Map<String, String> additionalProperties) {
+        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
+            nodeTemplate.getProperties()
+                .getKVProperties()
+                .entrySet()
+                .stream()
+                .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
+                    .isEmpty())
+                .forEach(entry -> additionalProperties.put(entry.getKey(),
+                    entry.getValue() != null && !entry.getValue()
+                        .isEmpty() ? entry.getValue() : "get_input: " + entry.getKey() + "_" + nodeTemplate.getId()
+                        .replaceAll("(\\s)|(:)|(\\.)", "_")));
+        }
+
+        // workaround to set new properties
+        nodeTemplate.setProperties(new TEntityTemplate.Properties());
+        nodeTemplate.getProperties().setKVProperties(additionalProperties);
     }
 }

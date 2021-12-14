@@ -34,6 +34,8 @@ public class PuppetCommand extends TransformCommand {
     private String operatingSystem;
     @CommandLine.Option(names = {"-osr", "--operatingSystemRelease"})
     private String operatingSystemRelease;
+    @CommandLine.Option(names = {"-env", "--environment"})
+    private String environment;
 
     @Override
     public void run() {
@@ -44,7 +46,8 @@ public class PuppetCommand extends TransformCommand {
             privateKeyLocation,
             port,
             operatingSystem,
-            operatingSystemRelease);
+            operatingSystemRelease,
+            environment);
         InstancePlugin<PuppetInstancePlugin> plugin = new InstancePlugin<>(PUPPET, pluginLifecycle);
         try {
             plugin.execute();

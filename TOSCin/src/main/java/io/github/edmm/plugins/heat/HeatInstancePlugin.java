@@ -67,10 +67,7 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
         } catch (AuthenticationException e) {
             throw new InstanceTransformationException("Failed to authenticate with OpenStack HEAT API", e.getCause());
         }
-    }
 
-    @Override
-    public void getModels() {
         ApiInteractorImpl apiInteractor = new ApiInteractorImpl(this.osClient, stackName, stackId);
         this.stack = apiInteractor.getDeployment();
         this.template = apiInteractor.getModel();
@@ -78,7 +75,7 @@ public class HeatInstancePlugin extends AbstractLifecycleInstancePlugin<HeatInst
     }
 
     @Override
-    public void transformDirectlyToTOSCA() {
+    public void transformToTOSCA() {
 
     }
 

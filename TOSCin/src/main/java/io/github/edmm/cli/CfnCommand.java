@@ -26,10 +26,16 @@ public class CfnCommand extends TransformCommand {
         description = "You need to specify the CFN stack name of the application you want to transform.")
     private String applicationId;
 
+    @CommandLine.Option(names = "--region", defaultValue = "us-east-1", description = "The AWS region your stack is located")
+    private String region;
+
+    public CfnCommand() {
+    }
+
     @Override
     public void run() {
         InstanceTransformationContext context = new InstanceTransformationContext(applicationId, CFN, outputPath);
-        CfnInstancePlugin pluginLifecycle = new CfnInstancePlugin(context);
+        CfnInstancePlugin pluginLifecycle = new CfnInstancePlugin(context, applicationId, region, null);
         InstancePlugin<CfnInstancePlugin> plugin = new InstancePlugin<>(CFN, pluginLifecycle);
         try {
             plugin.execute();
