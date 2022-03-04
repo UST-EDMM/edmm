@@ -1,7 +1,5 @@
 package com.scaleset.cfbuilder.core;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -64,26 +62,6 @@ public class ResourceInvocationHandler<T extends Resource> implements Invocation
         this.id = id;
         this.properties = properties;
         this.metadata = metadata;
-    }
-
-    protected Object doDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
-
-        final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-        if (!constructor.isAccessible()) {
-            constructor.setAccessible(true);
-        }
-
-        Object result = null;
-        if (method.isDefault()) {
-            final Class<?> declaringClass = method.getDeclaringClass();
-            result = constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
-                    .unreflectSpecial(method, declaringClass)
-                    .bindTo(proxy)
-                    .invokeWithArguments(args);
-        }
-
-        // proxy impl of not defaults methods
-        return result;
     }
 
     protected Object doSetter(Object proxy, Method method, Object[] args) {
@@ -165,7 +143,7 @@ public class ResourceInvocationHandler<T extends Resource> implements Invocation
         } else if (isRef(method, args)) {
             result = ref();
         } else if (method.isDefault()) {
-            result = doDefaultMethod(proxy, method, args);
+            result = InvocationHandler.invokeDefault(proxy, method, args);
         } else if (isSetter(method, args)) {
             result = doSetter(proxy, method, args);
         } else {

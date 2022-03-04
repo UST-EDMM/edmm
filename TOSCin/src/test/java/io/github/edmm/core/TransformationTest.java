@@ -1,6 +1,7 @@
 package io.github.edmm.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -55,9 +56,10 @@ public class TransformationTest {
     }
 
     @AfterEach
-    public void destroy() throws Exception {
+    public void destroy() {
         if (this.file != null) {
-            FileUtils.deleteDirectory(this.file);
+            this.file.delete();
+            this.file.deleteOnExit();
         }
     }
 }
