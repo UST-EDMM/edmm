@@ -11,10 +11,10 @@ import com.scaleset.cfbuilder.ec2.instance.ElasticGpuSpecification;
 import com.scaleset.cfbuilder.ec2.instance.SSMAssociation;
 import com.scaleset.cfbuilder.ec2.instance.ec2blockdevicemapping.EC2EBSBlockDevice;
 import com.scaleset.cfbuilder.ec2.instance.ssmassociation.AssociationParameter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test ec2 instance templates built with the cloudformation builder. Ec2withEbs and autoPubIP examples taken from
@@ -22,44 +22,44 @@ import static org.junit.Assert.assertNotNull;
  */
 public class InstanceTest {
     private String expectedEc2withEbsTemplateString = "---\n" +
-            "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
-            "Description: \"Ec2 block device mapping\"\n" +
-            "Resources:\n" +
-            "  MyEC2Instance:\n" +
-            "    Type: \"AWS::EC2::Instance\"\n" +
-            "    Properties:\n" +
-            "      ImageId: \"ami-79fd7eee\"\n" +
-            "      KeyName: \"testkey\"\n" +
-            "      BlockDeviceMappings:\n" +
-            "      - DeviceName: \"/dev/sdm\"\n" +
-            "        Ebs:\n" +
-            "          DeleteOnTermination: false\n" +
-            "          Iops: 200\n" +
-            "          VolumeSize: \"20\"\n" +
-            "          VolumeType: \"io1\"\n" +
-            "      - DeviceName: \"/dev/sdk\"\n" +
-            "        NoDevice: false\n";
+        "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
+        "Description: \"Ec2 block device mapping\"\n" +
+        "Resources:\n" +
+        "  MyEC2Instance:\n" +
+        "    Type: \"AWS::EC2::Instance\"\n" +
+        "    Properties:\n" +
+        "      ImageId: \"ami-79fd7eee\"\n" +
+        "      KeyName: \"testkey\"\n" +
+        "      BlockDeviceMappings:\n" +
+        "      - DeviceName: \"/dev/sdm\"\n" +
+        "        Ebs:\n" +
+        "          DeleteOnTermination: false\n" +
+        "          Iops: 200\n" +
+        "          VolumeSize: \"20\"\n" +
+        "          VolumeType: \"io1\"\n" +
+        "      - DeviceName: \"/dev/sdk\"\n" +
+        "        NoDevice: false\n";
 
     private String expectedAutoPubIPTemplateString = "---\n" +
-            "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
-            "Resources:\n" +
-            "  Ec2Instance:\n" +
-            "    Type: \"AWS::EC2::Instance\"\n" +
-            "    Properties:\n" +
-            "      ImageId:\n" +
-            "        Fn::FindInMap:\n" +
-            "        - \"RegionMap\"\n" +
-            "        - Ref: \"AWS::Region\"\n" +
-            "        - \"AMI\"\n" +
-            "      KeyName:\n" +
-            "        Ref: \"KeyName\"\n" +
-            "      NetworkInterfaces:\n" +
-            "      - AssociatePublicIpAddress: true\n" +
-            "        DeviceIndex: \"0\"\n" +
-            "        GroupSet:\n" +
-            "        - Ref: \"myVPCEC2SecurityGroup\"\n" +
-            "        SubnetId:\n" +
-            "          Ref: \"PublicSubnet\"\n";
+        "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
+        "Resources:\n" +
+        "  Ec2Instance:\n" +
+        "    Type: \"AWS::EC2::Instance\"\n" +
+        "    Properties:\n" +
+        "      ImageId:\n" +
+        "        Fn::FindInMap:\n" +
+        "        - \"RegionMap\"\n" +
+        "        - Ref: \"AWS::Region\"\n" +
+        "        - \"AMI\"\n" +
+        "      KeyName:\n" +
+        "        Ref: \"KeyName\"\n" +
+        "      NetworkInterfaces:\n" +
+        "      - AssociatePublicIpAddress: true\n" +
+        "        DeviceIndex: \"0\"\n" +
+        "        GroupSet:\n" +
+        "        - Ref: \"myVPCEC2SecurityGroup\"\n" +
+        "        SubnetId:\n" +
+        "          Ref: \"PublicSubnet\"\n";
 
     @Test
     public void ec2withEbs() {
@@ -98,40 +98,40 @@ public class InstanceTest {
             this.template.setDescription("Ec2 block device mapping");
 
             EC2EBSBlockDevice ec2EBSBlockDeviceA = new EC2EBSBlockDevice()
-                    .volumeType("io1")
-                    .iops(200)
-                    .deleteOnTermination(false)
-                    .volumeSize("20");
+                .volumeType("io1")
+                .iops(200)
+                .deleteOnTermination(false)
+                .volumeSize("20");
             EC2BlockDeviceMapping ec2BlockDeviceMappingA = new EC2BlockDeviceMapping()
-                    .deviceName("/dev/sdm")
-                    .ebs(ec2EBSBlockDeviceA);
+                .deviceName("/dev/sdm")
+                .ebs(ec2EBSBlockDeviceA);
 
             EC2BlockDeviceMapping ec2BlockDeviceMappingB = new EC2BlockDeviceMapping()
-                    .deviceName("/dev/sdk")
-                    .noDevice(false);
+                .deviceName("/dev/sdk")
+                .noDevice(false);
 
             resource(Instance.class, "MyEC2Instance")
-                    .imageId("ami-79fd7eee")
-                    .keyName("testkey")
-                    .blockDeviceMappings(ec2BlockDeviceMappingA, ec2BlockDeviceMappingB);
+                .imageId("ami-79fd7eee")
+                .keyName("testkey")
+                .blockDeviceMappings(ec2BlockDeviceMappingA, ec2BlockDeviceMappingB);
         }
     }
 
     class AutoPubIPModule extends Module {
         public void build() {
             EC2NetworkInterface ec2NetworkInterface = new EC2NetworkInterface()
-                    .associatePublicIpAddress(true)
-                    .deviceIndex("0")
-                    .addGroupSet(ref("myVPCEC2SecurityGroup"))
-                    .subnetId(ref("PublicSubnet"));
+                .associatePublicIpAddress(true)
+                .deviceIndex("0")
+                .addGroupSet(ref("myVPCEC2SecurityGroup"))
+                .subnetId(ref("PublicSubnet"));
 
             resource(Instance.class, "Ec2Instance")
-                    .imageId(new Fn("FindInMap",
-                            "RegionMap",
-                            ref("AWS::Region"),
-                            "AMI"))
-                    .keyName(ref("KeyName"))
-                    .networkInterfaces(ec2NetworkInterface);
+                .imageId(new Fn("FindInMap",
+                    "RegionMap",
+                    ref("AWS::Region"),
+                    "AMI"))
+                .keyName(ref("KeyName"))
+                .networkInterfaces(ec2NetworkInterface);
         }
     }
 
@@ -142,37 +142,37 @@ public class InstanceTest {
             ElasticGpuSpecification elasticGpuSpecification = new ElasticGpuSpecification().type("abc");
             elasticGpuSpecification.setType(elasticGpuSpecification.getType());
             EC2EBSBlockDevice ec2EBSBlockDevice = new EC2EBSBlockDevice()
-                    .deleteOnTermination(false)
-                    .iops(199)
-                    .volumeSize("volumeSizeVal")
-                    .volumeType("volumeTypeVal")
-                    .encrypted(true)
-                    .snapshotId("snapshotIdVal");
+                .deleteOnTermination(false)
+                .iops(199)
+                .volumeSize("volumeSizeVal")
+                .volumeType("volumeTypeVal")
+                .encrypted(true)
+                .snapshotId("snapshotIdVal");
             EC2BlockDeviceMapping ec2BlockDeviceMapping = new EC2BlockDeviceMapping()
-                    .deviceName("deviceNameVal")
-                    .noDevice(false)
-                    .ebs(ec2EBSBlockDevice)
-                    .virtualName("virtualNameVal");
+                .deviceName("deviceNameVal")
+                .noDevice(false)
+                .ebs(ec2EBSBlockDevice)
+                .virtualName("virtualNameVal");
             EC2MountPoint ec2MountPoint = new EC2MountPoint()
-                    .device("deviceVal")
-                    .volumeId("volumeIdVal");
+                .device("deviceVal")
+                .volumeId("volumeIdVal");
             AssociationParameter associationParameter = new AssociationParameter()
-                    .addValue("valueVal")
-                    .key("keyVal");
+                .addValue("valueVal")
+                .key("keyVal");
             SSMAssociation ssmAssociation = new SSMAssociation()
-                    .documentName("documentNameVal")
-                    .addAssociationParameters(associationParameter);
+                .documentName("documentNameVal")
+                .addAssociationParameters(associationParameter);
             resource(SecurityGroupIngress.class, "SecurityGroupIngressName")
-                    .cidrIp("cidrIpVal")
-                    .groupName("grouNameVal")
-                    .sourceSecurityGroupName("sourceSecurityGroupNameVal")
-                    .sourceSecurityGroupOwnerId("sourceSecurityGroupOwnerIdVal");
+                .cidrIp("cidrIpVal")
+                .groupName("grouNameVal")
+                .sourceSecurityGroupName("sourceSecurityGroupNameVal")
+                .sourceSecurityGroupOwnerId("sourceSecurityGroupOwnerIdVal");
             resource(Instance.class, "Ec2Test")
-                    .creditSpecification(creditSpecification)
-                    .elasticGpuSpecifications(elasticGpuSpecification)
-                    .blockDeviceMappings(ec2BlockDeviceMapping)
-                    .volumes(ec2MountPoint)
-                    .ssmAssociations(ssmAssociation);
+                .creditSpecification(creditSpecification)
+                .elasticGpuSpecifications(elasticGpuSpecification)
+                .blockDeviceMappings(ec2BlockDeviceMapping)
+                .volumes(ec2MountPoint)
+                .ssmAssociations(ssmAssociation);
         }
     }
 }

@@ -2,9 +2,9 @@ package com.scaleset.cfbuilder.beanstalk;
 
 import com.scaleset.cfbuilder.core.Module;
 import com.scaleset.cfbuilder.core.Template;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanstalkTest {
 
@@ -22,25 +22,25 @@ public class BeanstalkTest {
         public void build() {
             this.template.setDescription("Beanstalk Application");
             Application sampleApplication = resource(Application.class, "SampleApplication")
-                    .description("AWS ElasticBeanstalk Sample Application");
+                .description("AWS ElasticBeanstalk Sample Application");
             SourceBundle exampleSourceBundle = new SourceBundle("sample-bucket.s3.amazonaws.com", "sampleapp.jar");
             ApplicationVersion sampleApplicationVersion = resource(ApplicationVersion.class, "sampleApplicationVersion")
-                    .applicationName(sampleApplication)
-                    .description("AWS ElasticBeanstalk Sample Application Version")
-                    .sourceBundle(exampleSourceBundle);
+                .applicationName(sampleApplication)
+                .description("AWS ElasticBeanstalk Sample Application Version")
+                .sourceBundle(exampleSourceBundle);
             OptionSetting loadBalanceOption = new OptionSetting("aws:elasticbeanstalk:environment", "EnvironmentType")
-                    .setValue("LoadBalanced");
+                .setValue("LoadBalanced");
             ConfigurationTemplate sampleConfigurationTemplate = resource(ConfigurationTemplate.class,
-                    "sampleConfigurationTemplate")
-                    .applicationName(sampleApplication)
-                    .description("AWS ElasticBeanstalk Sample Configuration Template")
-                    .solutionStackName("64bit Amazon Linux 2017.09 v2.6.6 running Java 8")
-                    .optionSettings(loadBalanceOption);
+                "sampleConfigurationTemplate")
+                .applicationName(sampleApplication)
+                .description("AWS ElasticBeanstalk Sample Configuration Template")
+                .solutionStackName("64bit Amazon Linux 2017.09 v2.6.6 running Java 8")
+                .optionSettings(loadBalanceOption);
             resource(Environment.class, "sampleEnvironment")
-                    .applicationName(sampleApplication)
-                    .description("AWS ElasticBeanstalk Sample Environment")
-                    .templateName(sampleConfigurationTemplate)
-                    .versionLabel(sampleApplicationVersion);
+                .applicationName(sampleApplication)
+                .description("AWS ElasticBeanstalk Sample Environment")
+                .templateName(sampleConfigurationTemplate)
+                .versionLabel(sampleApplicationVersion);
         }
     }
 }

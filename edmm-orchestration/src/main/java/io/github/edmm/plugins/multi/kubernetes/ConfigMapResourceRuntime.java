@@ -10,7 +10,6 @@ import io.github.edmm.plugins.kubernetes.model.KubernetesResource;
 import io.kubernetes.client.models.V1ConfigMap;
 import io.kubernetes.client.models.V1ConfigMapBuilder;
 import io.kubernetes.client.util.Yaml;
-import lombok.var;
 
 public final class ConfigMapResourceRuntime implements KubernetesResource {
     String[] blacklist = {"key_name", "public_key", "hostname"};

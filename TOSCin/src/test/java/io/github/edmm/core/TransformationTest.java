@@ -9,13 +9,13 @@ import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.model.edimm.DeploymentInstance;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransformationTest {
 
@@ -54,7 +54,7 @@ public class TransformationTest {
         assertEquals(expectedString, actualString);
     }
 
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         if (this.file != null) {
             FileUtils.deleteDirectory(this.file);

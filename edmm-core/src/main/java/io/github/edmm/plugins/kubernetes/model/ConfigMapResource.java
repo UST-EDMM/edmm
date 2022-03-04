@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.client.internal.SerializationUtils;
-import lombok.var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

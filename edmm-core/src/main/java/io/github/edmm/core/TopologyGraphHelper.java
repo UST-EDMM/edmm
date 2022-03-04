@@ -20,7 +20,6 @@ import io.github.edmm.model.relation.HostedOn;
 import io.github.edmm.model.relation.RootRelation;
 
 import com.google.common.collect.Lists;
-import lombok.var;
 import org.jgrapht.Graph;
 
 public abstract class TopologyGraphHelper {

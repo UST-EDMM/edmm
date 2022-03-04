@@ -20,7 +20,6 @@ import io.github.edmm.core.parser.support.GraphNormalizer;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.var;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.yaml.snakeyaml.DumperOptions;

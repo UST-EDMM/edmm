@@ -5,10 +5,10 @@ import com.scaleset.cfbuilder.core.Module;
 import com.scaleset.cfbuilder.core.Tag;
 import com.scaleset.cfbuilder.core.Template;
 import com.scaleset.cfbuilder.ec2.instance.EC2NetworkInterface;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test templates using all {@code AWS::EC2} types built with the cloudformation builder. Examples taken from <a
@@ -16,117 +16,119 @@ import static org.junit.Assert.assertNotNull;
  * </a>.
  */
 public class Ec2Test {
-    private String expectedVpcInstanceWithEniTemplateString = "---\n" +
-            "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
-            "Resources:\n" +
-            "  ControlPortAddress:\n" +
-            "    Type: \"AWS::EC2::EIP\"\n" +
-            "    Properties:\n" +
-            "      Domain: \"vpc\"\n" +
-            "  Ec2Instance:\n" +
-            "    Type: \"AWS::EC2::Instance\"\n" +
-            "    Properties:\n" +
-            "      ImageId:\n" +
-            "        Fn::FindInMap:\n" +
-            "        - \"RegionMap\"\n" +
-            "        - Ref: \"'AWS::Region'\"\n" +
-            "        - \"AMI\"\n" +
-            "      KeyName:\n" +
-            "        Ref: \"KeyName\"\n" +
-            "      NetworkInterfaces: []\n" +
-            "      UserData:\n" +
-            "        Fn::Base64:\n" +
-            "          Fn::Join:\n" +
-            "          - \"\"\n" +
-            "          - - \"#!/bin/bash -xe\"\n" +
-            "            - \"yum install ec2-net-utils -y\"\n" +
-            "            - \"ec2ifup eth1\"\n" +
-            "            - \"service httpd start\"\n" +
-            "      Tags:\n" +
-            "      - Value: \"Role\"\n" +
-            "        Key: \"Key\"\n" +
-            "      - Value: \"Test Instance\"\n" +
-            "        Key: \"Value\"\n" +
-            "  AssociateControlPort:\n" +
-            "    Type: \"AWS::EC2::EIPAssociation\"\n" +
-            "    Properties:\n" +
-            "      AllocationId:\n" +
-            "        Fn::GetAtt:\n" +
-            "        - \"ControlPortAddress\"\n" +
-            "        - \"AllocationId\"\n" +
-            "      NetworkInterfaceId:\n" +
-            "        Ref: \"controlXface\"\n" +
-            "  controlXface:\n" +
-            "    Type: \"AWS::EC2::NetworkInterface\"\n" +
-            "    Properties:\n" +
-            "      SubnetId:\n" +
-            "        Ref: \"SubnetId\"\n" +
-            "      Description: \"Interace for controlling traffic such as SSH\"\n" +
-            "      GroupSet:\n" +
-            "      - Ref: \"SSHSecurityGroup\"\n" +
-            "      SourceDestCheck: true\n" +
-            "      Tags:\n" +
-            "      - Value: \"Network\"\n" +
-            "        Key: \"Key\"\n" +
-            "      - Value: \"Control\"\n" +
-            "        Key: \"Value\"\n" +
-            "  SSHSecurityGroup:\n" +
-            "    Type: \"AWS::EC2::SecurityGroup\"\n" +
-            "    Properties:\n" +
-            "      VpcId:\n" +
-            "        Ref: \"VpcId\"\n" +
-            "      GroupDescription: \"Enable SSH access via port 22\"\n" +
-            "      SecurityGroupIngress:\n" +
-            "      - IpProtocol: \"tcp\"\n" +
-            "        CidrIp: \"0.0.0.0/0\"\n" +
-            "        FromPort: 22\n" +
-            "        ToPort: 22\n" +
-            "      - IpProtocol: \"tcp\"\n" +
-            "        CidrIp: \"0.0.0.0/0\"\n" +
-            "        FromPort: 22\n" +
-            "        ToPort: 22\n" +
-            "  webXface:\n" +
-            "    Type: \"AWS::EC2::NetworkInterface\"\n" +
-            "    Properties:\n" +
-            "      SubnetId:\n" +
-            "        Ref: \"SubNetId\"\n" +
-            "      Description: \"Interface for controlling traffic such as SSH\"\n" +
-            "      GroupSet:\n" +
-            "      - Ref: \"WebSecurityGroup\"\n" +
-            "      SourceDestCheck: true\n" +
-            "      Tags:\n" +
-            "      - Value: \"Network\"\n" +
-            "        Key: \"Key\"\n" +
-            "      - Value: \"Web\"\n" +
-            "        Key: \"Value\"\n" +
-            "  WebSecurityGroup:\n" +
-            "    Type: \"AWS::EC2::SecurityGroup\"\n" +
-            "    Properties:\n" +
-            "      VpcId:\n" +
-            "        Ref: \"VpcId\"\n" +
-            "      GroupDescription: \"Enable HTTP access via user defined port\"\n" +
-            "      SecurityGroupIngress:\n" +
-            "      - IpProtocol: \"tcp\"\n" +
-            "        CidrIp: \"0.0.0.0/0\"\n" +
-            "        FromPort: 80\n" +
-            "        ToPort: 80\n" +
-            "      - IpProtocol: \"tcp\"\n" +
-            "        CidrIp: \"0.0.0.0/0\"\n" +
-            "        FromPort: 80\n" +
-            "        ToPort: 80\n" +
-            "  WebPortAddress:\n" +
-            "    Type: \"AWS::EC2::EIP\"\n" +
-            "    Properties:\n" +
-            "      Domain: \"vpc\"\n" +
-            "  AssociateWebPort:\n" +
-            "    Type: \"AWS::EC2::EIPAssociation\"\n" +
-            "    Properties:\n" +
-            "      AllocationId:\n" +
-            "        Fn::GetAtt:\n" +
-            "        - \"WebPortAddress\"\n" +
-            "        - \"AllocationId\"\n" +
-            "      NetworkInterfaceId:\n" +
-            "        Ref: \"webXface\"\n";
+    private String expectedVpcInstanceWithEniTemplateString = """
+        ---
+        AWSTemplateFormatVersion: "2010-09-09"
+        Resources:
+          ControlPortAddress:
+            Type: "AWS::EC2::EIP"
+            Properties:
+              Domain: "vpc"
+          Ec2Instance:
+            Type: "AWS::EC2::Instance"
+            Properties:
+              ImageId:
+                Fn::FindInMap:
+                - "RegionMap"
+                - Ref: "'AWS::Region'"
+                - "AMI"
+              KeyName:
+                Ref: "KeyName"
+              NetworkInterfaces: []
+              UserData:
+                Fn::Base64:
+                  Fn::Join:
+                  - ""
+                  - - "#!/bin/bash -xe"
+                    - "yum install ec2-net-utils -y"
+                    - "ec2ifup eth1"
+                    - "service httpd start"
+              Tags:
+              - Value: "Role"
+                Key: "Key"
+              - Value: "Test Instance"
+                Key: "Value"
+          AssociateControlPort:
+            Type: "AWS::EC2::EIPAssociation"
+            Properties:
+              AllocationId:
+                Fn::GetAtt:
+                - "ControlPortAddress"
+                - "AllocationId"
+              NetworkInterfaceId:
+                Ref: "controlXface"
+          controlXface:
+            Type: "AWS::EC2::NetworkInterface"
+            Properties:
+              SubnetId:
+                Ref: "SubnetId"
+              Description: "Interace for controlling traffic such as SSH"
+              GroupSet:
+              - Ref: "SSHSecurityGroup"
+              SourceDestCheck: true
+              Tags:
+              - Value: "Network"
+                Key: "Key"
+              - Value: "Control"
+                Key: "Value"
+          SSHSecurityGroup:
+            Type: "AWS::EC2::SecurityGroup"
+            Properties:
+              VpcId:
+                Ref: "VpcId"
+              GroupDescription: "Enable SSH access via port 22"
+              SecurityGroupIngress:
+              - IpProtocol: "tcp"
+                CidrIp: "0.0.0.0/0"
+                FromPort: 22
+                ToPort: 22
+              - IpProtocol: "tcp"
+                CidrIp: "0.0.0.0/0"
+                FromPort: 22
+                ToPort: 22
+          webXface:
+            Type: "AWS::EC2::NetworkInterface"
+            Properties:
+              SubnetId:
+                Ref: "SubNetId"
+              Description: "Interface for controlling traffic such as SSH"
+              GroupSet:
+              - Ref: "WebSecurityGroup"
+              SourceDestCheck: true
+              Tags:
+              - Value: "Network"
+                Key: "Key"
+              - Value: "Web"
+                Key: "Value"
+          WebSecurityGroup:
+            Type: "AWS::EC2::SecurityGroup"
+            Properties:
+              VpcId:
+                Ref: "VpcId"
+              GroupDescription: "Enable HTTP access via user defined port"
+              SecurityGroupIngress:
+              - IpProtocol: "tcp"
+                CidrIp: "0.0.0.0/0"
+                FromPort: 80
+                ToPort: 80
+              - IpProtocol: "tcp"
+                CidrIp: "0.0.0.0/0"
+                FromPort: 80
+                ToPort: 80
+          WebPortAddress:
+            Type: "AWS::EC2::EIP"
+            Properties:
+              Domain: "vpc"
+          AssociateWebPort:
+            Type: "AWS::EC2::EIPAssociation"
+            Properties:
+              AllocationId:
+                Fn::GetAtt:
+                - "WebPortAddress"
+                - "AllocationId"
+              NetworkInterfaceId:
+                Ref: "webXface"
+        """;
 
     @Test
     public void vpcInstanceWithEni() {
@@ -141,58 +143,58 @@ public class Ec2Test {
 
     class VpcInstanceWithEniModule extends Module {
         private String userDataString = "!Sub |\n" +
-                "          #!/bin/bash -xe\n" +
-                "          yum install ec2-net-utils -y\n" +
-                "          ec2ifup eth1\n" +
-                "          service httpd start";
+            "          #!/bin/bash -xe\n" +
+            "          yum install ec2-net-utils -y\n" +
+            "          ec2ifup eth1\n" +
+            "          service httpd start";
 
         public void build() {
             resource(Eip.class, "ControlPortAddress")
-                    .domain("vpc");
+                .domain("vpc");
             resource(EipAssociation.class, "AssociateControlPort")
-                    .allocationId(fnGetAtt("ControlPortAddress", "AllocationId"))
-                    .networkInterfaceId(ref("controlXface"));
+                .allocationId(fnGetAtt("ControlPortAddress", "AllocationId"))
+                .networkInterfaceId(ref("controlXface"));
             resource(Eip.class, "WebPortAddress")
-                    .domain("vpc");
+                .domain("vpc");
             resource(EipAssociation.class, "AssociateWebPort")
-                    .allocationId(fnGetAtt("WebPortAddress", "AllocationId"))
-                    .networkInterfaceId(ref("webXface"));
+                .allocationId(fnGetAtt("WebPortAddress", "AllocationId"))
+                .networkInterfaceId(ref("webXface"));
             resource(SecurityGroup.class, "SSHSecurityGroup")
-                    .vpcId(ref("VpcId"))
-                    .groupDescription("Enable SSH access via port 22")
-                    .ingress(ingress -> ingress.cidrIp("0.0.0.0/0"), "tcp", 22, 22);
+                .vpcId(ref("VpcId"))
+                .groupDescription("Enable SSH access via port 22")
+                .ingress(ingress -> ingress.cidrIp("0.0.0.0/0"), "tcp", 22, 22);
             resource(SecurityGroup.class, "WebSecurityGroup")
-                    .vpcId(ref("VpcId"))
-                    .groupDescription("Enable HTTP access via user defined port")
-                    .ingress(ingress -> ingress.cidrIp("0.0.0.0/0"), "tcp", 80, 80);
+                .vpcId(ref("VpcId"))
+                .groupDescription("Enable HTTP access via user defined port")
+                .ingress(ingress -> ingress.cidrIp("0.0.0.0/0"), "tcp", 80, 80);
             resource(NetworkInterface.class, "controlXface")
-                    .subnetId(ref("SubnetId"))
-                    .description("Interace for controlling traffic such as SSH")
-                    .groupSet(ref("SSHSecurityGroup"))
-                    .sourceDestCheck(true)
-                    .tags(new Tag("Key", "Network"), new Tag("Value", "Control"));
+                .subnetId(ref("SubnetId"))
+                .description("Interace for controlling traffic such as SSH")
+                .groupSet(ref("SSHSecurityGroup"))
+                .sourceDestCheck(true)
+                .tags(new Tag("Key", "Network"), new Tag("Value", "Control"));
             resource(NetworkInterface.class, "webXface")
-                    .subnetId(ref("SubNetId"))
-                    .description("Interface for controlling traffic such as SSH")
-                    .groupSet(ref("WebSecurityGroup"))
-                    .sourceDestCheck(true)
-                    .tags(new Tag("Key", "Network"), new Tag("Value", "Web"));
+                .subnetId(ref("SubNetId"))
+                .description("Interface for controlling traffic such as SSH")
+                .groupSet(ref("WebSecurityGroup"))
+                .sourceDestCheck(true)
+                .tags(new Tag("Key", "Network"), new Tag("Value", "Web"));
             EC2NetworkInterface networkInterfaceA = new EC2NetworkInterface()
-                    .networkInterfaceId(ref("controlXface"))
-                    .deviceIndex("0");
+                .networkInterfaceId(ref("controlXface"))
+                .deviceIndex("0");
             EC2NetworkInterface networkInterfaceB = new EC2NetworkInterface()
-                    .networkInterfaceId(ref("webXface"))
-                    .deviceIndex("1");
+                .networkInterfaceId(ref("webXface"))
+                .deviceIndex("1");
             resource(Instance.class, "Ec2Instance")
-                    .imageId(new Fn("FindInMap", "RegionMap", ref("'AWS::Region'"), "AMI"))
-                    .keyName(ref("KeyName"))
-                    .networkInterfaces()
-                    .userData(new UserData(Fn.fnDelimiter("Join", "",
-                            "#!/bin/bash -xe",
-                            "yum install ec2-net-utils -y",
-                            "ec2ifup eth1",
-                            "service httpd start")))
-                    .tags(new Tag("Key", "Role"), new Tag("Value", "Test Instance"));
+                .imageId(new Fn("FindInMap", "RegionMap", ref("'AWS::Region'"), "AMI"))
+                .keyName(ref("KeyName"))
+                .networkInterfaces()
+                .userData(new UserData(Fn.fnDelimiter("Join", "",
+                    "#!/bin/bash -xe",
+                    "yum install ec2-net-utils -y",
+                    "ec2ifup eth1",
+                    "service httpd start")))
+                .tags(new Tag("Key", "Role"), new Tag("Value", "Test Instance"));
         }
     }
 }
