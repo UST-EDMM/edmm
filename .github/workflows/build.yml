@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
 
-  java:
+  java-17:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,6 +13,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          cache: 'maven'
+      - name: Build with Maven
+        run: mvn -B package
+  java-8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 8
           cache: 'maven'
       - name: Build with Maven
         run: mvn -B package
