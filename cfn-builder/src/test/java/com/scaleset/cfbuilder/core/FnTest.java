@@ -11,10 +11,9 @@ public class FnTest {
         Fn fn = Fn.fnGetAtt("mydb", "Endpoint.Address");
         String yaml = fn.toString(true);
         // System.out.println(yaml);
-        String expected = """
-            Fn::GetAtt:
-            - "mydb"
-            - "Endpoint.Address\"""";
+        String expected = "Fn::GetAtt:\n" +
+                "- \"mydb\"\n" +
+                "- \"Endpoint.Address\"";
         assertEquals(yaml, expected);
     }
 }

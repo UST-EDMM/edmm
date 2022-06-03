@@ -14,41 +14,37 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ebs-volume.html">here</a>.
  */
 public class VolumeTest {
-    private final String expectedEncEbsSnapTemplateString = """
-        ---
-        AWSTemplateFormatVersion: "2010-09-09"
-        Resources:
-          NewVolume:
-            Type: "AWS::EC2::Volume"
-            Properties:
-              Size: 100
-              Encrypted: true
-              AvailabilityZone:
-                Fn::GetAtt:
-                - "Ec2Instance"
-                - "AvailabilityZone"
-              Tags:
-              - Value: "MyTag"
-                Key: "Key"
-              - Value: "TagValue"
-                Key: "Value"
-        """;
+    private String expectedEncEbsSnapTemplateString = "---\n" +
+            "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
+            "Resources:\n" +
+            "  NewVolume:\n" +
+            "    Type: \"AWS::EC2::Volume\"\n" +
+            "    Properties:\n" +
+            "      Size: 100\n" +
+            "      Encrypted: true\n" +
+            "      AvailabilityZone:\n" +
+            "        Fn::GetAtt:\n" +
+            "        - \"Ec2Instance\"\n" +
+            "        - \"AvailabilityZone\"\n" +
+            "      Tags:\n" +
+            "      - Value: \"MyTag\"\n" +
+            "        Key: \"Key\"\n" +
+            "      - Value: \"TagValue\"\n" +
+            "        Key: \"Value\"\n";
 
-    private final String expectedEbs100IopsTemplateString = """
-        ---
-        AWSTemplateFormatVersion: "2010-09-09"
-        Resources:
-          NewVolume:
-            Type: "AWS::EC2::Volume"
-            Properties:
-              Size: 100
-              VolumeType: "io1"
-              Iops: 100
-              AvailabilityZone:
-                Fn::GetAtt:
-                - "EC2Instance"
-                - "AvailabilityZone"
-        """;
+    private String expectedEbs100IopsTemplateString = "---\n" +
+            "AWSTemplateFormatVersion: \"2010-09-09\"\n" +
+            "Resources:\n" +
+            "  NewVolume:\n" +
+            "    Type: \"AWS::EC2::Volume\"\n" +
+            "    Properties:\n" +
+            "      Size: 100\n" +
+            "      VolumeType: \"io1\"\n" +
+            "      Iops: 100\n" +
+            "      AvailabilityZone:\n" +
+            "        Fn::GetAtt:\n" +
+            "        - \"EC2Instance\"\n" +
+            "        - \"AvailabilityZone\"\n";
 
     @Test
     public void encEbsSnap() {
