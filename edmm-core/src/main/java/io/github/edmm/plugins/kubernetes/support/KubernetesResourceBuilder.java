@@ -15,7 +15,6 @@ import io.github.edmm.plugins.kubernetes.model.DeploymentResource;
 import io.github.edmm.plugins.kubernetes.model.KubernetesResource;
 import io.github.edmm.plugins.kubernetes.model.ServiceResource;
 
-import lombok.var;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

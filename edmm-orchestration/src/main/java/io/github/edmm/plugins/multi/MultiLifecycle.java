@@ -38,7 +38,6 @@ import io.github.edmm.plugins.multi.undefined_technology.UndefinedAreaLifeCycle;
 import io.github.edmm.plugins.multi.workflows.Templating;
 
 import com.google.gson.Gson;
-import lombok.var;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.EdgeReversedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;

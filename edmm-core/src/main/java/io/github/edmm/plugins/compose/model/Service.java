@@ -14,7 +14,6 @@ import io.github.edmm.model.support.TypeWrapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.var;
 
 @Data
 @NoArgsConstructor

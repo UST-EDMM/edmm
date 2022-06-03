@@ -10,7 +10,6 @@ import io.github.edmm.model.Property;
 import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.relation.RootRelation;
 
-import lombok.var;
 import org.apache.commons.io.FilenameUtils;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;

@@ -17,7 +17,6 @@ import io.github.edmm.plugins.multi.model.ComponentProperties;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import lombok.var;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;

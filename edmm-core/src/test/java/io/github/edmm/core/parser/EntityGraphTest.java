@@ -7,10 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.ClassPathResource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EntityGraphTest {
 
@@ -18,7 +19,7 @@ public class EntityGraphTest {
     public void testBasicParsing() throws Exception {
         ClassPathResource resource = new ClassPathResource("templates/unit-tests/properties.yml");
         EntityGraph graph = new EntityGraph(resource.getInputStream());
-        Assert.assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version"))
+        assertEquals("edm_1_0", ((ScalarEntity) graph.getEntity(EntityGraph.ROOT.extend("version"))
             .orElseThrow(IllegalStateException::new)).getValue());
     }
 

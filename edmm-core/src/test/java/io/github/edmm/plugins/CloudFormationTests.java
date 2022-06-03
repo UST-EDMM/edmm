@@ -4,7 +4,7 @@ import java.nio.file.Files;
 
 import io.github.edmm.plugins.cfn.CloudFormationPlugin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 public class CloudFormationTests extends PluginTest {

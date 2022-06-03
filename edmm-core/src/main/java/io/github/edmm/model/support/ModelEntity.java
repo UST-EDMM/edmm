@@ -16,7 +16,6 @@ import io.github.edmm.model.Operation;
 import io.github.edmm.model.Property;
 
 import lombok.ToString;
-import lombok.var;
 
 @ToString
 public abstract class ModelEntity extends DescribableElement {

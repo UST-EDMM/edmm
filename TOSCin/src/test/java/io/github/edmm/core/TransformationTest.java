@@ -1,6 +1,7 @@
 package io.github.edmm.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -9,13 +10,13 @@ import io.github.edmm.core.yaml.EDMMiYamlTransformer;
 import io.github.edmm.model.edimm.DeploymentInstance;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransformationTest {
 
@@ -54,10 +55,11 @@ public class TransformationTest {
         assertEquals(expectedString, actualString);
     }
 
-    @After
-    public void destroy() throws Exception {
+    @AfterEach
+    public void destroy() {
         if (this.file != null) {
-            FileUtils.deleteDirectory(this.file);
+            this.file.delete();
+            this.file.deleteOnExit();
         }
     }
 }

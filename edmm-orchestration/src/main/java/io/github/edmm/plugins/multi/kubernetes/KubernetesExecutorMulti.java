@@ -29,7 +29,6 @@ import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1Service;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Yaml;
-import lombok.var;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

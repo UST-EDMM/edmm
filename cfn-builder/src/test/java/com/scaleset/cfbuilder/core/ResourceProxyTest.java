@@ -3,10 +3,11 @@ package com.scaleset.cfbuilder.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scaleset.cfbuilder.ec2.Instance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ResourceProxyTest extends Assert {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class ResourceProxyTest {
 
     @Test
     public void testRef() throws JsonProcessingException {

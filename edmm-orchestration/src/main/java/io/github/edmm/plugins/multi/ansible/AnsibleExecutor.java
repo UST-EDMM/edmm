@@ -18,7 +18,6 @@ import io.github.edmm.plugins.multi.DeploymentExecutor;
 import io.github.edmm.plugins.multi.model.ComponentProperties;
 
 import com.google.gson.JsonObject;
-import lombok.var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

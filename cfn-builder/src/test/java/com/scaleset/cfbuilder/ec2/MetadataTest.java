@@ -20,12 +20,12 @@ import com.scaleset.cfbuilder.iam.PolicyDocument;
 import com.scaleset.cfbuilder.iam.Principal;
 import com.scaleset.cfbuilder.iam.Role;
 import com.scaleset.cfbuilder.iam.Statement;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MetadataTest {
 
@@ -46,15 +46,15 @@ public class MetadataTest {
 
         assertNotNull(fileTemplate);
         String templateString = fileTemplate.toString(true);
-        Assert.assertThat(templateString, containsString("source:"));
-        Assert.assertThat(templateString, not(containsString("content:")));
+        assertThat(templateString, containsString("source:"));
+        assertThat(templateString, not(containsString("content:")));
 
         // System.err.println(templateString);
     }
 
     class MetadataModule extends Module {
         private static final String KEYNAME_DESCRIPTION = "Name of an existing EC2 KeyPair to enable SSH access to " +
-                "the instances";
+            "the instances";
         private static final String KEYNAME_TYPE = "AWS::EC2::KeyPair::KeyName";
         private static final String KEYNAME_CONSTRAINT_DESCRIPTION = "must be the name of an existing EC2 KeyPair.";
 
@@ -65,58 +65,58 @@ public class MetadataTest {
         public void build() {
 
             Object keyName = option("KeyName").orElseGet(
-                    () -> strParam("KeyName").type(KEYNAME_TYPE).description(KEYNAME_DESCRIPTION)
-                            .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
+                () -> strParam("KeyName").type(KEYNAME_TYPE).description(KEYNAME_DESCRIPTION)
+                    .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
 
             Object cidrIp = "0.0.0.0/0";
             Object keyNameVar = template.ref("KeyName");
 
             CFNPackage cfnPackage = new CFNPackage("apt")
-                    .addPackage("apache2")
-                    .addPackage("php")
-                    .addPackage("libapache2-mod-php7.0");
+                .addPackage("apache2")
+                .addPackage("php")
+                .addPackage("libapache2-mod-php7.0");
 
             CFNFile indexFile = new CFNFile("/var/www/html/index.php")
-                    .setContent("<php?\nphpinfo()\n?>")
-                    .setEncoding("base64")
-                    .setMode("000644")
-                    .setOwner("www-data")
-                    .setGroup("www-data");
+                .setContent("<php?\nphpinfo()\n?>")
+                .setEncoding("base64")
+                .setMode("000644")
+                .setOwner("www-data")
+                .setGroup("www-data");
 
             CFNFile indexFileWithUrl = new CFNFile("/var/www/html/index2.php")
-                    .setSource("https://s3-us-west-2.amazonaws.com/link/to/file")
-                    .setMode("000644")
-                    .setOwner("www-data")
-                    .setGroup("www-data");
+                .setSource("https://s3-us-west-2.amazonaws.com/link/to/file")
+                .setMode("000644")
+                .setOwner("www-data")
+                .setGroup("www-data");
 
             CFNService service = new CFNService().addService(new SimpleService("apache2")
-                    .setEnabled(true)
-                    .setEnsureRunning(true)
-                    .addPackage("apt", "libapache2-mod-php7.0"));
+                .setEnabled(true)
+                .setEnsureRunning(true)
+                .addPackage("apt", "libapache2-mod-php7.0"));
 
             Config install = new Config(CFNINIT_CONFIG_INSTALL)
-                    .putFile(indexFile)
-                    .putFile(indexFileWithUrl)
-                    .putPackage(cfnPackage)
-                    .putService(service);
+                .putFile(indexFile)
+                .putFile(indexFileWithUrl)
+                .putPackage(cfnPackage)
+                .putService(service);
 
             CFNCommand configure_mysql = new CFNCommand("configure_myphp", "sh /tmp/configure_myphpapp.sh")
-                    .addEnv("database_name", "mydatabase");
+                .addEnv("database_name", "mydatabase");
             CFNInit cfnInit = new CFNInit(CFNINIT_CONFIGSET)
-                    .addConfig(CFNINIT_CONFIGSET, install);
+                .addConfig(CFNINIT_CONFIGSET, install);
 
             cfnInit.getOrAddConfig(CFNINIT_CONFIGSET, CFNINIT_CONFIG_CONFIGURE)
-                    .putCommand(configure_mysql);
+                .putCommand(configure_mysql);
 
             SecurityGroup webServerSecurityGroup = resource(SecurityGroup.class, "WebServerSecurityGroup")
-                    .groupDescription("Enable ports 80 and 22")
-                    .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
+                .groupDescription("Enable ports 80 and 22")
+                .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
 
             Object groupId = webServerSecurityGroup.fnGetAtt("GroupId");
 
             Role instanceRole = resource(Role.class, "InstanceRole")
-                    .path("/")
-                    .assumeRolePolicyDocument("PolicyContent");
+                .path("/")
+                .assumeRolePolicyDocument("PolicyContent");
 
             List<String> resourceList = new ArrayList<>();
             resourceList.add("ec2.amazonaws.com");
@@ -124,45 +124,45 @@ public class MetadataTest {
             Principal principal = new Principal().principal("Service", resourceList);
 
             Statement policyDocumentStatement = new Statement()
-                    .addAction("s3:GetObject")
-                    .effect("Allow")
-                    .addResource("bucketName")
-                    .principal(principal);
+                .addAction("s3:GetObject")
+                .effect("Allow")
+                .addResource("bucketName")
+                .principal(principal);
 
             PolicyDocument policyDocument = new PolicyDocument()
-                    .version("1.0")
-                    .addStatement(policyDocumentStatement);
+                .version("1.0")
+                .addStatement(policyDocumentStatement);
 
             Policy rolePolicies = resource(Policy.class, "RolePolicies")
-                    .policyName("S3Download")
-                    .policyDocument(policyDocument)
-                    .roles(instanceRole)
-                    .groups("group")
-                    .users("user");
+                .policyName("S3Download")
+                .policyDocument(policyDocument)
+                .roles(instanceRole)
+                .groups("group")
+                .users("user");
 
             InstanceProfile instanceProfile = resource(InstanceProfile.class, "InstanceProfile")
-                    .path("/")
-                    .roles(instanceRole)
-                    .instanceProfileName("InstanceProfileName");
+                .path("/")
+                .roles(instanceRole)
+                .instanceProfileName("InstanceProfileName");
 
             Authentication authentication = new Authentication("S3Creds")
-                    .accessKeyId("123")
-                    .addBucket("bucketName")
-                    .roleName(ref("InstanceRole"))
-                    .type("S3")
-                    .addUri("www.com")
-                    .secretKey("secret")
-                    .username("user");
+                .accessKeyId("123")
+                .addBucket("bucketName")
+                .roleName(ref("InstanceRole"))
+                .type("S3")
+                .addUri("www.com")
+                .secretKey("secret")
+                .username("user");
 
             Instance webServerInstance = resource(Instance.class, "WebServerInstance")
-                    .addCFNInit(cfnInit)
-                    .imageId("ami-0def3275")
-                    .instanceType("t2.micro")
-                    .securityGroupIds(webServerSecurityGroup)
-                    .keyName(keyNameVar)
-                    .userData(new UserData(Fn.fnDelimiter("Join", "", "one", "two")))
-                    .iamInstanceProfile(instanceProfile)
-                    .authentication(authentication);
+                .addCFNInit(cfnInit)
+                .imageId("ami-0def3275")
+                .instanceType("t2.micro")
+                .securityGroupIds(webServerSecurityGroup)
+                .keyName(keyNameVar)
+                .userData(new UserData(Fn.fnDelimiter("Join", "", "one", "two")))
+                .iamInstanceProfile(instanceProfile)
+                .authentication(authentication);
 
             ArrayList<String> bucketList = new ArrayList<String>();
             bucketList.add("bucketName");
@@ -171,18 +171,18 @@ public class MetadataTest {
             uriList.add("www.com");
 
             Authentication authentication2 = new Authentication("S3Creds")
-                    .name("AltCreds")
-                    .buckets(bucketList)
-                    .uris(uriList)
-                    .deleteBucket("bucketName")
-                    .deleteUri("www.com")
-                    .addBucket("bucketName2")
-                    .addBucket("bucketName3")
-                    .addUri("www.org")
-                    .addUri("www.tv");
+                .name("AltCreds")
+                .buckets(bucketList)
+                .uris(uriList)
+                .deleteBucket("bucketName")
+                .deleteUri("www.com")
+                .addBucket("bucketName2")
+                .addBucket("bucketName3")
+                .addUri("www.org")
+                .addUri("www.tv");
 
             Instance otherInstance = resource(Instance.class, "OtherInstance")
-                    .authentication(authentication2);
+                .authentication(authentication2);
 
             Object publicDNSName = webServerInstance.fnGetAtt("PublicDnsName");
 
@@ -192,7 +192,7 @@ public class MetadataTest {
 
     class FileModule extends Module {
         private static final String KEYNAME_DESCRIPTION = "Name of an existing EC2 KeyPair to enable SSH access to " +
-                "the instances";
+            "the instances";
         private static final String KEYNAME_TYPE = "AWS::EC2::KeyPair::KeyName";
         private static final String KEYNAME_CONSTRAINT_DESCRIPTION = "must be the name of an existing EC2 KeyPair.";
 
@@ -202,35 +202,35 @@ public class MetadataTest {
         public void build() {
 
             Object keyName = option("KeyName").orElseGet(
-                    () -> strParam("KeyName").type(KEYNAME_TYPE).description(KEYNAME_DESCRIPTION)
-                            .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
+                () -> strParam("KeyName").type(KEYNAME_TYPE).description(KEYNAME_DESCRIPTION)
+                    .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
 
             Object cidrIp = "0.0.0.0/0";
             Object keyNameVar = template.ref("KeyName");
 
             CFNFile indexFile = new CFNFile("/var/www/html/index.php")
-                    .setSource("https://s3-us-west-2.amazonaws.com/link/to/file")
-                    .setContent("<php?\nphpinfo()\n?>")
-                    .setMode("000644")
-                    .setOwner("www-data")
-                    .setGroup("www-data");
+                .setSource("https://s3-us-west-2.amazonaws.com/link/to/file")
+                .setContent("<php?\nphpinfo()\n?>")
+                .setMode("000644")
+                .setOwner("www-data")
+                .setGroup("www-data");
 
             Config install = new Config(CFNINIT_CONFIG_INSTALL)
-                    .putFile(indexFile);
+                .putFile(indexFile);
 
             CFNInit cfnInit = new CFNInit(CFNINIT_CONFIGSET)
-                    .addConfig(CFNINIT_CONFIGSET, install);
+                .addConfig(CFNINIT_CONFIGSET, install);
 
             SecurityGroup webServerSecurityGroup = resource(SecurityGroup.class, "WebServerSecurityGroup")
-                    .groupDescription("Enable ports 80 and 22")
-                    .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
+                .groupDescription("Enable ports 80 and 22")
+                .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
 
             Instance webServerInstance = resource(Instance.class, "WebServerInstance")
-                    .addCFNInit(cfnInit)
-                    .imageId("ami-0def3275")
-                    .instanceType("t2.micro")
-                    .securityGroupIds(webServerSecurityGroup)
-                    .keyName(keyNameVar);
+                .addCFNInit(cfnInit)
+                .imageId("ami-0def3275")
+                .instanceType("t2.micro")
+                .securityGroupIds(webServerSecurityGroup)
+                .keyName(keyNameVar);
         }
     }
 }

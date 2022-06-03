@@ -6,14 +6,14 @@ import com.scaleset.cfbuilder.core.Template;
 import com.scaleset.cfbuilder.ec2.Instance;
 import com.scaleset.cfbuilder.ec2.SecurityGroup;
 import com.scaleset.cfbuilder.rds.DBInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CloudFormationBuilderTest extends Module {
 
     @Test
-    public void testTemplateBuilding() throws Exception {
+    public void testTemplateBuilding() {
         Template lampTemplate = new Template();
 
         new CloudFormationBuilderTest.TestModule().id("").template(lampTemplate).build();
@@ -24,17 +24,17 @@ public class CloudFormationBuilderTest extends Module {
 
     class TestModule extends Module {
         private static final String KEYNAME_DESCRIPTION = "Name of an existing EC2 KeyPair to enable SSH access to " +
-                "the instances";
+            "the instances";
         private static final String KEYNAME_TYPE = "AWS::EC2::KeyPair::KeyName";
         private static final String KEYNAME_CONSTRAINT_DESCRIPTION = "must be the name of an existing EC2 KeyPair.";
 
         public void build() {
 
             Parameter keyName = (Parameter) option("KeyName").orElseGet(
-                    () -> strParam("KeyName")
-                            .type(KEYNAME_TYPE)
-                            .description(KEYNAME_DESCRIPTION)
-                            .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
+                () -> strParam("KeyName")
+                    .type(KEYNAME_TYPE)
+                    .description(KEYNAME_DESCRIPTION)
+                    .constraintDescription(KEYNAME_CONSTRAINT_DESCRIPTION));
 
             Object cidrIp = "0.0.0.0/0";
             Object keyNameVar = template.ref("KeyName");
@@ -42,27 +42,27 @@ public class CloudFormationBuilderTest extends Module {
             Object dbEc2SecurityGroupId = template.fnGetAtt("DBEC2SecurityGroup", "GroupId");
 
             SecurityGroup webServerSecurityGroup = resource(SecurityGroup.class, "WebServerSecurityGroup")
-                    .groupDescription("Enable ports 80 and 22")
-                    .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
+                .groupDescription("Enable ports 80 and 22")
+                .ingress(ingress -> ingress.cidrIp(cidrIp), "tcp", 80, 22);
             SecurityGroup dbEc2SecurityGroup = resource(SecurityGroup.class, "DBEC2SecurityGroup")
-                    .groupDescription("Open database for access")
-                    .ingress(ingress -> ingress.sourceSecurityGroupName(webServerSecurityGroupName), "tcp", 3306);
+                .groupDescription("Open database for access")
+                .ingress(ingress -> ingress.sourceSecurityGroupName(webServerSecurityGroupName), "tcp", 3306);
 
             Instance webServerInstance = resource(Instance.class, "WebServerInstance")
-                    .imageId("ami-0def3275")
-                    .instanceType("t2.micro")
-                    .securityGroupIds(webServerSecurityGroup)
-                    .keyName(keyNameVar);
+                .imageId("ami-0def3275")
+                .instanceType("t2.micro")
+                .securityGroupIds(webServerSecurityGroup)
+                .keyName(keyNameVar);
 
             resource(DBInstance.class, "MySQLDatabase")
-                    .engine("MySQL")
-                    .dBName("mydatabase")
-                    .masterUsername("root")
-                    .masterUserPassword("abcd1234")
-                    .dBInstanceClass("db.t2.micro")
-                    .allocatedStorage(20)
-                    .storageType("gp2")
-                    .vPCSecurityGroups(dbEc2SecurityGroupId);
+                .engine("MySQL")
+                .dBName("mydatabase")
+                .masterUsername("root")
+                .masterUserPassword("abcd1234")
+                .dBInstanceClass("db.t2.micro")
+                .allocatedStorage(20)
+                .storageType("gp2")
+                .vPCSecurityGroups(dbEc2SecurityGroupId);
 
             Object publicDNSName = webServerInstance.fnGetAtt("PublicDnsName");
 

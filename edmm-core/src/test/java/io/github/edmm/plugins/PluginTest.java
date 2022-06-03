@@ -15,7 +15,7 @@ import io.github.edmm.plugins.rules.RuleEngine;
 import io.github.edmm.utils.Env;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public abstract class PluginTest {
         }
     }
 
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         if (targetDirectory != null && !skipCleanup) {
             logger.info("Clean up working directory...");

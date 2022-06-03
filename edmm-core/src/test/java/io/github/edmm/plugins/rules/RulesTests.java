@@ -23,8 +23,12 @@ import io.github.edmm.plugins.cfn.rules.AuroraRule;
 import io.github.edmm.plugins.cfn.rules.BeanstalkRule;
 import io.github.edmm.plugins.cfn.rules.CfnPaasRule;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class RulesTests {
 
@@ -43,9 +47,9 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(), false).matches());
+            assertTrue(ruleAssessor.assess(deploymentModel, deploymentModel, currentComponent.get(), false).matches());
         else
-            Assert.fail("component not present");
+            fail("component not present");
     }
 
     @Test
@@ -68,15 +72,15 @@ public class RulesTests {
 
         // the actual model should match the expected model, but not the other way around
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(expectedModel, actualModel, currentComponent.get(), false).matches());
-        else Assert.fail("component not present");
+            assertTrue(ruleAssessor.assess(expectedModel, actualModel, currentComponent.get(), false).matches());
+        else fail("component not present");
 
         currentComponent = expectedModel.getComponent("WebApplication");
         ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertFalse(ruleAssessor.assess(actualModel, expectedModel, currentComponent.get(), false).matches());
-        else Assert.fail("component not present");
+            assertFalse(ruleAssessor.assess(actualModel, expectedModel, currentComponent.get(), false).matches());
+        else fail("component not present");
     }
 
     @Test
@@ -95,9 +99,9 @@ public class RulesTests {
         RuleAssessor ruleAssessor = new RuleAssessor();
 
         if (currentComponent.isPresent())
-            Assert.assertTrue(ruleAssessor.assess(model, model, currentComponent.get(), false).matches());
+            assertTrue(ruleAssessor.assess(model, model, currentComponent.get(), false).matches());
         else
-            Assert.fail("component not present");
+            fail("component not present");
     }
 
     @Test
@@ -121,14 +125,14 @@ public class RulesTests {
 
         List<Rule.Result> results = ruleEngine.fire(context, ansible);
 
-        Assert.assertEquals(3, results.size());
+        assertEquals(3, results.size());
 
         for (Rule.Result result : results) {
             List<String> unsupportedComponents = result.getUnsupportedComponents();
             boolean contains = unsupportedComponents.contains("AwsAurora") ||
                 unsupportedComponents.contains("AwsBeanstalk") ||
                 unsupportedComponents.contains("Auth0");
-            Assert.assertTrue(contains);
+            assertTrue(contains);
         }
     }
 
@@ -145,9 +149,9 @@ public class RulesTests {
 
         // AwsBeanstalk is in the exception list so the evaluation should return false
         if (component.isPresent())
-            Assert.assertFalse(cfnPaasRule.evaluate(actualModel, component.get()));
+            assertFalse(cfnPaasRule.evaluate(actualModel, component.get()));
         else
-            Assert.fail("component not present");
+            fail("component not present");
 
         yamlBuilder = new EdmmYamlBuilder();
         yamlBuilder
@@ -157,9 +161,9 @@ public class RulesTests {
 
         // every other Paas component evaluation should return true instead
         if (component.isPresent())
-            Assert.assertTrue(cfnPaasRule.evaluate(actualModel, component.get()));
+            assertTrue(cfnPaasRule.evaluate(actualModel, component.get()));
         else
-            Assert.fail("component not present");
+            fail("component not present");
     }
 
     @Test
@@ -182,11 +186,11 @@ public class RulesTests {
 
             List<Rule.Result> results = ruleEngine.fire(actualModel, rules, currentComponent.get());
 
-            Assert.assertEquals(1, results.size());
+            assertEquals(1, results.size());
             List<String> unsupportedComponents = results.get(0).getUnsupportedComponents();
-            Assert.assertTrue(unsupportedComponents.contains("WebServer1") && unsupportedComponents.contains("Compute1"));
+            assertTrue(unsupportedComponents.contains("WebServer1") && unsupportedComponents.contains("Compute1"));
         } else
-            Assert.fail("component not present");
+            fail("component not present");
     }
 
     @Test
@@ -208,8 +212,8 @@ public class RulesTests {
         }
         // bad trick to get the results list
         List<Rule.Result> results = ruleEngine.fire(actualModel, new ArrayList<>(), null);
-        Assert.assertEquals(2, results.size());
-        Assert.assertEquals("Paas", results.get(0).getUnsupportedComponents().get(0));
-        Assert.assertEquals("Saas", results.get(1).getUnsupportedComponents().get(0));
+        assertEquals(2, results.size());
+        assertEquals("Paas", results.get(0).getUnsupportedComponents().get(0));
+        assertEquals("Saas", results.get(1).getUnsupportedComponents().get(0));
     }
 }

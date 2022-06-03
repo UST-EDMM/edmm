@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.scaleset.cfbuilder.core.Module;
 import com.scaleset.cfbuilder.core.Template;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IamTest {
     @Test
@@ -25,27 +25,27 @@ public class IamTest {
             List<String> resourceList = new ArrayList<>();
             resourceList.add("resourceVal");
             Principal principal = new Principal()
-                    .principal("arnVal", resourceList);
+                .principal("arnVal", resourceList);
             Statement statement = new Statement()
-                    .addAction("actionVal")
-                    .addResource("resourceVal")
-                    .addNotAction("notActionVal")
-                    .addNotResource("notResourceVal")
-                    .principal(principal)
-                    .notPrincipal(principal)
-                    .effect("effectVal")
-                    .sid("sidVal")
-                    .conditon("conditionVal");
+                .addAction("actionVal")
+                .addResource("resourceVal")
+                .addNotAction("notActionVal")
+                .addNotResource("notResourceVal")
+                .principal(principal)
+                .notPrincipal(principal)
+                .effect("effectVal")
+                .sid("sidVal")
+                .conditon("conditionVal");
             PolicyDocument policyDocument = new PolicyDocument()
-                    .version("versionVal")
-                    .id("idVal")
-                    .addStatement(statement);
+                .version("versionVal")
+                .id("idVal")
+                .addStatement(statement);
             resource(Policy.class, "PolicyName")
-                    .groups("groupVal1", "groupVal2")
-                    .roles("roleVal1")
-                    .users("userVal1")
-                    .policyName("policyNameVal")
-                    .policyDocument(policyDocument);
+                .groups("groupVal1", "groupVal2")
+                .roles("roleVal1")
+                .users("userVal1")
+                .policyName("policyNameVal")
+                .policyDocument(policyDocument);
         }
     }
 }

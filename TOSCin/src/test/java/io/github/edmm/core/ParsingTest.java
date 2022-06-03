@@ -6,7 +6,7 @@ import io.github.edmm.model.edimm.DeploymentInstance;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ParsingTest {
     private ClassPathResource resource;

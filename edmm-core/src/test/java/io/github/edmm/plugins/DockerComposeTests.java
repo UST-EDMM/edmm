@@ -4,7 +4,7 @@ import java.nio.file.Files;
 
 import io.github.edmm.plugins.compose.DockerComposePlugin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 public class DockerComposeTests extends PluginTest {

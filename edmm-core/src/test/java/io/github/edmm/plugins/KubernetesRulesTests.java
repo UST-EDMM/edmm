@@ -11,8 +11,9 @@ import io.github.edmm.plugins.kubernetes.KubernetesPlugin;
 import io.github.edmm.plugins.rules.Rule;
 import io.github.edmm.plugins.rules.RuleEngine;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KubernetesRulesTests {
 
@@ -30,8 +31,8 @@ public class KubernetesRulesTests {
 
         List<Rule.Result> results = engine.fire(context, plugin);
 
-        Assert.assertEquals(results.size(), 1);
-        Assert.assertEquals(results.get(0).getUnsupportedComponents().size(), 1);
-        Assert.assertEquals(results.get(0).getToTopology().size(), 2);
+        assertEquals(results.size(), 1);
+        assertEquals(results.get(0).getUnsupportedComponents().size(), 1);
+        assertEquals(results.get(0).getToTopology().size(), 2);
     }
 }
