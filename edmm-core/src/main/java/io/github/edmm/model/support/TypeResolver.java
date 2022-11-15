@@ -94,7 +94,7 @@ public abstract class TypeResolver {
         return TYPE_MAPPING.keySet();
     }
 
-    private static void put(String name, Class<? extends ModelEntity> clazz) {
+    public static void put(String name, Class<? extends ModelEntity> clazz) {
         TYPE_MAPPING.put(name, clazz);
     }
 }
