@@ -2,6 +2,8 @@ package io.github.edmm.model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,8 +61,13 @@ public final class DeploymentModel {
         if (!file.isFile() || !file.canRead()) {
             throw new IllegalStateException(String.format("File '%s' does not exist - failed to construct internal graph", file));
         }
-        EntityGraph graph = new EntityGraph(new FileInputStream(file));
-        return new DeploymentModel(file.getName(), graph);
+        try (InputStream inputStream = new FileInputStream(file)) {
+            EntityGraph graph = new EntityGraph(inputStream);
+            return new DeploymentModel(file.getName(), graph);
+        } catch (IOException e) {
+            logger.error("Error while loading deployment model from file!", e);
+            throw e;
+        }
     }
 
     @SneakyThrows
@@ -70,9 +77,7 @@ public final class DeploymentModel {
     }
 
     private void initNodes() {
-        componentMap.forEach((name, component) -> {
-            topology.addVertex(component);
-        });
+        componentMap.forEach((name, component) -> topology.addVertex(component));
     }
 
     private void initEdges() {
