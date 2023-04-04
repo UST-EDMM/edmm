@@ -205,7 +205,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                     Fact hypervisorFacts = node.getFactByName("productName".toLowerCase());
                     TNodeType hypervisorType = toscaTransformer.getComputeNodeType(hypervisorFacts.getValue()
                             .toString(),
-                        "");
+                        "22");
                     TNodeTemplate hypervisor = ModelUtilities.instantiateNodeTemplate(hypervisorType);
                     hypervisor.setName(hypervisorFacts.getValue().toString());
                     this.populateNodeTemplateProperties(hypervisor);

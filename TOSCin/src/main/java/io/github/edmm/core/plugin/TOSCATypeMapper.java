@@ -33,7 +33,7 @@ public interface TOSCATypeMapper {
             case "JavaApp":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "SpringWebApp_w1");
             case "OpenStackCompute":
-                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_15-Train-w1");
+                return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "OpenStack_22-Victoria-w1");
             case "nginx":
                 return new QName(OpenTOSCANamespaces.OPENTOSCA_NODE_TYPE, "NGINX_latest-w1");
             default:

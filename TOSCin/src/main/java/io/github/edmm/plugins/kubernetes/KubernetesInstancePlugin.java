@@ -36,6 +36,7 @@ import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1NodeList;
 import io.kubernetes.client.models.V1NodeSystemInfo;
 import io.kubernetes.client.models.V1PodList;
+import io.kubernetes.client.models.V1PodStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
@@ -100,8 +101,8 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             String serviceTemplateId = "kubernetes-" + this.targetNamespace;
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
-            return new TServiceTemplate.Builder(serviceTemplateId, new TTopologyTemplate()).setName(serviceTemplateId)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
+            return new TServiceTemplate.Builder(serviceTemplateId, "http://opentosca.org/retrieved/instances", new TTopologyTemplate())
+                .setName(serviceTemplateId)
                 .addTag(new TTag.Builder("deploymentTechnology", KUBERNETES.getName()).build())
                 .build();
         });
@@ -198,7 +199,10 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                             .forEach(aV1Container -> {
                                 String image = aV1Container.getImage();
                                 String name = aV1Container.getName();
-                                String podIp = v1Pod.getStatus().getPodIP();
+                                V1PodStatus status = v1Pod.getStatus();
+                                String podIp = status.getPodIP();
+                                String containerID = status.getContainerStatuses().get(0).getContainerID().split("://")[1];
+
                                 TNodeType dockerContainerType = toscaTransformer.getComputeNodeType(
                                     "DockerContainer",
                                     "");
@@ -209,7 +213,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                     .filter(prop -> prop instanceof TEntityTemplate.WineryKVProperties)
                                     .map(prop -> ((TEntityTemplate.WineryKVProperties) prop).getKVProperties())
                                     .orElseGet(LinkedHashMap::new);
-                                kvProperties.put("ContainerID", name);
+                                kvProperties.put("ContainerID", containerID);
                                 kvProperties.put("ImageID", image);
                                 kvProperties.put(Constants.STATE, Constants.RUNNING);
                                 kvProperties.put("PodName", v1Pod.getMetadata().getName());
