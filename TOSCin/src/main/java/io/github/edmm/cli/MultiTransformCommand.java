@@ -30,7 +30,7 @@ import io.github.edmm.util.Constants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,13 +104,11 @@ public class MultiTransformCommand extends TransformCommand {
         }
 
         if (!plugins.isEmpty()) {
-            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
             TServiceTemplate serviceTemplate = new TServiceTemplate.Builder("multitransform-" + modelName,
-                topologyTemplate).setName("multitransform-" + modelName)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", MULTI_TRANSFORM.getName())
-                    .addTag(Constants.TAG_DEPLOYMENT_TECHNOLOGIES, EMPTY_JSON_LIST)
-                    .build())
+                "http://opentosca.org/retrieved/instances", new TTopologyTemplate())
+                .setName("multitransform-" + modelName)
+                .addTag(new TTag.Builder("deploymentTechnology", MULTI_TRANSFORM.getName()).build())
+                .addTag(new TTag.Builder(Constants.TAG_DEPLOYMENT_TECHNOLOGIES, EMPTY_JSON_LIST).build())
                 .build();
 
             for (InstancePlugin<? extends AbstractLifecycleInstancePlugin<? extends AbstractLifecycleInstancePlugin<?>>> curPlugin : plugins) {

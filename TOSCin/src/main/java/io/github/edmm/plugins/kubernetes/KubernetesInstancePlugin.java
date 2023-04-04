@@ -41,7 +41,7 @@ import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
@@ -51,11 +51,6 @@ import org.slf4j.LoggerFactory;
 public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<KubernetesInstancePlugin> {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesInstancePlugin.class);
-    private static final List<String> IGNORED_CONTAINER_NAMES = Arrays.asList(
-        "queue-master",
-        "rabbitmq",
-        "rabbitmq-exporter",
-        "session-db");
     private static final SourceTechnology KUBERNETES = SourceTechnology.builder()
         .id("kubernetes")
         .name("Kubernetes")
@@ -103,12 +98,11 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
     @Override
     public void transformToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
-            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
             String serviceTemplateId = "kubernetes-" + this.targetNamespace;
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
-            return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
+            return new TServiceTemplate.Builder(serviceTemplateId, new TTopologyTemplate()).setName(serviceTemplateId)
                 .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", KUBERNETES.getName()).build())
+                .addTag(new TTag.Builder("deploymentTechnology", KUBERNETES.getName()).build())
                 .build();
         });
 
@@ -211,9 +205,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                                 TNodeTemplate dockerContainerTemplate = ModelUtilities.instantiateNodeTemplate(
                                     dockerContainerType);
                                 dockerContainerTemplate.setName(name);
-                                LinkedHashMap<String, String> kvProperties = Optional.ofNullable(
-                                        dockerContainerTemplate.getProperties())
-                                    .map(TEntityTemplate.Properties::getKVProperties)
+                                LinkedHashMap<String, String> kvProperties = Optional.ofNullable(dockerContainerTemplate.getProperties())
+                                    .filter(prop -> prop instanceof TEntityTemplate.WineryKVProperties)
+                                    .map(prop -> ((TEntityTemplate.WineryKVProperties) prop).getKVProperties())
                                     .orElseGet(LinkedHashMap::new);
                                 kvProperties.put("ContainerID", name);
                                 kvProperties.put("ImageID", image);
@@ -242,7 +236,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         managedIds.addAll(kubernetesTechnology.getManagedIds());
         kubernetesTechnology.setManagedIds(managedIds);
 
-        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }

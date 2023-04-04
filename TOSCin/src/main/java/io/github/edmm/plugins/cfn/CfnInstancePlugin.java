@@ -28,7 +28,7 @@ import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.services.cloudformation.model.StackResourceDetail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +43,6 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
     private final DeploymentTechnologyDescriptor cfnTechnology;
     private final DiscoveryPluginDescriptor cfnDiscoveryPlugin;
     private List<ResourceHandler> resourceHandlers;
-    private AmazonCloudFormation cloudFormation;
-    private Stack stack;
-    private Template template;
     private List<StackResourceDetail> stackResources;
 
     public CfnInstancePlugin(InstanceTransformationContext context,
@@ -74,7 +71,7 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
         AuthenticatorImpl authenticator = new AuthenticatorImpl(region, profileName);
         authenticator.authenticate();
 
-        this.cloudFormation = authenticator.getCloudFormation();
+        AmazonCloudFormation cloudFormation = authenticator.getCloudFormation();
 
         resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer,
             authenticator.getCredentialsProvider(),
@@ -83,10 +80,10 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
             cfnTechnology,
             cfnDiscoveryPlugin));
 
-        ApiInteractorImpl interactor = new ApiInteractorImpl(this.cloudFormation, this.inputStackName);
-        this.stack = interactor.getDeployment();
+        ApiInteractorImpl interactor = new ApiInteractorImpl(cloudFormation, this.inputStackName);
+        Stack stack = interactor.getDeployment();
         this.stackResources = interactor.getComponents();
-        this.template = interactor.getModel();
+        Template template = interactor.getModel();
     }
 
     @Override
@@ -94,21 +91,11 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             String serviceTemplateId = "cfn-" + UUID.randomUUID();
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
-            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
-                .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
-                .addTags(new TTags.Builder().addTag("deploymentTechnology",
-                    getContext().getSourceTechnology().getName()).build())
+            return new TServiceTemplate.Builder(serviceTemplateId, Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES, new TTopologyTemplate())
+                .setName(serviceTemplateId)
+                .addTag(new TTag.Builder("deploymentTechnology", getContext().getSourceTechnology().getName()).build())
                 .build();
         });
-
-        TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
-            .orElseGet(() -> {
-                logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
-            });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
@@ -132,7 +119,7 @@ public class CfnInstancePlugin extends AbstractLifecycleInstancePlugin<CfnInstan
             .findFirst()
             .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
 
-        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
         Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);

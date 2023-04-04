@@ -32,6 +32,7 @@
         <retrofit.version>2.7.0</retrofit.version>
         <zt-exec.version>1.11</zt-exec.version>
         <io.kubernetes.client-java.version>5.0.0</io.kubernetes.client-java.version>
+        <winery.version>patternBasedModeling-62d0b56f4c-1</winery.version>
     </properties>
 
     <modules>

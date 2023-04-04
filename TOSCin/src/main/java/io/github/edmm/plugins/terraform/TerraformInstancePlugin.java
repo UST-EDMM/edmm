@@ -29,7 +29,7 @@ import io.github.edmm.util.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,21 +91,10 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
             String serviceTemplateId = "terraform-" + UUID.randomUUID();
             logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
-            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            return new TServiceTemplate.Builder(serviceTemplateId, topologyTemplate).setName(serviceTemplateId)
-                .setTargetNamespace(Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES)
-                .addTags(new TTags.Builder().addTag("deploymentTechnology",
-                    getContext().getSourceTechnology().getName()).build())
+            return new TServiceTemplate.Builder(serviceTemplateId, Constants.TOSCA_NAME_SPACE_RETRIEVED_INSTANCES, new TTopologyTemplate()).setName(serviceTemplateId)
+                .addTag(new TTag.Builder("deploymentTechnology", getContext().getSourceTechnology().getName()).build())
                 .build();
         });
-
-        TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
-            .orElseGet(() -> {
-                logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
-            });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
@@ -129,7 +118,7 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
                 .findFirst()
                 .ifPresent(resourceHandler -> resourceHandler.addResourceToTemplate(serviceTemplate, curResource)));
 
-        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
         Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);

@@ -39,7 +39,7 @@ import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
-import org.eclipse.winery.model.tosca.TTags;
+import org.eclipse.winery.model.tosca.TTag;
 import org.eclipse.winery.model.tosca.TTopologyTemplate;
 import org.eclipse.winery.model.tosca.constants.ToscaBaseTypes;
 import org.eclipse.winery.model.tosca.utils.ModelUtilities;
@@ -49,7 +49,10 @@ import org.slf4j.LoggerFactory;
 public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<PuppetInstancePlugin> {
 
     private final static Logger logger = LoggerFactory.getLogger(PuppetInstancePlugin.class);
-    private static final SourceTechnology PUPPET = SourceTechnology.builder().id("puppet").name("Puppet").build();
+    private static final SourceTechnology PUPPET = SourceTechnology.builder()
+        .id("puppet")
+        .name("Puppet")
+        .build();
 
     // puppet master info
     private final String user;
@@ -100,12 +103,13 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
     @Override
     public void transformToTOSCA() {
         TServiceTemplate serviceTemplate = Optional.ofNullable(retrieveGeneratedServiceTemplate()).orElseGet(() -> {
-            TTopologyTemplate topologyTemplate = new TTopologyTemplate();
-            String serviceTempalteId = "puppet-" + this.master.getId();
-            logger.info("Creating new service template for transformation |{}|", serviceTempalteId);
-            return new TServiceTemplate.Builder(serviceTempalteId, topologyTemplate).setName(serviceTempalteId)
-                .setTargetNamespace("http://opentosca.org/retrieved/instances")
-                .addTags(new TTags.Builder().addTag("deploymentTechnology", PUPPET.getName()).build())
+            String serviceTemplateId = "puppet-" + this.master.getId();
+            logger.info("Creating new service template for transformation |{}|", serviceTemplateId);
+
+            return new TServiceTemplate.Builder(serviceTemplateId,
+                "http://opentosca.org/retrieved/instances", new TTopologyTemplate())
+                .setName(serviceTemplateId)
+                .addTag(new TTag.Builder("deploymentTechnology", PUPPET.getName()).build())
                 .build();
         });
 
@@ -167,14 +171,14 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 vm.setName(node.getCertname());
 
                 TEntityTemplate.Properties properties = vm.getProperties();
-                if (properties != null && properties.getKVProperties() != null) {
-                    Map<String, String> vmProps = properties.getKVProperties();
+                if (properties instanceof TEntityTemplate.WineryKVProperties props) {
+                    LinkedHashMap<String, String> vmProps = props.getKVProperties();
                     vmProps.put(Constants.VMIP, node.getFactByName("ipaddress").getValue().toString());
                     vmProps.put(Constants.VM_INSTANCE_ID, node.getCertname());
                     vmProps.put(Constants.VM_USER_NAME, nodeOS.getValue().toString().toLowerCase());
                     vmProps.put(Constants.STATE, Constants.RUNNING);
 
-                    Map<String, String> masterProps = new HashMap<>();
+                    LinkedHashMap<String, String> masterProps = new LinkedHashMap<>();
                     masterProps.put(Constants.PUPPET_ENV, node.getReport_environment());
                     masterProps.put(Constants.PUPPET_MASTER, this.master.getIp());
                     masterProps.put(Constants.PUPPET_MASTER_KEY, this.master.getPrivateKey());
@@ -190,7 +194,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                         }
                     }
 
-                    properties.setKVProperties(vmProps);
+                    props.setKVProperties(vmProps);
                 }
 
                 topologyTemplate.addNodeTemplate(vm);
@@ -252,7 +256,8 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                 if (environments.size() > 0) {
                     Map<String, String> vmProperties = Optional.ofNullable(properties)
-                        .map(TEntityTemplate.Properties::getKVProperties)
+                        .filter(prop -> prop instanceof TEntityTemplate.WineryKVProperties)
+                        .map(prop -> ((TEntityTemplate.WineryKVProperties) prop).getKVProperties())
                         .orElseGet(LinkedHashMap::new);
                     vmProperties.put("PuppetEnvironments", String.join(",", environments));
                     Util.populateNodeTemplateProperties(vm, vmProperties);
@@ -265,7 +270,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         managedIds.addAll(puppetTechnology.getManagedIds()); // workaround to handle possibly immutable lists
         puppetTechnology.setManagedIds(managedIds);
 
-        Util.updateDeploymenTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
+        Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
         Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);

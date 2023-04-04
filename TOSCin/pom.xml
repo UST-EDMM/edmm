@@ -177,18 +177,18 @@
         </dependency>
         <dependency>
             <groupId>com.github.opentosca.winery</groupId>
-            <artifactId>org.eclipse.winery.model.tosca</artifactId>
-            <version>846fd4657d</version>
+            <artifactId>org.eclipse.winery.model.tosca.canonical</artifactId>
+            <version>${winery.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.opentosca.winery</groupId>
             <artifactId>org.eclipse.winery.common</artifactId>
-            <version>846fd4657d</version>
+            <version>${winery.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.opentosca.winery</groupId>
             <artifactId>org.eclipse.winery.repository</artifactId>
-            <version>846fd4657d</version>
+            <version>${winery.version}</version>
         </dependency>
     </dependencies>
 

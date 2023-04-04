@@ -7,21 +7,18 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.winery.common.ids.definitions.NodeTypeId;
-import org.eclipse.winery.common.ids.definitions.RelationshipTypeId;
-import org.eclipse.winery.common.ids.definitions.ServiceTemplateId;
+import org.eclipse.winery.model.ids.definitions.NodeTypeId;
+import org.eclipse.winery.model.ids.definitions.RelationshipTypeId;
+import org.eclipse.winery.model.ids.definitions.ServiceTemplateId;
 import org.eclipse.winery.model.tosca.TNodeType;
 import org.eclipse.winery.model.tosca.TRelationshipType;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.repository.backend.BackendUtils;
 import org.eclipse.winery.repository.backend.IRepository;
 import org.eclipse.winery.repository.backend.RepositoryFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WineryConnector {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WineryConnector.class);
     private static WineryConnector INSTANCE;
 
     private final IRepository repository;
@@ -45,11 +42,11 @@ public class WineryConnector {
     public List<QName> getBaseNodeTypesQNames() {
         getNodeTypes();
         return this.nodeTypes.entrySet().stream()
-                .filter(entry -> entry.getValue().getTags() == null
-                        || entry.getValue().getTags().getTag().stream().noneMatch(tag -> "feature".equals(tag.getName())))
-                .filter(entry -> !repository.getNamespaceManager().isGeneratedNamespace(entry.getKey().getNamespaceURI()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+            .filter(entry -> entry.getValue().getTags() == null
+                || entry.getValue().getTags().stream().noneMatch(tag -> "feature".equals(tag.getName())))
+            .filter(entry -> !repository.getNamespaceManager().isGeneratedNamespace(entry.getKey().getNamespaceURI()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
     }
 
     public Map<QName, TNodeType> getNodeTypes() {
@@ -65,9 +62,9 @@ public class WineryConnector {
 
     public void save(TServiceTemplate serviceTemplate) throws IOException {
         BackendUtils.persist(
-                repository,
-                new ServiceTemplateId(serviceTemplate.getTargetNamespace(), serviceTemplate.getId(), false),
-                serviceTemplate
+            repository,
+            new ServiceTemplateId(serviceTemplate.getTargetNamespace(), serviceTemplate.getId(), false),
+            serviceTemplate
         );
     }
 }

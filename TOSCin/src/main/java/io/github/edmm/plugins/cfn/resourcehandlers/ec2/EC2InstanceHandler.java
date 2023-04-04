@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.model.DeploymentTechnologyDescriptor;
@@ -87,11 +86,11 @@ public class EC2InstanceHandler implements ResourceHandler {
         List<TNodeTemplate> matchingNodes = topologyTemplate.getNodeTemplates()
             .stream()
             .filter(tNodeTemplate -> Optional.ofNullable(tNodeTemplate.getProperties())
-                .map(TEntityTemplate.Properties::getKVProperties)
-                .map(kvProperties -> kvProperties.get(Constants.VMIP))
+                .filter(props -> props instanceof TEntityTemplate.WineryKVProperties)
+                .map(kvProperties -> ((TEntityTemplate.WineryKVProperties) kvProperties).getKVProperties().get(Constants.VMIP))
                 .map(nodeIp -> Objects.equals(nodeIp, publicIp) || Objects.equals(nodeIp, privateIp))
                 .orElse(false))
-            .collect(Collectors.toList());
+            .toList();
 
         TNodeTemplate instanceNode;
         if (matchingNodes.size() > 1) {

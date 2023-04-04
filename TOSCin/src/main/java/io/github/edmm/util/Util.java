@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,7 +23,6 @@ import org.eclipse.winery.model.tosca.TEntityTemplate;
 import org.eclipse.winery.model.tosca.TNodeTemplate;
 import org.eclipse.winery.model.tosca.TServiceTemplate;
 import org.eclipse.winery.model.tosca.TTag;
-import org.eclipse.winery.model.tosca.TTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,22 +48,21 @@ public abstract class Util {
         return stringBuilder.toString();
     }
 
-    public static void updateDeploymenTechnologiesInServiceTemplate(
-        TServiceTemplate serviceTemplate,
-        ObjectMapper objectMapper,
-        List<DeploymentTechnologyDescriptor> deploymentTechnologies) {
+    public static void updateDeploymentTechnologiesInServiceTemplate(TServiceTemplate serviceTemplate,
+                                                                     ObjectMapper objectMapper,
+                                                                     List<DeploymentTechnologyDescriptor> deploymentTechnologies) {
         try {
-            TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DEPLOYMENT_TECHNOLOGIES)
-                .setValue(objectMapper.writeValueAsString(deploymentTechnologies))
-                .build();
-            TTags serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
-                TTags tags = new TTags.Builder().build();
+            TTag updatedTag = new TTag.Builder(
+                Constants.TAG_DEPLOYMENT_TECHNOLOGIES,
+                objectMapper.writeValueAsString(deploymentTechnologies)
+            ).build();
+            List<TTag> serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
+                List<TTag> tags = new ArrayList<>();
                 serviceTemplate.setTags(tags);
                 return tags;
             });
-            serviceTemplateTags.getTag()
-                .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES));
-            serviceTemplate.getTags().getTag().add(updatedTag);
+            serviceTemplateTags.removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES));
+            serviceTemplateTags.add(updatedTag);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Could not write terraform deployment technology to JSON string");
         }
@@ -72,7 +71,6 @@ public abstract class Util {
     public static List<DeploymentTechnologyDescriptor> extractDeploymentTechnologiesFromServiceTemplate(
         TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
-            .map(TTags::getTag)
             .flatMap(tTags -> tTags.stream()
                 .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DEPLOYMENT_TECHNOLOGIES))
                 .findAny())
@@ -89,29 +87,29 @@ public abstract class Util {
             .orElseGet(ArrayList::new);
     }
 
-    public static void updateDiscoveryPluginsInServiceTemplate(
-        TServiceTemplate serviceTemplate, ObjectMapper objectMapper, List<DiscoveryPluginDescriptor> discoveryPlugins) {
+    public static void updateDiscoveryPluginsInServiceTemplate(TServiceTemplate serviceTemplate,
+                                                               ObjectMapper objectMapper,
+                                                               List<DiscoveryPluginDescriptor> discoveryPlugins) {
         try {
-            TTag updatedTag = new TTag.Builder().setName(Constants.TAG_DISCOVERY_PLUGINS)
-                .setValue(objectMapper.writeValueAsString(discoveryPlugins))
-                .build();
-            TTags serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
-                TTags tags = new TTags.Builder().build();
+            TTag updatedTag = new TTag.Builder(
+                Constants.TAG_DISCOVERY_PLUGINS,
+                objectMapper.writeValueAsString(discoveryPlugins)
+            ).build();
+            List<TTag> serviceTemplateTags = Optional.ofNullable(serviceTemplate.getTags()).orElseGet(() -> {
+                List<TTag> tags = new ArrayList<>();
                 serviceTemplate.setTags(tags);
                 return tags;
             });
-            serviceTemplateTags.getTag()
-                .removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS));
-            serviceTemplate.getTags().getTag().add(updatedTag);
+            serviceTemplateTags.removeIf(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS));
+            serviceTemplateTags.add(updatedTag);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Could not write terraform deployment technology to JSON string");
         }
     }
 
-    public static List<DiscoveryPluginDescriptor> extractDiscoveryPluginsFromServiceTemplate(
-        TServiceTemplate serviceTemplate, ObjectMapper objectMapper) {
+    public static List<DiscoveryPluginDescriptor> extractDiscoveryPluginsFromServiceTemplate(TServiceTemplate serviceTemplate,
+                                                                                             ObjectMapper objectMapper) {
         return Optional.ofNullable(serviceTemplate.getTags())
-            .map(TTags::getTag)
             .flatMap(tTags -> tTags.stream()
                 .filter(tTag -> Objects.equals(tTag.getName(), Constants.TAG_DISCOVERY_PLUGINS))
                 .findAny())
@@ -130,9 +128,8 @@ public abstract class Util {
 
     public static void populateNodeTemplateProperties(TNodeTemplate nodeTemplate,
                                                       Map<String, String> additionalProperties) {
-        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties().getKVProperties() != null) {
-            nodeTemplate.getProperties()
-                .getKVProperties()
+        if (nodeTemplate.getProperties() != null && nodeTemplate.getProperties() instanceof TEntityTemplate.WineryKVProperties properties) {
+            properties.getKVProperties()
                 .entrySet()
                 .stream()
                 .filter(entry -> !additionalProperties.containsKey(entry.getKey()) || additionalProperties.get(entry.getKey())
@@ -144,7 +141,8 @@ public abstract class Util {
         }
 
         // workaround to set new properties
-        nodeTemplate.setProperties(new TEntityTemplate.Properties());
-        nodeTemplate.getProperties().setKVProperties(additionalProperties);
+        TEntityTemplate.WineryKVProperties wineryKVProperties = new TEntityTemplate.WineryKVProperties();
+        wineryKVProperties.setKVProperties(new LinkedHashMap<>(additionalProperties));
+        nodeTemplate.setProperties(wineryKVProperties);
     }
 }
