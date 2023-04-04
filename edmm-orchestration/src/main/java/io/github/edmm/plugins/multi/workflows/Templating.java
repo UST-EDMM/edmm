@@ -16,9 +16,9 @@ import io.github.edmm.core.TemplateHelper;
 import io.github.edmm.core.plugin.PluginFileAccess;
 import io.github.edmm.core.transformation.TransformationContext;
 import io.github.edmm.core.transformation.TransformationException;
+import io.github.edmm.model.orchestration.Technology;
 import io.github.edmm.model.relation.RootRelation;
 import io.github.edmm.plugins.multi.MultiPlugin;
-import io.github.edmm.model.orchestration.Technology;
 import io.github.edmm.plugins.multi.model.ComponentProperties;
 import io.github.edmm.plugins.multi.model.ComponentResources;
 import io.github.edmm.plugins.multi.model.Plan;
@@ -42,14 +42,13 @@ public class Templating {
     private List<List<BPMNStep>> multiReceiveStepList = new ArrayList<>();
     private List<List<BPMNStep>> multiSendStepList = new ArrayList<>();
 
-
-
     public Templating(TransformationContext context) {
         this.context = context;
     }
 
     /**
      * Creates the Initiate Sequence as a text file
+     *
      * @param participantMap Map of all participants of EDMM model
      */
     public void createBPMNInitiateSequence(HashMap<String, String> participantMap) {
@@ -75,11 +74,10 @@ public class Templating {
     }
 
     /**
-     * Creates a Send Step for the Plan Sequence. This is done by comparing the current step and the next step in the Plan.
-     * If the next step is UNDEFINED e.g. (P1-STEP1: ANSIBLE, P2-STEP2: UNDEFINED), the relation between the current step (STEP1)
-     * and the next step (STEP2) is determined and Send Sequence is created. A relation for instance would be ${db.hostname}
-     * value from P1 that is needed to deploy the UNDEFINED step in P2.
-     *
+     * Creates a Send Step for the Plan Sequence. This is done by comparing the current step and the next step in the
+     * Plan. If the next step is UNDEFINED e.g. (P1-STEP1: ANSIBLE, P2-STEP2: UNDEFINED), the relation between the
+     * current step (STEP1) and the next step (STEP2) is determined and Send Sequence is created. A relation for
+     * instance would be ${db.hostname} value from P1 that is needed to deploy the UNDEFINED step in P2.
      */
     public List<BPMNStep> createSendStep(PlanStep currentStep, PlanStep nextStep) {
 
@@ -111,9 +109,10 @@ public class Templating {
     }
 
     /**
-     * Creates a Receive Step for the Plan Sequence. This is done by comparing the current step and the next step in the Plan.
-     * If the current step contains an UNDEFINED technology and the next step has a technology set, e.g. (P1-STEP1: UNDEFINED,
-     * P2-STEP2: ANSIBLE), a Receive Sequence is created by determining the relation between STEP1 and STEP2.
+     * Creates a Receive Step for the Plan Sequence. This is done by comparing the current step and the next step in the
+     * Plan. If the current step contains an UNDEFINED technology and the next step has a technology set, e.g.
+     * (P1-STEP1: UNDEFINED, P2-STEP2: ANSIBLE), a Receive Sequence is created by determining the relation between STEP1
+     * and STEP2.
      */
     public List<BPMNStep> createReceiveStep(PlanStep currentStep, PlanStep nextStep) {
 
@@ -145,9 +144,9 @@ public class Templating {
     }
 
     /**
-     * Transforms a Plan to a Execution Plan Sequence, which includes and creates a list of BPMN steps.
-     * This is done by comparing the current step of the plan with previous and next steps and determining the
-     * specific case for the sequence.
+     * Transforms a Plan to a Execution Plan Sequence, which includes and creates a list of BPMN steps. This is done by
+     * comparing the current step of the plan with previous and next steps and determining the specific case for the
+     * sequence.
      */
     public List<BPMNStep> createExecutionPlanSequence(Plan plan) {
 
@@ -185,8 +184,7 @@ public class Templating {
                         // If components has relation to multiple sources, so that multiple receives are possible
                         adjustedSteps = modifyMultiReceiveSteps(taskSequence, i, adjustedSteps, bpmnSteps);
                     }
-
-                } else  {
+                } else {
 
                     if (plan.steps.get(i + 1).tech.equals(Technology.UNDEFINED)) {
 
@@ -210,7 +208,6 @@ public class Templating {
                         } else {
                             adjustedSteps = modifyMultiSendSteps(taskSequence, i, adjustedSteps, bpmnSteps);
                         }
-
                     } else {
 
                         // DEPLOY
@@ -240,7 +237,6 @@ public class Templating {
                         // If components has relation to multiple sources, so that multiple receives are possible
                         adjustedSteps = modifyMultiReceiveSteps(taskSequence, i, adjustedSteps, bpmnSteps);
                     }
-
                 } else {
 
                     if (plan.steps.get(i - 1).tech.equals(Technology.UNDEFINED)) {
@@ -265,7 +261,6 @@ public class Templating {
                         taskSequence.add("DEPLOY");
                         bpmnStepList.add(bpmnStep);
                         logger.info("CREATING DEPLOY; STEP IN BETWEEN; PREVIOUS UNDEFINED TECHNOLOGY");
-
                     } else if (plan.steps.get(i + 1).tech.equals(Technology.UNDEFINED)) {
 
                         // DEPLOY
@@ -289,7 +284,6 @@ public class Templating {
                         } else {
                             adjustedSteps = modifyMultiSendSteps(taskSequence, i, adjustedSteps, bpmnSteps);
                         }
-
                     } else {
 
                         // DEPLOY
@@ -320,7 +314,6 @@ public class Templating {
                             adjustedSteps = modifyMultiSendSteps(taskSequence, i, adjustedSteps, bpmnSteps);
                         }
                     }
-
                 } else {
                     // DEPLOY
                     bpmnStep.setTaskType(BPMNStep.TaskType.DEPLOY);
@@ -381,13 +374,17 @@ public class Templating {
         for (BPMNStep bpmnStep : bpmnSteps) {
 
             switch (bpmnStep.getTaskType()) {
-                case DEPLOY: deployTasks.add(bpmnStep);
+                case DEPLOY:
+                    deployTasks.add(bpmnStep);
                     break;
-                case SEND: sendTasks.add(bpmnStep);
+                case SEND:
+                    sendTasks.add(bpmnStep);
                     break;
-                case RECEIVE: receiveTasks.add(bpmnStep);
+                case RECEIVE:
+                    receiveTasks.add(bpmnStep);
                     break;
-                default: logger.info("Task Type can not be found.");
+                default:
+                    logger.info("Task Type can not be found.");
             }
         }
 
@@ -415,7 +412,7 @@ public class Templating {
      */
     public void mergeFiles() throws IOException {
 
-        File finalWorkflow = new File( context.getTargetDirectory() +  "/bpmn/Workflow.bpmn");
+        File finalWorkflow = new File(context.getTargetDirectory() + "/bpmn/Workflow.bpmn");
         finalWorkflow.delete();
 
         File file1 = new File(context.getTargetDirectory() + "/bpmn/StartingSequence.txt");
@@ -468,6 +465,5 @@ public class Templating {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

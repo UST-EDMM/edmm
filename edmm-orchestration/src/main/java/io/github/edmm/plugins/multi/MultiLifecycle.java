@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +22,6 @@ import io.github.edmm.model.component.RootComponent;
 import io.github.edmm.model.orchestration.Group;
 import io.github.edmm.model.orchestration.Technology;
 import io.github.edmm.model.relation.RootRelation;
-import io.github.edmm.plugins.multi.DeploymentExecutor;
 import io.github.edmm.plugins.multi.ansible.AnsibleAreaLifecycle;
 import io.github.edmm.plugins.multi.ansible.AnsibleExecutor;
 import io.github.edmm.plugins.multi.kubernetes.KubernetesAreaLifecycle;
@@ -120,7 +118,6 @@ public class MultiLifecycle extends AbstractLifecycle {
                 var propLists = TransformationHelper.collectRuntimeEnvInputOutput(context.getTopologyGraph(), comp);
                 step.components
                     .add(new ComponentResources(comp.getName(), propLists.getFirst(), propLists.getSecond()));
-
             }
 
             if (!step.tech.equals(Technology.UNDEFINED) && context.getModel().getMultiId() != null) {
@@ -143,7 +140,6 @@ public class MultiLifecycle extends AbstractLifecycle {
         try {
             context.getFileAccess().write("state.yaml", writer.toString());
             context.getFileAccess().write("execution.plan.json", plan.toJson());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -188,7 +184,6 @@ public class MultiLifecycle extends AbstractLifecycle {
 
     /**
      * Assigns the sent process variables by Camunda to the specific lifecycle graphs
-     *
      */
     public List<ComponentProperties> assignRuntimeVariablesToLifecycles(ArrayList<String> components,
                                                                         ArrayList<ComponentProperties> inputs) {
@@ -197,13 +192,10 @@ public class MultiLifecycle extends AbstractLifecycle {
 
         // Deploy all components
         return deployComponents(components);
-
     }
 
     /**
-     * Updates the component by the sent process variables and executes
-     * the specified technology of the component
-     *
+     * Updates the component by the sent process variables and executes the specified technology of the component
      */
     public List<ComponentProperties> deployComponents(ArrayList<String> components) {
 
@@ -218,7 +210,6 @@ public class MultiLifecycle extends AbstractLifecycle {
                 if (component.getName().equals(components.get(0))) {
                     targetLifecycle = groupLifecycle;
                 }
-
             }
         }
 
@@ -233,7 +224,7 @@ public class MultiLifecycle extends AbstractLifecycle {
     /**
      * Executes the technology with given lifecycle and technology
      *
-     * @param lifecycle Specific lifecycle of the technology created by the workflow generation
+     * @param lifecycle  Specific lifecycle of the technology created by the workflow generation
      * @param technology Specific technology that has to be executed with given lifecycle
      */
     public List<ComponentProperties> executeTechnology(AbstractLifecycle lifecycle, Technology technology) {
@@ -253,7 +244,6 @@ public class MultiLifecycle extends AbstractLifecycle {
         logger.info("execute next tech");
         try {
             return visitorContext.executeWithOutputProperty();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -263,7 +253,7 @@ public class MultiLifecycle extends AbstractLifecycle {
     /**
      * Updates the component by the sent input process properties
      *
-     * @param component Component that has to be updated
+     * @param component  Component that has to be updated
      * @param properties Sent process properties by Camunda
      */
     public void populateInputProperties(String component, Map<String, String> properties) {
@@ -299,7 +289,6 @@ public class MultiLifecycle extends AbstractLifecycle {
                 property.setValue(variablesValue);
                 logger.info("Updating property from component");
             }
-
         });
     }
 
@@ -346,18 +335,15 @@ public class MultiLifecycle extends AbstractLifecycle {
                 }
                 logger.info("execute next tech");
                 visitorContext.execute();
-
             }
             Writer writer = new StringWriter();
             context.getModel().getGraph().generateYamlOutput(writer);
             fileAccess.write("state.yaml", writer.toString());
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         scanner.close();
-
     }
 
     private Map<String, Property> getComputedProperties(RootComponent component) {
