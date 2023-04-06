@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -110,9 +109,9 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
             .orElseGet(() -> {
                 logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
+                TTopologyTemplate topology = new TTopologyTemplate();
+                serviceTemplate.setTopologyTemplate(topology);
+                return topology;
             });
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -120,11 +119,14 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
             serviceTemplate,
             objectMapper);
 
+        List<String> managedIds = new ArrayList<>();
+        List<String> discoveredIds = new ArrayList<>();
+
         DeploymentTechnologyDescriptor kubernetesTechnology = new DeploymentTechnologyDescriptor();
         kubernetesTechnology.setId("kubernetes-" + UUID.randomUUID());
         kubernetesTechnology.setTechnologyId(getContext().getSourceTechnology().getId());
-        kubernetesTechnology.setManagedIds(Collections.emptyList());
-        kubernetesTechnology.setProperties(Collections.emptyMap());
+        kubernetesTechnology.setManagedIds(managedIds);
+        kubernetesTechnology.setDiscoveredIds(discoveredIds);
 
         String basePath = this.coreV1Api.getApiClient().getBasePath();
         Map<String, String> clusterProperties = new HashMap<>();
@@ -135,8 +137,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         kubernetesTechnology.setProperties(clusterProperties);
 
         deploymentTechnologies.add(kubernetesTechnology);
-
-        List<String> managedIds = new ArrayList<>();
         try {
             V1NodeList v1NodeList = this.coreV1Api.listNode(false, null, null, null, null, null, null, null, null);
             v1NodeList.getItems().stream().findFirst().ifPresent(aV1Node -> {
@@ -165,7 +165,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         hostTemplate,
                         ToscaBaseTypes.hostedOnRelationshipType,
                         topologyTemplate);
-                    managedIds.add(dockerEngineTemplate.getId());
+                    discoveredIds.add(dockerEngineTemplate.getId());
 
                     try {
                         V1PodList v1PodList;
@@ -236,9 +236,6 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
         } catch (ApiException aE) {
             logger.error("Error retrieving node list", aE);
         }
-
-        managedIds.addAll(kubernetesTechnology.getManagedIds());
-        kubernetesTechnology.setManagedIds(managedIds);
 
         Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
 

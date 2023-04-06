@@ -1,7 +1,6 @@
 package io.github.edmm.plugins.puppet;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +17,6 @@ import io.github.edmm.core.transformation.InstanceTransformationContext;
 import io.github.edmm.core.transformation.SourceTechnology;
 import io.github.edmm.core.transformation.TOSCATransformer;
 import io.github.edmm.model.DeploymentTechnologyDescriptor;
-import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.puppet.api.AuthenticatorImpl;
 import io.github.edmm.plugins.puppet.model.Fact;
 import io.github.edmm.plugins.puppet.model.Master;
@@ -116,30 +114,25 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         TTopologyTemplate topologyTemplate = Optional.ofNullable(serviceTemplate.getTopologyTemplate())
             .orElseGet(() -> {
                 logger.info("Creating new topology template, as existing service template has none");
-                TTopologyTemplate topologyTemplate1 = new TTopologyTemplate();
-                serviceTemplate.setTopologyTemplate(topologyTemplate1);
-                return topologyTemplate1;
+                TTopologyTemplate topology = new TTopologyTemplate();
+                serviceTemplate.setTopologyTemplate(topology);
+                return topology;
             });
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<DeploymentTechnologyDescriptor> deploymentTechnologies = Util.extractDeploymentTechnologiesFromServiceTemplate(
             serviceTemplate,
             objectMapper);
-        List<DiscoveryPluginDescriptor> discoveryPluginDescriptors = Util.extractDiscoveryPluginsFromServiceTemplate(
-            serviceTemplate,
-            objectMapper);
+
+        List<String> managedIds = new ArrayList<>();
+        List<String> discoveredIds = new ArrayList<>();
 
         String id = "puppet-" + UUID.randomUUID();
-        DiscoveryPluginDescriptor puppetDiscoveryPlugin = new DiscoveryPluginDescriptor();
-        puppetDiscoveryPlugin.setId(getContext().getSourceTechnology().getId());
-        puppetDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
-        discoveryPluginDescriptors.add(puppetDiscoveryPlugin);
-
         DeploymentTechnologyDescriptor puppetTechnology = new DeploymentTechnologyDescriptor();
         puppetTechnology.setId(id);
         puppetTechnology.setTechnologyId(getContext().getSourceTechnology().getId());
-        puppetTechnology.setManagedIds(Collections.emptyList());
-        puppetTechnology.setProperties(Collections.emptyMap());
+        puppetTechnology.setManagedIds(managedIds);
+        puppetTechnology.setDiscoveredIds(discoveredIds);
 
         deploymentTechnologies.add(puppetTechnology);
 
@@ -150,8 +143,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
         masterProperties.put(Constants.PUPPET_MASTER_PORT, String.valueOf(this.master.getSshPort()));
         puppetTechnology.setProperties(masterProperties);
 
-        List<String> managedIds = new ArrayList<>();
-        List<String> discoveredIds = new ArrayList<>();
         master.getNodes()
             .stream()
             .filter(node -> environment == null || StringUtils.equalsIgnoreCase(environment, node.getReport_environment()))
@@ -198,7 +189,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 }
 
                 topologyTemplate.addNodeTemplate(vm);
-                managedIds.add(vm.getId());
                 discoveredIds.add(vm.getId());
 
                 if (node.getFactByName("productName".toLowerCase()) != null) {
@@ -242,7 +232,6 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
 
                         topologyTemplate.addNodeTemplate(softwareNode);
                         managedIds.add(softwareNode.getId());
-                        discoveredIds.add(softwareNode.getId());
 
                         if (this.toscaTransformer.getTransformTypePlugins()
                             .stream()
@@ -264,14 +253,7 @@ public class PuppetInstancePlugin extends AbstractLifecycleInstancePlugin<Puppet
                 }
             });
 
-        discoveredIds.addAll(puppetDiscoveryPlugin.getDiscoveredIds()); // workaround to handle possibly immutable lists
-        puppetDiscoveryPlugin.setDiscoveredIds(discoveredIds);
-
-        managedIds.addAll(puppetTechnology.getManagedIds()); // workaround to handle possibly immutable lists
-        puppetTechnology.setManagedIds(managedIds);
-
         Util.updateDeploymentTechnologiesInServiceTemplate(serviceTemplate, objectMapper, deploymentTechnologies);
-        Util.updateDiscoveryPluginsInServiceTemplate(serviceTemplate, objectMapper, discoveryPluginDescriptors);
 
         updateGeneratedServiceTemplate(serviceTemplate);
     }
