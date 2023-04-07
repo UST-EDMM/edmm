@@ -22,6 +22,7 @@ import io.github.edmm.plugins.terraform.model.TerraformState;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.ec2.EC2InstanceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.ec2.KeyMapper;
+import io.github.edmm.plugins.terraform.resourcehandlers.openstack.OpenStackInstanceHandler;
 import io.github.edmm.plugins.terraform.typemapper.WindowsMapper;
 import io.github.edmm.util.Constants;
 import io.github.edmm.util.Util;
@@ -64,10 +65,18 @@ public class TerraformInstancePlugin extends AbstractLifecycleInstancePlugin<Ter
         terraformDiscoveryPlugin.setId(getContext().getSourceTechnology().getId());
         terraformDiscoveryPlugin.setDiscoveredIds(Collections.emptyList());
 
-        resourceHandlers = Arrays.asList(new EC2InstanceHandler(toscaTransformer,
-            terraformTechnology,
-            terraformDiscoveryPlugin,
-            new KeyMapper()));
+        KeyMapper keyMapper = new KeyMapper();
+
+        resourceHandlers = Arrays.asList(
+            new EC2InstanceHandler(toscaTransformer,
+                terraformTechnology,
+                terraformDiscoveryPlugin,
+                keyMapper),
+            new OpenStackInstanceHandler(toscaTransformer,
+                terraformTechnology,
+                terraformDiscoveryPlugin,
+                keyMapper)
+        );
     }
 
     @Override

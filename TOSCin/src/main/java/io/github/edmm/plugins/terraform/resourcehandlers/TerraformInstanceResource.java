@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform.resourcehandlers.ec2;
+package io.github.edmm.plugins.terraform.resourcehandlers;
 
 import java.util.List;
 
@@ -8,12 +8,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class EC2InstanceResource {
+public class TerraformInstanceResource<T> {
     private String mode;
     private String type;
     private String provider;
     private String name;
-    private List<EC2Instance> instances;
+    private List<TerraformInstance<T>> instances;
 
     public String getMode() {
         return mode;
@@ -47,11 +47,11 @@ public class EC2InstanceResource {
         this.name = name;
     }
 
-    public List<EC2Instance> getInstances() {
+    public List<TerraformInstance<T>> getInstances() {
         return instances;
     }
 
-    public void setInstances(List<EC2Instance> instances) {
+    public void setInstances(List<TerraformInstance<T>> instances) {
         this.instances = instances;
     }
 }

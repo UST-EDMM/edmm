@@ -1,4 +1,4 @@
-package io.github.edmm.plugins.terraform.resourcehandlers.ec2;
+package io.github.edmm.plugins.terraform.resourcehandlers.openstack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +13,7 @@ import io.github.edmm.model.DiscoveryPluginDescriptor;
 import io.github.edmm.plugins.terraform.resourcehandlers.ResourceHandler;
 import io.github.edmm.plugins.terraform.resourcehandlers.TerraformInstance;
 import io.github.edmm.plugins.terraform.resourcehandlers.TerraformInstanceResource;
+import io.github.edmm.plugins.terraform.resourcehandlers.ec2.KeyMapper;
 import io.github.edmm.util.Constants;
 import io.github.edmm.util.Util;
 
@@ -26,8 +27,8 @@ import org.eclipse.winery.model.tosca.utils.ModelUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EC2InstanceHandler implements ResourceHandler {
-    private final static Logger logger = LoggerFactory.getLogger(EC2InstanceHandler.class);
+public class OpenStackInstanceHandler implements ResourceHandler {
+    private final static Logger logger = LoggerFactory.getLogger(OpenStackInstanceHandler.class);
 
     private static final String PROPERTY_TYPE = "type";
 
@@ -36,7 +37,7 @@ public class EC2InstanceHandler implements ResourceHandler {
     private final DiscoveryPluginDescriptor terraformDiscoveryPlugin;
     private final KeyMapper keyMapper;
 
-    public EC2InstanceHandler(
+    public OpenStackInstanceHandler(
         TOSCATransformer toscaTransformer,
         DeploymentTechnologyDescriptor terraformDeploymentTechnology,
         DiscoveryPluginDescriptor terraformDiscoveryPlugin,
@@ -51,7 +52,7 @@ public class EC2InstanceHandler implements ResourceHandler {
     public boolean canHandleResource(Map<String, Object> resource) {
         boolean instanceType = Optional.ofNullable(resource.get(PROPERTY_TYPE))
             .map(Object::toString)
-            .map(s -> s.endsWith("instance"))
+            .map(s -> s.contains("openstack_compute_instance"))
             .orElse(false);
 
         if (!instanceType) {
@@ -59,7 +60,7 @@ public class EC2InstanceHandler implements ResourceHandler {
         }
 
         try {
-            new ObjectMapper().convertValue(resource, EC2InstanceResource.class);
+            new ObjectMapper().convertValue(resource, OpenStackInstanceResource.class);
         } catch (IllegalArgumentException e) {
             // assume we cannot handle the resource, if jackson conversion fails
             return false;
@@ -78,19 +79,18 @@ public class EC2InstanceHandler implements ResourceHandler {
         List<String> managedNodeIds = new ArrayList<>();
         List<String> discoveredIds = new ArrayList<>();
 
-        EC2InstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource, EC2InstanceResource.class);
+        OpenStackInstanceResource ec2InstanceResource = new ObjectMapper().convertValue(resource, OpenStackInstanceResource.class);
 
-        for (TerraformInstance<EC2InstanceAttributes> curInstance : ec2InstanceResource.getInstances()) {
-            EC2InstanceAttributes attributes = curInstance.getAttributes();
-            String publicIp = attributes.getPublicIp();
-            String privateIp = attributes.getPrivateIp();
+        for (TerraformInstance<OpenStackInstanceAttributes> curInstance : ec2InstanceResource.getInstances()) {
+            OpenStackInstanceAttributes attributes = curInstance.getAttributes();
+            String publicIp = attributes.access_ip_v4;
 
             List<TNodeTemplate> matchingNodes = topologyTemplate.getNodeTemplates()
                 .stream()
                 .filter(tNodeTemplate -> Optional.ofNullable(tNodeTemplate.getProperties())
                     .filter(props -> props instanceof TEntityTemplate.WineryKVProperties)
                     .map(kvProperties -> ((TEntityTemplate.WineryKVProperties) kvProperties).getKVProperties().get(Constants.VMIP))
-                    .map(nodeIp -> Objects.equals(nodeIp, publicIp) || Objects.equals(nodeIp, privateIp))
+                    .map(nodeIp -> Objects.equals(nodeIp, publicIp))
                     .orElse(false))
                 .toList();
 
@@ -104,28 +104,27 @@ public class EC2InstanceHandler implements ResourceHandler {
                 instanceNode = matchingNodes.get(0);
             } else {
                 logger.info("Could not find a suitable node template in topology template. Creating a new one.");
-                TNodeType computeNodeType = toscaTransformer.getComputeNodeType(attributes.getAmi(), "");
+                String[] imageName = attributes.image_name.split("\\s");
+                TNodeType computeNodeType = toscaTransformer.getComputeNodeType(imageName[0], imageName[1]);
                 instanceNode = ModelUtilities.instantiateNodeTemplate(computeNodeType);
-                instanceNode.setId(attributes.getArn());
-                instanceNode.setName(attributes.getId());
+                instanceNode.setId(imageName[0] + attributes.id);
+                instanceNode.setName(attributes.image_name);
 
                 topologyTemplate.addNodeTemplate(instanceNode);
             }
 
             Map<String, String> propertiesForInstance = new HashMap<>();
-            propertiesForInstance.put(Constants.VMTYPE, attributes.getInstanceType());
-            String keyName = attributes.getKeyName();
+            propertiesForInstance.put(Constants.VMTYPE, attributes.flavor_name);
+            String keyName = attributes.key_pair;
             propertiesForInstance.put(Constants.VM_KEY_PAIR_NAME, keyName);
             keyMapper.getPrivateKeyByName(keyName)
                 .ifPresent(key -> propertiesForInstance.put(Constants.VM_PRIVATE_KEY, key));
-            propertiesForInstance.put(Constants.VM_INSTANCE_ID, attributes.getId());
-            propertiesForInstance.put(Constants.VMIP, attributes.getPublicIp());
-            propertiesForInstance.put(Constants.EC_2_AMI, attributes.getAmi());
+            propertiesForInstance.put(Constants.VM_INSTANCE_ID, attributes.id);
+            propertiesForInstance.put(Constants.VMIP, attributes.access_ip_v4);
 
             Util.populateNodeTemplateProperties(instanceNode, propertiesForInstance);
 
             managedNodeIds.add(instanceNode.getId());
-            discoveredIds.add(instanceNode.getId());
 
             managedNodeIds.addAll(terraformDeploymentTechnology.getManagedIds());
             terraformDeploymentTechnology.setManagedIds(managedNodeIds);
@@ -135,6 +134,6 @@ public class EC2InstanceHandler implements ResourceHandler {
         }
     }
 
-    private static class EC2InstanceResource extends TerraformInstanceResource<EC2InstanceAttributes> {
+    private static class OpenStackInstanceResource extends TerraformInstanceResource<OpenStackInstanceAttributes> {
     }
 }

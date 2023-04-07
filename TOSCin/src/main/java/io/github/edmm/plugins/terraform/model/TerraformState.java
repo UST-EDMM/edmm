@@ -12,6 +12,7 @@ public class TerraformState {
     private String terraformVersion;
     private String serial;
     private String lineage;
+    private String check_results;
     private Map<String, Object> outputs;
     private List<Map<String, Object>> resources;
 
@@ -61,5 +62,13 @@ public class TerraformState {
 
     public void setResources(List<Map<String, Object>> resources) {
         this.resources = resources;
+    }
+
+    public String getCheck_results() {
+        return check_results;
+    }
+
+    public void setCheck_results(String check_results) {
+        this.check_results = check_results;
     }
 }
