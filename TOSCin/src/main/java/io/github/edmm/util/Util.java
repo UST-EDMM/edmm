@@ -153,7 +153,7 @@ public abstract class Util {
             nodeTemplate.setProperties(dockerEngineProps);
         }
         if (dockerEngineProps instanceof TEntityTemplate.WineryKVProperties props) {
-            props.getKVProperties().put("State", "Running");
+            props.getKVProperties().put(Constants.STATE, Constants.RUNNING);
         }
     }
 }
