@@ -145,4 +145,15 @@ public abstract class Util {
         wineryKVProperties.setKVProperties(new LinkedHashMap<>(additionalProperties));
         nodeTemplate.setProperties(wineryKVProperties);
     }
+
+    public static void setStateRunning(TNodeTemplate nodeTemplate) {
+        TEntityTemplate.Properties dockerEngineProps = nodeTemplate.getProperties();
+        if (dockerEngineProps == null) {
+            dockerEngineProps = new TEntityTemplate.WineryKVProperties();
+            nodeTemplate.setProperties(dockerEngineProps);
+        }
+        if (dockerEngineProps instanceof TEntityTemplate.WineryKVProperties props) {
+            props.getKVProperties().put("State", "Running");
+        }
+    }
 }

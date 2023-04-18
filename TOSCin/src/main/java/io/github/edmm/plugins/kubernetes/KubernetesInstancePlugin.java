@@ -151,6 +151,8 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                 TNodeTemplate hostTemplate = ModelUtilities.instantiateNodeTemplate(hostNodeType);
                 hostTemplate.setId(nodeInfo.getMachineID());
                 hostTemplate.setName(nodeInfo.getMachineID());
+                Util.setStateRunning(hostTemplate);
+
                 topologyTemplate.addNodeTemplate(hostTemplate);
 
                 String containerRuntimeVersion = nodeInfo.getContainerRuntimeVersion();
@@ -166,6 +168,7 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                         ToscaBaseTypes.hostedOnRelationshipType,
                         topologyTemplate);
                     discoveredIds.add(dockerEngineTemplate.getId());
+                    Util.setStateRunning(dockerEngineTemplate);
 
                     try {
                         V1PodList v1PodList;
