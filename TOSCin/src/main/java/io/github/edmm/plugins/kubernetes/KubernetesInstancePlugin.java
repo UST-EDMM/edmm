@@ -170,6 +170,10 @@ public class KubernetesInstancePlugin extends AbstractLifecycleInstancePlugin<Ku
                     discoveredIds.add(dockerEngineTemplate.getId());
                     Util.setStateRunning(dockerEngineTemplate);
 
+                    if (dockerEngineTemplate.getProperties() instanceof TEntityTemplate.WineryKVProperties props) {
+                        props.getKVProperties().putAll(clusterProperties);
+                    }
+
                     try {
                         V1PodList v1PodList;
                         if (this.targetNamespace != null) {
